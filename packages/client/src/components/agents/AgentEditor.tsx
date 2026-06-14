@@ -776,8 +776,7 @@ export function AgentEditor() {
         <div className="flex items-center gap-2 bg-amber-500/10 px-4 py-2 text-xs text-amber-400">
           <AlertCircle size="0.8125rem" />
           <span className="flex-1">
-            {isKnowledgeRouterAgent ? "Knowledge Retrieval" : "Knowledge Router"} is also configured. Both agents will
-            run in parallel and inject overlapping context. Consider disabling one for cleaner prompts.
+            {isKnowledgeRouterAgent ? "Knowledge Retrieval" : "Knowledge Router"}  também está configurado. Ambos os agentes rodarão em paralelo e injetarão contexto sobreposto. Considere desativar um para prompts mais limpos.
           </span>
         </div>
       )}
@@ -1034,9 +1033,8 @@ export function AgentEditor() {
                 ))}
               </select>
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                The Illustrator uses two connections: the LLM above analyzes the scene and writes an image prompt, then
-                this connection generates the actual image from that prompt. Leave this empty to use the default
-                Illustrator image connection from Settings → Connections, if one is configured.
+                
+                O Illustrator usa duas conexões: o LLM acima analisa a cena e escreve um prompt de imagem, e então esta conexão gera a imagem em si a partir desse prompt. Deixe vazio para usar a conexão de imagem padrão do Illustrator em Configurações → Conexões, se houver uma configurada.
               </p>
               <div className="mt-3 grid gap-3 md:grid-cols-2">
                 <label className="flex flex-col gap-1.5">
@@ -1195,12 +1193,13 @@ export function AgentEditor() {
                     </select>
                   </div>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Generated images are saved into your normal Backgrounds library, so later runs can reuse them
-                    instead of regenerating the same place.
+                    
+                    As imagens geradas são salvas na sua biblioteca normal de Fundos, para que execuções futuras possam reutilizá-las em vez de regenerar o mesmo lugar.
                   </p>
                   {!localImageConnectionId && !defaultAgentImageConn && (
                     <p className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-[0.625rem] text-amber-300">
-                      Add an image generation connection here or mark one as the default for agents in Connections.
+                      
+                      Adicione uma conexão de geração de imagem aqui ou marque uma como padrão para os agentes em Conexões.
                     </p>
                   )}
                 </div>
@@ -1423,8 +1422,8 @@ export function AgentEditor() {
                 <span className="text-[0.6875rem] text-[var(--muted-foreground)]">mensagens do usuário</span>
               </div>
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                The automatic summary will trigger after this many user messages have been sent since the last summary
-                update.
+                
+                O resumo automático será disparado depois que esta quantidade de mensagens do usuário tiver sido enviada desde a última atualização do resumo.
               </p>
             </FieldGroup>
           )}
@@ -1863,8 +1862,8 @@ export function AgentEditor() {
                   <span className="min-w-0">
                     <span className="block font-semibold">Use this chat&apos;s active lorebooks</span>
                     <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                      When no fixed source is selected below, this agent scans the lorebooks attached to the current
-                      chat.
+                      
+                      Quando nenhuma fonte fixa é selecionada abaixo, este agente escaneia os lorebooks anexados ao chat atual.
                     </span>
                   </span>
                 </button>
@@ -2182,8 +2181,8 @@ export function AgentEditor() {
             help="Select which tools this agent can use during generation. The AI can call these functions and receive results back for multi-step interactions."
           >
             <p className="text-[0.625rem] text-[var(--muted-foreground)] mb-3">
-              Toggle tools on or off for this agent. When enabled for a chat, only selected tools will be available
-              during generation.
+              
+              Ative ou desative ferramentas para este agente. Quando ativadas em um chat, apenas as ferramentas selecionadas ficarão disponíveis durante a geração.
             </p>
             <div className="space-y-2">
               {BUILT_IN_TOOLS.map((tool: ToolDefinition) => (

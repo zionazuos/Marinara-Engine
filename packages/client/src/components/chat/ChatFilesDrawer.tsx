@@ -183,8 +183,8 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
             <FileText size="2rem" className="text-[var(--muted-foreground)]/40" />
             <p className="text-xs text-[var(--muted-foreground)]">
-              This chat isn't part of a group and doesn't have any branches yet. Chats imported from SillyTavern for the
-              same character are automatically grouped together into branches.
+              
+              Este chat não faz parte de um grupo e ainda não tem ramificações. Chats importados do SillyTavern para o mesmo personagem são agrupados automaticamente em ramificações.
             </p>
           </div>
         </div>

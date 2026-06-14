@@ -664,8 +664,8 @@ export function RegexScriptEditor() {
             <h3 className="mb-2 text-xs font-semibold text-[var(--foreground)]">Sobre scripts de regex</h3>
             <div className="space-y-1.5 text-[0.6875rem] text-[var(--muted-foreground)]">
               <p>
-                Regex scripts are applied to text during chat — either transforming AI responses before display, or
-                modifying your input before it's sent.
+                
+                Os scripts de regex são aplicados ao texto durante o chat — transformando as respostas da IA antes de exibir, ou modificando sua entrada antes de enviá-la.
               </p>
               <p>
                 Scripts run in order (lowest first). Use capture groups (

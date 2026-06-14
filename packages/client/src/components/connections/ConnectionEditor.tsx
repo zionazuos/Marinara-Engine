@@ -932,7 +932,8 @@ export function ConnectionEditor() {
                 placeholder="e.g. Anthropic, Google, Amazon Bedrock…"
               />
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Forces OpenRouter to route through a specific provider. The provider name must match exactly as shown on{" "}
+                
+                Força o OpenRouter a rotear por um provedor específico. O nome do provedor deve corresponder exatamente ao que é mostrado em{" "}
                 <a
                   href="https://openrouter.ai/models"
                   target="_blank"
@@ -1057,8 +1058,8 @@ export function ConnectionEditor() {
               <p className="mt-1.5 flex items-start gap-1 text-[0.625rem] text-amber-400/80">
                 <AlertCircle size="0.625rem" className="mt-px shrink-0" />
                 <span>
-                  Only use URLs from providers you trust. A malicious endpoint could intercept your messages and API
-                  keys.
+                  
+                  Use apenas URLs de provedores em que você confia. Um endpoint malicioso poderia interceptar suas mensagens e chaves de API.
                 </span>
               </p>
             )}
@@ -1066,8 +1067,7 @@ export function ConnectionEditor() {
               <p className="mt-1.5 flex items-start gap-1 text-[0.625rem] text-sky-400/80">
                 <AlertCircle size="0.625rem" className="mt-px shrink-0" />
                 <span>
-                  <strong>Usuários do Windows:</strong> If your proxy or local server isn't detected, Windows Defender
-                  Firewall may be blocking the connection. Open{" "}
+                  <strong>Usuários do Windows:</strong>  Se o seu proxy ou servidor local não for detectado, o Windows Defender Firewall pode estar bloqueando a conexão. Abra{" "}
                   <em>Windows Security → Firewall & network protection → Allow an app through firewall</em> and add
                   Node.js or your proxy application.
                 </span>
@@ -1117,8 +1117,8 @@ export function ConnectionEditor() {
                 })}
               </div>
               <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                Pick the backend type once, then point Base URL to any host or port. Provider-specific features like
-                ComfyUI workflow JSON and checkpoint fetching use this selection, not the default localhost URL.
+                
+                Escolha o tipo de backend uma vez e então aponte a URL base para qualquer host ou porta. Recursos específicos do provedor, como o JSON de workflow do ComfyUI e a busca de checkpoint, usam esta seleção, não a URL padrão de localhost.
               </p>
               {selectedImageService === "runpod_comfyui" && (
                 <div className="mt-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-[0.625rem] text-amber-300/80">
@@ -1535,8 +1535,8 @@ export function ConnectionEditor() {
                 </span>
               </div>
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Set to 0 or leave empty to disable. When set, no request to this connection will exceed this token limit
-                — including batched agent calls.
+                
+                Defina como 0 ou deixe vazio para desativar. Quando definido, nenhuma requisição a esta conexão excederá este limite de tokens — incluindo chamadas de agente em lote.
               </p>
             </FieldGroup>
           )}
@@ -1565,8 +1565,8 @@ export function ConnectionEditor() {
                 </span>
               </div>
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Agent batches for the same connection can be split across this many parallel jobs. Set to 1 for the
-                safest provider behavior.
+                
+                Os lotes de agentes para a mesma conexão podem ser divididos nesta quantidade de tarefas paralelas. Defina como 1 para o comportamento mais seguro do provedor.
               </p>
             </FieldGroup>
           )}
@@ -1779,9 +1779,7 @@ export function ConnectionEditor() {
                   <p className="mt-1.5 flex items-start gap-1 text-[var(--muted-foreground)]">
                     <AlertCircle size="0.625rem" className="mt-px shrink-0 text-amber-400" />
                     <span>
-                      <strong className="text-amber-400">Doesn&apos;t work on Claude Opus 4.7 yet.</strong> There is no
-                      faster Opus 4.7 variant for the SDK to route to, so this toggle is a no-op when Opus 4.7 is the
-                      selected model.
+                      <strong className="text-amber-400">Doesn&apos;t work on Claude Opus 4.7 yet.</strong>  Não há uma variante mais rápida do Opus 4.7 para o SDK rotear, então esta opção não faz nada quando o Opus 4.7 é o modelo selecionado.
                     </span>
                   </p>
                 </div>
@@ -1951,9 +1949,7 @@ export function ConnectionEditor() {
               {localProvider === "claude_subscription" && (
                 <>
                   {" "}
-                  <strong>Diagnosticar roteamento do modelo</strong> sends a real prompt through the Claude Agent SDK and reports
-                  which model it actually billed against. Catches silent fast-mode / cooldown downgrades where you ask
-                  for Opus and quietly get Sonnet.
+                  <strong>Diagnosticar roteamento do modelo</strong>  envia um prompt real pelo Claude Agent SDK e informa contra qual modelo ele realmente foi cobrado. Detecta rebaixamentos silenciosos de fast-mode / cooldown em que você pede Opus e recebe Sonnet sem aviso.
                 </>
               )}
             </p>
@@ -2255,7 +2251,8 @@ function ImageGenerationDefaultsPanel({
           <div className="space-y-4 border-t border-[var(--border)] p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                Seed -1 keeps generation random. Any non-negative seed is reused exactly for this connection.
+                
+                Seed -1 mantém a geração aleatória. Qualquer seed não negativa é reutilizada exatamente para esta conexão.
               </p>
               <button
                 type="button"
@@ -2450,15 +2447,14 @@ function ImageGenerationDefaultsPanel({
                       Upload a 1x1 placeholder when no reference image is provided
                     </span>
                     <span className="mt-0.5 block text-[0.55rem] text-[var(--muted-foreground)]">
-                      Custom workflows using %reference_image% or %reference_image_name% receive a tiny PNG instead of
-                      the raw placeholder text.
+                      
+                      Workflows personalizados usando %reference_image% ou %reference_image_name% recebem um PNG minúsculo em vez do texto bruto do placeholder.
                     </span>
                   </span>
                 </label>
                 <p className="text-[0.55rem] text-[var(--muted-foreground)]">
-                  Custom ComfyUI workflows can use %steps%, %cfg%, %sampler%, %scheduler%, %denoise%, %clip_skip%,
-                  %reference_image% / %reference_image_01%-%reference_image_04%, and %reference_image_name% /
-                  %reference_image_name_01%-%reference_image_name_04% placeholders.
+                  
+                  Workflows personalizados do ComfyUI podem usar os placeholders %steps%, %cfg%, %sampler%, %scheduler%, %denoise%, %clip_skip%, %reference_image% / %reference_image_01%-%reference_image_04% e %reference_image_name% / %reference_image_name_01%-%reference_image_name_04%.
                 </p>
               </>
             ) : (
@@ -2490,8 +2486,8 @@ function ImageGenerationDefaultsPanel({
                   />
                 </div>
                 <p className="text-[0.55rem] text-[var(--muted-foreground)]">
-                  These values are sent with native NovelAI requests and embedded in generated PNG metadata for
-                  troubleshooting.
+                  
+                  Estes valores são enviados com as requisições nativas do NovelAI e embutidos nos metadados dos PNGs gerados para diagnóstico.
                 </p>
               </>
             )}

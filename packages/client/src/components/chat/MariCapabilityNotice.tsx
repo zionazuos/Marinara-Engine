@@ -71,8 +71,8 @@ export const MariCapabilityNotice = memo(function MariCapabilityNotice() {
     >
       <AlertTriangle size="0.875rem" className="mt-0.5 shrink-0 text-amber-500" />
       <p className="flex-1 leading-relaxed">
-        Mari can edit your characters, personas, and lorebooks directly when you ask her to update them. Character edits
-        keep a recoverable version snapshot you can roll back to from the character's history.{" "}
+        
+        A Mari pode editar seus personagens, personas e lorebooks diretamente quando você pede para ela atualizá-los. As edições de personagem mantêm um snapshot de versão recuperável, que você pode reverter pelo histórico do personagem.{" "}
         <strong className="font-semibold">
           Persona and lorebook edits overwrite without a snapshot, so back them up first
         </strong>{" "}

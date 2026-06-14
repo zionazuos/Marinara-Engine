@@ -2056,8 +2056,8 @@ function DescriptionTab({
           <div>
             <h3 className="text-sm font-semibold">Extensões de descrição</h3>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
-              Toggleable additions appended to your main description. Use these for situational details like combat
-              skills, relationships, or temporary states.
+              
+              Adições alternáveis anexadas à sua descrição principal. Use-as para detalhes situacionais como habilidades de combate, relacionamentos ou estados temporários.
             </p>
           </div>
           <button

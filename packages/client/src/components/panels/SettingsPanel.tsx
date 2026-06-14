@@ -874,8 +874,8 @@ function GeneralSettings() {
           ))}
         </select>
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-          English is the only bundled language for now. Future translations can add more options here without changing
-          the settings shape.
+          
+          O inglês é o único idioma incluído por enquanto. Traduções futuras podem adicionar mais opções aqui sem mudar o formato das configurações.
         </p>
       </label>
 
@@ -1848,9 +1848,8 @@ function AppearanceSettings() {
           </div>
         </div>
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-          Rectangles keep the compact side slot but give portraits a bit more vertical room. The larger panel crops
-          portraits from the top on short messages and fades them back into the bubble background on taller ones.
-          Per-chat sprite sizing still overrides the default sprite scale here.
+          
+          Os retângulos mantêm o slot lateral compacto, mas dão um pouco mais de espaço vertical aos retratos. O painel maior recorta os retratos pelo topo em mensagens curtas e os desvanece no fundo do balão em mensagens mais longas. O dimensionamento de sprite por chat ainda sobrepõe a escala padrão de sprite aqui.
         </p>
       </div>
 
@@ -2671,8 +2670,8 @@ function ThemesSettings() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)]">
         <Palette size="0.75rem" />
-        Create or import custom CSS themes. Themes sync across devices connected to this Marinara server, while
-        extensions stay local to this browser.
+        
+        Crie ou importe temas CSS personalizados. Os temas sincronizam entre os dispositivos conectados a este servidor Marinara, enquanto as extensões ficam locais neste navegador.
       </div>
 
       {/* Action buttons */}
@@ -3384,8 +3383,8 @@ function ImportSettings() {
   return (
     <div className="flex flex-col gap-3">
       <div className="text-xs text-[var(--muted-foreground)]">
-        Import data from Marinara exports, SillyTavern, or other tools. Full profile imports also restore synced custom
-        themes and profile archive assets.
+        
+        Importe dados de exportações do Marinara, do SillyTavern ou de outras ferramentas. Importações de perfil completo também restauram temas personalizados sincronizados e assets do arquivo de perfil.
       </div>
 
       {/* Profile import */}
@@ -4081,8 +4080,8 @@ function AdvancedSettings() {
             )}
             {isIosClient && (
               <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                On iPhone or iPad, this updates the Marinara server you are connected to. Reload the Home Screen app
-                after the host finishes updating.
+                
+                No iPhone ou iPad, isto atualiza o servidor Marinara ao qual você está conectado. Recarregue o app da Tela de Início depois que o host terminar de atualizar.
               </p>
             )}
             {updateCheck.data.applyAvailable ? (
@@ -4467,8 +4466,8 @@ function AdvancedSettings() {
           Zona de perigo
         </div>
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-          Permanently clear selected categories of local data. Professor Mari is always preserved, and Marinara resets
-          live caches immediately after a successful expunge so stale data does not linger on screen.
+          
+          Limpa permanentemente as categorias selecionadas de dados locais. A Professora Mari é sempre preservada, e o Marinara reinicia os caches ao vivo imediatamente após uma limpeza bem-sucedida, para que dados antigos não fiquem na tela.
         </p>
         <div className="grid gap-2">
           {EXPUNGE_SCOPE_OPTIONS.map((scope) => {

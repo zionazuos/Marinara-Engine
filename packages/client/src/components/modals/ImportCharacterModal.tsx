@@ -251,8 +251,8 @@ export function ImportCharacterModal({ open, onClose }: Props) {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-[var(--foreground)]">Lorebook embutido encontrado</p>
                 <p className="mt-1 text-xs leading-relaxed text-[var(--muted-foreground)]">
-                  Import the embedded lorebook as a standalone Marinara lorebook, or keep it only inside the character
-                  card.
+                  
+                  Importe o lorebook embutido como um lorebook independente do Marinara, ou mantenha-o apenas dentro do card do personagem.
                 </p>
                 <div className="mt-3 max-h-32 overflow-y-auto rounded-lg border border-[var(--border)]/70 bg-[var(--background)]/40">
                   {pendingLorebookChoice.previews.map((preview) => (

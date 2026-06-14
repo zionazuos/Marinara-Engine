@@ -169,8 +169,8 @@ export function CharacterCardUpdateModal({ open, onClose }: Props) {
         {applicableUpdates.length === 0 && (
           <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] p-2.5 text-xs text-[var(--muted-foreground)]">
             <AlertCircle size="0.75rem" className="shrink-0" />
-            None of these proposals still match the current card — the field was probably already edited. Reject to
-            dismiss.
+            
+            Nenhuma destas propostas ainda corresponde ao card atual — o campo provavelmente já foi editado. Rejeite para dispensar.
           </div>
         )}
 

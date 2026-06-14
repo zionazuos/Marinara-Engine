@@ -963,7 +963,8 @@ function SectionsTab({
             </button>
           </div>
           <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-            Groups wrap adjacent sections in a single XML/Markdown container. Assign sections to groups below.
+            
+            Os grupos envolvem seções adjacentes em um único contêiner XML/Markdown. Atribua seções aos grupos abaixo.
           </p>
           {groupMap.size === 0 ? (
             <p className="py-2 text-center text-[0.625rem] text-[var(--muted-foreground)]">
@@ -1246,8 +1247,8 @@ function SectionsTab({
                                   <code className="rounded bg-black/20 px-1 py-0.5 text-[0.625rem] font-mono text-pink-300">
                                     {"{{agent::" + (mc.agentType ?? "agent") + "}}"}
                                   </code>{" "}
-                                  macro will be replaced with the latest output from the agent at assembly time. You can
-                                  add additional instructions around it.
+                                  
+                                  macro será substituída pela saída mais recente do agente no momento da montagem. Você pode adicionar instruções extras ao redor dela.
                                 </p>
                               </div>
                               <SectionContentTextarea
@@ -1686,8 +1687,7 @@ function VariableCard({
             <VariableNameInput value={varName} onCommit={(v) => update({ variableName: v })} />
             <p className="text-[0.5625rem] text-[var(--muted-foreground)]">
               
-              Usar <code className="text-amber-400">{`{{${varName}}}`}</code> in any prompt section to insert the
-              selected value. Must be alphanumeric/underscores only.
+              Usar <code className="text-amber-400">{`{{${varName}}}`}</code>  em qualquer seção de prompt para inserir o valor selecionado. Deve conter apenas caracteres alfanuméricos/underscores.
             </p>
           </div>
 
@@ -1707,8 +1707,8 @@ function VariableCard({
                 <span className="text-[0.625rem] font-medium text-purple-400">Alternância booleana</span>
               </div>
               <p className="text-[0.5625rem] text-[var(--muted-foreground)]">
-                This variable has only one option, so it behaves as a Boolean toggle. Users can switch it on or off in
-                the Configure Preset Variables wizard.
+                
+                Esta variável tem apenas uma opção, então se comporta como uma alternância booleana. Os usuários podem ligá-la ou desligá-la no assistente Configurar Variáveis do Preset.
               </p>
             </div>
           ) : (
@@ -2450,8 +2450,8 @@ function ReviewTab({ presetId }: { presetId: string }) {
     <>
       <FieldGroup label="Revisão de prompt por IA">
         <p className="mb-3 text-xs text-[var(--muted-foreground)]">
-          Have an AI analyze your prompt preset for clarity, consistency, coverage, and efficiency. This requires an
-          active API connection.
+          
+          Faça uma IA analisar seu preset de prompt quanto à clareza, consistência, cobertura e eficiência. Isto requer uma conexão de API ativa.
         </p>
         <ConnectionSelector
           onSelect={(connId) => startReview(connId)}

@@ -1471,8 +1471,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                         </p>
                       )}
                       <p className="mt-1 text-[0.55rem] text-[var(--muted-foreground)]">
-                        Generates portraits for new NPCs and backgrounds for new locations using the scene analysis
-                        pipeline.
+                        
+                        Gera retratos para novos NPCs e fundos para novos locais usando o pipeline de análise de cena.
                       </p>
                     </div>
                   )}

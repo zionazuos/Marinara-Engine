@@ -1897,7 +1897,7 @@ export function ChatSettingsDrawer({
                         updateMeta.mutate({ id: chat.id, gameExtraPrompt: extraPromptDraft || null });
                       }
                     }}
-                    placeholder="e.g. Write in a poetic, literary style. Avoid graphic violence. Always describe the weather..."
+                    placeholder="ex.: Escreva em um estilo poético e literário. Evite violência gráfica. Sempre descreva o clima..."
                     rows={5}
                     className="w-full resize-y rounded-lg bg-[var(--secondary)] px-3 py-2 pr-8 text-xs leading-relaxed outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                   />
@@ -2751,8 +2751,8 @@ export function ChatSettingsDrawer({
                     <div className="flex-1 min-w-0">
                       <span className="text-[0.6875rem] font-medium">Colorir diálogos</span>
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                        Color character dialogues differently using the special tags. The colors are assigned based on
-                        what you chose in the Color tab for your Character.
+                        
+                        Colore os diálogos dos personagens de forma diferente usando as tags especiais. As cores são atribuídas com base no que você escolheu na aba Cor do seu personagem.
                       </p>
                     </div>
                     <div
@@ -3110,8 +3110,8 @@ export function ChatSettingsDrawer({
                       Comandos
                     </span>
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                      Allow models to interact with you via commands. This way, they can send you selfies, play songs
-                      for you, change their schedules, start scenes, and do much more!
+                      
+                      Permita que os modelos interajam com você via comandos. Assim, eles podem te enviar selfies, tocar músicas para você, mudar as próprias agendas, iniciar cenas e muito mais!
                     </p>
                   </div>
                   <div
@@ -3148,8 +3148,8 @@ export function ChatSettingsDrawer({
                     ))}
                   </select>
                   <p className="text-[0.55rem] text-[var(--muted-foreground)]">
-                    Used for character selfies when Commands are enabled. The Illustrator agent uses its own connection
-                    from the Agents tab.
+                    
+                    Usado para selfies de personagem quando os Comandos estão ativados. O agente Illustrator usa a própria conexão da aba Agentes.
                   </p>
 
                   {/* Selfie resolution picker */}
@@ -3217,7 +3217,7 @@ export function ChatSettingsDrawer({
                   <textarea
                     value={scheduleGenerationPreferences}
                     onChange={(e) => setScheduleGenerationPreferences(e.target.value)}
-                    placeholder="e.g. Make everyone go to sleep before midnight. Give characters free time 10am-noon. I work 9-5 on weekdays."
+                    placeholder="ex.: Faça todos dormirem antes da meia-noite. Dê tempo livre aos personagens das 10h ao meio-dia. Eu trabalho das 9h às 17h nos dias úteis."
                     className="min-h-[5rem] resize-y rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-2.5 text-[0.6875rem] text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]/50 placeholder:text-[var(--muted-foreground)]/40"
                   />
                   <p className="text-[0.59375rem] text-[var(--muted-foreground)]/70">
@@ -3403,7 +3403,8 @@ export function ChatSettingsDrawer({
                   })()
                 ) : (
                   <p className="rounded-lg bg-[var(--secondary)]/50 px-3 py-2 text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-                    No OOC conversation is linked. Direct-message commands can still create new Conversation DMs.
+                    
+                    Nenhuma conversa OOC está vinculada. Os comandos de mensagem direta ainda podem criar novas DMs de conversa.
                   </p>
                 )}
 
@@ -3425,8 +3426,8 @@ export function ChatSettingsDrawer({
                   <div className="flex-1 min-w-0">
                     <span className="text-[0.6875rem] font-medium">Permitir DMs do personagem</span>
                     <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-                      Adds a short hidden command reminder so characters can open a new DM conversation when they text
-                      the user in-world.
+                      
+                      Adiciona um pequeno lembrete de comando oculto para que os personagens possam abrir uma nova conversa por DM quando mandarem mensagem ao usuário dentro da ficção.
                     </p>
                   </div>
                   <div
@@ -3668,8 +3669,8 @@ export function ChatSettingsDrawer({
               <div className="space-y-2">
                 {isGame && metadata.enableAgents && (
                   <p className="px-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                    Toggle agents for this game session. Only the ones below are allowed to ensure the game's format
-                    doesn't break.
+                    
+                    Ative ou desative agentes para esta sessão de game. Apenas os listados abaixo são permitidos para garantir que o formato do game não quebre.
                   </p>
                 )}
                 <button
@@ -3759,7 +3760,8 @@ export function ChatSettingsDrawer({
                         <span>Guardião de lorebook do game</span>
                       </div>
                       <p className="mt-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
-                        Updates a game-scoped lorebook after End Session finishes and attaches it only to this game.
+                        
+                        Atualiza um lorebook com escopo de game depois que Encerrar Sessão termina e o anexa apenas a este game.
                       </p>
                       {gameLorebookKeeperLorebook && (
                         <p className="mt-0.5 truncate text-[0.55rem] text-[var(--primary)]/70">
@@ -3944,8 +3946,8 @@ export function ChatSettingsDrawer({
                           <span>Guardião de lorebook</span>
                         </div>
                         <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                          Pick a chat-specific target lorebook and optionally keep Lorebook Keeper a few assistant
-                          replies behind the latest canon before it writes.
+                          
+                          Escolha um lorebook de destino específico do chat e, opcionalmente, mantenha o Lorebook Keeper algumas respostas atrás do cânone mais recente antes de ele escrever.
                         </p>
                       </div>
                       <button
@@ -4008,8 +4010,8 @@ export function ChatSettingsDrawer({
                     </div>
 
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                      Read-behind uses assistant messages: 0 means the newest eligible reply, 1 waits one reply, and
-                      backfill only processes messages Lorebook Keeper has not already saved.
+                      
+                      O read-behind usa mensagens do assistente: 0 significa a resposta elegível mais recente, 1 espera uma resposta, e o backfill só processa mensagens que o Lorebook Keeper ainda não salvou.
                     </p>
                   </div>
                 )}
@@ -4028,8 +4030,8 @@ export function ChatSettingsDrawer({
                           )}
                         </div>
                         <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                          Choose which added characters or the active persona can appear as VN sprites and control the
-                          sprite layout for this chat.
+                          
+                          Escolha quais personagens adicionados ou a persona ativa podem aparecer como sprites de visual novel e controle o layout dos sprites para este chat.
                         </p>
                       </div>
                     </div>
@@ -4051,8 +4053,8 @@ export function ChatSettingsDrawer({
                       <div className="min-w-0 flex-1">
                         <span className="text-[0.6875rem] font-medium">Avatares de expressão</span>
                         <p className="mt-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
-                          Replace message avatars with the selected expression sprite and hide duplicate portrait
-                          sprites.
+                          
+                          Substitui os avatares das mensagens pelo sprite de expressão selecionado e oculta sprites de retrato duplicados.
                         </p>
                       </div>
                       <div
@@ -4152,8 +4154,8 @@ export function ChatSettingsDrawer({
                     )}
 
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                      Only added characters and the active persona with uploaded sprites appear here. You can enable up
-                      to 3 at a time.
+                      
+                      Apenas os personagens adicionados e a persona ativa com sprites enviados aparecem aqui. Você pode ativar até 3 por vez.
                     </p>
 
                     {spriteCharacterIds.length > 0 && (
@@ -4242,8 +4244,8 @@ export function ChatSettingsDrawer({
                         </div>
 
                         <p className="mt-2 text-[0.5625rem] leading-relaxed text-[var(--muted-foreground)]">
-                          Arrange mode lets you drag sprites anywhere in the chat area. Reset clears saved positions.
-                          Changing the side flips the current layout.
+                          
+                          O modo de organização permite arrastar os sprites para qualquer lugar da área do chat. Redefinir limpa as posições salvas. Mudar o lado inverte o layout atual.
                         </p>
                       </div>
                     )}
@@ -4368,8 +4370,8 @@ export function ChatSettingsDrawer({
                     )}
 
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                      Roleplay DJ queues several fitting tracks when it changes music. Spotify Premium, a connected
-                      account, and an active Spotify device are still required.
+                      
+                      O DJ de roleplay coloca na fila várias faixas adequadas quando muda a música. Ainda são necessários Spotify Premium, uma conta conectada e um dispositivo Spotify ativo.
                     </p>
                   </div>
                 )}
@@ -4995,9 +4997,8 @@ export function ChatSettingsDrawer({
                       <div className="flex items-start gap-1.5 rounded-md bg-amber-400/10 px-2 py-1.5 ring-1 ring-amber-400/20">
                         <AlertTriangle size="0.75rem" className="mt-[0.125rem] shrink-0 text-amber-400/80" />
                         <p className="text-[0.625rem] text-amber-400/80 leading-snug">
-                          Existing summaries were built with the previous setting. For today, messages near the rollover
-                          hour may be duplicated or missing from the prompt. From tomorrow onward, new day summaries
-                          will line up correctly. To adjust an older summary, use{" "}
+                          
+                          Os resumos existentes foram construídos com a configuração anterior. Por hoje, mensagens próximas à hora de virada podem ficar duplicadas ou faltando no prompt. A partir de amanhã, os novos resumos diários ficarão alinhados corretamente. Para ajustar um resumo mais antigo, use{" "}
                           <span className="font-medium">Editar resumos</span> above.
                         </p>
                       </div>
@@ -5041,8 +5042,8 @@ export function ChatSettingsDrawer({
           >
             <div className="space-y-2">
               <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                Paste a Discord webhook URL to mirror this chat's messages to a channel. Character messages appear under
-                their name, and game narration/party messages use simple speaker labels.
+                
+                Cole uma URL de webhook do Discord para espelhar as mensagens deste chat em um canal. As mensagens dos personagens aparecem sob o nome deles, e a narração do game/mensagens do grupo usam rótulos de falante simples.
               </p>
               <input
                 type="url"
@@ -5110,8 +5111,8 @@ export function ChatSettingsDrawer({
                 <>
                   {activeToolIds.length === 0 ? (
                     <p className="text-[0.6875rem] text-[var(--muted-foreground)] px-1">
-                      All globally enabled tools are available to this chat. Add tools below to restrict this chat to a
-                      specific set.
+                      
+                      Todas as ferramentas ativadas globalmente estão disponíveis para este chat. Adicione ferramentas abaixo para restringir este chat a um conjunto específico.
                     </p>
                   ) : (
                     <div className="flex max-h-40 flex-col gap-1 overflow-y-auto">
@@ -6073,8 +6074,8 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
 
         {!memoriesQuery.isLoading && !memoriesQuery.error && memories.length === 0 && (
           <div className="rounded-xl bg-[var(--secondary)]/60 px-4 py-8 text-center text-xs text-[var(--muted-foreground)]">
-            No recall memories have been created for this chat yet. Marinara creates them after generation in groups of
-            5 messages.
+            
+            Nenhuma memória de recuperação foi criada para este chat ainda. O Marinara as cria após a geração, em grupos de 5 mensagens.
           </div>
         )}
 
@@ -6851,7 +6852,8 @@ function SelfiePromptControls({
         />
       </label>
       <p className="text-[0.55rem] text-[var(--muted-foreground)]">
-        Saved for this chat. Leave the selfie prompt blank to use the default prompt. The template can use{" "}
+        
+        Salvo para este chat. Deixe o prompt de selfie em branco para usar o prompt padrão. O modelo pode usar{" "}
         {"${charName}"} and {"${appearance}"}. Positive tags are appended to the generated selfie prompt; negative tags
         are sent directly to the image generator.
       </p>
@@ -7280,7 +7282,8 @@ function HapticConnectionPanel({
           className="rounded-md bg-[var(--background)] px-2.5 py-1.5 text-[0.6875rem] text-[var(--foreground)] outline-none ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)]/55 focus:ring-[var(--primary)]/60"
         />
         <span className="text-[0.5625rem] leading-relaxed text-[var(--muted-foreground)]">
-          Blank uses the server default. Docker or remote browser setups usually need ws://CLIENT_IP:12345.
+          
+          Em branco usa o padrão do servidor. Configurações com Docker ou navegador remoto geralmente precisam de ws://CLIENT_IP:12345.
         </span>
       </label>
 
@@ -7421,8 +7424,8 @@ function ConversationNotesSection({ chatId }: { chatId: string }) {
           </p>
         ) : notes.length === 0 ? (
           <p className="rounded-lg bg-[var(--secondary)]/50 px-3 py-3 text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-            Characters in the connected conversation can save things they want this roleplay to durably remember by
-            wrapping text in <code className="rounded bg-[var(--accent)]/60 px-1">{"<note>...</note>"}</code>. Saved
+            
+            Os personagens na conversa conectada podem salvar coisas que querem que este roleplay lembre de forma durável envolvendo o texto em <code className="rounded bg-[var(--accent)]/60 px-1">{"<note>...</note>"}</code>. Saved
             notes will appear here.
           </p>
         ) : (

@@ -436,8 +436,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
           </div>
           <div className="text-sm text-[var(--muted-foreground)]">
             <p>
-              Marinara Engine can run a local sidecar for trackers, scene analysis, and game-state helpers without
-              spending main-model tokens.
+              
+              O Marinara Engine pode rodar um sidecar local para rastreadores, análise de cena e auxiliares de estado do jogo sem gastar os tokens do modelo principal.
             </p>
             <p className="mt-1.5 text-xs text-[var(--muted-foreground)]/70">
               {isAppleSilicon
@@ -602,8 +602,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                       </div>
                       {platform === "linux" && config.runtimePreference === "nvidia" && (
                         <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-100">
-                          Linux CUDA binaries are not currently published by llama.cpp, so Marinara tries Vulkan first
-                          and falls back to CPU. Use System llama-server for a custom CUDA build.
+                          
+                          Binários CUDA para Linux não são publicados atualmente pelo llama.cpp, então o Marinara tenta o Vulkan primeiro e recorre à CPU. Use o System llama-server para um build CUDA personalizado.
                         </div>
                       )}
                     </>
@@ -662,8 +662,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                         </div>
                       )}
                       <div className="text-xs text-[var(--muted-foreground)]/70">
-                        Auto tries max offload first, CPU only disables GPU use, and custom lets you cap how many layers
-                        go to the GPU.
+                        
+                        Automático tenta o máximo de offload primeiro, Somente CPU desativa o uso da GPU, e personalizado permite limitar quantas camadas vão para a GPU.
                       </div>
                     </>
                   )}
@@ -746,8 +746,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-stretch">
                   <div className="text-xs text-[var(--muted-foreground)]/70">
-                    Max response tokens caps how much the local runtime can generate. If it is too large relative to the
-                    context window, Marinara has to trim more of the prompt to make room.
+                    
+                    O máximo de tokens de resposta limita quanto o runtime local pode gerar. Se for grande demais em relação à janela de contexto, o Marinara precisa aparar mais do prompt para abrir espaço.
                   </div>
                   <button
                     onClick={handleApplyGenerationSettings}

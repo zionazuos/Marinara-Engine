@@ -1423,8 +1423,8 @@ export function SpriteGenerationModal({
                   )}
                 </div>
                 <p className="flex-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                  Upload reference images of the character to improve consistency. Multiple angles or the existing
-                  avatar work well.
+                  
+                  Envie imagens de referência do personagem para melhorar a consistência. Vários ângulos ou o avatar existente funcionam bem.
                 </p>
               </div>
             </div>
@@ -1458,12 +1458,13 @@ export function SpriteGenerationModal({
               <span className="min-w-0 flex-1">
                 <span className="block font-medium">Preferir PNG transparente</span>
                 <span className="mt-0.5 block text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-                  Uses native transparent output when the selected model supports it, removes white-background wording
-                  from the prompt, then applies cleanup when transparent preview is enabled.
+                  
+                  Usa saída transparente nativa quando o modelo selecionado suporta, remove as menções a fundo branco do prompt e então aplica a limpeza quando a pré-visualização transparente está ativada.
                 </span>
                 {selectedModelIsGptImage2 && nativeTransparentPng && (
                   <span className="mt-1 block text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-                    GPT-Image-2 does not support native transparent backgrounds right now, so cleanup is the fallback.
+                    
+                    O GPT-Image-2 não suporta fundos transparentes nativos no momento, então a limpeza é a alternativa.
                   </span>
                 )}
               </span>
@@ -1537,8 +1538,8 @@ export function SpriteGenerationModal({
                     <span className="min-w-0 flex-1">
                       <span className="block font-medium">Casar com sprites de expressão existentes</span>
                       <span className="mt-0.5 block text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-                        Generates idle full-body sprites named after the portrait expressions, saved as full_neutral,
-                        full_happy, and so on.
+                        
+                        Gera sprites de corpo inteiro em repouso nomeados conforme as expressões dos retratos, salvos como full_neutral, full_happy e assim por diante.
                       </span>
                     </span>
                   </label>
@@ -1572,8 +1573,8 @@ export function SpriteGenerationModal({
                       ))}
                     </div>
                     <p className="mt-2 text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-                      Each batch generates a 2×2 idle full-body sheet for higher per-sprite resolution and cleaner
-                      slicing. Only the face and mood should change to match the expression name.
+                      
+                      Cada lote gera uma folha 2×2 de corpo inteiro em repouso para maior resolução por sprite e um recorte mais limpo. Só o rosto e o humor devem mudar para combinar com o nome da expressão.
                     </p>
                   </div>
                 )}
@@ -1866,8 +1867,8 @@ export function SpriteGenerationModal({
                   </div>
                 )}
                 <p className="mt-2 text-[0.625rem] text-[var(--muted-foreground)]">
-                  Use this when the generated sheet has borders, gutters, or uneven spacing. Applying re-slices the
-                  original source sheet{generatedSheets.length === 1 ? "" : "s"}  sem regenerar.
+                  
+                  Use isto quando a folha gerada tiver bordas, espaços ou espaçamento irregular. Aplicar refaz o fatiamento da folha de origem original{generatedSheets.length === 1 ? "" : "s"}  sem regenerar.
                 </p>
               </div>
             )}
@@ -1930,7 +1931,8 @@ export function SpriteGenerationModal({
                   )}
                 </div>
                 <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                  Cleanup only runs when you press Apply Cleanup, using the current slices without regenerating.
+                  
+                  A limpeza só roda quando você pressiona Aplicar limpeza, usando as fatias atuais sem regenerar.
                 </p>
                 {backgroundRemoverUnavailable && noBackground && (
                   <p className="mt-1 text-[0.625rem] text-amber-300/80">{backgroundRemoverReason}</p>

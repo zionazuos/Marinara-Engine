@@ -513,8 +513,8 @@ export function ToolEditor() {
                 className="w-full resize-y rounded-xl bg-[var(--secondary)] px-4 py-3 font-mono text-xs leading-relaxed ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
               />
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                This string is returned as-is when the AI calls this tool. Useful for informational tools or
-                placeholders.
+                
+                Esta string é retornada como está quando a IA chama esta ferramenta. Útil para ferramentas informativas ou placeholders.
               </p>
             </FieldGroup>
           )}

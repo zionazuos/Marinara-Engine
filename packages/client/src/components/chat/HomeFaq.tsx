@@ -469,8 +469,8 @@ export function HomeFaq() {
                     Start here before you go hunting through Discord logs.
                   </p>
                   <p className="mt-1 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]/85">
-                    The biggest repeat problems are Game Mode model choice, silent agent failures from low max response
-                    length, and confusion about the local sidecar using CPU instead of the GPU.
+                    
+                    Os maiores problemas recorrentes são a escolha de modelo no modo Game, falhas silenciosas de agentes por causa de um limite de resposta baixo, e confusão sobre o sidecar local usar CPU em vez da GPU.
                   </p>
                 </div>
               </div>

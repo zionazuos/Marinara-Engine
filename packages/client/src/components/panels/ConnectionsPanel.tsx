@@ -220,7 +220,8 @@ function SidecarCard() {
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-medium text-purple-200">Usar modelo local para todos os agentes de rastreador</div>
                   <div className="mt-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
-                    Assigns the built-in local model as the connection override for every built-in tracker agent.
+                    
+                    Atribui o modelo local embutido como substituição de conexão para todos os agentes de rastreador embutidos.
                   </div>
                 </div>
                 {assigningTrackers ? (

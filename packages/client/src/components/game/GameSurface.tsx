@@ -8484,8 +8484,8 @@ export function GameSurface({
                             {sidecarStartupError ? ` ${sidecarStartupError}.` : ""}
                           </div>
                           <div className="mt-1 text-[0.6875rem] leading-relaxed text-white/55">
-                            Open Local AI Model to retry startup, switch models, or disable local scene analysis
-                            temporarily.
+                            
+                            Abra o Modelo de IA Local para repetir a inicialização, trocar de modelo ou desativar temporariamente a análise de cena local.
                           </div>
                         </div>
                         <button
@@ -9111,8 +9111,8 @@ export function GameSurface({
               <AlertTriangle size="1.125rem" className="text-red-300" />
             </div>
             <p className="text-sm text-[var(--muted-foreground)]">
-              Interruption attempts can go badly depending on the situation. Force Interrupt cuts in cleanly without
-              telling the GM it was an interrupt — Yes attempts an in-fiction interruption that the GM may resist.
+              
+              Tentativas de interrupção podem dar errado dependendo da situação. Forçar interrupção corta de forma limpa sem avisar o GM de que foi uma interrupção — Sim tenta uma interrupção dentro da ficção que o GM pode resistir.
             </p>
           </div>
 

@@ -620,7 +620,7 @@ function NotesView({ notes, onChange, saved }: { notes: string; onChange: (text:
         <textarea
           value={notes}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Write your notes here... track clues, plans, NPC names, theories — anything you want to remember."
+          placeholder="Escreva suas notas aqui... registre pistas, planos, nomes de NPC, teorias — qualquer coisa que você queira lembrar."
           className="min-h-44 resize-none rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 text-xs leading-relaxed text-white/80 outline-none placeholder:text-white/25 focus:border-white/20 md:min-h-0"
           spellCheck={false}
         />

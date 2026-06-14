@@ -91,8 +91,8 @@ export function GameJsonRepairModal({ request, onClose, onApplied }: GameJsonRep
             <Braces size="1rem" />
           </div>
           <div className="min-w-0 text-sm text-[var(--muted-foreground)]">
-            The model returned JSON that Marinara could not apply. Fix the brackets, commas, or fields here, then apply
-            it without regenerating the whole response.
+            
+            O modelo retornou um JSON que o Marinara não conseguiu aplicar. Corrija os colchetes, vírgulas ou campos aqui e então aplique sem regenerar a resposta inteira.
           </div>
         </div>
 

@@ -104,8 +104,8 @@ function BudgetSkippedEntriesNotice({ entries }: { entries: BudgetSkippedLoreboo
             {entries.length}  lore correspondente {entries.length === 1 ? "entry was" : "entries were"}  ignorado pelo orçamento de tokens
           </span>
           <span className="mt-0.5 block text-[0.625rem] leading-relaxed text-amber-50/65">
-            Expand for budget details. Knowledge Retrieval or Knowledge Router may fit large lorebooks better than
-            simply raising caps.
+            
+            Expanda para detalhes do orçamento. O Knowledge Retrieval ou o Knowledge Router podem lidar melhor com lorebooks grandes do que simplesmente aumentar os limites.
           </span>
         </span>
         {expanded ? <ChevronDown size="0.75rem" /> : <ChevronRight size="0.75rem" />}

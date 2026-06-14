@@ -1342,7 +1342,7 @@ function ExpandedDrawer({
           label="Sem recursão"
           value={form.preventRecursion ?? false}
           onChange={(v) => update({ preventRecursion: v })}
-          tooltip="When enabled, this entry's content won't trigger additional entries during recursive scanning."
+          tooltip="Quando ativado, o conteúdo desta entrada não dispara entradas adicionais durante a varredura recursiva."
         />
         <ToggleButton
           label="No Vector"

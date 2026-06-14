@@ -34,7 +34,8 @@ export function CreateLorebookModal({ open, onClose }: Props) {
           </div>
           <div className="flex-1">
             <p className="text-xs text-[var(--muted-foreground)]">
-              Lorebooks inject contextual world-building information into prompts based on keyword triggers.
+              
+              Os lorebooks injetam informações contextuais de construção de mundo nos prompts com base em gatilhos de palavras-chave.
             </p>
           </div>
         </div>

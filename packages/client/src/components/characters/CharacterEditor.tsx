@@ -784,7 +784,7 @@ export function CharacterEditor() {
       <ExportFormatDialog
         open={exportDialogOpen}
         title="Exportar personagem"
-        description="Native keeps Marinara metadata. Compatible exports direct Chara Card V2 JSON for other platforms."
+        description="O Nativo mantém os metadados do Marinara. O Compatível exporta um JSON Chara Card V2 direto para outras plataformas."
         compatibleDescription="Exports direct Chara Card V2 JSON without the Marinara wrapper."
         showPngOption
         onClose={() => setExportDialogOpen(false)}
@@ -992,7 +992,7 @@ export function CharacterEditor() {
             {activeTab === "personality" && (
               <TextareaTab
                 title="Personalidade"
-                subtitle="A concise summary of the character's personality traits, temperament, and behavioral patterns."
+                subtitle="Um resumo conciso dos traços de personalidade, temperamento e padrões de comportamento do personagem."
                 value={formData.personality}
                 onChange={(v) => updateField("personality", v)}
                 placeholder="Energetic, curious, and fiercely loyal. Speaks in short bursts. Has a habit of…"
@@ -1012,7 +1012,7 @@ export function CharacterEditor() {
             {activeTab === "appearance" && (
               <TextareaTab
                 title="Aparência"
-                subtitle="Detailed physical description — height, build, hair, eyes, clothing, distinguishing features."
+                subtitle="Descrição física detalhada — altura, constituição, cabelo, olhos, roupas, características marcantes."
                 value={(formData.extensions.appearance as string) ?? ""}
                 onChange={(v) => updateExtension("appearance", v)}
                 placeholder="Tall and willowy with silver-streaked dark hair. Wears a battered leather coat over…"
@@ -1134,8 +1134,8 @@ function CharacterDescriptionTab({
           <div>
             <h3 className="text-sm font-semibold">Extensões de descrição</h3>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
-              Toggleable additions appended to this character's main description. Use these for situational states,
-              relationships, combat details, or story-phase context.
+              
+              Adições alternáveis anexadas à descrição principal deste personagem. Use-as para estados situacionais, relacionamentos, detalhes de combate ou contexto de fase da história.
             </p>
           </div>
           <button
