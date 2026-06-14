@@ -1277,8 +1277,7 @@ export function AgentEditor() {
               </p>
             )}
             <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-              For 8k local models, try {DEFAULT_AGENT_MAX_TOKENS.toLocaleString()} or lower so the agent prompt keeps
-              enough room.
+              For 8k local models, try {DEFAULT_AGENT_MAX_TOKENS.toLocaleString()}  ou menos para o prompt do agente manter espaço suficiente.
             </p>
           </FieldGroup>
 
@@ -1396,7 +1395,8 @@ export function AgentEditor() {
                 </div>
               </div>
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Leave keywords empty to run this custom agent on its normal cadence.
+                
+                Deixe as palavras-chave vazias para rodar este agente personalizado na cadência normal.
               </p>
             </FieldGroup>
           )}

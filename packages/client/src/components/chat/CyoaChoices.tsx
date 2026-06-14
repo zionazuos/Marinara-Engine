@@ -269,7 +269,7 @@ export function CyoaChoices({ messages }: Props) {
                 value={choice.text}
                 onChange={(e) => updateDraftChoice(index, "text", e.target.value)}
                 rows={Math.min(Math.max(choice.text.split("\n").length, 2), 6)}
-                placeholder="Describe the action or dialogue sent when this choice is clicked."
+                placeholder="Descreva a ação ou o diálogo enviado quando esta escolha for clicada."
                 className="mt-2 w-full resize-y rounded-lg border border-[var(--border)] bg-[var(--muted)]/20 px-3 py-2 text-[0.6875rem] leading-relaxed text-[var(--foreground)]/80 outline-none transition-colors focus:border-purple-400/40 dark:border-white/10 dark:bg-black/35 dark:text-white/75"
               />
             </div>

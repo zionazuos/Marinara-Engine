@@ -1036,7 +1036,8 @@ export function ConnectionEditor() {
             )}
             {localProvider === "claude_subscription" && (
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                The Claude Agent SDK selects the endpoint automatically based on your local{" "}
+                
+                O Claude Agent SDK seleciona o endpoint automaticamente com base na sua{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">claude</code> CLI auth.
               </p>
             )}
@@ -1068,8 +1069,7 @@ export function ConnectionEditor() {
                 <AlertCircle size="0.625rem" className="mt-px shrink-0" />
                 <span>
                   <strong>Usuários do Windows:</strong>  Se o seu proxy ou servidor local não for detectado, o Windows Defender Firewall pode estar bloqueando a conexão. Abra{" "}
-                  <em>Segurança do Windows → Firewall e proteção de rede → Permitir um aplicativo pelo firewall</em> and add
-                  Node.js or your proxy application.
+                  <em>Segurança do Windows → Firewall e proteção de rede → Permitir um aplicativo pelo firewall</em>  e adicione o Node.js ou o seu aplicativo de proxy.
                 </span>
               </p>
             )}
@@ -1238,7 +1238,8 @@ export function ConnectionEditor() {
                     {localProvider === "custom" ? (
                       <div className="p-3">
                         <p className="mb-2 text-[0.625rem] text-[var(--muted-foreground)]">
-                          Custom endpoints: type the model ID or fetch from API above.
+                          
+                          Endpoints personalizados: digite o ID do modelo ou busque pela API acima.
                         </p>
                         <input
                           value={localModel}
@@ -1294,7 +1295,8 @@ export function ConnectionEditor() {
                       </div>
                     ) : filteredModels.length === 0 ? (
                       <div className="p-4 text-center text-xs text-[var(--muted-foreground)]">
-                        No models found. Try a different search or type the model ID below.
+                        
+                        Nenhum modelo encontrado. Tente uma busca diferente ou digite o ID do modelo abaixo.
                         <input
                           value={localModel}
                           onChange={(e) => {
@@ -1934,11 +1936,11 @@ export function ConnectionEditor() {
             </div>
 
             <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-              <strong>Testar conexão</strong> verifies your API key against the provider catalog or health endpoint.
+              <strong>Testar conexão</strong>  verifica sua chave de API contra o catálogo do provedor ou o endpoint de health.
               {localProvider !== "image_generation" && (
                 <>
                   {" "}
-                  <strong>Enviar mensagem de teste</strong> sends "hi" to the selected model endpoint and shows the response.
+                  <strong>Enviar mensagem de teste</strong>  envia "hi" ao endpoint do modelo selecionado e mostra a resposta.
                 </>
               )}
               {localProvider === "image_generation" && (
@@ -2444,7 +2446,8 @@ function ImageGenerationDefaultsPanel({
                   />
                   <span className="min-w-0">
                     <span className="block text-xs text-[var(--foreground)]">
-                      Upload a 1x1 placeholder when no reference image is provided
+                      
+                      Enviar um placeholder 1x1 quando nenhuma imagem de referência é fornecida
                     </span>
                     <span className="mt-0.5 block text-[0.55rem] text-[var(--muted-foreground)]">
                       

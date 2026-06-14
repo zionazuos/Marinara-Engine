@@ -4323,7 +4323,7 @@ export function GameNarration({
                     
                     Mostrando {visibleLogEntries.length} of {logEntries.length}
                     {sessionHistoryTokens > 0 && (
-                      <span title="Approximate tokens in the current session's loaded chat history.">
+                      <span title="Tokens aproximados no histórico de chat carregado da sessão atual.">
                         {" | ~"}
                         {formatTokenEstimate(sessionHistoryTokens)} tokens
                       </span>

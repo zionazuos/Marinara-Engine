@@ -493,7 +493,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
             )}
 
             <div className="rounded-lg bg-[var(--secondary)]/50 p-2.5 text-[0.625rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-              <strong>Dica:</strong> This is the main SillyTavern folder, usually the one containing{" "}
+              <strong>Dica:</strong>  Esta é a pasta principal do SillyTavern, geralmente a que contém{" "}
               <code className="rounded bg-[var(--secondary)] px-1">data/</code> or{" "}
               <code className="rounded bg-[var(--secondary)] px-1">public/</code>.
             </div>
@@ -556,7 +556,8 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-3">
                   <p className="text-xs font-medium text-[var(--foreground)]">Tags de personagem importadas</p>
                   <p className="mt-0.5 text-[0.6875rem] text-[var(--muted-foreground)]">
-                    Choose how source-site tags are applied to imported characters.
+                    
+                    Escolha como as tags do site de origem são aplicadas aos personagens importados.
                   </p>
                   <div className="mt-2 grid gap-2 sm:grid-cols-3">
                     {TAG_IMPORT_OPTIONS.map((option) => (

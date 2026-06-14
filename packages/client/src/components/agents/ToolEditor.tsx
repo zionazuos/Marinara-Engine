@@ -362,7 +362,8 @@ export function ToolEditor() {
             help="The input arguments the AI can pass when calling this tool. Each parameter has a name, type, and description."
           >
             <p className="text-[0.625rem] text-[var(--muted-foreground)] mb-3">
-              Define the arguments the AI can pass when calling this tool.
+              
+              Defina os argumentos que a IA pode passar ao chamar esta ferramenta.
             </p>
             <div className="space-y-2">
               {localParams.map((param, idx) => (
@@ -490,8 +491,7 @@ export function ToolEditor() {
                   <div className="mt-1 text-amber-100/80">
                     
                     Definir <code className="rounded bg-black/20 px-1">CUSTOM_TOOL_SCRIPT_ENABLED=true</code> in{" "}
-                    <code className="rounded bg-black/20 px-1">.env</code> and restart Marinara before saving Script
-                    tools.
+                    <code className="rounded bg-black/20 px-1">.env</code>  e reinicie o Marinara antes de salvar as ferramentas de Script.
                   </div>
                 </div>
               </div>
@@ -533,8 +533,7 @@ export function ToolEditor() {
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
                 
                 Uma requisição POST será enviada com{" "}
-                <code className="rounded bg-[var(--secondary)] px-1">{"{ tool, arguments }"}</code> as JSON body.
-                Response is returned to the AI.
+                <code className="rounded bg-[var(--secondary)] px-1">{"{ tool, arguments }"}</code>  como corpo JSON. A resposta é retornada à IA.
               </p>
             </FieldGroup>
           )}

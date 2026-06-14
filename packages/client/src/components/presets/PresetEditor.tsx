@@ -1476,7 +1476,8 @@ function PresetVariablesEditor({
       </div>
 
       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-        Define variables that users select when assigning this preset to a chat. Use{" "}
+        
+        Defina variáveis que os usuários selecionam ao atribuir este preset a um chat. Use{" "}
         <code className="rounded bg-[var(--secondary)] px-1 text-amber-400">{"{{variable_name}}"}</code> in any section
         to insert the selected value.
       </p>
@@ -1485,7 +1486,8 @@ function PresetVariablesEditor({
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-[var(--border)] py-6 text-center">
           <Hash size="1.25rem" className="text-[var(--muted-foreground)]" />
           <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-            No variables yet. Add one to let users customize prompts per chat.
+            
+            Nenhuma variável ainda. Adicione uma para os usuários personalizarem os prompts por chat.
           </p>
         </div>
       ) : (
@@ -1735,7 +1737,8 @@ function VariableCard({
                 </button>
               </div>
               <p className="text-[0.5625rem] text-[var(--muted-foreground)]">
-                Allow users to select multiple options instead of just one.
+                
+                Permitir que os usuários selecionem várias opções em vez de apenas uma.
               </p>
 
               {isMultiSelect && (
@@ -2295,7 +2298,8 @@ function MacrosReferenceModal({ onClose }: { onClose: () => void }) {
               Use estas macros nas suas seções de prompt. Elas serão substituídas pelos valores reais no momento da geração.
             </p>
             <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-              In group chats, a bracketed block containing character macros like <code>{"{{char}}"}</code> and{" "}
+              
+              Em chats em grupo, um bloco entre colchetes contendo macros de personagem como <code>{"{{char}}"}</code> and{" "}
               <code>{"{{description}}"}</code>  repete uma vez por personagem.
             </p>
             <div className="space-y-2 border-y border-[var(--border)] py-3">

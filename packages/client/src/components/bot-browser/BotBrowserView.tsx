@@ -1703,7 +1703,7 @@ export function BotBrowserView() {
     if (effectiveNsfwAvailable) return; // Let the checkbox handle it
     e.preventDefault();
     if (sourceId === "wyvern") {
-      toast.info('Use the "🔞 Popular NSFW" sort option to browse NSFW content on Wyvern.');
+      toast.info('Use a opção de ordenação "🔞 Popular NSFW" para navegar por conteúdo NSFW no Wyvern.');
     } else if (provider.nsfwMode === "login") {
       setShowLoginModal(true);
     }
@@ -2477,7 +2477,7 @@ function LoginModal({
           {/* Info boxes */}
           <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-[var(--foreground)]">
             <span className="mr-1.5 text-emerald-400">✅</span>
-            <strong>Browsing and downloading public characters works without logging in!</strong>
+            <strong>Navegar e baixar personagens públicos funciona sem fazer login!</strong>
           </div>
           <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-[var(--foreground)]">
             <span className="mr-1.5">🔑</span>

@@ -672,8 +672,7 @@ export function RegexScriptEditor() {
                 Scripts run in order (lowest first). Use capture groups (
                 <code className="rounded bg-[var(--secondary)] px-1">$1</code>,{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">$2</code>) in the replacement to reference matched
-                groups. Use <code className="rounded bg-[var(--secondary)] px-1">\u$1</code> to capitalize the first
-                character of a capture, or <code className="rounded bg-[var(--secondary)] px-1">\U$1\E</code> to
+                groups. Use <code className="rounded bg-[var(--secondary)] px-1">\u$1</code>  para capitalizar o primeiro caractere de uma captura, ou <code className="rounded bg-[var(--secondary)] px-1">\U$1\E</code> to
                 uppercase a capture.
               </p>
               <p>

@@ -1026,7 +1026,8 @@ export function ChatSidebar() {
               <AlertTriangle size="1.25rem" className="text-[var(--destructive)]" />
             </div>
             <p className="text-xs text-[var(--muted-foreground)]">
-              Marinara is still waking up. Chats should appear in a moment.
+              
+              O Marinara ainda está acordando. Os chats devem aparecer em um instante.
             </p>
             <button
               onClick={() => void refetchChats()}

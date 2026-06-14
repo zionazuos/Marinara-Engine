@@ -608,7 +608,8 @@ function NotesView({ notes, onChange, saved }: { notes: string; onChange: (text:
     <div className="flex h-full flex-col gap-2">
       <div className="flex items-center justify-between">
         <p className="text-[0.625rem] text-white/40">
-          Your personal notes — visible to the Game Master and party members.
+          
+          Suas notas pessoais — visíveis para o Game Master e os membros do grupo.
         </p>
         <span
           className={cn("text-[0.5625rem] transition-opacity", saved ? "text-emerald-400/60" : "text-amber-400/60")}

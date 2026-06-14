@@ -485,7 +485,7 @@ export function SecretPlotPanel({
                         <span>Descrição do arco</span>
                         <label
                           className="inline-flex shrink-0 items-center gap-1 rounded border border-[var(--border)]/70 bg-[var(--secondary)]/30 px-1.5 py-0.5 text-[0.5rem] font-medium transition-colors hover:bg-[var(--accent)]/45 hover:text-[var(--accent-foreground)]"
-                          title="Mark this long-term arc as complete without deleting the arc notes."
+                          title="Marque este arco de longo prazo como concluído sem excluir as notas do arco."
                           aria-label="Marcar este arco de longo prazo como concluído"
                         >
                           <input

@@ -636,7 +636,7 @@ export function GameSessionHistory({
                                 <button
                                   onClick={() => void onRegenerateLorebook?.(session.sessionNumber)}
                                   disabled={isRegeneratingLorebook}
-                                  title="Regenerate the Game Lorebook Keeper entries for this latest session"
+                                  title="Regenerar as entradas do Game Lorebook Keeper para esta última sessão"
                                   className="inline-flex items-center gap-1 rounded-md bg-[var(--secondary)] px-2 py-1 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                   <BookOpen
@@ -788,7 +788,7 @@ export function GameSessionHistory({
                                 }
                                 disabled={isSaving}
                                 rows={4}
-                                placeholder="One small preference, habit, promise, or past detail per line"
+                                placeholder="Uma pequena preferência, hábito, promessa ou detalhe do passado por linha"
                                 className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
                               />
                             </label>

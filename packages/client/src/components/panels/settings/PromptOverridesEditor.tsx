@@ -385,7 +385,8 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
         <span className="min-w-0">
           <span className="block text-xs font-medium text-[var(--foreground)]">Aplicar esta substituição</span>
           <span className="block text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-            Turn this off to keep the template saved without using it.
+            
+            Desligue isto para manter o modelo salvo sem usá-lo.
           </span>
         </span>
       </label>

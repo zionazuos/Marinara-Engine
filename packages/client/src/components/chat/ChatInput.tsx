@@ -473,7 +473,7 @@ export const ChatInput = memo(function ChatInput({
     const raw = getValue();
     if (!activeChatId || isStreaming) return;
     if (isReadingAttachments) {
-      toast.info("Still reading attached files. Send will be ready in a moment.");
+      toast.info("Ainda lendo os arquivos anexados. O envio estará pronto em um instante.");
       return;
     }
     // Cancel pending draft debounce so clearInputDraft isn't overwritten
@@ -726,7 +726,7 @@ export const ChatInput = memo(function ChatInput({
   const handleImpersonateQuickButton = useCallback(async () => {
     if (!activeChatId || isStreaming) return;
     if (hasPendingAttachments) {
-      toast.info("Clear or send attachments before using quick impersonate.");
+      toast.info("Limpe ou envie os anexos antes de usar a personificação rápida.");
       return;
     }
     const text = textareaRef.current?.value?.trim() ?? "";
@@ -738,7 +738,7 @@ export const ChatInput = memo(function ChatInput({
     if (!activeChatId || isStreaming) return;
     const submittingChatId = activeChatId;
     if (isReadingAttachments) {
-      toast.info("Still reading attached files. Post will be ready in a moment.");
+      toast.info("Ainda lendo os arquivos anexados. A publicação estará pronta em um instante.");
       return;
     }
     const raw = textareaRef.current?.value ?? "";
@@ -857,7 +857,7 @@ export const ChatInput = memo(function ChatInput({
   const handleGuidedGenerationButton = useCallback(async () => {
     if (!activeChatId || isStreaming) return;
     if (requiresManualGuideTarget) {
-      toast.info("Choose a character from the reply picker to guide a specific reply.");
+      toast.info("Escolha um personagem no seletor de resposta para guiar uma resposta específica.");
       return;
     }
     if (hasPendingAttachments) {

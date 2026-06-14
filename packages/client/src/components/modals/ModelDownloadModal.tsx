@@ -492,7 +492,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
               </div>
               {status === "server_error" && (
                 <div className="mt-2 text-xs text-amber-200">
-                  Runtime startup failed. Open Runtime Settings for details.
+                  
+                  A inicialização do runtime falhou. Abra as Configurações de Runtime para detalhes.
                 </div>
               )}
             </div>
@@ -573,7 +574,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                   </div>
                   {activeBackend === "mlx" ? (
                     <div className="rounded-xl border border-[var(--border)] bg-[var(--card)]/60 px-3 py-2 text-sm text-[var(--muted-foreground)]/75">
-                      MLX chooses the Apple Silicon accelerator path automatically.
+                      
+                      O MLX escolhe o caminho do acelerador do Apple Silicon automaticamente.
                     </div>
                   ) : (
                     <>

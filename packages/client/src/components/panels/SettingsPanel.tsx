@@ -1958,8 +1958,7 @@ function AppearanceSettings() {
         <p className="text-[0.625rem] text-[var(--muted-foreground)] pl-6">
           
           Mostra partículas de clima animadas com base no clima da história e na hora do dia. Requer o{" "}
-          <span className="font-medium">Estado do mundo</span> agent to be enabled so weather data is extracted from the
-          narrative.
+          <span className="font-medium">Estado do mundo</span>  agente esteja ativado para que os dados de clima sejam extraídos da narrativa.
         </p>
       </div>
 
@@ -2525,7 +2524,7 @@ function ThemesSettings() {
       setEditorOpen(false);
     } catch (err) {
       console.error("[ThemesSettings] Failed to save theme:", err);
-      toast.error("Failed to save theme. Check the browser console for details.");
+      toast.error("Falha ao salvar o tema. Verifique o console do navegador para detalhes.");
     }
   }, [createTheme, editingId, setActiveTheme, themeCss, themeName, updateTheme]);
 
@@ -2561,7 +2560,7 @@ function ThemesSettings() {
       }
     } catch (err) {
       console.error("[ThemesSettings] Failed to import theme:", err);
-      toast.error("Failed to import theme. Ensure it's a valid CSS or JSON file.");
+      toast.error("Falha ao importar o tema. Verifique se é um arquivo CSS ou JSON válido.");
     }
     e.target.value = "";
   };
@@ -2792,7 +2791,8 @@ function ThemesSettings() {
 
         {!isLoading && syncedThemes.length === 0 && (
           <p className="py-2 text-center text-[0.625rem] text-[var(--muted-foreground)]">
-            No synced custom themes yet. Create one or import a .css file above.
+            
+            Nenhum tema personalizado sincronizado ainda. Crie um ou importe um arquivo .css acima.
           </p>
         )}
       </div>
@@ -3236,7 +3236,7 @@ function ImportSettings() {
       }
     } catch (err) {
       if (err instanceof Error && err.message === "parse") {
-        toast.error("Import failed. Make sure this is a valid .marinara or .json file.");
+        toast.error("Falha na importação. Verifique se este é um arquivo .marinara ou .json válido.");
       } else {
         toast.error(`Import failed: ${err instanceof Error ? err.message : "network/server error"}`);
       }
@@ -3951,7 +3951,7 @@ function AdvancedSettings() {
   const runExpunge = (mode: "selected" | "all") => {
     if (mode === "all") {
       clearAllData.mutate(undefined, {
-        onSuccess: () => toast.success("All selected data was cleared. Runtime caches were reset immediately."),
+        onSuccess: () => toast.success("Todos os dados selecionados foram limpos. Os caches de runtime foram reiniciados imediatamente."),
         onError: () => toast.error("Falha ao limpar todos os dados."),
         onSettled: () => setConfirmAction(null),
       });
@@ -3959,7 +3959,7 @@ function AdvancedSettings() {
     }
 
     expungeData.mutate(selectedScopes, {
-      onSuccess: () => toast.success("Selected data was cleared. Runtime caches were reset immediately."),
+      onSuccess: () => toast.success("Os dados selecionados foram limpos. Os caches de runtime foram reiniciados imediatamente."),
       onError: () => toast.error("Falha ao limpar os dados selecionados."),
       onSettled: () => setConfirmAction(null),
     });

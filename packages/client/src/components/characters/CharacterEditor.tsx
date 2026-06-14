@@ -339,7 +339,7 @@ export function CharacterEditor() {
   const handleSave = async () => {
     if (!characterId || !formData) return false;
     if (avatarUploadInFlightRef.current) {
-      toast.error("Wait for the current avatar upload to finish before saving.");
+      toast.error("Espere o envio do avatar atual terminar antes de salvar.");
       return false;
     }
     setSaving(true);
@@ -368,7 +368,7 @@ export function CharacterEditor() {
     if (!file || !characterId) return;
     if (saving) {
       e.target.value = "";
-      toast.error("Wait for the current save to finish before uploading an avatar.");
+      toast.error("Espere o salvamento atual terminar antes de enviar um avatar.");
       return;
     }
     if (!beginAvatarUpload()) {
@@ -491,7 +491,7 @@ export function CharacterEditor() {
   const handleAvatarRemove = useCallback(async () => {
     if (!characterId || !avatarPreview) return;
     if (saving) {
-      toast.error("Wait for the current save to finish before removing the avatar.");
+      toast.error("Espere o salvamento atual terminar antes de remover o avatar.");
       return;
     }
     if (avatarUploadInFlightRef.current) {
@@ -561,7 +561,7 @@ export function CharacterEditor() {
 
     const personaName = formData.name.trim();
     if (!personaName) {
-      toast.error("Character needs a name before it can be imported as a persona.");
+      toast.error("O personagem precisa de um nome antes de poder ser importado como persona.");
       return;
     }
 
@@ -1002,7 +1002,7 @@ export function CharacterEditor() {
             {activeTab === "backstory" && (
               <TextareaTab
                 title="História de fundo"
-                subtitle="The character's history, origin story, and formative life events."
+                subtitle="A história do personagem, sua origem e os eventos marcantes da vida dele."
                 value={(formData.extensions.backstory as string) ?? ""}
                 onChange={(v) => updateExtension("backstory", v)}
                 placeholder="Born in a small village on the outskirts of the empire…"
@@ -1022,7 +1022,7 @@ export function CharacterEditor() {
             {activeTab === "scenario" && (
               <TextareaTab
                 title="Cenário"
-                subtitle="The default setting or situation where interactions take place."
+                subtitle="A ambientação ou situação padrão onde as interações acontecem."
                 value={formData.scenario}
                 onChange={(v) => updateField("scenario", v)}
                 placeholder="Uma agitada cidade portuária durante um festival comercial. As ruas estão cheias de mercadores e artistas…"
@@ -1120,7 +1120,7 @@ function CharacterDescriptionTab({
         <textarea
           value={formData.description}
           onChange={(event) => updateField("description", event.target.value)}
-          placeholder="Describe who this character is, their role, and their key traits…"
+          placeholder="Descreva quem é este personagem, seu papel e seus traços principais…"
           rows={12}
           className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
         />
@@ -1228,7 +1228,7 @@ function CharacterDescriptionTab({
         title="Descrição"
         value={formData.description}
         onChange={(value) => updateField("description", value)}
-        placeholder="Describe who this character is, their role, and their key traits…"
+        placeholder="Descreva quem é este personagem, seu papel e seus traços principais…"
       />
       {altDescs.map((desc) => (
         <ExpandedTextarea
@@ -1480,7 +1480,7 @@ function MetadataTab({
           onChange={(e) => updateField("creator_notes", e.target.value)}
           rows={4}
           className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-3 text-sm outline-none placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-          placeholder="Notes about this character, intended use, tips for best results…"
+          placeholder="Notas sobre este personagem, uso pretendido, dicas para melhores resultados…"
         />
       </label>
     </div>
@@ -1594,7 +1594,8 @@ function CharacterVersionHistoryPanel({
 
       {versions.length === 0 ? (
         <p className="mt-2 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]">
-          Previous card states will appear here after the next edit.
+          
+          Os estados anteriores do card aparecerão aqui após a próxima edição.
         </p>
       ) : (
         <div className="mt-2 flex max-h-36 flex-col gap-1.5 overflow-y-auto pr-1">
@@ -1757,7 +1758,7 @@ function DialogueTab({
     <div className="space-y-6">
       <SectionHeader
         title="Diálogo e saudações"
-        subtitle="First message, example dialogue, and alternate greetings."
+        subtitle="Primeira mensagem, exemplo de diálogo e saudações alternativas."
       />
 
       {/* First Message */}
@@ -1908,7 +1909,7 @@ function AdvancedTab({
     <div className="space-y-6">
       <SectionHeader
         title="Avançado"
-        subtitle="System prompt, post-history instructions, and depth prompt injection."
+        subtitle="Prompt de sistema, instruções pós-histórico e injeção de prompt de profundidade."
       />
 
       <label className="block space-y-1.5">
@@ -1957,7 +1958,7 @@ function AdvancedTab({
           onChange={(e) => updateField("post_history_instructions", e.target.value)}
           rows={4}
           className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4 text-sm outline-none placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-          placeholder="Text inserted after the chat history but before generation…"
+          placeholder="Texto inserido após o histórico do chat, mas antes da geração…"
         />
       </label>
 
@@ -2028,7 +2029,7 @@ function AdvancedTab({
         title="Instruções pós-histórico"
         value={formData.post_history_instructions}
         onChange={(value) => updateField("post_history_instructions", value)}
-        placeholder="Text inserted after the chat history but before generation…"
+        placeholder="Texto inserido após o histórico do chat, mas antes da geração…"
       />
       <ExpandedTextarea
         open={expandedField === "depth_prompt"}
@@ -2618,7 +2619,7 @@ function SpritesTab({
               onClick={() => folderInputRef.current?.click()}
               disabled={!!folderProgress}
               className="flex min-w-0 items-center justify-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-1.5 text-center text-[0.6875rem] font-medium leading-tight text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-40 max-md:flex-1 max-md:basis-[calc(50%-0.25rem)] max-md:px-2.5"
-              title="Select a folder of PNGs — each filename becomes the expression name"
+              title="Selecione uma pasta de PNGs — cada nome de arquivo vira o nome da expressão"
             >
               <FolderOpen size="0.8125rem" />
               

@@ -422,7 +422,7 @@ export function GameCharacterSheet({
                     onClick={() => void handleRegenerate()}
                     disabled={isRegenerating || isSaving}
                     className="inline-flex h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)]/90 px-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)] disabled:cursor-wait disabled:opacity-60 sm:h-auto sm:min-w-0 sm:px-3 sm:py-1.5"
-                    title="Regenerate this sheet from character and current game context"
+                    title="Regenerar esta folha a partir do personagem e do contexto atual do game"
                     aria-label="Regenerar folha"
                   >
                     <RefreshCw size={13} className={cn(isRegenerating && "animate-spin")} />
@@ -626,7 +626,8 @@ export function GameCharacterSheet({
                   </div>
                 ) : (
                   <p className="text-sm text-[var(--muted-foreground)]">
-                    Use this when the sheet should track HP and tabletop-style attributes.
+                    
+                    Use isto quando a ficha deve rastrear HP e atributos no estilo de RPG de mesa.
                   </p>
                 )}
               </div>

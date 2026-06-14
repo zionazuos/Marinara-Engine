@@ -623,7 +623,7 @@ export function PersonaEditor() {
             {activeTab === "personality" && (
               <TextareaTab
                 title="Personalidade"
-                subtitle="Your personality traits, temperament, and behavioral patterns."
+                subtitle="Seus traços de personalidade, temperamento e padrões de comportamento."
                 value={formData.personality}
                 onChange={(v) => updateField("personality", v)}
                 placeholder="Calmo e analítico, mas rápido para agir quando alguém está em perigo. Tem um humor seco…"
@@ -633,10 +633,10 @@ export function PersonaEditor() {
             {activeTab === "backstory" && (
               <TextareaTab
                 title="História de fundo"
-                subtitle="Your character's history, origin story, and formative life events."
+                subtitle="A história do seu personagem, sua origem e os eventos marcantes da vida dele."
                 value={formData.backstory}
                 onChange={(v) => updateField("backstory", v)}
-                placeholder="Grew up in a frontier town, apprenticed under a traveling scholar…"
+                placeholder="Cresceu em uma cidade de fronteira, aprendiz de um estudioso viajante…"
                 rows={12}
               />
             )}
@@ -656,7 +656,7 @@ export function PersonaEditor() {
                 subtitle="Your default situation or context within roleplays."
                 value={formData.scenario}
                 onChange={(v) => updateField("scenario", v)}
-                placeholder="A wandering adventurer seeking answers about a mysterious artifact…"
+                placeholder="Um aventureiro errante em busca de respostas sobre um artefato misterioso…"
                 rows={8}
               />
             )}
@@ -1994,7 +1994,7 @@ function DescriptionTab({
         <textarea
           value={formData.description}
           onChange={(e) => updateField("description", e.target.value)}
-          placeholder="Describe who you are, your role in the story, and your key traits…"
+          placeholder="Descreva quem você é, seu papel na história e seus traços principais…"
           rows={12}
           className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-[var(--muted-foreground)]/40 focus:border-emerald-400/40 focus:ring-1 focus:ring-emerald-400/20"
         />
@@ -2155,7 +2155,7 @@ function DescriptionTab({
         title="Descrição"
         value={formData.description}
         onChange={(value) => updateField("description", value)}
-        placeholder="Describe who you are, your role in the story, and your key traits…"
+        placeholder="Descreva quem você é, seu papel na história e seus traços principais…"
       />
       {altDescs.map((desc) => (
         <ExpandedTextarea

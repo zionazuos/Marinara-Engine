@@ -2071,7 +2071,7 @@ export function GameCombatUI({
                     }
                   }}
                   className="min-h-20 w-full resize-none rounded-lg border border-violet-300/20 bg-violet-500/10 px-2.5 py-2 text-sm leading-relaxed text-white/85 outline-none transition-colors placeholder:text-white/35 focus:border-violet-300/45"
-                  placeholder="I kick sand into the Ruin Guard's cracked lens, trying to blind it for a round."
+                  placeholder="Eu chuto areia na lente rachada do Guardião da Ruína, tentando cegá-lo por uma rodada."
                   autoFocus
                 />
                 <div className="flex flex-wrap gap-1.5">

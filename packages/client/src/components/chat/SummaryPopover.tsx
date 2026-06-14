@@ -941,7 +941,8 @@ export function SummaryPopover({
 
             {draftEntry && !displayEntries.some((entry) => entry.id === draftEntry.id) && (
               <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/20 px-2.5 py-2 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]">
-                New manual summary. Save it to include it in prompt context.
+                
+                Novo resumo manual. Salve-o para incluí-lo no contexto do prompt.
               </div>
             )}
 
@@ -970,7 +971,8 @@ export function SummaryPopover({
                 onClick={() => setShowInactiveSummaries(true)}
                 className="w-full rounded-lg border border-dashed border-[var(--border)] bg-[var(--secondary)]/20 p-5 text-center text-xs italic text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]/35"
               >
-                Inactive summaries are hidden. Show inactive summaries to view them.
+                
+                Os resumos inativos estão ocultos. Mostre os resumos inativos para vê-los.
               </button>
             ) : (
               <button

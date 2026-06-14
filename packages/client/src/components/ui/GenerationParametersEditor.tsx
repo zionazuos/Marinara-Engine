@@ -362,7 +362,8 @@ function CustomParametersInput({
         <p className="mt-1 text-[0.5625rem] text-amber-500">{error}</p>
       ) : (
         <p className="mt-1 text-[0.5625rem] text-[var(--muted-foreground)]/70">
-          Must be a JSON object. Use lowercase true, false, and null.
+          
+          Deve ser um objeto JSON. Use true, false e null em minúsculas.
         </p>
       )}
     </div>

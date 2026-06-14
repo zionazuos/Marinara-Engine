@@ -239,7 +239,8 @@ export function SpriteOverlay({
 
       {editing && (
         <div className="pointer-events-none absolute bottom-4 left-1/2 z-[30] -translate-x-1/2 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-[0.625rem] font-medium text-white/80 shadow-lg backdrop-blur-md">
-          Drag sprites to reposition them. Changes save automatically.
+          
+          Arraste os sprites para reposicioná-los. As alterações são salvas automaticamente.
         </div>
       )}
     </div>

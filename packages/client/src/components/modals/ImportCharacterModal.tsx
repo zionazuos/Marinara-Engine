@@ -295,7 +295,8 @@ export function ImportCharacterModal({ open, onClose }: Props) {
             <div>
               <p className="text-xs font-semibold text-[var(--foreground)]">Tags de card importadas</p>
               <p className="mt-0.5 text-[0.6875rem] text-[var(--muted-foreground)]">
-                Choose how source-site tags are applied to character cards.
+                
+                Escolha como as tags do site de origem são aplicadas aos cards de personagem.
               </p>
             </div>
           </div>
@@ -348,7 +349,8 @@ export function ImportCharacterModal({ open, onClose }: Props) {
           <div className="text-center">
             <p className="text-sm font-medium">Drop one or more files here or click to browse</p>
             <p className="mt-1 text-xs text-[var(--muted-foreground)]">
-              Supports JSON, PNG character cards, CharX, and Marinara exports
+              
+              Suporta JSON, cards de personagem em PNG, CharX e exportações do Marinara
             </p>
           </div>
           <div className="flex gap-2">

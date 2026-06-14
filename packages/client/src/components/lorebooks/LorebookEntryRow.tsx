@@ -1336,7 +1336,7 @@ function ExpandedDrawer({
           label="Bloqueado"
           value={form.locked ?? false}
           onChange={(v) => update({ locked: v })}
-          tooltip="Prevents the Lorebook Keeper agent from modifying this entry."
+          tooltip="Impede que o agente Lorebook Keeper modifique esta entrada."
         />
         <ToggleButton
           label="Sem recursão"

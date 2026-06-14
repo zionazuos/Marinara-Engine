@@ -490,7 +490,8 @@ export function AgentsPanel() {
           }
         >
           <div className="text-[0.625rem] text-[var(--muted-foreground)] mb-1.5">
-            Create your own AI agents with custom instructions and settings.
+            
+            Crie seus próprios agentes de IA com instruções e configurações personalizadas.
           </div>
           {!customAgents.length ? (
             <p className="text-[0.625rem] text-[var(--muted-foreground)] px-1 py-2">Nenhum agente personalizado ainda.</p>

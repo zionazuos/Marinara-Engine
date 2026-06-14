@@ -2177,7 +2177,8 @@ function VectorizeSection({
       </div>
       {excludeFromVectorization ? (
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-          Semantic search is disabled by the lorebook-level No Vector toggle.
+          
+          A busca semântica está desativada pela opção No Vector no nível do lorebook.
         </p>
       ) : embeddingConnections.length === 0 ? (
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">

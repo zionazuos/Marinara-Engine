@@ -1875,7 +1875,7 @@ export function ChatSettingsDrawer({
               {showLorebookMarkerWarning && (
                 <div className="mt-2 flex items-start gap-2 rounded-lg bg-amber-400/10 px-3 py-2 text-[0.6875rem] text-amber-200 ring-1 ring-amber-400/25">
                   <AlertTriangle size="0.75rem" className="mt-[0.125rem] shrink-0" />
-                  <span>This preset has active lorebooks available, but no lorebook marker.</span>
+                  <span>Este preset tem lorebooks ativos disponíveis, mas nenhum marcador de lorebook.</span>
                 </div>
               )}
             </Section>
@@ -3806,7 +3806,8 @@ export function ChatSettingsDrawer({
                           <span>Spotify DJ Music</span>
                         </div>
                         <p className="mt-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
-                          Use Spotify instead of the built-in Game Mode music library.
+                          
+                          Usar o Spotify em vez da biblioteca de música embutida do modo Game.
                         </p>
                       </div>
                       <div
@@ -3911,7 +3912,8 @@ export function ChatSettingsDrawer({
                             )}
                             {spotifyPlaylistsQuery.isError && (
                               <span className="text-[0.5625rem] text-amber-400/90">
-                                Connect Spotify in the Spotify DJ agent to load playlist names.
+                                
+                                Conecte o Spotify no agente Spotify DJ para carregar os nomes das playlists.
                               </span>
                             )}
                           </label>
@@ -4349,7 +4351,8 @@ export function ChatSettingsDrawer({
                         )}
                         {spotifyPlaylistsQuery.isError && (
                           <span className="text-[0.5625rem] text-amber-400/90">
-                            Connect Spotify in the Spotify DJ agent to load playlist names.
+                            
+                            Conecte o Spotify no agente Spotify DJ para carregar os nomes das playlists.
                           </span>
                         )}
                       </label>
@@ -4434,7 +4437,8 @@ export function ChatSettingsDrawer({
                           <Vibrate size="0.75rem" />  Controle de brinquedos íntimos
                         </span>
                         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                          Control connected intimate toys based on narrative content
+                          
+                          Controlar brinquedos íntimos conectados com base no conteúdo da narrativa
                         </p>
                       </div>
                       <div
@@ -4483,7 +4487,8 @@ export function ChatSettingsDrawer({
                           <Image size="0.75rem" />  Geração de imagem
                         </span>
                         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                          Auto-generate NPC portraits and location backgrounds during gameplay.
+                          
+                          Gerar automaticamente retratos de NPC e fundos de locais durante o jogo.
                         </p>
                       </div>
                       <div
@@ -5397,7 +5402,8 @@ export function ChatSettingsDrawer({
                 <div className="flex-1 min-w-0">
                   <span className="text-[0.6875rem] font-medium">Traduzir minhas mensagens</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Translate your messages to the target language before sending.
+                    
+                    Traduza suas mensagens para o idioma de destino antes de enviar.
                   </p>
                 </div>
                 <div
@@ -5537,7 +5543,8 @@ export function ChatSettingsDrawer({
                 <div>
                   <span className="text-xs font-medium">Excluir raciocínio anterior</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Keep stored thinking/reasoning metadata out of future prompts.
+                    
+                    Manter os metadados de pensamento/raciocínio armazenados fora dos prompts futuros.
                   </p>
                 </div>
                 <div

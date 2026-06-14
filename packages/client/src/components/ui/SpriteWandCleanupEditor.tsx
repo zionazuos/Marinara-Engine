@@ -999,7 +999,7 @@ export function SpriteWandCleanupEditor({
                   value={wandFeather}
                   onChange={setWandFeather}
                   disabled={loading || applying}
-                  title="How much soft border the wand leaves behind, and how gradually it fades"
+                  title="Quanta borda suave a varinha deixa, e quão gradualmente ela se desvanece"
                   className="min-w-[14rem] flex-[1_1_14rem]"
                 />
               </>

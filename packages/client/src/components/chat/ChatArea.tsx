@@ -798,7 +798,7 @@ export function ChatArea() {
             await flushPatch();
           } catch {
             if (swipeActionSeq.current === actionId) {
-              toast.error("Could not save tracker changes before deleting the swipe.");
+              toast.error("Não foi possível salvar as alterações do rastreador antes de excluir o swipe.");
             }
             return;
           }
@@ -1592,7 +1592,8 @@ export function ChatArea() {
             <div className="text-center">
               <h3 className="retro-glow-text text-base sm:text-xl font-bold tracking-tight">✧ Marinara Engine ✧</h3>
               <p className="mt-1.5 sm:mt-2 max-w-xs text-xs sm:text-sm text-[var(--muted-foreground)]">
-                To get started, choose the type of chat you'd like to have with the AI
+                
+                Para começar, escolha o tipo de chat que você quer ter com a IA
               </p>
             </div>
 
@@ -1607,7 +1608,7 @@ export function ChatArea() {
                 label="Conversa"
                 bg="linear-gradient(135deg, #4de5dd, #3ab8b1)"
                 shadowColor="rgba(77,229,221,0.15)"
-                tooltip="General chat with one or more characters, or a model itself"
+                tooltip="Chat geral com um ou mais personagens, ou com o próprio modelo"
                 onClick={() => handleQuickStart("conversation")}
               />
               <QuickStartCard
@@ -1615,7 +1616,7 @@ export function ChatArea() {
                 label="Roleplay"
                 bg="linear-gradient(135deg, #eb8951, #d97530)"
                 shadowColor="rgba(235,137,81,0.15)"
-                tooltip="For roleplaying or creative writing with one or more characters"
+                tooltip="Para roleplay ou escrita criativa com um ou mais personagens"
                 onClick={() => handleQuickStart("roleplay")}
               />
               <QuickStartCard

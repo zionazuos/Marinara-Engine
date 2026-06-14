@@ -4091,7 +4091,7 @@ export function GameSurface({
               api.post<{ items: GameImagePromptReviewItem[] }>("/game/generate-assets/preview", payload, { signal }),
             GAME_ASSET_PREVIEW_TIMEOUT_MS,
             () => {
-              toast.error("Image prompt preview timed out. Continuing with the default prompts.");
+              toast.error("A pré-visualização do prompt de imagem expirou. Continuando com os prompts padrão.");
             },
           );
         } catch (error) {
@@ -4110,7 +4110,7 @@ export function GameSurface({
               GAME_ASSET_PROMPT_REVIEW_TIMEOUT_MS,
               () => {
                 closeImagePromptReview(null);
-                toast.error("Image prompt review timed out. Continuing with the default prompts.");
+                toast.error("A revisão do prompt de imagem expirou. Continuando com os prompts padrão.");
               },
             );
           } catch (error) {
@@ -4976,7 +4976,7 @@ export function GameSurface({
       if (!normalizedName) return;
 
       if (!chatMeta.enableSpriteGeneration || !chatMeta.gameImageConnectionId) {
-        toast.error("Enable Game image generation and choose an image connection first.");
+        toast.error("Ative a geração de imagem do game e escolha uma conexão de imagem primeiro.");
         return;
       }
 
@@ -6184,7 +6184,7 @@ export function GameSurface({
     }
     const messageId = latestAssistantMsg?.id;
     if (!messageId) {
-      toast.error("The GM needs to write at least one turn before combat can start.");
+      toast.error("O GM precisa escrever pelo menos um turno antes do combate poder começar.");
       return;
     }
     const confirmed = await showConfirmDialog({
@@ -6741,7 +6741,7 @@ export function GameSurface({
       const cleanInstruction = instruction.trim();
       if (!cleanInstruction) return;
       if (!sessionInteractive || isStreaming) {
-        toast.error("Wait for the current GM response before attempting a special maneuver.");
+        toast.error("Espere a resposta atual do GM antes de tentar uma manobra especial.");
         return;
       }
 
@@ -8479,7 +8479,8 @@ export function GameSurface({
                         <div className="min-w-0 flex-1">
                           <div className="text-xs font-medium text-amber-200">O auxiliar de cena local falhou ao iniciar</div>
                           <div className="mt-1 text-[0.6875rem] leading-relaxed text-white/70">
-                            Marinara will keep the game running without the local sidecar for now.
+                            
+                            O Marinara manterá o game rodando sem o sidecar local por enquanto.
                             {sidecarFailedRuntimeVariant &&
                               ` Runtime: ${sidecarFailedRuntimeVariant.replace(/-/g, " ")}.`}
                             {sidecarStartupError ? ` ${sidecarStartupError}.` : ""}

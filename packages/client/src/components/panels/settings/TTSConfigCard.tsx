@@ -811,7 +811,7 @@ export function TTSConfigCard() {
                 </datalist>
                 <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
                   Eleven v3 speech uses <code className="font-mono">eleven_v3</code>. IDs containing{" "}
-                  <code className="font-mono">ttv</code> are Text to Voice / voice design models. NanoGPT proxies use{" "}
+                  <code className="font-mono">ttv</code>  são modelos de Texto para Voz / design de voz. Os proxies do NanoGPT usam{" "}
                   <code className="font-mono">Elevenlabs-V3</code>.
                 </p>
               </>
@@ -911,7 +911,8 @@ export function TTSConfigCard() {
               )}
               {!voicesFromProvider && source === "elevenlabs" && !fetchingVoices && (
                 <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                  ElevenLabs voices load after the connection is saved with an API key
+                  
+                  As vozes do ElevenLabs carregam depois que a conexão é salva com uma chave de API
                 </p>
               )}
               {!voicesFromProvider && source === "pockettts" && voices.length > 0 && (

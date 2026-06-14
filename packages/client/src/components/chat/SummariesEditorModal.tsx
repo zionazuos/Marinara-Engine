@@ -307,7 +307,8 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
               <div className="min-w-0">
                 <p className="text-[0.75rem] font-medium text-[var(--foreground)]">Resumos faltando</p>
                 <p className="text-[0.625rem] leading-snug text-[var(--muted-foreground)]">
-                  Retry past days that failed or never received an automatic summary.
+                  
+                  Repita os dias passados que falharam ou nunca receberam um resumo automático.
                 </p>
               </div>
               <button

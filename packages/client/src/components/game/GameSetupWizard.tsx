@@ -843,7 +843,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                 ))}
               </div>
               <p className="mt-1 text-[0.575rem] text-[var(--muted-foreground)]">
-                All narration and dialogue will be written in this language.
+                
+                Toda a narração e o diálogo serão escritos neste idioma.
               </p>
             </div>
           </>
@@ -1191,7 +1192,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
               </div>
               {connections.length === 0 && (
                 <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                  No connections configured. Add one in Settings → Connections.
+                  
+                  Nenhuma conexão configurada. Adicione uma em Configurações → Conexões.
                 </p>
               )}
             </div>
@@ -1256,7 +1258,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                       <div className="min-w-0">
                         <span className="block text-xs font-medium text-[var(--foreground)]">Spotify DJ Music</span>
                         <span className="block text-[0.575rem] text-[var(--muted-foreground)]">
-                          Use Spotify music for this game instead of local music assets
+                          
+                          Usar música do Spotify para este game em vez dos assets de música locais
                         </span>
                       </div>
                     </div>
@@ -1352,7 +1355,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                           )}
                           {spotifyPlaylistsQuery.isError && (
                             <span className="text-[0.5625rem] text-amber-400/90">
-                              Connect Spotify in the Spotify DJ agent to load playlist names.
+                              
+                              Conecte o Spotify no agente Spotify DJ para carregar os nomes das playlists.
                             </span>
                           )}
                         </label>
@@ -1427,7 +1431,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                     <div className="flex-1">
                       <span className="block text-xs font-medium text-[var(--foreground)]">Geração de imagem</span>
                       <span className="block text-[0.575rem] text-[var(--muted-foreground)]">
-                        Auto-generate NPC portraits and location backgrounds during gameplay
+                        
+                        Gerar automaticamente retratos de NPC e fundos de locais durante o jogo
                       </span>
                     </div>
                     <div
