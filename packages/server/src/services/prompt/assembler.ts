@@ -41,9 +41,12 @@ interface RuntimeAgentData {
 // (roleplay e conversa) para garantir que a IA responda
 // sempre em português do Brasil, sem mexer em tags/comandos.
 // ──────────────────────────────────────────────
-export const PT_BR_LANGUAGE_DIRECTIVE = `<idioma_resposta>
-IMPORTANTE: Escreva TODAS as suas respostas — narração, diálogos, descrições, pensamentos e qualquer texto voltado ao usuário — em português do Brasil (pt-BR), com naturalidade e fluência, independentemente do idioma destas instruções, do card do personagem ou do preset.
-NÃO traduza nem altere tags de sistema, comandos entre colchetes (ex.: [scene: ...], [selfie], [state: ...], [choices: ...]), blocos XML estruturais, nomes de campos, JSON, código ou macros ({{...}}) — mantenha-os exatamente como especificado. Apenas o texto em linguagem natural deve estar em português.
+export const PT_BR_LANGUAGE_DIRECTIVE = `<idioma_resposta prioridade="máxima">
+REGRA DE IDIOMA INEGOCIÁVEL: Escreva 100% das suas respostas — narração, diálogos, descrições, pensamentos e qualquer texto voltado ao usuário — em português do Brasil (pt-BR), com naturalidade e fluência.
+- Isto vale MESMO que estas instruções, o prompt do assistente, o card do personagem, a persona ou o preset estejam escritos em inglês. O idioma do seu contexto NÃO é o idioma da sua resposta.
+- NUNCA misture idiomas na mesma frase (nada de "need help", "let me", "you can", etc.) e NUNCA responda em inglês. Se perceber uma palavra ou expressão em inglês saindo, troque por português.
+- Bordões e gírias também em português; só mantenha em inglês nomes próprios consagrados (ex.: marcas, nomes de modelos/apps).
+- NÃO traduza nem altere tags de sistema, comandos entre colchetes (ex.: [scene: ...], [selfie], [state: ...], [choices: ...], [navigate: ...]), blocos XML estruturais, nomes de campos, valores de enum, JSON, código ou macros ({{...}}) — mantenha-os exatamente como especificado. Apenas o texto em linguagem natural deve estar em português.
 </idioma_resposta>`;
 
 /** Anexa a diretiva de idioma PT-BR à mensagem de sistema final (ou cria uma). */
