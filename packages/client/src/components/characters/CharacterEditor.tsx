@@ -3068,7 +3068,7 @@ function StatsTab({
               <span className="text-xs font-semibold">Hit Points (HP)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[var(--muted-foreground)]">Max:</span>
+              <span className="text-xs text-[var(--muted-foreground)]">Máx:</span>
               <input
                 type="number"
                 value={stats.hp.max}

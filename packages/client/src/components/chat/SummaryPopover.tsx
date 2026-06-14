@@ -1060,7 +1060,8 @@ export function SummaryPopover({
                     />
                   </label>
                   <label className="space-y-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                    To
+                    
+                    Para
                     <input
                       type="number"
                       min={1}

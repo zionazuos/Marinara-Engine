@@ -385,7 +385,7 @@ export function LorebookMakerModal({ open, onClose }: Props) {
 
             <div className="space-y-1.5">
               <p className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                {generated.entries?.length ?? 0} entries generated
+                {generated.entries?.length ?? 0}  entradas geradas
               </p>
               <div className="max-h-48 space-y-1.5 overflow-y-auto">
                 {generated.entries?.map((entry, i) => (

@@ -367,7 +367,7 @@ export function CharacterLibraryView() {
                 Navegar pelos seus personagens
               </h1>
               <p className="text-xs text-[var(--muted-foreground)] md:text-sm">
-                {filteredCharacters.length} out of {parsedCharacters.length} card
+                {filteredCharacters.length}  de {parsedCharacters.length} card
                 {parsedCharacters.length === 1 ? "" : "s"}
               </p>
             </div>

@@ -1204,7 +1204,8 @@ export function ChatSidebar() {
                 <AlertTriangle size="1.125rem" className="text-[var(--destructive)]" />
               </div>
               <p className="text-sm text-[var(--muted-foreground)]">
-                This conversation has{" "}
+                
+                Esta conversa tem{" "}
                 <strong className="text-[var(--foreground)]">{deleteTarget.branchCount} branches</strong>. What would
                 you like to delete?
               </p>

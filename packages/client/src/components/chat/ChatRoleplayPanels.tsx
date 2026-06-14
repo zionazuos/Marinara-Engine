@@ -74,11 +74,11 @@ function BudgetSkippedEntryRow({ entry }: { entry: BudgetSkippedLorebookEntry })
         <span className="shrink-0 text-[0.625rem] text-amber-200/70">~{entry.estimatedTokens.toLocaleString()}</span>
       </div>
       <p className="mt-0.5 truncate pl-5 text-[0.625rem] text-amber-100/70">
-        {entry.lorebookName} blocked by {formatBudgetName(entry.blockedBy)}
+        {entry.lorebookName}  bloqueado por {formatBudgetName(entry.blockedBy)}
       </p>
       {expanded && (
         <div className="mt-1.5 space-y-1 border-t border-amber-500/20 pt-1.5 pl-5 text-[0.625rem] leading-relaxed text-amber-50/75">
-          <p>Matched: {entry.matchedKeys.length > 0 ? entry.matchedKeys.slice(0, 5).join(", ") : "No key recorded"}</p>
+          <p>Correspondido: {entry.matchedKeys.length > 0 ? entry.matchedKeys.slice(0, 5).join(", ") : "No key recorded"}</p>
           <p>Entry estimate: ~{entry.estimatedTokens.toLocaleString()} tokens</p>
           <p>Orçamento usado antes da entrada: {formatBudgetCap(entry)}</p>
         </div>

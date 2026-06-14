@@ -3467,7 +3467,8 @@ function ImportSettings() {
               </div>
               {formatProfileImportStats(profileImportProgress.imported) && (
                 <div className="text-[0.6875rem] text-[var(--muted-foreground)]">
-                  Imported so far: {formatProfileImportStats(profileImportProgress.imported)}
+                  
+                  Importados até agora: {formatProfileImportStats(profileImportProgress.imported)}
                 </div>
               )}
               {profileImportProgress.warnings?.length ? (
@@ -4034,7 +4035,7 @@ function AdvancedSettings() {
             )}
           </button>
           <div className="flex flex-col text-[0.6875rem] text-[var(--muted-foreground)]">
-            <span>Release: {currentReleaseLabel}</span>
+            <span>Versão: {currentReleaseLabel}</span>
             <span>{currentBuildLabel}</span>
           </div>
         </div>
@@ -4120,7 +4121,8 @@ function AdvancedSettings() {
                     className="flex items-center justify-center gap-1.5 rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-medium text-white transition-all hover:opacity-90 active:scale-95"
                   >
                     <Download size="0.8125rem" />
-                    Download v{updateCheck.data.latestVersion}
+                    
+                    Baixar v{updateCheck.data.latestVersion}
                   </a>
                 )}
                 {updateCheck.data.versionUpdate && (

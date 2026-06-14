@@ -1208,7 +1208,7 @@ function ExpandedDrawer({
       >
         <KeysEditor keys={form.secondaryKeys ?? []} onChange={(keys) => update({ secondaryKeys: keys })} />
         <div className="mt-2 flex items-center gap-3">
-          <label className="text-[0.6875rem] text-[var(--muted-foreground)]">Logic:</label>
+          <label className="text-[0.6875rem] text-[var(--muted-foreground)]">Lógica:</label>
           {(["and", "or", "not"] as const).map((logic) => (
             <button
               key={logic}
@@ -1345,7 +1345,7 @@ function ExpandedDrawer({
           tooltip="Quando ativado, o conteúdo desta entrada não dispara entradas adicionais durante a varredura recursiva."
         />
         <ToggleButton
-          label="No Vector"
+          label="Sem vetor"
           value={form.excludeFromVectorization ?? false}
           onChange={(v) => update({ excludeFromVectorization: v })}
           tooltip="Quando ativado, a vetorização em lote pula esta entrada e remove qualquer embedding armazenado."

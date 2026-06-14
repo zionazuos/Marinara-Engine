@@ -906,7 +906,8 @@ export function ConnectionEditor() {
                 </span>
               </p>
               <p className="mt-1.5 text-[0.625rem] text-[var(--muted-foreground)]">
-                Example Base URL:{" "}
+                
+                URL base de exemplo:{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">
                   https://us-central1-aiplatform.googleapis.com/v1/projects/my-project/locations/us-central1
                 </code>
@@ -1368,7 +1369,8 @@ export function ConnectionEditor() {
             {selectedModelInfo && (
               <div className="mt-2 flex items-center gap-4 rounded-lg bg-sky-400/5 px-3 py-2 text-[0.6875rem]">
                 <span className="text-[var(--muted-foreground)]">
-                  Context: <strong className="text-sky-400">{formatContext(selectedModelInfo.context)}</strong>
+                  
+                  Contexto: <strong className="text-sky-400">{formatContext(selectedModelInfo.context)}</strong>
                 </span>
                 <span className="text-[var(--muted-foreground)]">
                   
@@ -1453,7 +1455,8 @@ export function ConnectionEditor() {
                         )}
                         {comfyWorkflowValidation.missing.some((m) => !m.critical) && (
                           <>
-                            Unused:{" "}
+                            
+                            Não usado:{" "}
                             {comfyWorkflowValidation.missing
                               .filter((m) => !m.critical)
                               .map((m) => m.label)
@@ -2005,9 +2008,9 @@ export function ConnectionEditor() {
               >
                 <div className="mt-1.5 space-y-2">
                   <div className="grid grid-cols-[max-content,1fr] gap-x-3 gap-y-1 text-[0.6875rem]">
-                    <span className="text-[var(--muted-foreground)]">Requested model:</span>
+                    <span className="text-[var(--muted-foreground)]">Modelo solicitado:</span>
                     <span className="font-mono">{claudeDiagResult.requestedModel}</span>
-                    <span className="text-[var(--muted-foreground)]">SDK billed against:</span>
+                    <span className="text-[var(--muted-foreground)]">SDK cobrou contra:</span>
                     <span
                       className={cn(
                         "font-mono",
@@ -2044,7 +2047,8 @@ export function ConnectionEditor() {
                             {secondary.length > 0 && (
                               <span className="flex flex-col gap-0.5">
                                 <span className="text-[0.5625rem] font-sans uppercase tracking-wide text-[var(--muted-foreground)]">
-                                  SDK session bookkeeping
+                                  
+                                  Controle de sessão do SDK
                                 </span>
                                 {secondary.map((u) => (
                                   <span key={u.model} className="text-[var(--muted-foreground)]">
@@ -2073,7 +2077,7 @@ export function ConnectionEditor() {
                     <div className="rounded-lg bg-[var(--destructive)]/10 p-2.5 text-[0.6875rem] text-[var(--destructive)] ring-1 ring-[var(--destructive)]/30">
                       
                       Rebaixamento silencioso detectado — você pediu <strong>{claudeDiagResult.requestedModel}</strong>  mas o SDK cobrou <strong>{claudeDiagResult.modelsBilled.join(", ")}</strong>. This is usually caused
-                      by Claude Code being in <code>cooldown</code>  após atingir os limites de taxa do Opus, ou o fast mode estar ligado nas configurações do seu CLI. Execute <code>claude /model</code> in your terminal to check.
+                      by Claude Code being in <code>cooldown</code>  após atingir os limites de taxa do Opus, ou o fast mode estar ligado nas configurações do seu CLI. Execute <code>claude /model</code>  no seu terminal para verificar.
                     </div>
                   )}
                   {claudeDiagResult.modelUsageDetail.some((u) => u.model !== claudeDiagResult.requestedModel) && (

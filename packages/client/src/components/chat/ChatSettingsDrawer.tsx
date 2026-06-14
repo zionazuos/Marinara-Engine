@@ -4628,7 +4628,7 @@ export function ChatSettingsDrawer({
                             )}
                             <span className="truncate">
                               ~{agentLoadCost.cost.instructionTokens.toLocaleString()}  tokens de instruções do agente
-                              {" · "}~{agentLoadCost.cost.extraCalls} extra call
+                              {" · "}~{agentLoadCost.cost.extraCalls}  chamada extra
                               {agentLoadCost.cost.extraCalls === 1 ? "" : "s"}/turn
                             </span>
                           </span>
@@ -5015,7 +5015,7 @@ export function ChatSettingsDrawer({
                         <p className="text-[0.625rem] text-amber-400/80 leading-snug">
                           
                           Os resumos existentes foram construídos com a configuração anterior. Por hoje, mensagens próximas à hora de virada podem ficar duplicadas ou faltando no prompt. A partir de amanhã, os novos resumos diários ficarão alinhados corretamente. Para ajustar um resumo mais antigo, use{" "}
-                          <span className="font-medium">Editar resumos</span> above.
+                          <span className="font-medium">Editar resumos</span>  acima.
                         </p>
                       </div>
                     )}

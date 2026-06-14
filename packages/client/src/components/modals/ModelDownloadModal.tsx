@@ -849,7 +849,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                         <div className="text-xs text-[var(--muted-foreground)]/75">
                           {testMessageResult.usage && (
                             <span>
-                              Usage: prompt {testMessageResult.usage.promptTokens ?? "?"}, completion{" "}
+                              
+                              Uso: prompt {testMessageResult.usage.promptTokens ?? "?"}, completion{" "}
                               {testMessageResult.usage.completionTokens ?? "?"}, total{" "}
                               {testMessageResult.usage.totalTokens ?? "?"}
                             </span>
@@ -857,7 +858,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                           {testMessageResult.usage && testMessageResult.timings && <span> • </span>}
                           {testMessageResult.timings && (
                             <span>
-                              Timings: prompt {testMessageResult.timings.promptMs ?? "?"}ms / gen{" "}
+                              
+                              Tempos: prompt {testMessageResult.timings.promptMs ?? "?"}ms / gen{" "}
                               {testMessageResult.timings.predictedMs ?? "?"}ms
                             </span>
                           )}

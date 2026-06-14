@@ -1924,7 +1924,7 @@ export function BotBrowserView() {
                     }}
                     className="flex w-full items-center gap-1.5 rounded-md bg-red-500/10 px-2 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/20"
                   >
-                    − Block <strong>{tagSearch.trim().toLowerCase()}</strong> from results
+                    − Block <strong>{tagSearch.trim().toLowerCase()}</strong>  dos resultados
                   </button>
                 </div>
               )}
@@ -2165,7 +2165,8 @@ export function BotBrowserView() {
                   ))}
                 {sourceId === "wyvern" && (
                   <span className="flex items-center gap-1.5 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-[0.65rem] text-amber-400">
-                    Use "🔞 Popular NSFW" sort for NSFW content
+                    
+                    Use a ordenação "🔞 Popular NSFW" para conteúdo NSFW
                   </span>
                 )}
 
@@ -2516,7 +2517,8 @@ function LoginModal({
                     >
                       pygmalion.chat
                     </a>{" "}
-                    and log in
+                    
+                    e faça login
                   </p>
                   <p>
                     2. Open DevTools (F12) → <strong>Aplicativo</strong> tab → <strong>Armazenamento local</strong>
@@ -2591,7 +2593,8 @@ function LoginModal({
                     >
                       character-tavern.com
                     </a>{" "}
-                    and log in
+                    
+                    e faça login
                   </p>
                   <p>2. Open DevTools (F12) → Application tab → Cookies</p>
                   <p>
@@ -2798,7 +2801,7 @@ function DetailView({
           rel="noopener noreferrer"
           className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
         >
-          <ExternalLink size="0.75rem" /> View on {provider.siteName}
+          <ExternalLink size="0.75rem" />  Ver em {provider.siteName}
         </a>
       </div>
       {loading ? (

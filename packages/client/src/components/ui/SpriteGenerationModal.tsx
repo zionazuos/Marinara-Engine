@@ -1552,7 +1552,7 @@ export function SpriteGenerationModal({
                         Matched expressions ({matchedFullBodyExpressions.length})
                       </span>
                       <span className="text-[0.625rem] text-[var(--muted-foreground)]">
-                        {matchedFullBodyBatches.length} batch{matchedFullBodyBatches.length === 1 ? "" : "es"} of up to{" "}
+                        {matchedFullBodyBatches.length} batch{matchedFullBodyBatches.length === 1 ? "" : "es"}  de até{" "}
                         {MATCHED_FULL_BODY_BATCH_SIZE}
                       </span>
                       {existingPortraitExpressions.length > matchedFullBodyExpressions.length && (

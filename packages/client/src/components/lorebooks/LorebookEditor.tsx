@@ -1368,7 +1368,7 @@ export function LorebookEditor() {
                   {scopeSummary && (
                     <div className="flex h-[10.25rem] items-start overflow-hidden rounded-xl bg-[var(--secondary)] px-4 py-3 ring-1 ring-[var(--border)] md:row-span-2">
                       <div className="min-w-0 overflow-hidden">
-                        <p className="text-xs font-medium mb-1">Linked To:</p>
+                        <p className="text-xs font-medium mb-1">Vinculado a:</p>
                         {"text" in scopeSummary ? (
                           <p className="text-[0.6875rem] text-[var(--muted-foreground)]">{scopeSummary.text}</p>
                         ) : (
@@ -1501,7 +1501,8 @@ export function LorebookEditor() {
                   <div className="flex items-end">
                     <div className="flex w-full items-center justify-between rounded-xl bg-[var(--secondary)] px-3 py-2.5 ring-1 ring-[var(--border)]">
                       <span className="mr-2 inline-flex items-center gap-1 text-xs">
-                        No Vector
+                        
+                        Sem vetor
                         <HelpTooltip text="Skip semantic embeddings for every entry in this lorebook. Keyword matching still works." />
                       </span>
                       <button

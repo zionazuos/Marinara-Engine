@@ -1747,7 +1747,7 @@ function PersonaStatsTab({
                       className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--input)] px-2 py-1 text-xs font-medium"
                       placeholder="Nome do atributo"
                     />
-                    <span className="text-[0.625rem] text-[var(--muted-foreground)]">max:</span>
+                    <span className="text-[0.625rem] text-[var(--muted-foreground)]">máx:</span>
                     <input
                       type="number"
                       value={bar.max}
@@ -1820,7 +1820,7 @@ function PersonaStatsTab({
                 <span className="text-xs font-semibold">Hit Points (HP)</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[var(--muted-foreground)]">Max:</span>
+                <span className="text-xs text-[var(--muted-foreground)]">Máx:</span>
                 <input
                   type="number"
                   value={rpgStats.hp.max}

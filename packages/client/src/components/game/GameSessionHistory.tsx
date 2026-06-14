@@ -365,7 +365,7 @@ export function GameSessionHistory({
           <History size={16} className="text-[var(--muted-foreground)]" />
           <span className="text-sm font-semibold text-[var(--foreground)]">Histórico de sessões</span>
           <span className="text-xs text-[var(--muted-foreground)]">
-            ({sorted.length} past session{sorted.length !== 1 ? "s" : ""})
+            ({sorted.length}  sessão passada{sorted.length !== 1 ? "s" : ""})
           </span>
         </div>
         <button
@@ -468,7 +468,8 @@ export function GameSessionHistory({
                     </label>
                     <label className="flex flex-col gap-1">
                       <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        Maps JSON
+                        
+                        JSON de mapas
                       </span>
                       <textarea
                         value={secretDraft?.maps ?? ""}
@@ -482,7 +483,8 @@ export function GameSessionHistory({
                     </label>
                     <label className="flex flex-col gap-1">
                       <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        NPCs JSON
+                        
+                        JSON de NPCs
                       </span>
                       <textarea
                         value={secretDraft?.npcs ?? ""}
@@ -496,7 +498,8 @@ export function GameSessionHistory({
                     </label>
                     <label className="flex flex-col gap-1">
                       <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        Character Cards JSON
+                        
+                        JSON de cards de personagem
                       </span>
                       <textarea
                         value={secretDraft?.characterCards ?? ""}

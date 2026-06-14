@@ -558,7 +558,7 @@ export function ToolEditor() {
                 <code className="rounded bg-[var(--secondary)] px-1">JSON</code>,{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">Math</code>,{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">Data</code>. Must{" "}
-                <code className="rounded bg-[var(--secondary)] px-1">return</code> a result.
+                <code className="rounded bg-[var(--secondary)] px-1">return</code>  um resultado.
               </p>
             </FieldGroup>
           )}

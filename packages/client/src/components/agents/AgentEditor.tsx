@@ -1790,7 +1790,8 @@ export function AgentEditor() {
                   <p className="font-medium text-green-400/80">Configuração:</p>
                   <ol className="list-decimal list-inside space-y-1 text-white/40">
                     <li>
-                      Go to the{" "}
+                      
+                      Vá para o{" "}
                       <a
                         href="https://developer.spotify.com/dashboard"
                         target="_blank"
@@ -1810,7 +1811,8 @@ export function AgentEditor() {
                       </code>
                     </li>
                     <li>
-                      Copy the <strong>Client ID</strong>  e cole acima
+                      
+                      Copie o <strong>Client ID</strong>  e cole acima
                     </li>
                     <li>
                       
@@ -1822,7 +1824,8 @@ export function AgentEditor() {
                     Requer Spotify Premium. Os tokens são atualizados automaticamente — não precisa reconectar.
                   </p>
                   <p className="text-[0.625rem] text-white/30 leading-relaxed">
-                    Spotify only accepts <code className="text-white/40">https://</code> redirect URIs or loopback (
+                    
+                    O Spotify só aceita <code className="text-white/40">https://</code> redirect URIs or loopback (
                     <code className="text-white/40">http://127.0.0.1</code>). If you&apos;re running Marinara on another
                     machine over plain HTTP, register the loopback URI anyway and use the paste-back fallback that
                     appears under the Connect button — or set{" "}
@@ -2238,7 +2241,7 @@ export function AgentEditor() {
             <h3 className="mb-2 text-xs font-semibold text-[var(--foreground)]">Sobre este agente</h3>
             <div className="space-y-1.5 text-[0.6875rem] text-[var(--muted-foreground)]">
               <p>
-                <strong className="text-[var(--foreground)]">Type:</strong> {isCustomAgent ? "Custom" : agentDetailId}
+                <strong className="text-[var(--foreground)]">Tipo:</strong> {isCustomAgent ? "Custom" : agentDetailId}
               </p>
               <p>
                 <strong className="text-[var(--foreground)]">Fase:</strong> {phaseMeta.label} — {phaseMeta.description}
