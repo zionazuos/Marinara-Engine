@@ -929,7 +929,7 @@ export function CustomTrackerPanel({
         </span>
       </div>
       <div className="p-2 space-y-1">
-        {fields.length === 0 && <div className={cn(EMPTY_STATE, "py-2")}>No fields tracked — add one above</div>}
+        {fields.length === 0 && <div className={cn(EMPTY_STATE, "py-2")}>Nenhum campo rastreado — adicione um acima</div>}
         {fields.map((field, idx) => (
           <div key={idx} className="flex items-center gap-1.5 rounded-lg bg-[var(--muted)]/20 px-2 py-1.5">
             <SlidersHorizontal size="0.625rem" className="shrink-0 text-cyan-400/60" />

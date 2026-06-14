@@ -785,7 +785,8 @@ export function PersonasPanel() {
         <div className="flex items-center gap-2 rounded-xl bg-[var(--primary)]/10 px-3 py-2 text-xs ring-1 ring-[var(--primary)]/30">
           <Users size="0.8125rem" className="text-[var(--primary)]" />
           <span className="flex-1">
-            Click personas to add/remove from{" "}
+            
+            Clique nas personas para adicionar/remover de{" "}
             <strong>{parsedGroups.find((g) => g.id === assigningToGroup)?.name}</strong>
           </span>
           <button onClick={() => setAssigningToGroup(null)} className="rounded p-0.5 hover:bg-[var(--accent)]">
@@ -807,7 +808,7 @@ export function PersonasPanel() {
           <div className="animate-float flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400/20 to-teal-500/20">
             <User size="1.25rem" className="text-emerald-400" />
           </div>
-          <p className="text-xs text-[var(--muted-foreground)]">No personas yet — create one!</p>
+          <p className="text-xs text-[var(--muted-foreground)]">Nenhuma persona ainda — crie uma!</p>
         </div>
       )}
 

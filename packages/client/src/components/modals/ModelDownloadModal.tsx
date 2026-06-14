@@ -619,7 +619,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                   </div>
                   {activeBackend === "mlx" ? (
                     <div className="rounded-xl border border-[var(--border)] bg-[var(--card)]/60 px-3 py-2 text-sm text-[var(--muted-foreground)]/75">
-                      MLX manages GPU offload automatically.
+                      
+                      O MLX gerencia o offload da GPU automaticamente.
                     </div>
                   ) : (
                     <>

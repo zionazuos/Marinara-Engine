@@ -319,7 +319,7 @@ function ImageDimensionRow({
           {label}
           <HelpTooltip text={help} />
         </div>
-        <div className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">Pixels, clamped from 64 to 4096.</div>
+        <div className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">Pixels, limitado de 64 a 4096.</div>
       </div>
       <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 sm:w-40">
         <DraftNumberInput
@@ -1478,8 +1478,7 @@ function AppearanceSettings() {
         </select>
         {(!customFonts || customFonts.length === 0) && (
           <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-            Drop font files (.ttf, .otf, .woff, .woff2) into the <span className="font-medium">data/fonts/</span> folder
-            to add custom fonts.
+            Drop font files (.ttf, .otf, .woff, .woff2) into the <span className="font-medium">data/fonts/</span>  pasta para adicionar fontes personalizadas.
           </p>
         )}
         <button
@@ -1530,7 +1529,8 @@ function AppearanceSettings() {
           rel="noopener noreferrer"
           className="text-[0.625rem] text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors inline-flex items-center gap-1"
         >
-          Browse fonts at fonts.google.com →
+          
+          Procure fontes em fonts.google.com →
         </a>
       </div>
 
@@ -4076,7 +4076,8 @@ function AdvancedSettings() {
             )}
             {commitsBehind > 0 && (
               <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                Commit counts compare this build with {updateCheck.data.targetRef ?? "origin/main"}  e pode incluir commits de desenvolvimento não lançados, não apenas versões marcadas.
+                
+                As contagens de commits comparam este build com {updateCheck.data.targetRef ?? "origin/main"}  e pode incluir commits de desenvolvimento não lançados, não apenas versões marcadas.
               </p>
             )}
             {isIosClient && (
@@ -4376,7 +4377,7 @@ function AdvancedSettings() {
         help="Displays message numbers in roleplay and conversation chats."
       />
       <ToggleSetting
-        label="Guide swipes/regens with chat input"
+        label="Guiar swipes/regenerações com a entrada do chat"
         checked={guideGenerations}
         onChange={setGuideGenerations}
         help="Uses the current draft as direction when regenerating a message or manually triggering a character response."

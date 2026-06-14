@@ -7103,7 +7103,8 @@ function ScheduleEditor({
                         placeholder="Padrão"
                       />
                       <span className="block text-[0.5rem] text-[var(--muted-foreground)]">
-                        Blank keeps the built-in 2-5 minute range.
+                        
+                        Em branco mantém o intervalo embutido de 2 a 5 minutos.
                       </span>
                     </label>
                   </div>
@@ -7339,11 +7340,13 @@ function HapticConnectionPanel({
       {/* Error message */}
       {connect.isError && !connected && (
         <p className="text-[0.625rem] text-red-400 px-1">
-          Could not connect — make sure{" "}
+          
+          Não foi possível conectar — verifique se{" "}
           <a href="https://intiface.com/central/" target="_blank" rel="noopener noreferrer" className="underline">
             Intiface Central
           </a>{" "}
-          is running and the server is started.
+          
+          está rodando e o servidor foi iniciado.
         </p>
       )}
 

@@ -1787,7 +1787,8 @@ function VariableCard({
                         placeholder=", "
                       />
                       <span className="text-[0.5625rem] text-[var(--muted-foreground)]">
-                        e.g. ", " becomes Romance, Fantasy, Action
+                        
+                        ex.: ", " vira Romance, Fantasia, Ação
                       </span>
                     </div>
                   )}
@@ -1846,7 +1847,7 @@ function VariableCard({
                     </button>
                     <button
                       onClick={() => {
-                        if (opts.length <= 1) return toast.error("A variable needs at least 1 option.");
+                        if (opts.length <= 1) return toast.error("Uma variável precisa de pelo menos 1 opção.");
                         updateOpts(opts.filter((_, i) => i !== oi));
                       }}
                       className="shrink-0 rounded p-0.5 hover:bg-[var(--destructive)]/15"

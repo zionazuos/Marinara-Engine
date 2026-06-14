@@ -50,7 +50,7 @@ export function AudioPlayerModal({ path, name, onClose }: { path: string; name: 
         {playError && (
           <p className="mt-2 text-xs text-(--destructive)">
             
-            Seu navegador não consegue reproduzir {ext || "this"} file. Use the download button below.
+            Seu navegador não consegue reproduzir {ext || "this"}  arquivo. Use o botão de download abaixo.
           </p>
         )}
         <div className="mt-4 flex justify-end gap-2">

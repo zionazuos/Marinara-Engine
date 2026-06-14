@@ -846,7 +846,7 @@ export function ConnectionEditor() {
                 <AlertCircle size="0.75rem" className="mt-px shrink-0" />
                 <span>
                   
-                  Roteia o chat pelo seu modelo local <strong>Claude Code</strong> install so it bills against your Anthropic{" "}
+                  Roteia o chat pelo seu modelo local <strong>Claude Code</strong>  instale para que seja cobrado na sua Anthropic{" "}
                   <strong>Pro / Max</strong>  assinatura em vez de uma chave de API. Pré-requisitos no host do Marinara:
                 </span>
               </p>
@@ -928,7 +928,7 @@ export function ConnectionEditor() {
                   markDirty();
                 }}
                 className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-                placeholder="e.g. Anthropic, Google, Amazon Bedrock…"
+                placeholder="ex.: Anthropic, Google, Amazon Bedrock…"
               />
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
                 
@@ -994,13 +994,15 @@ export function ConnectionEditor() {
             )}
             {localProvider === "claude_subscription" && (
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Authentication is read from your local{" "}
+                
+                A autenticação é lida do seu{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">claude</code> CLI session.
               </p>
             )}
             {isOpenAIChatGPTProvider && (
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Authentication is read from your local{" "}
+                
+                A autenticação é lida do seu{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">codex login</code>  sessão.
               </p>
             )}
@@ -1049,7 +1051,8 @@ export function ConnectionEditor() {
             )}
             {localProvider === "custom" && (
               <p className="mt-1.5 text-[0.625rem] text-[var(--muted-foreground)]">
-                Local model examples: Ollama →{" "}
+                
+                Exemplos de modelo local: Ollama →{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">http://localhost:11434/v1</code> · LM Studio →{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">http://localhost:1234/v1</code> · KoboldCpp →{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">http://localhost:5001/v1</code>
@@ -1122,7 +1125,7 @@ export function ConnectionEditor() {
               </p>
               {selectedImageService === "runpod_comfyui" && (
                 <div className="mt-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-[0.625rem] text-amber-300/80">
-                  <strong>Configuração do RunPod:</strong> Your endpoint ID goes in the <strong>Endpoint ID</strong>  campo abaixo. A chave de API é o seu token de API do RunPod. O JSON de workflow é <strong>required</strong> — the
+                  <strong>Configuração do RunPod:</strong>  O seu endpoint ID vai no <strong>Endpoint ID</strong>  campo abaixo. A chave de API é o seu token de API do RunPod. O JSON de workflow é <strong>required</strong> — the
                   endpoint executes the workflow you supply. Use <code>%prompt%</code>  placeholders no nó CLIPTextEncode.
                 </div>
               )}
@@ -1462,7 +1465,8 @@ export function ConnectionEditor() {
                     </p>
                   )}
                 <p className="text-[0.55rem] text-[var(--muted-foreground)] mt-1">
-                  Export your workflow from ComfyUI using <strong>Save (API Format)</strong>  no menu. Placeholders como <code>%prompt%</code>, <code>%steps%</code>, <code>%sampler%</code>, and reference-image
+                  
+                  Exporte seu workflow do ComfyUI usando <strong>Save (API Format)</strong>  no menu. Placeholders como <code>%prompt%</code>, <code>%steps%</code>, <code>%sampler%</code>, and reference-image
                   placeholders will be replaced at generation time.
                 </p>
               </FieldGroup>
@@ -2067,8 +2071,8 @@ export function ConnectionEditor() {
                   </div>
                   {claudeDiagResult.billedDifferent && (
                     <div className="rounded-lg bg-[var(--destructive)]/10 p-2.5 text-[0.6875rem] text-[var(--destructive)] ring-1 ring-[var(--destructive)]/30">
-                      Silent downgrade detected — you asked for <strong>{claudeDiagResult.requestedModel}</strong> but
-                      the SDK billed <strong>{claudeDiagResult.modelsBilled.join(", ")}</strong>. This is usually caused
+                      
+                      Rebaixamento silencioso detectado — você pediu <strong>{claudeDiagResult.requestedModel}</strong>  mas o SDK cobrou <strong>{claudeDiagResult.modelsBilled.join(", ")}</strong>. This is usually caused
                       by Claude Code being in <code>cooldown</code>  após atingir os limites de taxa do Opus, ou o fast mode estar ligado nas configurações do seu CLI. Execute <code>claude /model</code> in your terminal to check.
                     </div>
                   )}

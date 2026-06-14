@@ -1219,7 +1219,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                 }}
                 className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all focus:ring-[var(--primary)]/40"
               >
-                <option value="">Skip — use inline tags from GM</option>
+                <option value="">Pular — usar tags inline do GM</option>
                 {sidecarAvailable && <option value="local">Local Model (Gemma)</option>}
                 {connections.map((c) => (
                   <option key={c.id} value={c.id}>

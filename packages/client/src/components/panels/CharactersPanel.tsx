@@ -626,7 +626,7 @@ export function CharactersPanel() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder='Search characters or -tag:"tag name"'
+            placeholder='Busque por personagens ou -tag:"tag name"'
             className="w-full rounded-xl border border-[var(--border)] bg-[var(--secondary)] py-2 pl-8 pr-3 text-xs outline-none transition-colors placeholder:text-[var(--muted-foreground)]/50 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
           />
         </div>
@@ -1132,7 +1132,8 @@ export function CharactersPanel() {
         <div className="flex items-center gap-2 rounded-xl bg-[var(--primary)]/10 px-3 py-2 text-xs ring-1 ring-[var(--primary)]/30">
           <Users size="0.8125rem" className="text-[var(--primary)]" />
           <span className="flex-1">
-            Click characters to add/remove from{" "}
+            
+            Clique nos personagens para adicionar/remover de{" "}
             <strong>{parsedGroups.find((g) => g.id === assigningToGroup)?.name}</strong>
           </span>
           <button onClick={() => setAssigningToGroup(null)} className="rounded p-0.5 hover:bg-[var(--accent)]">

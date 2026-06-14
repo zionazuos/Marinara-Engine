@@ -2151,7 +2151,8 @@ function CharacterGalleryTab({ characterId, characterName }: { characterId: stri
           <div>
             <p className="text-sm font-medium text-[var(--muted-foreground)]">Nenhuma imagem de personagem ainda</p>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]/60">
-              Upload images here to keep them tied to {characterName || "this character"}  em vez de um chat específico.
+              
+              Envie imagens aqui para mantê-las vinculadas a {characterName || "this character"}  em vez de um chat específico.
             </p>
           </div>
         </div>
@@ -2912,8 +2913,7 @@ function SpritesTab({
             happy_01.png and happy_blush.png are offered to the agent as "happy"
           </li>
           <li>
-            • Enable the <strong className="text-[var(--foreground)]">Motor de expressões</strong> agent in the Agents
-            panel
+            • Enable the <strong className="text-[var(--foreground)]">Motor de expressões</strong>  agente no painel Agentes
           </li>
           <li>• During roleplay, the agent will detect emotions and display the matching sprite</li>
           <li>• Sprites appear as VN-style overlays in the chat area</li>

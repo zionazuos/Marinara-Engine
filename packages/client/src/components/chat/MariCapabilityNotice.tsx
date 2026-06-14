@@ -77,7 +77,8 @@ export const MariCapabilityNotice = memo(function MariCapabilityNotice() {
           
           Edições de persona e lorebook sobrescrevem sem snapshot, então faça backup delas primeiro
         </strong>{" "}
-        if you want to keep the old version.
+        
+        se você quiser manter a versão antiga.
       </p>
       <button
         type="button"

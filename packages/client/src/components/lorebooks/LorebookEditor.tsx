@@ -1771,7 +1771,7 @@ export function LorebookEditor() {
                 {entries.length === 0 && folders.length === 0 && (
                   <div className="flex flex-col items-center gap-2 py-8 text-center">
                     <FileText size="1.5rem" className="text-[var(--muted-foreground)]" />
-                    <p className="text-xs text-[var(--muted-foreground)]">No entries yet — add one to get started</p>
+                    <p className="text-xs text-[var(--muted-foreground)]">Nenhuma entrada ainda — adicione uma para começar</p>
                   </div>
                 )}
 

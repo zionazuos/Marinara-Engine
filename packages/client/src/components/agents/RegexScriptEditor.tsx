@@ -448,7 +448,7 @@ export function RegexScriptEditor() {
                 markDirty();
               }}
               className="w-full rounded-xl bg-[var(--secondary)] px-4 py-2.5 font-mono text-sm ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-              placeholder="e.g. $1 or leave empty to remove"
+              placeholder="ex.: $1 ou deixe vazio para remover"
             />
           </FieldGroup>
 
@@ -672,8 +672,7 @@ export function RegexScriptEditor() {
                 Scripts run in order (lowest first). Use capture groups (
                 <code className="rounded bg-[var(--secondary)] px-1">$1</code>,{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">$2</code>) in the replacement to reference matched
-                groups. Use <code className="rounded bg-[var(--secondary)] px-1">\u$1</code>  para capitalizar o primeiro caractere de uma captura, ou <code className="rounded bg-[var(--secondary)] px-1">\U$1\E</code> to
-                uppercase a capture.
+                groups. Use <code className="rounded bg-[var(--secondary)] px-1">\u$1</code>  para capitalizar o primeiro caractere de uma captura, ou <code className="rounded bg-[var(--secondary)] px-1">\U$1\E</code>  para deixar uma captura em maiúsculas.
               </p>
               <p>
                 <strong className="text-[var(--foreground)]">Exemplos:</strong>

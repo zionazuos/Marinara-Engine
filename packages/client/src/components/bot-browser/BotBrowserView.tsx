@@ -2531,7 +2531,7 @@ function LoginModal({
               </details>
               {isLoggedIn && (
                 <div className="flex items-center gap-1.5 text-xs text-emerald-400">
-                  <CheckCircle size="0.75rem" /> Token active — NSFW content enabled
+                  <CheckCircle size="0.75rem" />  Token ativo — conteúdo NSFW ativado
                 </div>
               )}
               <div className="flex items-center gap-2">
@@ -2604,7 +2604,7 @@ function LoginModal({
               </details>
               {isLoggedIn && (
                 <div className="flex items-center gap-1.5 text-xs text-emerald-400">
-                  <CheckCircle size="0.75rem" /> Session active — NSFW content enabled
+                  <CheckCircle size="0.75rem" />  Sessão ativa — conteúdo NSFW ativado
                 </div>
               )}
               <div className="flex items-center gap-2">

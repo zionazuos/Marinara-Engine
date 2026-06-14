@@ -786,7 +786,7 @@ export function GameCharacterSheet({
                         type="text"
                         value={entry.value}
                         onChange={(e) => updateExtraEntry(index, "value", e.target.value)}
-                        placeholder="Lockpicking, survival, marksmanship"
+                        placeholder="Arrombamento de fechaduras, sobrevivência, pontaria"
                         className={TEXT_INPUT_CLASS}
                       />
                       <button
