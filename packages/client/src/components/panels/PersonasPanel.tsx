@@ -716,7 +716,8 @@ export function PersonasPanel() {
                     <div className="border-t border-[var(--border)]/50 px-2.5 py-1.5">
                       {group.memberIds.length === 0 ? (
                         <p className="py-1 text-[0.625rem] italic text-[var(--muted-foreground)]">
-                          No members — use <UserPlus size="0.5rem" className="inline" />  para atribuir personas
+                          
+                          Sem membros — use <UserPlus size="0.5rem" className="inline" />  para atribuir personas
                         </p>
                       ) : (
                         <div className="flex flex-col gap-0.5">

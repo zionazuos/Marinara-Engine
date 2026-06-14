@@ -1641,7 +1641,8 @@ function AppearanceSettings() {
         {/* Text Stroke */}
         <div className="flex flex-col gap-1.5">
           <span className="text-[0.6875rem] font-medium inline-flex items-center gap-1">
-            Text Outline / Stroke
+            
+            Contorno / traçado do texto
             <HelpTooltip text="Adds an outline around chat text for better readability over backgrounds. Set width to 0 to disable." />
           </span>
           <div className="flex items-center gap-3">
@@ -2637,11 +2638,11 @@ function ThemesSettings() {
               <span>--foreground</span>
               <span className="text-white/40">Texto principal</span>
               <span>--primary</span>
-              <span className="text-white/40">Accent / buttons</span>
+              <span className="text-white/40">Destaque / botões</span>
               <span>--primary-foreground</span>
               <span className="text-white/40">Texto sobre primária</span>
               <span>--secondary</span>
-              <span className="text-white/40">Cards / inputs</span>
+              <span className="text-white/40">Cards / entradas</span>
               <span>--card</span>
               <span className="text-white/40">Fundo do card</span>
               <span>--border</span>
@@ -2653,7 +2654,7 @@ function ThemesSettings() {
               <span>--sidebar-border</span>
               <span className="text-white/40">Borda da barra lateral</span>
               <span>--destructive</span>
-              <span className="text-white/40">Error / delete</span>
+              <span className="text-white/40">Erro / excluir</span>
               <span>--popover</span>
               <span className="text-white/40">Fundo do dropdown</span>
               <span>--accent</span>

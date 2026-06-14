@@ -794,7 +794,7 @@ export function ConnectionEditor() {
                 markDirty();
               }}
               className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-              placeholder="e.g. Claude Sonnet — RP"
+              placeholder="ex.: Claude Sonnet — RP"
             />
           </FieldGroup>
 

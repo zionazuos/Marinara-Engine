@@ -7831,7 +7831,8 @@ export function GameSurface({
               <label className="flex w-full max-w-sm flex-col gap-1.5 text-left">
                 <span className="flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)] dark:text-white/50">
                   <Plug size={12} />
-                  GM / Party Model
+                  
+                  Modelo do GM / grupo
                 </span>
                 <select
                   value={chat.connectionId ?? ""}

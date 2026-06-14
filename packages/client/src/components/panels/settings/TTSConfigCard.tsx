@@ -810,7 +810,8 @@ export function TTSConfigCard() {
                   ))}
                 </datalist>
                 <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-                  Eleven v3 speech uses <code className="font-mono">eleven_v3</code>. IDs containing{" "}
+                  
+                  A fala do Eleven v3 usa <code className="font-mono">eleven_v3</code>. IDs containing{" "}
                   <code className="font-mono">ttv</code>  são modelos de Texto para Voz / design de voz. Os proxies do NanoGPT usam{" "}
                   <code className="font-mono">Elevenlabs-V3</code>.
                 </p>
@@ -859,7 +860,7 @@ export function TTSConfigCard() {
                         mark({ voice: e.target.value });
                       }}
                       className={cn(INPUT_CLS, "flex-1")}
-                      placeholder="alba or a voice URL/path"
+                      placeholder="alba ou uma URL/caminho de voz"
                     />
                     <datalist id="pockettts-voices">
                       {voiceOptions.map((option) => (
@@ -1021,7 +1022,7 @@ export function TTSConfigCard() {
                         list="pockettts-narrator-voices"
                         onChange={(e) => handleNarratorVoiceChange(e.target.value)}
                         className={cn(INPUT_CLS, "min-w-0 flex-1")}
-                        placeholder="alba or a voice URL/path"
+                        placeholder="alba ou uma URL/caminho de voz"
                       />
                       <datalist id="pockettts-narrator-voices">
                         {voiceOptions.map((option) => (

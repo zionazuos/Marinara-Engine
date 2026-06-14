@@ -1042,7 +1042,8 @@ export function AgentEditor() {
               <div className="mt-3 grid gap-3 md:grid-cols-2">
                 <label className="flex flex-col gap-1.5">
                   <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                    Positive prompt / tags
+                    
+                    Prompt positivo / tags
                   </span>
                   <textarea
                     value={localImagePositivePrompt}
@@ -1279,7 +1280,8 @@ export function AgentEditor() {
               </p>
             )}
             <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-              For 8k local models, try {DEFAULT_AGENT_MAX_TOKENS.toLocaleString()}  ou menos para o prompt do agente manter espaço suficiente.
+              
+              Para modelos locais de 8k, tente {DEFAULT_AGENT_MAX_TOKENS.toLocaleString()}  ou menos para o prompt do agente manter espaço suficiente.
             </p>
           </FieldGroup>
 
@@ -2187,7 +2189,7 @@ export function AgentEditor() {
 
           {/* ── Available Tools (Function Calling) ── */}
           <FieldGroup
-            label="Tools / Function Calling"
+            label="Ferramentas / chamada de função"
             icon={<Wrench size="0.875rem" className="text-[var(--primary)]" />}
             help="Select which tools this agent can use during generation. The AI can call these functions and receive results back for multi-step interactions."
           >

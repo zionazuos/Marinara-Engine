@@ -1133,7 +1133,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">
                 <Plug size={12} className="mr-1 inline" />
-                GM / Party Model
+                
+                Modelo do GM / grupo
               </label>
               <select
                 value={gmConnectionId ?? ""}

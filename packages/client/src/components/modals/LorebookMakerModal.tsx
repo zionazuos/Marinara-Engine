@@ -304,7 +304,7 @@ export function LorebookMakerModal({ open, onClose }: Props) {
             />
           </div>
           <div className="flex-1 space-y-1.5">
-            <label className="text-xs font-medium text-[var(--muted-foreground)]">World / Topic</label>
+            <label className="text-xs font-medium text-[var(--muted-foreground)]">Mundo / Tema</label>
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}

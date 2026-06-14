@@ -1799,7 +1799,8 @@ export function ChatSettingsDrawer({
               <div className="space-y-2">
                 <div>
                   <label className="mb-1 block text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                    GM / Party Model
+                    
+                    Modelo do GM / grupo
                   </label>
                   <select
                     value={chat.connectionId ?? ""}

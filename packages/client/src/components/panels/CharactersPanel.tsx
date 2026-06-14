@@ -1033,7 +1033,8 @@ export function CharactersPanel() {
                     <div className="ml-5 flex flex-col gap-0.5 border-l border-[var(--border)]/40 pl-3 pb-2">
                       {group.memberIds.length === 0 && (
                         <div className="py-2 text-[0.625rem] text-[var(--muted-foreground)] italic">
-                          No members — click <Users size="0.625rem" className="inline" />  para adicionar personagens
+                          
+                          Sem membros — clique <Users size="0.625rem" className="inline" />  para adicionar personagens
                         </div>
                       )}
                       {group.memberIds.map((memberId) => {
@@ -1120,7 +1121,8 @@ export function CharactersPanel() {
 
             {parsedGroups.length === 0 && !creatingGroup && (
               <div className="py-2 text-center text-[0.625rem] text-[var(--muted-foreground)]">
-                No groups yet — click <FolderPlus size="0.625rem" className="inline" />  para criar um
+                
+                Nenhum grupo ainda — clique <FolderPlus size="0.625rem" className="inline" />  para criar um
               </div>
             )}
           </div>

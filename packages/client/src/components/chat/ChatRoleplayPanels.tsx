@@ -79,7 +79,7 @@ function BudgetSkippedEntryRow({ entry }: { entry: BudgetSkippedLorebookEntry })
       {expanded && (
         <div className="mt-1.5 space-y-1 border-t border-amber-500/20 pt-1.5 pl-5 text-[0.625rem] leading-relaxed text-amber-50/75">
           <p>Correspondido: {entry.matchedKeys.length > 0 ? entry.matchedKeys.slice(0, 5).join(", ") : "No key recorded"}</p>
-          <p>Entry estimate: ~{entry.estimatedTokens.toLocaleString()} tokens</p>
+          <p>Estimativa de entradas: ~{entry.estimatedTokens.toLocaleString()} tokens</p>
           <p>Orçamento usado antes da entrada: {formatBudgetCap(entry)}</p>
         </div>
       )}
