@@ -233,7 +233,7 @@ export function AgentsPanel() {
             <button
               onClick={handleCreateRegex}
               className="rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--primary)]"
-              title="Create regex script"
+              title="Criar script de regex"
             >
               <Plus size="0.8125rem" />
             </button>
@@ -414,7 +414,8 @@ export function AgentsPanel() {
                 <div className="mb-1.5 text-[0.625rem] text-[var(--muted-foreground)]">{desc}</div>
                 {!agents.length ? (
                   <p className="px-1 py-2 text-[0.625rem] text-[var(--muted-foreground)]">
-                    No agents in this category.
+                    
+                    Nenhum agente nesta categoria.
                   </p>
                 ) : (
                   agents.map((agent) =>
@@ -457,7 +458,7 @@ export function AgentsPanel() {
           </PanelSection>
           <PanelSection title="Agentes desativados" icon={<Sparkles size="0.8125rem" />}>
             {!inactiveAgents.length ? (
-              <p className="px-1 py-2 text-[0.625rem] text-[var(--muted-foreground)]">No inactive agents.</p>
+              <p className="px-1 py-2 text-[0.625rem] text-[var(--muted-foreground)]">Nenhum agente inativo.</p>
             ) : (
               inactiveAgents.map((agent) =>
                 renderAgentCard({
@@ -480,7 +481,7 @@ export function AgentsPanel() {
             <button
               onClick={handleCreateAgent}
               className="rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--primary)]"
-              title="Create custom agent"
+              title="Criar agente personalizado"
             >
               <Plus size="0.8125rem" />
             </button>

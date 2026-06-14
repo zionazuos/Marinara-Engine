@@ -13,7 +13,7 @@ export function ConversationSoundSetting() {
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-1.5">
         <Volume2 size="0.75rem" className="text-[var(--muted-foreground)]" />
-        <span className="text-xs font-medium">Notification Sounds</span>
+        <span className="text-xs font-medium">Sons de Notificação</span>
         <HelpTooltip text="Play a notification ping when you receive a new message while on a different chat." />
       </div>
       <ToggleSetting

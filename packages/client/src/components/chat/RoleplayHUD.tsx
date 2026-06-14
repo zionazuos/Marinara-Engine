@@ -943,7 +943,7 @@ function CharactersWidget({
         placement={layout === "left" ? "right" : layout === "right" ? "left" : "bottom"}
         className="w-72 max-h-80 overflow-y-auto"
       >
-        <Suspense fallback={<DeferredHUDPanelFallback label="Loading characters…" />}>
+        <Suspense fallback={<DeferredHUDPanelFallback label="Carregando personagens…" />}>
           <CharactersPanel
             characters={characters}
             onUpdate={onUpdate}

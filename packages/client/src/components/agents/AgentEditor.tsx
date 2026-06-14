@@ -798,7 +798,7 @@ export function AgentEditor() {
                 markDirty();
               }}
               className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-              placeholder="What does this agent do…"
+              placeholder="O que este agente faz…"
             />
           </FieldGroup>
 
@@ -939,7 +939,7 @@ export function AgentEditor() {
                     <ToggleLeft size="1rem" className="mt-0.5 shrink-0" />
                   )}
                   <span className="min-w-0">
-                    <span className="block font-semibold">Pre-generation injections</span>
+                    <span className="block font-semibold">Injeções de pré-geração</span>
                     <span className="mt-0.5 block text-[0.625rem] leading-tight">
                       Current-turn context injected before the reply.
                     </span>
@@ -1093,7 +1093,7 @@ export function AgentEditor() {
           {/* ── NPC Avatar Generation (Character Tracker only) ── */}
           {(agentDetailId === "character-tracker" || dbConfig?.type === "character-tracker") && (
             <FieldGroup
-              label="Auto-Generate NPC Avatars"
+              label="Gerar avatares de NPC automaticamente"
               icon={<Sparkles size="0.875rem" className="text-[var(--primary)]" />}
               help="When enabled, the Character Tracker will automatically generate portrait images for NPCs that don't have an avatar, using their appearance description."
             >
@@ -1112,7 +1112,8 @@ export function AgentEditor() {
               {localAutoGenerateAvatars && (
                 <div className="mt-2">
                   <label className="block text-xs text-[var(--muted-foreground)] mb-1">
-                    Image Generation Connection
+                    
+                    Conexão de geração de imagem
                   </label>
                   <select
                     value={localImageConnectionId}
@@ -1137,7 +1138,7 @@ export function AgentEditor() {
           {/* ── Missing Background Generation (Background agent only) ── */}
           {isBackgroundAgent && (
             <FieldGroup
-              label="Background Image Generation"
+              label="Geração de imagem de fundo"
               icon={<ImageIcon size="0.875rem" className="text-[var(--primary)]" />}
               help="When enabled, the Background agent can generate a new reusable roleplay background when none of your existing backgrounds fit the scene."
             >
@@ -1170,7 +1171,8 @@ export function AgentEditor() {
                 <div className="mt-3 space-y-2">
                   <div>
                     <label className="mb-1 block text-xs text-[var(--muted-foreground)]">
-                      Image Generation Connection
+                      
+                      Conexão de geração de imagem
                     </label>
                     <select
                       value={localImageConnectionId}
@@ -1315,7 +1317,7 @@ export function AgentEditor() {
                   <div className="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col overflow-hidden rounded-md">
                     <button
                       type="button"
-                      aria-label="Increase trigger cadence"
+                      aria-label="Aumentar cadência do gatilho"
                       onClick={() => {
                         setLocalRunInterval(stepCadenceValue(localRunInterval, 1, customRunIntervalMeta.max));
                         markDirty();
@@ -1326,7 +1328,7 @@ export function AgentEditor() {
                     </button>
                     <button
                       type="button"
-                      aria-label="Decrease trigger cadence"
+                      aria-label="Diminuir cadência do gatilho"
                       onClick={() => {
                         setLocalRunInterval(stepCadenceValue(localRunInterval, -1, customRunIntervalMeta.max));
                         markDirty();
@@ -1791,12 +1793,14 @@ export function AgentEditor() {
                         rel="noopener noreferrer"
                         className="text-green-400 hover:underline inline-flex items-center gap-0.5"
                       >
-                        Spotify Developer Dashboard <ExternalLink size="0.5625rem" />
+                        
+                        Painel de Desenvolvedor do Spotify <ExternalLink size="0.5625rem" />
                       </a>
                     </li>
                     <li>Create a new app — select &quot;Web API&quot;</li>
                     <li>
-                      In Redirect URIs, add:{" "}
+                      
+                      Em Redirect URIs, adicione:{" "}
                       <code className="text-white/50 select-all">
                         {spotifyStatus?.redirectUri ?? getDisplayedSpotifyRedirectUri()}
                       </code>
@@ -1805,7 +1809,8 @@ export function AgentEditor() {
                       Copy the <strong>Client ID</strong>  e cole acima
                     </li>
                     <li>
-                      Save the agent, then click <strong>Conectar conta do Spotify</strong>
+                      
+                      Salve o agente e então clique <strong>Conectar conta do Spotify</strong>
                     </li>
                   </ol>
                   <p className="text-[0.625rem] text-white/30 mt-1">

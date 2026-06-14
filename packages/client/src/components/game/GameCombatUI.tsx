@@ -1119,8 +1119,8 @@ export function GameCombatUI({
               type="button"
               onClick={restartCombatVoicePlayback}
               className="inline-flex h-6 w-6 items-center justify-center rounded-full text-sky-100 transition-colors hover:bg-white/10"
-              title="Restart combat voice-over"
-              aria-label="Restart combat voice-over"
+              title="Reiniciar narração de combate"
+              aria-label="Reiniciar narração de combate"
             >
               <RotateCcw size={12} />
             </button>

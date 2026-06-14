@@ -59,8 +59,8 @@ export function FeaturedCharacterNameplate({
           <button
             type="button"
             onClick={onToggleFeatured}
-            title="Use compact character card"
-            aria-label="Use compact character card"
+            title="Usar card de personagem compacto"
+            aria-label="Usar card de personagem compacto"
             aria-pressed
             className={TRACKER_PROFILE_NAMEPLATE_HEADER_BUTTON_CLASS}
           >

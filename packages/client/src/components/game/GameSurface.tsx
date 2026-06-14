@@ -4394,7 +4394,7 @@ export function GameSurface({
           options?.showSuccessToast &&
           (res.generatedBackground || res.generatedIllustration || res.generatedNpcAvatars?.length)
         ) {
-          toast.success("Missing assets regenerated.", { duration: 1800 });
+          toast.success("Assets faltantes regenerados.", { duration: 1800 });
         }
 
         return res;
@@ -6175,7 +6175,7 @@ export function GameSurface({
 
   const handleRequestManualCombatStart = useCallback(async () => {
     if (combatUiActive) {
-      toast("Combat is already active.");
+      toast("O combate já está ativo.");
       return;
     }
     if (combatGenerationPending) {
@@ -8495,7 +8495,8 @@ export function GameSurface({
                           }}
                           className="rounded-lg bg-white/10 px-3 py-1.5 text-[0.6875rem] font-medium text-white/80 transition-colors hover:bg-white/20 hover:text-white"
                         >
-                          Open Local AI Model
+                          
+                          Abrir modelo de IA local
                         </button>
                       </div>
                     </div>

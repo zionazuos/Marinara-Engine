@@ -394,7 +394,7 @@ function NpcsView({
   );
 
   if (!hasContent) {
-    return <div className="text-center text-xs text-white/40">No NPCs encountered yet.</div>;
+    return <div className="text-center text-xs text-white/40">Nenhum NPC encontrado ainda.</div>;
   }
 
   const npcMap = new Map<string, { npc: GameNpc; interactions: string[]; displayName: string; originalName: string }>();
@@ -515,7 +515,7 @@ function NpcsView({
 
 function LocationsView({ locations }: { locations: string[] }) {
   if (locations.length === 0) {
-    return <div className="text-center text-xs text-white/40">No locations discovered yet.</div>;
+    return <div className="text-center text-xs text-white/40">Nenhum local descoberto ainda.</div>;
   }
 
   return (
@@ -543,7 +543,7 @@ function InventoryView({
   const visibleItems = dedupeAdjacentInventoryEntries(items);
 
   if (visibleItems.length === 0) {
-    return <div className="text-center text-xs text-white/40">No items in inventory log.</div>;
+    return <div className="text-center text-xs text-white/40">Nenhum item no registro do inventário.</div>;
   }
 
   const actionColors: Record<string, string> = {
@@ -573,7 +573,7 @@ function InventoryView({
 
 function LibraryView({ entries }: { entries: JournalEntry[] }) {
   if (entries.length === 0) {
-    return <div className="text-center text-xs text-white/40">No books or notes found yet.</div>;
+    return <div className="text-center text-xs text-white/40">Nenhum livro ou nota encontrado ainda.</div>;
   }
 
   return (

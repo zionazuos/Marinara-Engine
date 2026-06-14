@@ -278,8 +278,8 @@ export function Toolbar({
                 ? "border-[var(--primary)]/40 bg-[var(--primary)]/10 text-[var(--primary)]"
                 : "border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--accent)]",
             )}
-            title="Select assets for this game"
-            aria-label="Select assets for this game"
+            title="Selecionar assets para este game"
+            aria-label="Selecionar assets para este game"
             aria-pressed={assetSelection.active}
           >
             <FolderCheck size="0.875rem" />

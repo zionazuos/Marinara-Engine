@@ -81,7 +81,8 @@ function DeleteConfirmationDialog({
             onClick={onConfirm}
             className="rounded-lg bg-[var(--destructive)] px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-[var(--destructive)]/80"
           >
-            Delete this message
+            
+            Excluir esta mensagem
           </button>
           <button
             onClick={onDeleteMore}
@@ -149,8 +150,8 @@ function MultiSelectBar({
         <button
           onClick={onSelectAllAbove}
           disabled={selectedCount === 0}
-          title="Select all messages above"
-          aria-label="Select all messages above"
+          title="Selecionar todas as mensagens acima"
+          aria-label="Selecionar todas as mensagens acima"
           className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
         >
           <ChevronUp size="0.85rem" />
@@ -166,8 +167,8 @@ function MultiSelectBar({
         <button
           onClick={onSelectAllBelow}
           disabled={selectedCount === 0}
-          title="Select all messages below"
-          aria-label="Select all messages below"
+          title="Selecionar todas as mensagens abaixo"
+          aria-label="Selecionar todas as mensagens abaixo"
           className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
         >
           <ChevronDown size="0.85rem" />

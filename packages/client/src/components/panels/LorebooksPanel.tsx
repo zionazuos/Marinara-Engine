@@ -353,13 +353,13 @@ export function LorebooksPanel() {
       reader.onload = async () => {
         const image = typeof reader.result === "string" ? reader.result : "";
         if (!image) {
-          toast.error("Could not read that image");
+          toast.error("Não foi possível ler essa imagem");
           return;
         }
 
         try {
           await uploadLorebookImage.mutateAsync({ id: lorebookId, image });
-          toast.success("Lorebook picture updated");
+          toast.success("Imagem do lorebook atualizada");
         } catch (error) {
           toast.error(error instanceof Error ? error.message : "Failed to upload lorebook picture");
         } finally {
@@ -368,7 +368,7 @@ export function LorebooksPanel() {
       };
       reader.onerror = () => {
         imageTargetLorebookIdRef.current = null;
-        toast.error("Could not read that image");
+        toast.error("Não foi possível ler essa imagem");
       };
       reader.readAsDataURL(file);
     },

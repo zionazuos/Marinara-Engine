@@ -65,7 +65,7 @@ export function GameSkillCheckResult({ result, onDismiss }: GameSkillCheckResult
           type="button"
           onClick={onDismiss}
           className="absolute right-2 top-2 rounded p-1 text-white/40 transition hover:bg-white/10 hover:text-white"
-          aria-label="Dismiss skill check result"
+          aria-label="Dispensar resultado do teste de perícia"
         >
           <X size={14} />
         </button>

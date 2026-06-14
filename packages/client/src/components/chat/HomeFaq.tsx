@@ -479,7 +479,8 @@ export function HomeFaq() {
             <div className="mt-3 rounded-[1.1rem] border border-amber-400/20 bg-amber-500/8 p-3">
               <div className="flex items-center gap-2 text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-amber-700 dark:text-amber-200/90">
                 <TriangleAlert size="0.875rem" />
-                Before You Post A Bug
+                
+                Antes de reportar um bug
               </div>
               <ul className="mt-2 space-y-1.5 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]/88">
                 {QUICK_FIXES.map((fix) => (
@@ -494,7 +495,8 @@ export function HomeFaq() {
             <div className="mt-3">
               <div className="mb-2 flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                 <p className="text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-[var(--muted-foreground)]/65">
-                  Frequently Asked Questions
+                  
+                  Perguntas frequentes
                 </p>
                 <p className="text-[0.625rem] text-[var(--muted-foreground)]/50">
                   Tap a question to reveal the answer.

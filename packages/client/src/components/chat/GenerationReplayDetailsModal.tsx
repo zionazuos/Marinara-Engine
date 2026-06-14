@@ -68,7 +68,7 @@ function TextBlock({
       await copyToClipboard(copyValue);
       toast.success("Comando guiado copiado.");
     } catch {
-      toast.error("Could not copy guidance.");
+      toast.error("Não foi possível copiar a orientação.");
     }
   };
 

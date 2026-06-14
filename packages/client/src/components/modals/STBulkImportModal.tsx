@@ -381,7 +381,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
             </p>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium">SillyTavern Folder Path</label>
+              <label className="text-xs font-medium">Caminho da pasta do SillyTavern</label>
               <div className="flex gap-2 max-sm:flex-col">
                 <input
                   type="text"
@@ -505,7 +505,8 @@ export function STBulkImportModal({ open, onClose }: Props) {
             <div className="flex items-start gap-2 rounded-lg bg-emerald-500/10 p-2.5 text-xs text-emerald-400">
               <CheckCircle size="0.875rem" className="mt-0.5 shrink-0" />
               <span>
-                Found SillyTavern data in{" "}
+                
+                Dados do SillyTavern encontrados em{" "}
                 <code className="rounded bg-[var(--secondary)] px-1 text-[0.625rem]">{scanResult.dataDir}</code>
               </span>
             </div>

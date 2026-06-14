@@ -1283,7 +1283,7 @@ function ExpandedDrawer({
 
           <div className="space-y-2 rounded-lg bg-[var(--secondary)]/45 p-2 ring-1 ring-[var(--border)]">
             <div>
-              <p className="text-[0.6875rem] font-medium">Additional matching sources</p>
+              <p className="text-[0.6875rem] font-medium">Fontes de correspondência adicionais</p>
               <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                 Optional card fields to scan for this entry&apos;s keywords in addition to recent chat.
               </p>
@@ -1421,7 +1421,7 @@ function ExpandedDrawer({
               onChange={(e) => update({ tag: e.target.value })}
               onBlur={flushAutosave}
               className="w-full rounded-lg bg-[var(--secondary)] px-2 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-              placeholder="e.g. location, item, lore"
+              placeholder="ex.: local, item, lore"
             />
           </div>
         </div>

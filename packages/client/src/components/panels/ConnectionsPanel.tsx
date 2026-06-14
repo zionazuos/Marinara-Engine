@@ -193,7 +193,7 @@ function SidecarCard() {
           <button
             onClick={openLocalModelSettings}
             className="rounded-lg p-1.5 text-purple-400 transition-all hover:bg-purple-400/15 active:scale-90"
-            title="Open local model settings"
+            title="Abrir configurações do modelo local"
           >
             <Settings2 size="0.8125rem" />
           </button>
@@ -273,13 +273,13 @@ function SidecarCard() {
                     )}
                   />
                 </div>
-                <span className="text-xs text-[var(--muted-foreground)]">Use for game scene analysis</span>
+                <span className="text-xs text-[var(--muted-foreground)]">Usar para análise de cena do game</span>
               </button>
             </div>
           )}
           {status === "server_error" && (
             <div className="mt-2.5 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2.5">
-              <div className="text-[0.6875rem] font-medium text-amber-200">Local runtime unavailable</div>
+              <div className="text-[0.6875rem] font-medium text-amber-200">Runtime local indisponível</div>
               <div className="mt-1 text-[0.6875rem] text-[var(--muted-foreground)]/75">
                 {startupError ?? "Marinara will keep running without the local model until you retry."}
               </div>
@@ -294,7 +294,8 @@ function SidecarCard() {
                 }}
                 className="mt-2 rounded-lg bg-amber-500/15 px-2.5 py-1 text-[0.6875rem] font-medium text-amber-200 transition-colors hover:bg-amber-500/25"
               >
-                Open Local AI Model
+                
+                Abrir modelo de IA local
               </button>
             </div>
           )}
@@ -763,7 +764,8 @@ export function ConnectionsPanel() {
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-all hover:bg-[var(--secondary)]"
             >
               <X size="0.75rem" />
-              Dismiss permanently
+              
+              Dispensar permanentemente
             </button>
           </div>
         </div>

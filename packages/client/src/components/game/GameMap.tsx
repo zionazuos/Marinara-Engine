@@ -153,8 +153,8 @@ function TimeOfDayIndicator({ timeOfDay, size = "desktop", className }: TimeOfDa
           size === "mobile" ? "h-3.5 w-6" : "h-4 w-7",
           className,
         )}
-        aria-label="Time of day unknown"
-        title="Time of day unknown"
+        aria-label="Hora do dia desconhecida"
+        title="Hora do dia desconhecida"
       >
         ?
       </span>

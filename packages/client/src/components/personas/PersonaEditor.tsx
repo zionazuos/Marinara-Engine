@@ -368,7 +368,7 @@ export function PersonaEditor() {
         avatar: avatarDataUrl,
         filename: `persona-${personaId}-${Date.now()}.png`,
       });
-      toast.success("Persona avatar generated.");
+      toast.success("Avatar da persona gerado.");
     },
     [personaId, updateField, uploadAvatar],
   );
@@ -1546,7 +1546,7 @@ function PersonaColorsTab({
       <ColorPicker
         value={formData.dialogueColor}
         onChange={(v) => updateField("dialogueColor", v)}
-        label="Dialogue Highlight Color"
+        label="Cor de destaque do diálogo"
         helpText={
           'Text inside dialogue quotation marks ("", “”, «», 「」, 『』) will be automatically colored with this, and can also be bolded from Settings.'
         }
@@ -1691,7 +1691,7 @@ function PersonaStatsTab({
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Persona Status Bars"
+        title="Barras de status da persona"
         subtitle="Track your persona's physical and mental needs. These are updated by the Persona Stats agent after each message."
       />
 
@@ -1774,7 +1774,7 @@ function PersonaStatsTab({
                 physical and mental state (hunger, energy, hygiene, etc.)
               </li>
               <li>
-                &bull; The <strong className="text-[var(--foreground)]">Persona Stats agent</strong> adjusts values
+                &bull; The <strong className="text-[var(--foreground)]">Agente de atributos da persona</strong> adjusts values
                 realistically based on what happens in the narrative.
               </li>
               <li>

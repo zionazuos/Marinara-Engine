@@ -50,7 +50,7 @@ export function ImageUploadDropzone({
     const imageFiles = getSupportedImageFiles(files);
     if (imageFiles.length === 0) {
       if (files && files.length > 0) {
-        toast.error("Drop image files to upload.");
+        toast.error("Solte arquivos de imagem para enviar.");
       }
       return;
     }

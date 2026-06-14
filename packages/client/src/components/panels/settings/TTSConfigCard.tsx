@@ -422,7 +422,7 @@ export function TTSConfigCard() {
         await saveNow(payload);
       } catch {
         setSaveStatus("error");
-        toast.error("Failed to save TTS settings.");
+        toast.error("Falha ao salvar as configurações de TTS.");
       }
     }, 600);
   };
@@ -830,14 +830,14 @@ export function TTSConfigCard() {
               }}
               className={cn(INPUT_CLS, "cursor-pointer appearance-none")}
             >
-              <option value="single">One voice for all characters</option>
+              <option value="single">Uma voz para todos os personagens</option>
               <option value="per-character">Selecionado por personagem</option>
             </select>
           </FieldRow>
 
           {voiceMode === "single" && (
             <FieldRow
-              label="All Characters Voice"
+              label="Voz de todos os personagens"
               help={
                 source === "elevenlabs"
                   ? "ElevenLabs voices are fetched by name and saved by voice ID."
@@ -875,7 +875,7 @@ export function TTSConfigCard() {
                     disabled={fetchingVoices || voiceOptions.length === 0}
                     className={cn(INPUT_CLS, "flex-1 cursor-pointer appearance-none")}
                   >
-                    {source === "elevenlabs" && <option value="">Select an ElevenLabs voice</option>}
+                    {source === "elevenlabs" && <option value="">Selecionar uma voz do ElevenLabs</option>}
                     {fetchingVoices && <option value="">Carregando vozes…</option>}
                     {!fetchingVoices && voiceOptions.length === 0 && !voicesError && (
                       <option value="">
@@ -896,7 +896,7 @@ export function TTSConfigCard() {
                   onClick={() => void refetchVoices()}
                   disabled={fetchingVoices || !savedConfig?.enabled}
                   className="flex shrink-0 items-center gap-1 rounded-xl bg-[var(--secondary)] px-3 py-2 text-xs ring-1 ring-[var(--border)] transition-colors hover:ring-rose-400/60 disabled:opacity-50"
-                  title="Refresh voices from provider"
+                  title="Atualizar vozes do provedor"
                 >
                   <RefreshCw size="0.75rem" className={cn(fetchingVoices && "animate-spin")} />
                 </button>
@@ -983,7 +983,8 @@ export function TTSConfigCard() {
                   className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] transition-colors hover:border-rose-400/50 hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Plus size="0.75rem" />
-                  Add character voice
+                  
+                  Adicionar voz do personagem
                 </button>
                 {characterOptions.length === 0 && (
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
@@ -1000,7 +1001,7 @@ export function TTSConfigCard() {
           >
             <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-2">
               <ToggleRow
-                label="Use separate narrator voice"
+                label="Usar voz separada para o narrador"
                 checked={narratorVoiceEnabled}
                 onChange={toggleNarratorVoice}
               />
@@ -1050,7 +1051,7 @@ export function TTSConfigCard() {
                     onClick={() => void refetchVoices()}
                     disabled={fetchingVoices || !savedConfig?.enabled}
                     className="flex shrink-0 items-center justify-center gap-1 rounded-xl bg-[var(--secondary)] px-3 py-2 text-xs ring-1 ring-[var(--border)] transition-colors hover:ring-rose-400/60 disabled:opacity-50"
-                    title="Refresh voices from provider"
+                    title="Atualizar vozes do provedor"
                   >
                     <RefreshCw size="0.75rem" className={cn(fetchingVoices && "animate-spin")} />
                   </button>
@@ -1105,7 +1106,7 @@ export function TTSConfigCard() {
                       note={maleNpcVoiceFallbackNote}
                     />
                     <NpcDefaultVoicePool
-                      label="Female NPC defaults"
+                      label="Padrões de NPC feminino"
                       options={elevenLabsNpcFemaleVoiceOptions}
                       selected={npcDefaultFemaleVoices}
                       onToggle={(voiceId, checked) => toggleNpcDefaultVoice("female", voiceId, checked)}
@@ -1229,7 +1230,7 @@ export function TTSConfigCard() {
               }}
             />
             <ToggleRow
-              label="Only read dialogues"
+              label="Ler apenas diálogos"
               checked={dialogueOnly}
               onChange={(v) => {
                 setDialogueOnly(v);

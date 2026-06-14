@@ -110,7 +110,7 @@ export function TrackerDataSidebar({ fillHeight = false }: { fillHeight?: boolea
         ) : !currentGameState ? (
           <EmptySection>Nenhum dado de rastreador ainda.</EmptySection>
         ) : !hasFixedTrackerPanel ? (
-          <EmptySection>No enabled tracker panels.</EmptySection>
+          <EmptySection>Nenhum painel de rastreador ativado.</EmptySection>
         ) : null}
       </div>
     </section>

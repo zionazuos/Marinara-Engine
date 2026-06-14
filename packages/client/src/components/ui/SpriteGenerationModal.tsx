@@ -1331,7 +1331,8 @@ export function SpriteGenerationModal({
             {/* Image Generation Connection */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">
-                Image Generation Connection
+                
+                Conexão de geração de imagem
               </label>
               {imageConnections.length === 0 ? (
                 <p className="text-xs text-[var(--destructive)]">
@@ -1376,7 +1377,7 @@ export function SpriteGenerationModal({
                   />
                   <img
                     src={defaultAvatarUrl ?? ""}
-                    alt="Current avatar reference"
+                    alt="Referência do avatar atual"
                     className="h-12 w-12 rounded-lg object-cover ring-1 ring-[var(--border)]"
                   />
                   <span className="flex-1">Use current avatar as a reference image</span>
@@ -1388,7 +1389,7 @@ export function SpriteGenerationModal({
                     <div className="relative">
                       <img
                         src={defaultAvatarUrl}
-                        alt="Current avatar reference"
+                        alt="Referência do avatar atual"
                         className="h-20 w-20 rounded-lg object-cover ring-2 ring-[var(--primary)]/40"
                       />
                       <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[0.5625rem] text-white">
@@ -1866,7 +1867,7 @@ export function SpriteGenerationModal({
                 )}
                 <p className="mt-2 text-[0.625rem] text-[var(--muted-foreground)]">
                   Use this when the generated sheet has borders, gutters, or uneven spacing. Applying re-slices the
-                  original source sheet{generatedSheets.length === 1 ? "" : "s"} without regenerating.
+                  original source sheet{generatedSheets.length === 1 ? "" : "s"}  sem regenerar.
                 </p>
               </div>
             )}

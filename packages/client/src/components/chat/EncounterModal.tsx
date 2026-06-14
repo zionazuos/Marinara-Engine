@@ -344,7 +344,8 @@ function EncounterConfig() {
       >
         <h2 className="mb-5 flex items-center gap-2 text-base font-bold text-[var(--foreground)]">
           <Swords size="1.125rem" className="text-red-400" />
-          Configure Combat Narrative
+          
+          Configurar narrativa de combate
         </h2>
 
         <div className="space-y-5">
@@ -493,7 +494,7 @@ function PlayerControls({ onAction }: { onAction: (text: string) => void }) {
     return (
       <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 text-center">
         <AlertTriangle size="1.5rem" className="mx-auto mb-2 text-yellow-400" />
-        <p className="text-xs text-yellow-300">Waiting for combat data...</p>
+        <p className="text-xs text-yellow-300">Aguardando dados de combate...</p>
       </div>
     );
   }
@@ -503,7 +504,7 @@ function PlayerControls({ onAction }: { onAction: (text: string) => void }) {
     return (
       <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-center">
         <Skull size="1.5rem" className="mx-auto mb-2 text-red-400" />
-        <p className="text-xs text-red-300">You have been defeated...</p>
+        <p className="text-xs text-red-300">Você foi derrotado...</p>
       </div>
     );
   }
@@ -673,7 +674,8 @@ function CombatEndScreen() {
       {summaryStatus === "generating" && (
         <div className="mt-4 flex items-center gap-2 text-sm text-foreground/50">
           <Loader2 size="1rem" className="animate-spin" />
-          Generating combat summary...
+          
+          Gerando resumo de combate...
         </div>
       )}
 
@@ -684,14 +686,15 @@ function CombatEndScreen() {
             onClick={closeEncounter}
             className="mt-6 rounded-xl bg-foreground/10 px-6 py-3 text-sm font-bold text-foreground/80 transition-all hover:bg-foreground/20"
           >
-            Close Combat Window
+            
+            Fechar janela de combate
           </button>
         </>
       )}
 
       {summaryStatus === "error" && (
         <>
-          <p className="mt-2 text-sm text-red-400">Failed to generate summary.</p>
+          <p className="mt-2 text-sm text-red-400">Falha ao gerar o resumo.</p>
           <button
             onClick={closeEncounter}
             className="mt-6 rounded-xl bg-foreground/10 px-6 py-3 text-sm font-bold text-foreground/80 transition-all hover:bg-foreground/20"

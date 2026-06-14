@@ -165,7 +165,8 @@ export function GameJsonRepairModal({ request, onClose, onApplied }: GameJsonRep
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-[var(--primary-foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isApplying ? <Loader2 size="0.95rem" className="animate-spin" /> : <CheckCircle2 size="0.95rem" />}
-            Apply Repaired JSON
+            
+            Aplicar JSON reparado
           </button>
         </div>
       </div>

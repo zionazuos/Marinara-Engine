@@ -87,7 +87,7 @@ export function QuickConnectionSwitcher({ className }: { className?: string }) {
       <button
         ref={btnRef}
         onClick={() => setOpen((v) => !v)}
-        title="Quick Connection Switcher"
+        title="Alternador rápido de conexão"
         className={cn(
           "flex h-8 w-8 items-center justify-center rounded-xl transition-all",
           open

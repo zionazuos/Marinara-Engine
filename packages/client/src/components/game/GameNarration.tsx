@@ -3419,7 +3419,7 @@ export function GameNarration({
               <button
                 onClick={onJumpToLatest}
                 className="flex items-center gap-1 self-stretch rounded-lg border border-amber-400/40 bg-amber-400/15 px-2 text-xs font-semibold text-amber-100 transition-colors hover:bg-amber-400/25 hover:text-amber-50 sm:px-2.5 dark:border-amber-400/40 dark:bg-amber-400/15 dark:text-amber-100 dark:hover:bg-amber-400/25"
-                title="Jump back to the present"
+                title="Voltar ao presente"
                 aria-label="Voltar ao presente"
               >
                 <span className="hidden sm:inline">Voltar</span>
@@ -3747,7 +3747,7 @@ export function GameNarration({
           {partyTurnPending && !scenePreparing && !active?.id?.startsWith("party-chat-input-") && (
             <div className="mb-2 flex shrink-0 items-center gap-1.5 rounded-xl border border-sky-500/15 bg-sky-500/5 px-3 py-1.5 backdrop-blur-md">
               <MessageCircle size={12} className="animate-pulse text-sky-300/70" />
-              <span className="text-[0.6875rem] text-sky-200/60">The party is reacting...</span>
+              <span className="text-[0.6875rem] text-sky-200/60">O grupo está reagindo...</span>
             </div>
           )}
 
@@ -4038,7 +4038,7 @@ export function GameNarration({
               {partyTurnPending && active.id?.startsWith("party-chat-input-") && (
                 <div className="mt-1.5 flex items-center gap-1.5">
                   <MessageCircle size={12} className="animate-pulse text-sky-300/70" />
-                  <span className="text-xs text-sky-200/60">The party is reacting...</span>
+                  <span className="text-xs text-sky-200/60">O grupo está reagindo...</span>
                 </div>
               )}
 
@@ -4346,7 +4346,7 @@ export function GameNarration({
                       type="button"
                       onClick={showAllLogs}
                       className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[0.65rem] font-medium text-white/65 transition-colors hover:bg-white/10 hover:text-white"
-                      title="Load the entire session log"
+                      title="Carregar o registro inteiro da sessão"
                     >
                       
                       Todos

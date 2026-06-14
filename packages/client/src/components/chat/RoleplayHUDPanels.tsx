@@ -376,7 +376,7 @@ export function CombinedPlayerPanel({
                   agentType="quest"
                   onRerunSingleTracker={onRerunSingleTracker}
                   busy={isTrackerRetryBusy}
-                  title="Re-run quest tracker only"
+                  title="Reexecutar apenas o rastreador de missões"
                 />
                 <button
                   onClick={addQuest}
@@ -411,7 +411,7 @@ export function CombinedPlayerPanel({
                   agentType="custom-tracker"
                   onRerunSingleTracker={onRerunSingleTracker}
                   busy={isTrackerRetryBusy}
-                  title="Re-run custom tracker only"
+                  title="Reexecutar apenas o rastreador personalizado"
                 />
                 <button
                   onClick={addCustomField}
@@ -855,7 +855,7 @@ export function QuestsPanel({ quests, onUpdate, onRerunSingleTracker, isTrackerR
             agentType="quest"
             onRerunSingleTracker={onRerunSingleTracker}
             busy={isTrackerRetryBusy}
-            title="Re-run quest tracker only"
+            title="Reexecutar apenas o rastreador de missões"
           />
           <button
             onClick={addQuest}
@@ -918,7 +918,7 @@ export function CustomTrackerPanel({
             agentType="custom-tracker"
             onRerunSingleTracker={onRerunSingleTracker}
             busy={isTrackerRetryBusy}
-            title="Re-run custom tracker only"
+            title="Reexecutar apenas o rastreador personalizado"
           />
           <button
             onClick={addField}

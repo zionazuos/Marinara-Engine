@@ -619,7 +619,8 @@ function AuthorNotesButton({ chatId, chatMeta }: { chatId: string | null; chatMe
                   fallback={
                     <div className="flex items-center gap-2 py-4 text-xs text-[var(--muted-foreground)]">
                       <Loader2 size="0.75rem" className="animate-spin" />
-                      Loading author's notes...
+                      
+                      Carregando notas do autor...
                     </div>
                   }
                 >
@@ -640,7 +641,8 @@ function AuthorNotesButton({ chatId, chatMeta }: { chatId: string | null; chatMe
               fallback={
                 <div className="flex items-center gap-2 py-4 text-xs text-[var(--muted-foreground)]">
                   <Loader2 size="0.75rem" className="animate-spin" />
-                  Loading author's notes...
+                  
+                  Carregando notas do autor...
                 </div>
               }
             >

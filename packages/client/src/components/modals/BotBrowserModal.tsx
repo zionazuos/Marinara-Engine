@@ -361,7 +361,8 @@ export function BotBrowserModal({ open, onClose }: Props) {
               </div>
             ) : results.length === 0 ? (
               <div className="flex flex-1 items-center justify-center py-12 text-sm text-[var(--muted-foreground)]">
-                No characters found
+                
+                Nenhum personagem encontrado
               </div>
             ) : (
               <>

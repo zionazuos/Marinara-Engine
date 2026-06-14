@@ -571,7 +571,7 @@ export function SpotifyMiniPlayer({ mobile = false }: { mobile?: boolean }) {
     onSuccess: (result) => {
       dismissDjMariToast();
       invalidate();
-      toast.success("DJ Mari playlist is ready", {
+      toast.success("A playlist do DJ Mari está pronta", {
         description: `${result.name} - ${result.trackCount} tracks`,
         duration: DJ_MARI_PLAYLIST_READY_TOAST_MS,
         action: result.playlistUrl
@@ -900,7 +900,7 @@ export function SpotifyMiniPlayer({ mobile = false }: { mobile?: boolean }) {
                 runControl.mutate({ type: "transfer", deviceId: sdkDeviceId, play: player?.isPlaying === true })
               }
               className="hidden h-7 w-7 items-center justify-center rounded-full text-[oklch(0.70_0.012_145)] transition-colors hover:text-[oklch(0.96_0.006_145)] sm:inline-flex"
-              title="Use Marinara player"
+              title="Usar player do Marinara"
             >
               <Laptop size="0.8125rem" />
             </button>

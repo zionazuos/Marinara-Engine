@@ -303,8 +303,8 @@ export function TrackerPortraitStage({
               event.stopPropagation();
               resetPortraitView();
             }}
-            title="Reset portrait view"
-            aria-label="Reset portrait view"
+            title="Redefinir visão do retrato"
+            aria-label="Redefinir visão do retrato"
             className={PORTRAIT_VIEW_BUTTON_CLASS}
           >
             <RotateCcw size="0.6875rem" />

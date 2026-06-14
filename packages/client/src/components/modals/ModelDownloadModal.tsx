@@ -691,7 +691,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
 
                   <label className="flex flex-col gap-1.5">
                     <span className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-                      Max Response Tokens
+                      
+                      Máx. de tokens de resposta
                     </span>
                     <input
                       value={maxTokensInput}
@@ -807,7 +808,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                       onClick={() => void updateConfig({ useForTrackers: false, useForGameScene: false })}
                       className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-4 py-2.5 text-sm text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)]"
                     >
-                      Continue Without Local AI
+                      
+                      Continuar sem IA local
                     </button>
                   </div>
                 </div>
@@ -832,7 +834,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                     <div className="mt-3 flex flex-col gap-3">
                       {testMessageResult.nonce && (
                         <div className="text-xs text-[var(--muted-foreground)]/75">
-                          Verification token:{" "}
+                          
+                          Token de verificação:{" "}
                           <span className="font-mono text-[var(--foreground)]">{testMessageResult.nonce}</span>
                           {testMessageResult.nonceVerified ? " • echoed by model" : " • not echoed"}
                         </div>
@@ -884,7 +887,7 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                   </div>
                   <div className="mt-2 flex flex-col gap-1 text-xs text-[var(--muted-foreground)]/75">
                     {runtimeDiagnostics.gpuVendors.length > 0 && (
-                      <span>Detected GPU vendors: {runtimeDiagnostics.gpuVendors.join(", ")}</span>
+                      <span>Fornecedores de GPU detectados: {runtimeDiagnostics.gpuVendors.join(", ")}</span>
                     )}
                     <span>
                       
@@ -906,7 +909,7 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                       <span>System llama-server: {runtimeDiagnostics.systemLlamaPath}</span>
                     )}
                     {runtimeDiagnostics.launchCommand && (
-                      <span>Last launch command: {runtimeDiagnostics.launchCommand}</span>
+                      <span>Último comando de inicialização: {runtimeDiagnostics.launchCommand}</span>
                     )}
                   </div>
                 </div>

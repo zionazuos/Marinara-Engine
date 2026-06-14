@@ -417,14 +417,14 @@ export function CharacterEditor() {
     };
     reader.onerror = () => {
       if (!isCurrentAvatarUpload(uploadToken, uploadCharacterId)) return;
-      toast.error("Failed to read avatar image.");
+      toast.error("Falha ao ler a imagem do avatar.");
       finishAvatarUpload(uploadToken, uploadCharacterId);
     };
     e.target.value = "";
     try {
       reader.readAsDataURL(file);
     } catch {
-      toast.error("Failed to read avatar image.");
+      toast.error("Falha ao ler a imagem do avatar.");
       finishAvatarUpload(uploadToken, uploadCharacterId);
     }
   };
@@ -457,7 +457,7 @@ export function CharacterEditor() {
       try {
         await uploadAvatar.mutateAsync({ id: uploadCharacterId, avatar: avatarDataUrl });
         if (isCurrentAvatarUpload(uploadToken, uploadCharacterId)) {
-          toast.success("Character avatar generated.");
+          toast.success("Avatar do personagem gerado.");
         }
       } catch (error) {
         if (isCurrentAvatarUpload(uploadToken, uploadCharacterId)) {
@@ -743,7 +743,7 @@ export function CharacterEditor() {
         onClick={handleImportAsPersona}
         disabled={createPersona.isPending || uploadPersonaAvatar.isPending}
         className="rounded-xl p-2 text-[var(--muted-foreground)] transition-all hover:bg-emerald-500/10 hover:text-emerald-400 disabled:cursor-not-allowed disabled:opacity-50 max-md:rounded-lg max-md:p-1.5"
-        title="Import character as persona"
+        title="Importar personagem como persona"
       >
         {createPersona.isPending || uploadPersonaAvatar.isPending ? (
           <Loader2 size="1rem" className="animate-spin" />
@@ -763,7 +763,7 @@ export function CharacterEditor() {
           });
         }}
         className="rounded-xl p-2 text-[var(--muted-foreground)] transition-all hover:bg-sky-400/10 hover:text-sky-400 max-md:rounded-lg max-md:p-1.5"
-        title="Duplicate character"
+        title="Duplicar personagem"
       >
         <Copy size="1rem" />
       </button>
@@ -800,7 +800,7 @@ export function CharacterEditor() {
       />
       <AvatarGenerationModal
         open={avatarGeneratorOpen}
-        title="Generate Character Avatar"
+        title="Gerar avatar do personagem"
         entityName={formData.name}
         defaultAppearance={
           ((formData.extensions.appearance as string | undefined) || formData.description || formData.personality) ?? ""
@@ -1606,7 +1606,7 @@ function CharacterVersionHistoryPanel({
                 type="button"
                 onClick={() => setSelectedVersion(version)}
                 className="min-w-0 flex-1 text-left"
-                title="Compare with current card"
+                title="Comparar com o card atual"
               >
                 <span className="block truncate text-[0.6875rem] font-medium text-[var(--foreground)]">
                   {getVersionTitle(version)}
@@ -1634,7 +1634,7 @@ function CharacterVersionHistoryPanel({
                 onClick={() => handleDeleteVersion(version)}
                 disabled={restoreVersion.isPending || deleteVersion.isPending}
                 className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)] disabled:opacity-50"
-                title="Delete this saved version"
+                title="Excluir esta versão salva"
               >
                 {deleteVersion.isPending && deleteVersion.variables?.versionId === version.id ? (
                   <Loader2 size="0.75rem" className="animate-spin" />
@@ -1938,7 +1938,8 @@ function AdvancedTab({
       <label className="block space-y-1.5">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-            Post-History Instructions{" "}
+            
+            Instruções pós-histórico{" "}
             <HelpTooltip text="Text inserted after the chat history, right before the AI generates. Great for reminders like 'stay in character' or 'respond in 2 paragraphs'." />
           </span>
           <button
@@ -2023,7 +2024,7 @@ function AdvancedTab({
       <ExpandedTextarea
         open={expandedField === "post_history"}
         onClose={() => setExpandedField(null)}
-        title="Post-History Instructions"
+        title="Instruções pós-histórico"
         value={formData.post_history_instructions}
         onChange={(value) => updateField("post_history_instructions", value)}
         placeholder="Text inserted after the chat history but before generation…"
@@ -2082,7 +2083,7 @@ function CharacterGalleryTab({ characterId, characterName }: { characterId: stri
       />
 
       <ImageUploadDropzone
-        label="Upload Character Images"
+        label="Enviar imagens do personagem"
         pending={upload.isPending}
         pendingLabel="Uploading…"
         dragLabel="Drop character images to upload"
@@ -2148,7 +2149,7 @@ function CharacterGalleryTab({ characterId, characterName }: { characterId: stri
           <div>
             <p className="text-sm font-medium text-[var(--muted-foreground)]">Nenhuma imagem de personagem ainda</p>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]/60">
-              Upload images here to keep them tied to {characterName || "this character"} instead of a specific chat.
+              Upload images here to keep them tied to {characterName || "this character"}  em vez de um chat específico.
             </p>
           </div>
         </div>
@@ -3253,7 +3254,7 @@ function ColorsTab({
       <ColorPicker
         value={dialogueColor}
         onChange={(v) => updateExtension("dialogueColor", v)}
-        label="Dialogue Highlight Color"
+        label="Cor de destaque do diálogo"
         helpText={
           'Text inside dialogue quotation marks ("", “”, «», 「」, 『』) will be automatically colored with this, and can also be bolded from Settings.'
         }
@@ -3390,7 +3391,7 @@ function LorebookTab({ characterId, formData }: { characterId: string | null; fo
         <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-[var(--border)] py-12 text-center">
           <Library size="1.5rem" className="text-[var(--muted-foreground)]/40" />
           <div>
-            <p className="text-sm font-medium text-[var(--muted-foreground)]">No lorebook entries</p>
+            <p className="text-sm font-medium text-[var(--muted-foreground)]">Nenhuma entrada de lorebook</p>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]/60">
               Import a character with an embedded lorebook, or add entries via the Lorebooks panel.
             </p>

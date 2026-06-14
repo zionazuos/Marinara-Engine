@@ -65,7 +65,7 @@ export function GameCheckpoints({ chatId, onClose, onLoaded }: GameCheckpointsPr
           setNewLabel("");
           refetch();
         },
-        onError: () => toast.error("Failed to save checkpoint"),
+        onError: () => toast.error("Falha ao salvar o checkpoint"),
       },
     );
   }, [chatId, newLabel, createCheckpoint, refetch]);
@@ -80,7 +80,7 @@ export function GameCheckpoints({ chatId, onClose, onLoaded }: GameCheckpointsPr
             setConfirmLoadId(null);
             onLoaded?.();
           },
-          onError: () => toast.error("Failed to load checkpoint"),
+          onError: () => toast.error("Falha ao carregar o checkpoint"),
         },
       );
     },

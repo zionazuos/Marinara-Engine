@@ -238,7 +238,7 @@ export function GameInventory({
                     onClick={() => setPageIndex((page) => Math.min(pageCount - 1, page + 1))}
                     disabled={pageIndex >= pageCount - 1}
                     className="flex h-6 w-6 items-center justify-center rounded border border-white/8 bg-white/[0.03] transition-colors hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-35"
-                    title="Next inventory page"
+                    title="Próxima página do inventário"
                   >
                     <ChevronRight size={12} />
                   </button>

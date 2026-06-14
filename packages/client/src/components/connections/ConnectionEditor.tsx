@@ -1119,7 +1119,7 @@ export function ConnectionEditor() {
               </p>
               {selectedImageService === "runpod_comfyui" && (
                 <div className="mt-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-[0.625rem] text-amber-300/80">
-                  <strong>RunPod configuration:</strong> Your endpoint ID goes in the <strong>Endpoint ID</strong> field
+                  <strong>Configuração do RunPod:</strong> Your endpoint ID goes in the <strong>Endpoint ID</strong> field
                   below. The API key is your RunPod API token. The workflow JSON is <strong>required</strong> — the
                   endpoint executes the workflow you supply. Use <code>%prompt%</code> placeholders in the
                   CLIPTextEncode node.
@@ -1353,7 +1353,7 @@ export function ConnectionEditor() {
                     markDirty();
                   }}
                   className="flex-1 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-[var(--ring)]"
-                  placeholder="Or type model ID directly…"
+                  placeholder="Ou digite o ID do modelo diretamente…"
                 />
               </div>
             )}
@@ -1512,7 +1512,7 @@ export function ConnectionEditor() {
           {/* ── Max Output Tokens Override ── */}
           {localProvider !== "image_generation" && !isLocalAuthProvider && (
             <FieldGroup
-              label="Max Output Tokens Override"
+              label="Substituição do máx. de tokens de saída"
               icon={<Zap size="0.875rem" className="text-amber-400" />}
               help="Hard cap on max_tokens for the API response (limiting output size). Use this for providers that enforce a lower limit than what the engine calculates (e.g. DeepSeek caps at 8192). Leave empty to let the engine decide."
             >
@@ -2022,7 +2022,8 @@ export function ConnectionEditor() {
                             {primary.length > 0 && (
                               <span className="flex flex-col gap-0.5">
                                 <span className="text-[0.5625rem] font-sans uppercase tracking-wide text-emerald-400/80">
-                                  Roleplay generation
+                                  
+                                  Geração de roleplay
                                 </span>
                                 {primary.map((u) => (
                                   <span key={u.model}>
@@ -2072,19 +2073,20 @@ export function ConnectionEditor() {
                   )}
                   {claudeDiagResult.modelUsageDetail.some((u) => u.model !== claudeDiagResult.requestedModel) && (
                     <div className="rounded-lg bg-[var(--secondary)]/50 p-2.5 text-[0.6875rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                      <strong className="text-[var(--foreground)]">Why is Haiku in the list?</strong> The Claude Agent
+                      <strong className="text-[var(--foreground)]">Por que o Haiku está na lista?</strong> The Claude Agent
                       SDK runs a <code>UserPromptSubmit</code> hook on every call that uses its small/fast model (Haiku)
                       to auto-generate a session title and optional context for the main model. This is Claude Code
                       session bookkeeping — it&apos;s organic to the subscription path, can&apos;t be cleanly disabled,
                       and doesn&apos;t serve any of your roleplay output. Your actual response always comes from the
-                      model labeled <em>Roleplay generation</em> above. The Haiku tagalong adds only a few output tokens
+                      model labeled <em>Geração de roleplay</em> above. The Haiku tagalong adds only a few output tokens
                       per turn and a tiny slice of quota.
                     </div>
                   )}
                   {claudeDiagResult.response && (
                     <div className="rounded-lg bg-[var(--secondary)] p-2.5 ring-1 ring-[var(--border)]">
                       <div className="text-[0.5625rem] font-sans uppercase tracking-wide text-[var(--muted-foreground)]">
-                        Model Self Identifies As
+                        
+                        O modelo se identifica como
                       </div>
                       <div className="mt-0.5 text-sm font-semibold text-[var(--foreground)]">
                         {claudeDiagResult.response}
@@ -2377,7 +2379,7 @@ function ImageGenerationDefaultsPanel({
                   label="Prefixo negativo"
                   value={automatic1111.negativePromptPrefix}
                   onChange={(negativePromptPrefix) => updateAutomatic1111({ negativePromptPrefix })}
-                  placeholder="e.g. low quality, blurry"
+                  placeholder="ex.: baixa qualidade, borrado"
                 />
                 <div className="grid gap-2 sm:grid-cols-2">
                   <ChoiceSetting
@@ -2415,7 +2417,7 @@ function ImageGenerationDefaultsPanel({
                   label="Prefixo negativo"
                   value={comfyui.negativePromptPrefix}
                   onChange={(negativePromptPrefix) => updateComfyUi({ negativePromptPrefix })}
-                  placeholder="e.g. low quality, blurry"
+                  placeholder="ex.: baixa qualidade, borrado"
                 />
                 <div className="grid gap-2 sm:grid-cols-2">
                   <ChoiceSetting
@@ -2466,7 +2468,7 @@ function ImageGenerationDefaultsPanel({
                   label="Prefixo negativo"
                   value={novelai.negativePromptPrefix}
                   onChange={(negativePromptPrefix) => updateNovelAi({ negativePromptPrefix })}
-                  placeholder="e.g. low quality, blurry"
+                  placeholder="ex.: baixa qualidade, borrado"
                 />
                 <div className="grid gap-2 sm:grid-cols-2">
                   <ChoiceSetting

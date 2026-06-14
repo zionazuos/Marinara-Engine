@@ -90,7 +90,7 @@ export function CreatePresetModal({ open, onClose }: Props) {
           <input
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="What this preset is for..."
+            placeholder="Para que serve este preset..."
             onKeyDown={(e) => {
               if (e.key === "Enter") handleCreate();
             }}

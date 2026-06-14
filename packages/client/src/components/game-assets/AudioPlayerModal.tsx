@@ -48,7 +48,8 @@ export function AudioPlayerModal({ path, name, onClose }: { path: string; name: 
         </audio>
         {playError && (
           <p className="mt-2 text-xs text-(--destructive)">
-            Your browser can't play {ext || "this"} file. Use the download button below.
+            
+            Seu navegador não consegue reproduzir {ext || "this"} file. Use the download button below.
           </p>
         )}
         <div className="mt-4 flex justify-end gap-2">

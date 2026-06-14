@@ -80,7 +80,7 @@ function BudgetSkippedEntryRow({ entry }: { entry: BudgetSkippedLorebookEntry })
         <div className="mt-1.5 space-y-1 border-t border-amber-500/20 pt-1.5 pl-5 text-[0.625rem] leading-relaxed text-amber-50/75">
           <p>Matched: {entry.matchedKeys.length > 0 ? entry.matchedKeys.slice(0, 5).join(", ") : "No key recorded"}</p>
           <p>Entry estimate: ~{entry.estimatedTokens.toLocaleString()} tokens</p>
-          <p>Budget used before entry: {formatBudgetCap(entry)}</p>
+          <p>Orçamento usado antes da entrada: {formatBudgetCap(entry)}</p>
         </div>
       )}
     </button>
@@ -101,7 +101,7 @@ function BudgetSkippedEntriesNotice({ entries }: { entries: BudgetSkippedLoreboo
         <AlertTriangle size="0.875rem" className="mt-0.5 shrink-0 text-amber-300" />
         <span className="min-w-0 flex-1">
           <span className="block font-medium text-amber-100">
-            {entries.length}  lore correspondente {entries.length === 1 ? "entry was" : "entries were"} skipped by token budget
+            {entries.length}  lore correspondente {entries.length === 1 ? "entry was" : "entries were"}  ignorado pelo orçamento de tokens
           </span>
           <span className="mt-0.5 block text-[0.625rem] leading-relaxed text-amber-50/65">
             Expand for budget details. Knowledge Retrieval or Knowledge Router may fit large lorebooks better than
@@ -152,7 +152,8 @@ export function WorldInfoPanel({
       {isLoading ? (
         <div className="flex items-center gap-2 py-4 text-xs text-[var(--muted-foreground)]">
           <Loader2 size="0.75rem" className="animate-spin" />
-          Scanning entries...
+          
+          Escaneando entradas...
         </div>
       ) : entries.length === 0 ? (
         <>

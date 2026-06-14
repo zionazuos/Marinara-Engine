@@ -809,7 +809,7 @@ export function ChatArea() {
         await refreshVisibleGameState();
       } catch {
         if (swipeActionSeq.current !== actionId) return;
-        toast.error("Could not delete the swipe.");
+        toast.error("Não foi possível excluir o swipe.");
       } finally {
         if (swipeActionSeq.current === actionId) {
           useGameStateStore.getState().clearRefreshingChat(refreshChatId);
@@ -1034,7 +1034,7 @@ export function ChatArea() {
           await refreshVisibleGameState();
         } catch {
           if (swipeActionSeq.current !== actionId) return;
-          toast.error("Could not switch swipes.");
+          toast.error("Não foi possível trocar de swipe.");
         } finally {
           if (swipeActionSeq.current === actionId) {
             useGameStateStore.getState().clearRefreshingChat(refreshChatId);
@@ -2127,7 +2127,7 @@ function AgentInjectionReviewModal({
   onClose: () => void;
 }) {
   return (
-    <Modal open onClose={onClose} title="Writer Agent Review" width="max-w-3xl">
+    <Modal open onClose={onClose} title="Revisão do agente escritor" width="max-w-3xl">
       <div className="flex flex-col gap-3">
         <p className="text-xs leading-relaxed text-[var(--muted-foreground)]">
           Edit the writer guidance before the main reply starts.

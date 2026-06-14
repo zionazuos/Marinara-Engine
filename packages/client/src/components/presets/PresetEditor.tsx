@@ -561,7 +561,7 @@ function OverviewTab({
           value={description}
           onFocus={(e) => e.target.select()}
           onChange={(e) => onDescriptionChange(e.target.value)}
-          placeholder="What does this preset do?"
+          placeholder="O que este preset faz?"
           className="min-h-[5rem] w-full rounded-xl bg-[var(--secondary)] p-3 text-sm text-[var(--foreground)] ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
         />
       </FieldGroup>
@@ -1834,7 +1834,7 @@ function VariableCard({
                     <button
                       onClick={() => setExpandedOptIdx(oi)}
                       className="shrink-0 rounded p-0.5 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                      title="Expand value editor"
+                      title="Expandir editor de valor"
                     >
                       <Maximize2 size="0.625rem" />
                     </button>
@@ -2294,7 +2294,7 @@ function MacrosReferenceModal({ onClose }: { onClose: () => void }) {
             </p>
             <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
               In group chats, a bracketed block containing character macros like <code>{"{{char}}"}</code> and{" "}
-              <code>{"{{description}}"}</code> repeats once per character.
+              <code>{"{{description}}"}</code>  repete uma vez por personagem.
             </p>
             <div className="space-y-2 border-y border-[var(--border)] py-3">
               <div>
@@ -2313,7 +2313,8 @@ Write this for anyone else.
 {{/if}}`}</code>
               </pre>
               <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-                Supported comparisons: <code>==</code>, <code>!=</code>, and <code>contains</code>. Character checks
+                
+                Comparações suportadas: <code>==</code>, <code>!=</code>, and <code>contains</code>. Character checks
                 also work with <code>char</code> or <code>speaker</code>, and group chats evaluate them for the speaking
                 character. Straight and typographic quotes both work.
               </p>

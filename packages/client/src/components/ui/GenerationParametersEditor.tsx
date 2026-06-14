@@ -214,7 +214,8 @@ export function GenerationParametersFields({
         {showOpenRouterServiceTier && (
           <div>
             <span className="inline-flex items-center gap-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-              OpenRouter Service Tier
+              
+              Tier de serviço do OpenRouter
               <HelpTooltip
                 text="Optional OpenRouter routing tier. Default sends no service_tier; Flex can be cheaper and slower, Priority can be faster and more expensive."
                 size="0.625rem"

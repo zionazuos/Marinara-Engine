@@ -558,7 +558,7 @@ export function GameSessionHistory({
           {sorted.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-12 text-[var(--muted-foreground)]">
               <ScrollText size={24} className="opacity-50" />
-              <span className="text-sm">No completed sessions yet</span>
+              <span className="text-sm">Nenhuma sessão concluída ainda</span>
               <span className="text-xs">Conclude your current session to see a summary here.</span>
             </div>
           ) : (
@@ -772,13 +772,14 @@ export function GameSessionHistory({
                                 }
                                 disabled={isSaving}
                                 rows={4}
-                                placeholder="One moment per line"
+                                placeholder="Um momento por linha"
                                 className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
                               <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                Little Details To Recall
+                                
+                                Pequenos detalhes a lembrar
                               </span>
                               <textarea
                                 value={draft?.littleDetails ?? ""}
@@ -803,13 +804,14 @@ export function GameSessionHistory({
                                 }
                                 disabled={isSaving}
                                 rows={4}
-                                placeholder="One update per line"
+                                placeholder="Uma atualização por linha"
                                 className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
                               <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                Stats Snapshot JSON
+                                
+                                JSON do snapshot de atributos
                               </span>
                               <textarea
                                 value={draft?.statsSnapshot ?? ""}
@@ -910,7 +912,8 @@ export function GameSessionHistory({
                         <div className="mb-3">
                           <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)]">
                             <Sparkles size={12} />
-                            Little Details To Recall
+                            
+                            Pequenos detalhes a lembrar
                           </div>
                           <ul className="flex flex-col gap-1 pl-4">
                             {session.littleDetails.map((detail, i) => (

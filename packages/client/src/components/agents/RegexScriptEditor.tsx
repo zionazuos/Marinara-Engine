@@ -646,7 +646,7 @@ export function RegexScriptEditor() {
                 onChange={(e) => setTestInput(e.target.value)}
                 rows={3}
                 className="w-full resize-y rounded-xl bg-[var(--secondary)] px-4 py-3 font-mono text-xs leading-relaxed ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-                placeholder="Paste sample text to test…"
+                placeholder="Cole um texto de exemplo para testar…"
               />
               {testInput && (
                 <div className="rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
@@ -661,7 +661,7 @@ export function RegexScriptEditor() {
 
           {/* ── Info Card ── */}
           <div className="rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
-            <h3 className="mb-2 text-xs font-semibold text-[var(--foreground)]">About Regex Scripts</h3>
+            <h3 className="mb-2 text-xs font-semibold text-[var(--foreground)]">Sobre scripts de regex</h3>
             <div className="space-y-1.5 text-[0.6875rem] text-[var(--muted-foreground)]">
               <p>
                 Regex scripts are applied to text during chat — either transforming AI responses before display, or

@@ -371,7 +371,7 @@ export function SummaryPopover({
             setDraftEntry(null);
             maybeHideSummarisedMessages(data.messageIds);
           },
-          onError: () => toast.error("Could not generate summary."),
+          onError: () => toast.error("Não foi possível gerar o resumo."),
         },
       );
       return;
@@ -389,7 +389,7 @@ export function SummaryPopover({
           setDraftEntry(null);
           maybeHideSummarisedMessages(data.messageIds);
         },
-        onError: () => toast.error("Could not generate summary."),
+        onError: () => toast.error("Não foi possível gerar o resumo."),
       },
     );
   }, [
@@ -441,7 +441,7 @@ export function SummaryPopover({
     const content = draftEntry.content.trim();
     const title = draftEntry.title.trim() || "Manual summary";
     if (!content) {
-      toast.error("Summary content is required.");
+      toast.error("O conteúdo do resumo é obrigatório.");
       return;
     }
     const existingEntry = displayEntries.find((entry) => entry.id === draftEntry.id);
@@ -679,8 +679,8 @@ export function SummaryPopover({
                 "rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)]",
                 scopeSettingsOpen && "bg-[var(--accent)] text-[var(--foreground)] ring-1 ring-[var(--border)]",
               )}
-              title="Summary source settings"
-              aria-label="Summary source settings"
+              title="Configurações da fonte do resumo"
+              aria-label="Configurações da fonte do resumo"
               aria-expanded={scopeSettingsOpen}
             >
               <Settings2 size="0.75rem" />
@@ -760,7 +760,7 @@ export function SummaryPopover({
                         className="flex w-full min-w-0 items-center justify-between gap-2 rounded-md bg-[var(--card)] py-1 pl-2 pr-2 text-left truncate text-xs font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                         aria-haspopup="listbox"
                         aria-expanded={templateSelectOpen}
-                        aria-label="Summary prompt template"
+                        aria-label="Modelo de prompt de resumo"
                       >
                         <span className="min-w-0 truncate">{promptTemplateSummary}</span>
                         <ChevronRight
@@ -881,12 +881,12 @@ export function SummaryPopover({
                 <div className="space-y-1 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/25 p-2">
                   <p className="px-1 text-xs font-semibold text-[var(--popover-foreground)]">Exibição</p>
                   <SummarySettingsToggle
-                    label="Hide summarised messages"
+                    label="Ocultar mensagens resumidas"
                     checked={summaryPopoverSettings.hideSummarisedMessages}
                     onChange={(checked) => setSummaryPopoverSettings({ hideSummarisedMessages: checked })}
                   />
                   <SummarySettingsToggle
-                    label="Collapse hidden messages"
+                    label="Recolher mensagens ocultas"
                     checked={summaryPopoverSettings.collapseHiddenMessages}
                     onChange={(checked) => setSummaryPopoverSettings({ collapseHiddenMessages: checked })}
                   />
@@ -927,7 +927,8 @@ export function SummaryPopover({
 
             {tokenWarning && (
               <div className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-2.5 py-2 text-[0.6875rem] leading-relaxed text-amber-200">
-                Enabled summaries are around {formatTokenCount(enabledTokenEstimate)} tokens. Consider disabling older
+                
+                Os resumos ativados ficam por volta de {formatTokenCount(enabledTokenEstimate)} tokens. Consider disabling older
                 entries if prompt context feels crowded.
               </div>
             )}
@@ -1095,7 +1096,7 @@ export function SummaryPopover({
               type="button"
               onClick={handleCreateManualEntry}
               className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)] active:scale-[0.98]"
-              title="Write summary entry"
+              title="Escrever entrada de resumo"
             >
               <PenLine size="0.8125rem" />
               
@@ -1111,7 +1112,7 @@ export function SummaryPopover({
                   ? "cursor-not-allowed bg-[var(--secondary)] text-[var(--muted-foreground)]"
                   : "bg-[var(--secondary)] text-[var(--foreground)] ring-1 ring-[var(--border)] hover:bg-[var(--accent)] active:scale-[0.98]",
               )}
-              title="Generate summary with AI"
+              title="Gerar resumo com IA"
             >
               {isGenerating ? <Loader2 size="0.8125rem" className="animate-spin" /> : <Sparkles size="0.8125rem" />}
               {isGenerating ? "Generating..." : "Generate"}

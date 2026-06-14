@@ -1581,7 +1581,7 @@ function UserStatusFooter() {
           value={userActivity}
           onChange={(event) => setUserActivity(event.target.value)}
           maxLength={120}
-          placeholder="What are you doing?"
+          placeholder="O que você está fazendo?"
           aria-label="Atividade personalizada"
           className="min-w-0 flex-1 rounded-lg border border-[var(--border)]/40 bg-[var(--sidebar-accent)]/35 px-2 py-1.5 text-xs text-[var(--sidebar-foreground)] outline-none transition-colors placeholder:text-[var(--muted-foreground)]/70 focus:border-[var(--primary)]/40 focus:bg-[var(--sidebar-accent)]/60"
         />

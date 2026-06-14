@@ -84,8 +84,8 @@ export function AssetGrid({
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 pt-8 text-[var(--muted-foreground)]">
         <FolderOpen size="2rem" className="opacity-40" />
-        <p className="text-sm">This folder is empty</p>
-        <p className="text-xs opacity-60">Drop files here to upload</p>
+        <p className="text-sm">Esta pasta está vazia</p>
+        <p className="text-xs opacity-60">Solte os arquivos aqui para enviar</p>
       </div>
     );
   }
@@ -140,7 +140,7 @@ export function AssetGrid({
                       ? "border-[var(--border)] bg-[var(--background)] text-[var(--muted-foreground)] hover:border-[var(--primary)]"
                       : "border-[var(--primary)]/40 bg-[var(--primary)] text-white hover:opacity-90")
                   }
-                  title="Select assets for this game"
+                  title="Selecionar assets para este game"
                   aria-label={`Select ${node.name} assets for this game`}
                 >
                   <FolderSelectionMark status={folderSelectionStatus} />
@@ -237,7 +237,7 @@ export function AssetGrid({
                       ? "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--primary)]"
                       : "border-[var(--primary)]/40 bg-[var(--primary)] text-white hover:opacity-90")
                   }
-                  title="Select assets for this game"
+                  title="Selecionar assets para este game"
                   aria-label={`Select ${node.name} assets for this game`}
                 >
                   <FolderSelectionMark status={folderSelectionStatus} />

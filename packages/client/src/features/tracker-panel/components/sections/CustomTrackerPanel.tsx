@@ -35,7 +35,7 @@ function CustomFieldList({
   deleteMode?: boolean;
   trackerPanelSizeProfile: TrackerPanelSizeProfile;
 }) {
-  if (fields.length === 0 && !onUpdate) return <EmptySection>No custom stats tracked.</EmptySection>;
+  if (fields.length === 0 && !onUpdate) return <EmptySection>Nenhum atributo personalizado rastreado.</EmptySection>;
   const readableValues = trackerPanelSizeProfile !== "compact";
   const useFieldColumns = shouldUseCustomFieldColumns(fields, trackerPanelSizeProfile);
   const updateField = (index: number, updated: CustomTrackerField) => {
@@ -52,7 +52,7 @@ function CustomFieldList({
     <div className="group/statbox relative">
       {fields.length === 0 ? (
         <div className="px-1 py-1">
-          <EmptySection>No custom stats tracked.</EmptySection>
+          <EmptySection>Nenhum atributo personalizado rastreado.</EmptySection>
         </div>
       ) : (
         <div

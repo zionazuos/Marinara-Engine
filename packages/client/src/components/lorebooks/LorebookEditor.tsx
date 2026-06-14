@@ -1059,7 +1059,7 @@ export function LorebookEditor() {
       {showUnsavedWarning && (
         <div className="flex items-center gap-3 bg-amber-500/10 px-4 py-2.5 text-xs">
           <AlertTriangle size="0.875rem" className="text-amber-400" />
-          <span className="flex-1 text-amber-200">You have unsaved changes</span>
+          <span className="flex-1 text-amber-200">Você tem alterações não salvas</span>
           <button
             onClick={() => setShowUnsavedWarning(false)}
             className="rounded-lg px-3 py-1 text-[0.6875rem] font-medium text-amber-300 ring-1 ring-amber-400/30 transition-colors hover:bg-amber-400/10"
@@ -1196,7 +1196,7 @@ export function LorebookEditor() {
                       markLorebookDirty();
                     }}
                     rows={3}
-                    title="Edit lorebook description"
+                    title="Editar descrição do lorebook"
                   />
                 </div>
 
@@ -2055,7 +2055,7 @@ export function LorebookEditor() {
                 {lorebookId && !showFolderGrouping && filteredEntries.length === 0 && entries.length > 0 && (
                   <div className="flex flex-col items-center gap-2 py-8 text-center">
                     <FileText size="1.5rem" className="text-[var(--muted-foreground)]" />
-                    <p className="text-xs text-[var(--muted-foreground)]">No entries match your search</p>
+                    <p className="text-xs text-[var(--muted-foreground)]">Nenhuma entrada corresponde à sua busca</p>
                   </div>
                 )}
               </div>
@@ -2170,7 +2170,7 @@ function VectorizeSection({
           {allVectorized ? <Check size="0.625rem" /> : <AlertTriangle size="0.625rem" />}
           {vectorizedCount}/{vectorizableEntryCount}  entradas vetorizadas
         </span>
-        {missingCount > 0 && <span>{missingCount} still need embeddings.</span>}
+        {missingCount > 0 && <span>{missingCount}  ainda precisam de embeddings.</span>}
         {excludeFromVectorization ? <span>This lorebook excludes every entry.</span> : null}
         {!excludeFromVectorization && excludedCount > 0 && <span>{excludedCount}  excluído.</span>}
       </div>

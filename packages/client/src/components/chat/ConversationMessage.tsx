@@ -897,7 +897,7 @@ export const ConversationMessage = memo(function ConversationMessage({
                   </button>
                   <button
                     onClick={() => handleRemoveAttachment(i)}
-                    title="Remove from message"
+                    title="Remover da mensagem"
                     className="absolute top-1.5 right-1.5 rounded-full bg-black/60 p-1 text-white/80 transition-opacity hover:bg-black/80 hover:text-white sm:opacity-0 sm:group-hover/att:opacity-100"
                   >
                     <X size="0.875rem" />
@@ -1196,7 +1196,7 @@ export const ConversationMessage = memo(function ConversationMessage({
                   </button>
                   <button
                     onClick={() => handleRemoveAttachment(i)}
-                    title="Remove from message"
+                    title="Remover da mensagem"
                     className="absolute top-1.5 right-1.5 rounded-full bg-black/60 p-1 text-white/80 transition-opacity hover:bg-black/80 hover:text-white sm:opacity-0 sm:group-hover/att:opacity-100"
                   >
                     <X size="0.875rem" />

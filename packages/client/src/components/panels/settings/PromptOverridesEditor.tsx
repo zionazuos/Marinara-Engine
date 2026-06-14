@@ -321,7 +321,7 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
 
       {variables.length > 0 && (
         <div className="flex flex-col gap-1">
-          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Available variables</span>
+          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Variáveis disponíveis</span>
           <div className="flex flex-wrap gap-1.5">
             {variables.map((variable) => (
               <button
@@ -382,7 +382,7 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
           className="mt-0.5 h-3.5 w-3.5 rounded border-[var(--border)] accent-[var(--primary)]"
         />
         <span className="min-w-0">
-          <span className="block text-xs font-medium text-[var(--foreground)]">Apply this override</span>
+          <span className="block text-xs font-medium text-[var(--foreground)]">Aplicar esta substituição</span>
           <span className="block text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
             Turn this off to keep the template saved without using it.
           </span>

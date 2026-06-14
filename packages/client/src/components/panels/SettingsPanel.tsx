@@ -389,8 +389,8 @@ function TrackerPanelCardOrderSetting() {
           type="button"
           onClick={() => setTrackerPanelSectionOrder([...TRACKER_DATA_PANEL_SECTIONS])}
           disabled={isDefaultOrder}
-          title="Reset tracker card order"
-          aria-label="Reset tracker card order"
+          title="Redefinir ordem dos cards de rastreador"
+          aria-label="Redefinir ordem dos cards de rastreador"
           className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--secondary)] hover:text-[var(--foreground)] active:scale-95 disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--muted-foreground)]"
         >
           <RotateCcw size="0.6875rem" />
@@ -547,7 +547,7 @@ function TrackerPanelAppearanceDrawer({
           )}
         >
           <ToggleSetting
-            label="Replace tracker HUD icons"
+            label="Substituir ícones do HUD de rastreador"
             checked={trackerPanelHideHudWidgets}
             onChange={setTrackerPanelHideHudWidgets}
             help="Hides the old world/player tracker icon strip so the Tracker panel can dock to the edge. The Agents button stays visible."
@@ -626,7 +626,7 @@ function TrackerPanelAppearanceDrawer({
             </div>
           </div>
           <ToggleSetting
-            label="Always show Docked thoughts"
+            label="Sempre mostrar pensamentos fixados"
             checked={trackerPanelDockedThoughtsAlwaysVisible}
             onChange={setTrackerPanelDockedThoughtsAlwaysVisible}
             help="When Thought display mode is Docked, every featured character's thought stays visible inside the tracker card instead of waiting for the per-card thought button."
@@ -880,21 +880,21 @@ function GeneralSettings() {
       </label>
 
       <ToggleSetting
-        label="Enable streaming responses"
+        label="Ativar respostas em streaming"
         checked={enableStreaming}
         onChange={setEnableStreaming}
         help="When on, AI responses appear word-by-word as they're generated. When off, the full response appears at once after completion."
       />
 
       <ToggleSetting
-        label="Spotify mini player"
+        label="Mini player do Spotify"
         checked={spotifyPlayerEnabled}
         onChange={setSpotifyPlayerEnabled}
         help="Shows a compact Spotify player in the top bar on desktop and as a draggable floating widget on mobile. Requires the Spotify DJ agent to be connected."
       />
 
       <ToggleSetting
-        label="Mini Mari surprise visits"
+        label="Visitas surpresa da Mini Mari"
         checked={chibiProfessorMariEnabled}
         onChange={setChibiProfessorMariEnabled}
         help="Allows the rare Chibi Professor Mari message to appear while scrolling. Turn this off if it gets in the way of settings or other workflows."
@@ -928,7 +928,7 @@ function GeneralSettings() {
       </label>
 
       <ToggleSetting
-        label="Instantly reveal game text"
+        label="Revelar o texto do game instantaneamente"
         checked={gameInstantTextReveal}
         onChange={setGameInstantTextReveal}
         help="When enabled, Game mode narration segments appear fully as soon as you enter them. This skips the typewriter effect and hides the narration speed control."
@@ -968,7 +968,7 @@ function GeneralSettings() {
       {/* Game Auto-Play Delay */}
       <label className="flex flex-col gap-1.5 rounded-lg p-1 transition-colors hover:bg-[var(--secondary)]/50">
         <div className="flex items-center gap-2">
-          <span className="text-xs">Game auto-play segment delay</span>
+          <span className="text-xs">Atraso do segmento de reprodução automática do game</span>
           <span className="text-xs tabular-nums text-[var(--muted-foreground)]">
             {(gameAutoPlayDelay / 1000).toFixed(1)}s
           </span>
@@ -1100,14 +1100,14 @@ function GeneralSettings() {
       />
 
       <ToggleSetting
-        label="Speech-to-text microphone"
+        label="Microfone de fala para texto"
         checked={speechToTextEnabled}
         onChange={setSpeechToTextEnabled}
         help="When on, chat input bars show a microphone button for browser dictation. Handy still works independently by pasting into the focused input field."
       />
 
       <ToggleSetting
-        label="Intuitive swipe navigation"
+        label="Navegação intuitiva por swipe"
         checked={intuitiveSwipeNavigation}
         onChange={setIntuitiveSwipeNavigation}
         help="In Conversation and Roleplay modes, use Left/Right Arrow on desktop or horizontal touch swipes on mobile to move between alternate generations on the latest assistant message."
@@ -1115,7 +1115,7 @@ function GeneralSettings() {
 
       <div className={cn("pl-5 transition-opacity", intuitiveSwipeNavigation ? "" : "pointer-events-none opacity-45")}>
         <ToggleSetting
-          label="Reroll past the newest swipe"
+          label="Rerrolar além do swipe mais recente"
           checked={intuitiveSwipeRerollLatest}
           onChange={setIntuitiveSwipeRerollLatest}
           help="When intuitive swipes are enabled, pressing Right Arrow or swiping left on the newest swipe of the latest assistant message creates a new reroll."
@@ -1123,7 +1123,7 @@ function GeneralSettings() {
       </div>
 
       <ToggleSetting
-        label="Up Arrow edits last message"
+        label="Seta para cima edita a última mensagem"
         checked={editLastMessageOnArrowUp}
         onChange={setEditLastMessageOnArrowUp}
         help="In Conversation and Roleplay modes, press Up Arrow while the chat input is empty to open the most recent message in the chat for editing — whether it's yours or the AI's."
@@ -1170,7 +1170,7 @@ function GeneralSettings() {
       </div>
 
       <PromptOverridesEditor
-        title="Game Image Prompt Templates"
+        title="Modelos de prompt de imagem do game"
         description="Edit the reusable templates Game Mode uses for NPC portraits, backgrounds, and scene illustrations."
         help="These templates render before Game Mode sends recurring image-generation requests. One-off prompt review edits still only affect the current request."
         keys={GAME_IMAGE_PROMPT_TEMPLATE_KEYS}
@@ -2226,7 +2226,7 @@ function BackgroundPicker({ selected, onSelect }: { selected: string | null; onS
         );
       }
     } catch {
-      toast.error("Background import failed.");
+      toast.error("Falha na importação do fundo.");
     } finally {
       setUploading(false);
     }
@@ -2447,7 +2447,7 @@ function BackgroundPicker({ selected, onSelect }: { selected: string | null; onS
       {(!backgrounds || backgrounds.length === 0) && (
         <div className="flex flex-col items-center gap-1.5 py-4 text-center">
           <Image size="1.25rem" className="text-[var(--muted-foreground)]/40" />
-          <p className="text-[0.625rem] text-[var(--muted-foreground)]">No backgrounds available yet</p>
+          <p className="text-[0.625rem] text-[var(--muted-foreground)]">Nenhum fundo disponível ainda</p>
         </div>
       )}
     </div>
@@ -2732,7 +2732,7 @@ function ThemesSettings() {
                 setActiveTheme.mutate(t.id, {
                   onError: (err) => {
                     console.error("[ThemesSettings] Failed to activate theme:", err);
-                    toast.error("Failed to activate theme.");
+                    toast.error("Falha ao ativar o tema.");
                   },
                 })
               }
@@ -2786,7 +2786,7 @@ function ThemesSettings() {
         ))}
 
         {isLoading && syncedThemes.length === 0 && (
-          <p className="py-2 text-center text-[0.625rem] text-[var(--muted-foreground)]">Loading synced themes...</p>
+          <p className="py-2 text-center text-[0.625rem] text-[var(--muted-foreground)]">Carregando temas sincronizados...</p>
         )}
 
         {!isLoading && syncedThemes.length === 0 && (
@@ -3854,7 +3854,7 @@ function AdvancedSettings() {
       toast.success("Admin secret saved for this browser");
     } else {
       localStorage.removeItem(ADMIN_SECRET_STORAGE_KEY);
-      toast.info("Admin secret cleared");
+      toast.info("Segredo de admin limpo");
     }
   }, [adminSecret]);
 
@@ -3950,7 +3950,7 @@ function AdvancedSettings() {
     if (mode === "all") {
       clearAllData.mutate(undefined, {
         onSuccess: () => toast.success("All selected data was cleared. Runtime caches were reset immediately."),
-        onError: () => toast.error("Failed to clear all data."),
+        onError: () => toast.error("Falha ao limpar todos os dados."),
         onSettled: () => setConfirmAction(null),
       });
       return;
@@ -4342,7 +4342,7 @@ function AdvancedSettings() {
         )}
       </div>
       <ToggleSetting
-        label="Group consecutive messages"
+        label="Agrupar mensagens consecutivas"
         checked={messageGrouping}
         onChange={setMessageGrouping}
         help="Combines multiple messages from the same sender into a visual group, reducing clutter in the chat."
@@ -4354,13 +4354,13 @@ function AdvancedSettings() {
         help="Displays the date and time each message was sent next to it in the chat."
       />
       <ToggleSetting
-        label="Show model name on messages"
+        label="Mostrar nome do modelo nas mensagens"
         checked={showModelName}
         onChange={setShowModelName}
         help="Displays which AI model generated each response, shown as a small label on assistant messages."
       />
       <ToggleSetting
-        label="Show token usage on messages"
+        label="Mostrar uso de tokens nas mensagens"
         checked={showTokenUsage}
         onChange={setShowTokenUsage}
         help="Displays prompt and completion token counts on each AI message. Useful for monitoring context size and cost."
@@ -4510,7 +4510,8 @@ function AdvancedSettings() {
             className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--destructive)]/85 px-3 py-2 text-xs font-medium text-white transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Trash2 size="0.8125rem" />
-            Clear Selected Data
+            
+            Limpar dados selecionados
           </button>
           <button
             onClick={() => setConfirmAction("all")}

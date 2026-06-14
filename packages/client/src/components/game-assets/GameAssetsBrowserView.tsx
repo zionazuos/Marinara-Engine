@@ -711,7 +711,7 @@ export function GameAssetsBrowserView() {
                   if (e.key === "Enter") handleSaveDescription();
                   if (e.key === "Escape") setEditingDescription(false);
                 }}
-                placeholder="What is this folder for?"
+                placeholder="Para que serve esta pasta?"
                 className="flex-1 rounded-md border border-[var(--border)] bg-[var(--background)] px-2 py-1 text-xs text-[var(--foreground)] outline-none focus:border-[var(--primary)]/50"
                 maxLength={500}
               />
@@ -1047,12 +1047,13 @@ export function GameAssetsBrowserView() {
                     {(() => {
                       const itemCount = countItems(modal.node);
                       if (itemCount === 0) {
-                        return <p>This folder is empty.</p>;
+                        return <p>Esta pasta está vazia.</p>;
                       }
                       return (
                         <>
                           <p className="text-[var(--destructive)]">
-                            This folder contains {itemCount} item{itemCount !== 1 ? "s" : ""}.
+                            
+                            Esta pasta contém {itemCount} item{itemCount !== 1 ? "s" : ""}.
                           </p>
                           <label className="mt-2 flex items-center gap-2">
                             <input
@@ -1061,7 +1062,7 @@ export function GameAssetsBrowserView() {
                               onChange={(e) => setDeleteRecursive(e.target.checked)}
                               className="rounded border-[var(--border)]"
                             />
-                            <span className="text-xs">Delete everything inside</span>
+                            <span className="text-xs">Excluir tudo que há dentro</span>
                           </label>
                           {!deleteRecursive && (
                             <p className="mt-1 text-xs text-[var(--destructive)]">

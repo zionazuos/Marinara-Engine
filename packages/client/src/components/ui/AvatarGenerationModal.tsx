@@ -173,7 +173,7 @@ export function AvatarGenerationModal({
           <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_13rem]">
             <div className="space-y-4">
               <label className="space-y-1.5">
-                <span className="block text-xs font-medium text-[var(--foreground)]">Image Generation Connection</span>
+                <span className="block text-xs font-medium text-[var(--foreground)]">Conexão de geração de imagem</span>
                 {imageConnections.length === 0 ? (
                   <p className="rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--destructive)]">
                     No image generation connections found.
@@ -215,7 +215,7 @@ export function AvatarGenerationModal({
                   />
                   <img
                     src={defaultAvatarUrl}
-                    alt="Current avatar reference"
+                    alt="Referência do avatar atual"
                     className="h-10 w-10 rounded-lg object-cover ring-1 ring-[var(--border)]"
                   />
                   <span className="min-w-0 flex-1">Use current avatar as a reference</span>

@@ -297,7 +297,8 @@ export function SecretPlotPanel({
           )}
           {isError && (
             <p className="rounded-lg border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-3 py-2 text-center text-[0.625rem] text-[var(--destructive)]">
-              Could not load agent memory.
+              
+              Não foi possível carregar a memória do agente.
             </p>
           )}
 
@@ -350,7 +351,7 @@ export function SecretPlotPanel({
                   <div className="space-y-1.5 border-t border-[var(--border)] px-1.5 py-1.5">
                     {draft.sceneDirections.length === 0 && (
                       <div className="space-y-1.5 rounded-md border border-[var(--border)] bg-[var(--secondary)]/35 px-2 py-1.5">
-                        <p className="text-[0.5625rem] text-[var(--muted-foreground)]">No direction currently set.</p>
+                        <p className="text-[0.5625rem] text-[var(--muted-foreground)]">Nenhuma direção definida no momento.</p>
                         <button
                           type="button"
                           onClick={() => {

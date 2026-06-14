@@ -151,7 +151,7 @@ export function GameQteOverlay({ actions, timerSeconds, onSelect, onTimeout, onD
         {/* Bonus indicator */}
         {selected !== null && timeLeft > 0 && (
           <div className="mt-3 text-center">
-            <span className="text-xs font-semibold text-emerald-400">Quick reflexes! +{Math.ceil(timeLeft)} bonus</span>
+            <span className="text-xs font-semibold text-emerald-400">Reflexos rápidos! +{Math.ceil(timeLeft)} bonus</span>
           </div>
         )}
       </div>

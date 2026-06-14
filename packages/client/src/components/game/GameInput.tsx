@@ -573,7 +573,8 @@ export function GameInput({
         {/* Right: Dice, Emoji (desktop), Send */}
         {riskyInterrupt && !queuedDice && (
           <span className="hidden text-[0.625rem] font-medium uppercase tracking-wide text-red-300/80 sm:inline">
-            using dice recommended
+            
+            recomendado usar dados
           </span>
         )}
         {forceInterrupt && (

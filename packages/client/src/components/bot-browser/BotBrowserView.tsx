@@ -1743,7 +1743,7 @@ export function BotBrowserView() {
     setPygLoggedIn(false);
     setNsfw(false);
     setPage(1);
-    toast.info("Logged out of Pygmalion.");
+    toast.info("Desconectado do Pygmalion.");
   };
 
   const handleCtSetCookie = async (cookie: string) => {
@@ -2184,7 +2184,8 @@ export function BotBrowserView() {
                   {(provider.features.length > 0 || provider.extraToggles.length > 0) && (
                     <div className="flex flex-col gap-2">
                       <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
-                        Character Must Have
+                        
+                        O personagem precisa ter
                       </span>
                       {provider.features.map((f) => (
                         <label key={f.key} className="flex cursor-pointer items-center gap-2 text-xs">
@@ -2288,7 +2289,8 @@ export function BotBrowserView() {
                 </div>
               ) : results.length === 0 ? (
                 <div className="flex flex-1 items-center justify-center py-12 text-sm text-[var(--muted-foreground)]">
-                  No characters found
+                  
+                  Nenhum personagem encontrado
                 </div>
               ) : (
                 <>
@@ -2360,7 +2362,7 @@ export function BotBrowserView() {
           >
             <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
               <h3 className="flex items-center gap-2 text-sm font-bold text-[var(--foreground)]">
-                <span className="text-amber-400">⚠️</span> DataCat is NSFW only
+                <span className="text-amber-400">⚠️</span>  O DataCat é apenas NSFW
               </h3>
               <button
                 onClick={() => setPendingDatacatSwitch(false)}
@@ -2382,13 +2384,15 @@ export function BotBrowserView() {
                   }}
                   className="flex-1 rounded-lg bg-pink-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-pink-500"
                 >
-                  Continue to DataCat
+                  
+                  Continuar para o DataCat
                 </button>
                 <button
                   onClick={() => setPendingDatacatSwitch(false)}
                   className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-4 py-2 text-xs font-medium transition-colors hover:bg-[var(--accent)]"
                 >
-                  Don't continue to DataCat
+                  
+                  Não continuar para o DataCat
                 </button>
               </div>
             </div>
@@ -2452,7 +2456,7 @@ function LoginModal({
           <h3 className="flex items-center gap-2 text-sm font-bold text-[var(--foreground)]">
             {isPyg ? (
               <>
-                <KeyRound size="1rem" className="text-amber-400" /> Pygmalion Authentication
+                <KeyRound size="1rem" className="text-amber-400" />  Autenticação do Pygmalion
               </>
             ) : (
               <>

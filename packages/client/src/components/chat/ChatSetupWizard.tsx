@@ -232,7 +232,7 @@ function PersonaPicker({
           );
         })}
         {personas.length === 0 && (
-          <p className="px-3 py-2 text-[0.6875rem] text-[var(--muted-foreground)]">No personas created yet.</p>
+          <p className="px-3 py-2 text-[0.6875rem] text-[var(--muted-foreground)]">Nenhuma persona criada ainda.</p>
         )}
       </div>
     </div>
@@ -573,7 +573,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                   className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/20"
                 >
                   <Plug size="0.75rem" />
-                  Set Up a Connection
+                  
+                  Configurar uma conexão
                 </button>
               )}
               <SetupGenerationParametersPanel
@@ -719,7 +720,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                     className={autonomousEnabled ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}
                   />
                   <div>
-                    <span className="text-xs font-medium">Autonomous Messages</span>
+                    <span className="text-xs font-medium">Mensagens autônomas</span>
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                       Characters can message you first when you&apos;re inactive
                     </p>
@@ -811,7 +812,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
               <div className="flex items-center justify-center gap-2 py-1">
                 <Loader2 size="0.875rem" className="animate-spin text-[var(--primary)]" />
                 <span className="text-xs text-[var(--muted-foreground)]">
-                  Generating schedule{chatCharIds.length > 1 ? "s" : ""}… hang tight!
+                  
+                  Gerando agenda{chatCharIds.length > 1 ? "s" : ""}… hang tight!
                 </span>
               </div>
             ) : (
@@ -1146,7 +1148,8 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
             className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-3 py-2 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/20"
           >
             <Plug size="0.8125rem" />
-            Set Up a Connection
+            
+            Configurar uma conexão
           </button>
         )}
         <SetupGenerationParametersPanel

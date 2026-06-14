@@ -1819,7 +1819,7 @@ export function ConversationInput({
                       onClick={() => void handleDeleteSavedStatus(status)}
                       disabled={updatePersona.isPending}
                       className="mr-1 rounded-md p-1.5 text-[var(--muted-foreground)] opacity-70 transition-colors hover:text-[var(--destructive)] disabled:opacity-40 sm:opacity-0 sm:group-hover:opacity-100"
-                      title="Remove saved status"
+                      title="Remover status salvo"
                     >
                       <Trash2 size="0.75rem" />
                     </button>

@@ -233,7 +233,8 @@ export function ContextInjectionPanel({
             className={cn("shrink-0 text-[var(--primary)] transition-transform", open && "rotate-180")}
           />
           <span className="min-w-0 truncate font-semibold text-[var(--popover-foreground)]/75 group-hover:text-[var(--popover-foreground)]">
-            Cached prompt injections
+            
+            Injeções de prompt em cache
           </span>
         </button>
         <span className="flex shrink-0 items-center gap-1.5">

@@ -914,7 +914,7 @@ export function SpriteWandCleanupEditor({
               className={navigationButtonClass(tool === "pan")}
               aria-label="Deslocar"
               aria-pressed={tool === "pan"}
-              title="Drag around while zoomed in"
+              title="Arraste enquanto estiver com zoom"
             >
               <Hand size="0.875rem" />
             </button>

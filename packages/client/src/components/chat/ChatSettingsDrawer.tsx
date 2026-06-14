@@ -2130,7 +2130,7 @@ export function ChatSettingsDrawer({
               <div className="mt-2 space-y-1.5">
                 <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Personagens do grupo</label>
                 {chatCharIds.length === 0 ? (
-                  <p className="text-[0.6875rem] text-[var(--muted-foreground)]">No characters in party yet.</p>
+                  <p className="text-[0.6875rem] text-[var(--muted-foreground)]">Nenhum personagem no grupo ainda.</p>
                 ) : (
                   <div className="flex flex-col gap-1">
                     {chatCharIds.map((cid) => {
@@ -2149,7 +2149,7 @@ export function ChatSettingsDrawer({
                               useUIStore.getState().openCharacterDetail(c.id);
                             }}
                             className="flex min-w-0 flex-1 items-center gap-2.5 text-left transition-colors hover:opacity-80"
-                            title="Open character card"
+                            title="Abrir card do personagem"
                           >
                             {c.avatarPath ? (
                               <span className="relative block h-7 w-7 shrink-0 overflow-hidden rounded-full">
@@ -2442,7 +2442,7 @@ export function ChatSettingsDrawer({
                               useUIStore.getState().openCharacterDetail(c.id);
                             }}
                             className="flex items-center gap-2.5 min-w-0 flex-1 text-left transition-colors hover:opacity-80"
-                            title="Open character card"
+                            title="Abrir card do personagem"
                           >
                             {c.avatarPath ? (
                               <span className="relative block h-7 w-7 shrink-0 overflow-hidden rounded-full">
@@ -2667,7 +2667,7 @@ export function ChatSettingsDrawer({
                 )}
               >
                 <div className="min-w-0 flex-1">
-                  <span className="text-[0.6875rem] font-medium">Only Reply When Mentioned</span>
+                  <span className="text-[0.6875rem] font-medium">Só responder quando mencionado</span>
                   <p className="mt-0.5 text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
                     {metadata.groupResponseOrder === "manual"
                       ? "Characters will stay quiet until you type @Name or use the character picker."
@@ -2927,7 +2927,7 @@ export function ChatSettingsDrawer({
                   )}
                 >
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-medium">Autonomous Messages</span>
+                    <span className="text-xs font-medium">Mensagens autônomas</span>
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                       Characters message you when you&apos;re inactive, even without schedules
                     </p>
@@ -2968,7 +2968,7 @@ export function ChatSettingsDrawer({
                     )}
                   >
                     <div className="flex-1 min-w-0">
-                      <span className="text-xs font-medium">Character Exchanges</span>
+                      <span className="text-xs font-medium">Trocas do personagem</span>
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                         Characters chat with each other in group chats
                       </p>
@@ -3331,7 +3331,7 @@ export function ChatSettingsDrawer({
                   }}
                   className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)]/40 hover:text-[var(--primary)]"
                 >
-                  <Plus size="0.75rem" /> Link to Roleplay or Game
+                  <Plus size="0.75rem" />  Vincular a roleplay ou game
                 </button>
               ) : (
                 <PickerDropdown
@@ -3420,7 +3420,7 @@ export function ChatSettingsDrawer({
                   )}
                 >
                   <div className="flex-1 min-w-0">
-                    <span className="text-[0.6875rem] font-medium">Allow character DMs</span>
+                    <span className="text-[0.6875rem] font-medium">Permitir DMs do personagem</span>
                     <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
                       Adds a short hidden command reminder so characters can open a new DM conversation when they text
                       the user in-world.
@@ -3502,7 +3502,7 @@ export function ChatSettingsDrawer({
                   search={connectionSearch}
                   onSearchChange={setConnectionSearch}
                   onClose={() => setShowConnectionPicker(false)}
-                  placeholder="Search conversation chats…"
+                  placeholder="Buscar chats de conversa…"
                 >
                   {((allChats ?? []) as Chat[])
                     .filter(
@@ -4017,7 +4017,7 @@ export function ChatSettingsDrawer({
                       <Image size="0.75rem" className="mt-0.5 text-[var(--primary)]" />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 text-[0.6875rem] font-medium">
-                          <span>Expression Engine Sprites</span>
+                          <span>Sprites do motor de expressões</span>
                           {spriteCharacterIds.length > 0 && (
                             <span className="rounded-full bg-[var(--primary)]/10 px-1.5 py-0.5 text-[0.5625rem] font-medium text-[var(--primary)]">
                               {spriteCharacterIds.length}/3 enabled
@@ -4072,7 +4072,7 @@ export function ChatSettingsDrawer({
                         Add characters to this chat or choose a persona first to enable sprite selection.
                       </p>
                     ) : chatSpriteSubjectsLoading ? (
-                      <p className="text-[0.625rem] text-[var(--muted-foreground)]">Loading sprite owners...</p>
+                      <p className="text-[0.625rem] text-[var(--muted-foreground)]">Carregando donos dos sprites...</p>
                     ) : chatSpriteSubjectsWithSprites.length > 0 ? (
                       <div className="space-y-1.5">
                         {chatSpriteSubjectsWithSprites.map((subject) => {
@@ -4499,7 +4499,7 @@ export function ChatSettingsDrawer({
                           }
                           className="w-full rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-2.5 py-1.5 text-xs text-[var(--foreground)]"
                         >
-                          <option value="">Select image connection…</option>
+                          <option value="">Selecionar conexão de imagem…</option>
                           {(imageConnectionsList ?? []).map((c: { id: string; name: string; model?: string }) => (
                             <option key={c.id} value={c.id}>
                               {c.name}
@@ -4509,7 +4509,8 @@ export function ChatSettingsDrawer({
                         </select>
                         <label className="flex flex-col gap-1">
                           <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                            Scene image instructions
+                            
+                            Instruções de imagem da cena
                           </span>
                           <textarea
                             value={gameImagePromptInstructionsDraft}
@@ -4854,7 +4855,7 @@ export function ChatSettingsDrawer({
                             <AgentCategorySection
                               label="Agentes personalizados"
                               icon={<Settings2 size="0.75rem" />}
-                              description="Your custom-created agents."
+                              description="Seus agentes criados personalizados."
                               count={activeCustom.length}
                             >
                               {activeCustom.length > 0 && (
@@ -5002,7 +5003,7 @@ export function ChatSettingsDrawer({
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <MessageCircle size="0.75rem" className="text-[var(--primary)]" />
-                    <span className="text-xs font-medium">Recent Message Tail</span>
+                    <span className="text-xs font-medium">Cauda de mensagens recentes</span>
                   </div>
                   <input
                     type="number"
@@ -5050,7 +5051,7 @@ export function ChatSettingsDrawer({
               {metadata.discordWebhookUrl &&
                 !/^https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+$/.test(
                   (metadata.discordWebhookUrl as string).trim(),
-                ) && <p className="text-[0.625rem] text-red-400">Invalid webhook URL format</p>}
+                ) && <p className="text-[0.625rem] text-red-400">Formato de URL de webhook inválido</p>}
             </div>
           </Section>
 
@@ -5350,7 +5351,7 @@ export function ChatSettingsDrawer({
                 )}
               >
                 <div className="flex-1 min-w-0">
-                  <span className="text-[0.6875rem] font-medium">Auto-Translate Responses</span>
+                  <span className="text-[0.6875rem] font-medium">Traduzir respostas automaticamente</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                     Automatically translate AI responses after generation.
                   </p>
@@ -5416,7 +5417,7 @@ export function ChatSettingsDrawer({
                 )}
               >
                 <div className="flex-1 min-w-0">
-                  <span className="text-[0.6875rem] font-medium">Show Draft Translate Button</span>
+                  <span className="text-[0.6875rem] font-medium">Mostrar botão de tradução de rascunho</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                     Add a translate button beside Send so you can translate and edit your message before sending it.
                   </p>
@@ -5765,7 +5766,7 @@ export function ChatSettingsDrawer({
                       <div className="absolute right-1 top-1/2 flex -translate-y-1/2 flex-col overflow-hidden rounded-md">
                         <button
                           type="button"
-                          aria-label="Increase trigger cadence"
+                          aria-label="Aumentar cadência do gatilho"
                           disabled={addingAgentToChat}
                           onClick={() => {
                             setAgentAddPreview((current) =>
@@ -5787,7 +5788,7 @@ export function ChatSettingsDrawer({
                         </button>
                         <button
                           type="button"
-                          aria-label="Decrease trigger cadence"
+                          aria-label="Diminuir cadência do gatilho"
                           disabled={addingAgentToChat}
                           onClick={() => {
                             setAgentAddPreview((current) =>
@@ -6051,13 +6052,15 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
 
         {memoriesQuery.isLoading && (
           <div className="rounded-xl bg-[var(--secondary)]/60 px-4 py-8 text-center text-xs text-[var(--muted-foreground)]">
-            Loading memories...
+            
+            Carregando memórias...
           </div>
         )}
 
         {memoriesQuery.error && (
           <div className="rounded-xl bg-[var(--destructive)]/10 px-4 py-3 text-xs text-[var(--destructive)] ring-1 ring-[var(--destructive)]/25">
-            Failed to load memories.
+            
+            Falha ao carregar as memórias.
           </div>
         )}
 
@@ -6175,7 +6178,7 @@ function AdvancedParametersSection({
         <span className="shrink-0 text-[var(--muted-foreground)]">
           <Settings2 size="0.875rem" />
         </span>
-        <span className="min-w-0 flex-1 text-xs font-semibold">Advanced Parameters</span>
+        <span className="min-w-0 flex-1 text-xs font-semibold">Parâmetros avançados</span>
         <span className="flex shrink-0 items-center" onClick={(event) => event.stopPropagation()}>
           <HelpTooltip
             text="Override generation parameters for this chat. Only change these if you know what you're doing."
@@ -7126,7 +7129,7 @@ function ScheduleEditor({
                                   value={block.activity}
                                   onChange={(e) => updateBlock(day, idx, "activity", e.target.value)}
                                   className="w-full rounded bg-[var(--secondary)] px-1.5 py-0.5 text-[0.625rem] outline-none ring-1 ring-transparent focus:ring-[var(--primary)]/40"
-                                  placeholder="Activity description"
+                                  placeholder="Descrição da atividade"
                                 />
                                 {/* Status selector */}
                                 <div className="flex gap-1">
@@ -7244,7 +7247,8 @@ function HapticConnectionPanel({
   if (isLoading) {
     return (
       <div className="rounded-lg bg-[var(--secondary)] px-3 py-2 text-[0.625rem] text-[var(--muted-foreground)]">
-        Checking Intiface Central...
+        
+        Verificando o Intiface Central...
       </div>
     );
   }

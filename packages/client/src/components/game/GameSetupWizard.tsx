@@ -1084,7 +1084,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   <input
                     value={personaSearch}
                     onChange={(e) => setPersonaSearch(e.target.value)}
-                    placeholder="Search personas or titles…"
+                    placeholder="Buscar personas ou títulos…"
                     className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]"
                   />
                 </div>
@@ -1199,7 +1199,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             {/* Scene Effects Model — unified dropdown */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">
-                Scene Effects Model
+                
+                Modelo de efeitos de cena
                 <span className="ml-1 text-[0.575rem] text-[var(--muted-foreground)]">(optional)</span>
               </label>
               <select
@@ -1448,14 +1449,15 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   {enableSpriteGeneration && (
                     <div className="mt-2">
                       <label className="mb-1 block text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                        Image Generation Connection
+                        
+                        Conexão de geração de imagem
                       </label>
                       <select
                         value={imageConnectionId ?? ""}
                         onChange={(e) => setImageConnectionId(e.target.value || null)}
                         className="w-full rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-2.5 py-1.5 text-xs text-[var(--foreground)]"
                       >
-                        <option value="">Select image connection…</option>
+                        <option value="">Selecionar conexão de imagem…</option>
                         {imageConnections.map((c) => (
                           <option key={c.id} value={c.id}>
                             {c.name}
