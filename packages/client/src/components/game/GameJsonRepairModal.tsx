@@ -52,7 +52,7 @@ export function GameJsonRepairModal({ request, onClose, onApplied }: GameJsonRep
   const handleFormat = () => {
     const next = validateJson(draft);
     if (!next.valid) {
-      toast.error("JSON is still invalid, so I cannot format it yet.");
+      toast.error("O JSON ainda é inválido, então não consigo formatá-lo ainda.");
       return;
     }
     setDraft(JSON.stringify(next.parsed, null, 2));

@@ -347,7 +347,7 @@ export function ImportCharacterModal({ open, onClose }: Props) {
             className={`transition-colors ${dragOver ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}`}
           />
           <div className="text-center">
-            <p className="text-sm font-medium">Drop one or more files here or click to browse</p>
+            <p className="text-sm font-medium">Solte um ou mais arquivos aqui ou clique para procurar</p>
             <p className="mt-1 text-xs text-[var(--muted-foreground)]">
               
               Suporta JSON, cards de personagem em PNG, CharX e exportações do Marinara

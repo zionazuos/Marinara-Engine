@@ -1964,7 +1964,8 @@ export function GameCombatUI({
                   </div>
                 ) : (
                   <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/45">
-                    No combat skills are available for this combatant.
+                    
+                    Nenhuma habilidade de combate está disponível para este combatente.
                   </div>
                 )}
                 <button
@@ -2526,7 +2527,7 @@ export function GameCombatUI({
                 })}
               </div>
             ) : (
-              <div className="text-xs text-white/45">No combat skills are available for this combatant.</div>
+              <div className="text-xs text-white/45">Nenhuma habilidade de combate está disponível para este combatente.</div>
             )}
 
             <div>

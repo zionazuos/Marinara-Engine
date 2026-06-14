@@ -475,7 +475,7 @@ export function TTSConfigCard() {
           ? (payload.voiceAssignments.find((assignment) => assignment.voice)?.voice ?? payload.voice)
           : payload.voice;
       if (payload.source === "elevenlabs" && !previewVoice) {
-        toast.error("Select an ElevenLabs voice before previewing.");
+        toast.error("Selecione uma voz do ElevenLabs antes de pré-visualizar.");
         return;
       }
 
@@ -934,7 +934,8 @@ export function TTSConfigCard() {
                 </div>
                 {voiceAssignments.length === 0 && (
                   <p className="rounded-lg border border-dashed border-[var(--border)] px-2.5 py-2 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]">
-                    Add a character voice to route TTS by speaker.
+                    
+                    Adicione uma voz de personagem para rotear o TTS por falante.
                   </p>
                 )}
                 {voiceAssignments.map((assignment, index) => (

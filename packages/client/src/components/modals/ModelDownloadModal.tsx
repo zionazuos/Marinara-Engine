@@ -1168,8 +1168,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
             <ul className="mt-2 flex flex-col gap-1 text-xs text-[var(--muted-foreground)]/80">
               <li>Agentes de rastreador no modo roleplay</li>
               <li>Scene effects in game mode (backgrounds, music, SFX, ambient)</li>
-              <li>Widget updates, weather, and time-of-day changes</li>
-              <li>NPC reputation tracking and expression selection</li>
+              <li>Atualizações de widget, clima e mudanças de hora do dia</li>
+              <li>Rastreamento de reputação de NPC e seleção de expressão</li>
             </ul>
           </div>
         )}

@@ -152,7 +152,8 @@ export function ChatBranchSelector({
                 Ramificações do chat
               </div>
               <div className="mt-1 text-xs text-[var(--muted-foreground)]">
-                Switch branches without opening Manage Chat Files.
+                
+                Trocar de ramificação sem abrir Gerenciar arquivos do chat.
               </div>
             </div>
 

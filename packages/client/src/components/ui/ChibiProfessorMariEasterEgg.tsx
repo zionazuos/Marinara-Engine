@@ -53,7 +53,7 @@ function showChibiProfessorMariToast() {
             Se você vir esta imagem enquanto rola o Marinara Engine, você foi visitado pela rara Chibi Professora Mari!
           </p>
           <p>Sorte e fortuna virão até você muito em breve. Não esqueça de dizer "obrigado, Professora!"</p>
-          <p>Remember, you are loved and appreciated. Cheers!</p>
+          <p>Lembre-se: você é amado e valorizado. Saúde!</p>
         </div>
       </div>
     ),

@@ -1363,7 +1363,7 @@ export function BotBrowserView() {
       .then((d) => {
         if (!d?.active && pygLoggedIn) {
           setPygLoggedIn(false);
-          toast.info("Pygmalion session expired — please log in again.");
+          toast.info("A sessão do Pygmalion expirou — faça login novamente.");
         } else if (d?.active) setPygLoggedIn(true);
       })
       .catch(() => {});
@@ -1372,7 +1372,7 @@ export function BotBrowserView() {
       .then((d) => {
         if (!d?.active && ctLoggedIn) {
           setCtLoggedIn(false);
-          toast.info("CharacterTavern session expired — please log in again.");
+          toast.info("A sessão do CharacterTavern expirou — faça login novamente.");
         } else if (d?.active) setCtLoggedIn(true);
       })
       .catch(() => {});
@@ -1730,7 +1730,7 @@ export function BotBrowserView() {
       setShowLoginModal(false);
       setNsfw(true);
       setPage(1);
-      toast.success("Logged in to Pygmalion! NSFW content enabled.");
+      toast.success("Conectado ao Pygmalion! Conteúdo NSFW ativado.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Token validation failed");
     } finally {

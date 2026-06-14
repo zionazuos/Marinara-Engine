@@ -968,7 +968,8 @@ function SectionsTab({
           </p>
           {groupMap.size === 0 ? (
             <p className="py-2 text-center text-[0.625rem] text-[var(--muted-foreground)]">
-              No groups yet. Create one to organize sections.
+              
+              Nenhum grupo ainda. Crie um para organizar as seções.
             </p>
           ) : (
             <div className="space-y-1">
@@ -1273,7 +1274,8 @@ function SectionsTab({
                               </p>
                               {["lorebook", "world_info_before", "world_info_after"].includes(mc.type) && (
                                 <p className="mt-1 text-amber-200">
-                                  This is where active lorebook entries are inserted.
+                                  
+                                  É aqui que as entradas de lorebook ativas são inseridas.
                                 </p>
                               )}
                             </div>
@@ -1357,7 +1359,8 @@ function SectionsTab({
 
       {sections.length > 0 && (
         <p className="text-center text-[0.625rem] text-[var(--muted-foreground)]">
-          Click to expand · Sections are assembled top-to-bottom
+          
+          Clique para expandir · As seções são montadas de cima para baixo
         </p>
       )}
 
@@ -1478,8 +1481,7 @@ function PresetVariablesEditor({
       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
         
         Defina variáveis que os usuários selecionam ao atribuir este preset a um chat. Use{" "}
-        <code className="rounded bg-[var(--secondary)] px-1 text-amber-400">{"{{variable_name}}"}</code> in any section
-        to insert the selected value.
+        <code className="rounded bg-[var(--secondary)] px-1 text-amber-400">{"{{variable_name}}"}</code>  em qualquer seção para inserir o valor selecionado.
       </p>
 
       {variables.length === 0 ? (

@@ -44,7 +44,8 @@ export function AudioPlayerModal({ path, name, onClose }: { path: string; name: 
         <h3 className="mb-4 text-sm font-semibold text-(--foreground)">{name}</h3>
         <audio controls className="w-full" autoPlay onError={() => setPlayError(true)}>
           <source src={`/api/game-assets/file/${encodedPath}`} type={mime} />
-          Your browser does not support the audio element.
+          
+          Seu navegador não suporta o elemento de áudio.
         </audio>
         {playError && (
           <p className="mt-2 text-xs text-(--destructive)">

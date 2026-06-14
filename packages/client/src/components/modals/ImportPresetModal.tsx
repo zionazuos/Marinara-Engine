@@ -109,7 +109,7 @@ export function ImportPresetModal({ open, onClose }: Props) {
           }`}
         >
           <Download size="2rem" className={dragOver ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"} />
-          <p className="text-sm font-medium">Drop one or more preset files here or click to browse</p>
+          <p className="text-sm font-medium">Solte um ou mais arquivos de preset aqui ou clique para procurar</p>
           <span className="flex items-center gap-1 rounded-full bg-[var(--secondary)] px-2.5 py-1 text-xs text-[var(--muted-foreground)]">
             <FileJson size="0.75rem" /> .json
           </span>

@@ -373,7 +373,7 @@ export function CharacterEditor() {
     }
     if (!beginAvatarUpload()) {
       e.target.value = "";
-      toast.error("Wait for the current avatar upload to finish.");
+      toast.error("Espere o envio do avatar atual terminar.");
       return;
     }
 
@@ -616,7 +616,7 @@ export function CharacterEditor() {
           });
         } catch (error) {
           console.warn("[CharacterEditor] Failed to copy avatar to imported persona:", error);
-          toast.error("Persona imported, but the avatar could not be copied.");
+          toast.error("Persona importada, mas o avatar não pôde ser copiado.");
           return;
         }
       }
@@ -630,7 +630,7 @@ export function CharacterEditor() {
 
   const handleClose = useCallback(() => {
     if (avatarUploading) {
-      toast.error("Wait for the current avatar upload to finish.");
+      toast.error("Espere o envio do avatar atual terminar.");
       return;
     }
     if (dirty) {
@@ -642,7 +642,7 @@ export function CharacterEditor() {
 
   const forceClose = useCallback(() => {
     if (avatarUploading) {
-      toast.error("Wait for the current avatar upload to finish.");
+      toast.error("Espere o envio do avatar atual terminar.");
       return;
     }
     setShowUnsavedWarning(false);
@@ -903,7 +903,7 @@ export function CharacterEditor() {
       {showUnsavedWarning && (
         <div className="flex items-center gap-3 border-b border-amber-500/30 bg-amber-500/10 px-4 py-2.5">
           <AlertTriangle size="0.9375rem" className="shrink-0 text-amber-500" />
-          <p className="flex-1 text-xs font-medium text-amber-500">You have unsaved changes. Close without saving?</p>
+          <p className="flex-1 text-xs font-medium text-amber-500">Você tem alterações não salvas. Fechar sem salvar?</p>
           <button
             type="button"
             onClick={() => setShowUnsavedWarning(false)}
@@ -1005,7 +1005,7 @@ export function CharacterEditor() {
                 subtitle="A história do personagem, sua origem e os eventos marcantes da vida dele."
                 value={(formData.extensions.backstory as string) ?? ""}
                 onChange={(v) => updateExtension("backstory", v)}
-                placeholder="Born in a small village on the outskirts of the empire…"
+                placeholder="Nascido em uma pequena vila nos arredores do império…"
                 rows={12}
               />
             )}
@@ -1329,7 +1329,7 @@ function MetadataTab({
 
   return (
     <div className="space-y-5">
-      <SectionHeader title="Metadados" subtitle="Basic character info — name, creator, version, tags." />
+      <SectionHeader title="Metadados" subtitle="Info básica do personagem — nome, criador, versão, tags." />
 
       {/* Avatar Crop */}
       {avatarPreview && (
@@ -1984,7 +1984,7 @@ function AdvancedTab({
           onChange={(e) => updateExtension("depth_prompt", { ...depthPrompt, prompt: e.target.value })}
           rows={4}
           className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-3 text-sm outline-none focus:border-[var(--primary)]/40"
-          placeholder="Prompt injected at a specific depth in the chat history…"
+          placeholder="Prompt injetado em uma profundidade específica do histórico do chat…"
         />
         <div className="flex gap-4">
           <label className="flex items-center gap-2 text-xs">
@@ -2037,7 +2037,7 @@ function AdvancedTab({
         title="Prompt de profundidade"
         value={depthPrompt.prompt}
         onChange={(value) => updateExtension("depth_prompt", { ...depthPrompt, prompt: value })}
-        placeholder="Prompt injected at a specific depth in the chat history…"
+        placeholder="Prompt injetado em uma profundidade específica do histórico do chat…"
       />
     </div>
   );
@@ -2713,7 +2713,8 @@ function SpritesTab({
         {cleaningSprites && (
           <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--muted-foreground)]">
             <Loader2 size="0.75rem" className="animate-spin text-[var(--primary)]" />
-            Running local backgroundremover on saved sprites…
+            
+            Rodando o backgroundremover local nos sprites salvos…
           </div>
         )}
         {lastCleanupBackupId && (

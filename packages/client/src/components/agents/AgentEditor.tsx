@@ -941,7 +941,8 @@ export function AgentEditor() {
                   <span className="min-w-0">
                     <span className="block font-semibold">Injeções de pré-geração</span>
                     <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                      Current-turn context injected before the reply.
+                      
+                      Contexto do turno atual injetado antes da resposta.
                     </span>
                   </span>
                 </button>
@@ -966,7 +967,8 @@ export function AgentEditor() {
                   <span className="min-w-0">
                     <span className="block font-semibold">Resultados de agentes paralelos</span>
                     <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                      Results from agents that ran alongside the reply.
+                      
+                      Resultados dos agentes que rodaram junto com a resposta.
                     </span>
                   </span>
                 </button>
@@ -2153,7 +2155,8 @@ export function AgentEditor() {
                   {defaultPrompt || "No default prompt."}
                 </pre>
                 <span className="absolute right-3 top-2 rounded-md bg-[var(--card)] px-1.5 py-0.5 text-[0.5625rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                  Default — click "Copy default to edit" to customize
+                  
+                  Padrão — clique em "Copiar padrão para editar" para personalizar
                 </span>
               </div>
             ) : (

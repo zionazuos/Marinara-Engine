@@ -478,7 +478,7 @@ export function SecretPlotPanel({
                   <div className="space-y-1.5 border-t border-[var(--border)] px-1.5 py-1.5">
                     <p className="flex items-start gap-1.5 rounded-md border border-[var(--destructive)]/20 bg-[var(--destructive)]/10 px-2 py-1 text-[0.5625rem] leading-snug text-[var(--destructive)]">
                       <AlertTriangle size="0.625rem" className="mt-0.5 shrink-0" />
-                      <span>This section exposes hidden long-term plot structure.</span>
+                      <span>Esta seção expõe a estrutura oculta do enredo de longo prazo.</span>
                     </p>
                     <div>
                       <div className="mb-0.5 flex min-h-5 items-center justify-between gap-2 text-[0.5625rem] font-medium text-[var(--muted-foreground)]">

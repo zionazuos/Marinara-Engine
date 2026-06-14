@@ -371,7 +371,7 @@ export function GameAssetsBrowserView() {
     async (files: FileList | null) => {
       if (!files || files.length === 0) return;
       if (selectedPath === "") {
-        toast.error("Please navigate to a category folder before uploading.");
+        toast.error("Navegue até uma pasta de categoria antes de enviar.");
         return;
       }
       const parts = selectedPath.split("/").filter(Boolean);
@@ -1068,7 +1068,8 @@ export function GameAssetsBrowserView() {
                           </label>
                           {!deleteRecursive && (
                             <p className="mt-1 text-xs text-[var(--destructive)]">
-                              You must check the box to delete a non-empty folder.
+                              
+                              Você precisa marcar a caixa para excluir uma pasta não vazia.
                             </p>
                           )}
                         </>

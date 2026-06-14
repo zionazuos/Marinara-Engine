@@ -245,7 +245,7 @@ export function CyoaChoices({ messages }: Props) {
           }}
           disabled={isStreaming || isEditing || isRerolling || updateMessageExtra.isPending}
           className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--muted)]/20 px-2 py-1 text-[0.5625rem] text-[var(--foreground)]/60 transition-all hover:border-[var(--border)] hover:bg-[var(--muted)]/40 hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:bg-black/35 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white/80"
-          title="Re-roll CYOA choices using the latest chat context"
+          title="Rerrolar as escolhas CYOA usando o contexto mais recente do chat"
         >
           {isRerolling ? <Loader2 size="0.625rem" className="animate-spin" /> : <Dices size="0.625rem" />}
           <span>{isRerolling ? "Rolling" : "Re-roll"}</span>

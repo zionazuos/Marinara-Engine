@@ -297,7 +297,8 @@ export function GamePartySidebar({
                   {partyMembers?.find((m) => m.id === selectedMemberId)?.name ?? "Unknown"}
                 </p>
                 <p className="mt-0.5 text-[0.5625rem] text-amber-400/40">
-                  Card data will populate as the story progresses
+                  
+                  Os dados do card serão preenchidos conforme a história avança
                 </p>
               </div>
             </div>

@@ -57,7 +57,7 @@ export function PresetsPanel() {
   const selectPreset = (presetId: string) => {
     if (!activeChat) return;
     if (activeChat.mode === "conversation") {
-      toast.error("Prompt presets are not available in conversation mode.");
+      toast.error("Os presets de prompt não estão disponíveis no modo Conversa.");
       return;
     }
     const newId = activePresetId === presetId ? null : presetId;

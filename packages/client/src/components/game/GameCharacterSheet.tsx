@@ -1001,7 +1001,8 @@ export function GameCharacterSheet({
           {!isEditing && !hasAnyData && (
             <div className="px-5 py-8 text-center">
               <p className="text-sm text-[var(--muted-foreground)]">
-                Character data will populate as the story progresses.
+                
+                Os dados do personagem serão preenchidos conforme a história avança.
               </p>
             </div>
           )}

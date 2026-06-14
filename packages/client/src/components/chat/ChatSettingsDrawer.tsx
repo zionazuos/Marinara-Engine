@@ -1939,7 +1939,7 @@ export function ChatSettingsDrawer({
                 title="Prompt extra"
                 value={extraPromptDraft}
                 onChange={setExtraPromptDraft}
-                placeholder="Additional instructions for game generation..."
+                placeholder="Instruções adicionais para a geração do game..."
               />
             </Section>
           )}
@@ -2973,7 +2973,8 @@ export function ChatSettingsDrawer({
                     <div className="flex-1 min-w-0">
                       <span className="text-xs font-medium">Trocas do personagem</span>
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                        Characters chat with each other in group chats
+                        
+                        Os personagens conversam entre si nos chats em grupo
                       </p>
                     </div>
                     <div
@@ -3011,7 +3012,8 @@ export function ChatSettingsDrawer({
                   <div className="flex-1 min-w-0">
                     <span className="text-xs font-medium">Agendas</span>
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                      Optional character routines for availability and delays
+                      
+                      Rotinas opcionais do personagem para disponibilidade e atrasos
                     </p>
                   </div>
                   <div
@@ -3244,7 +3246,8 @@ export function ChatSettingsDrawer({
                         "{scheduleGenerationPreferences.trim()}"
                       </p>
                       <p className="mt-1 text-[0.59375rem] text-[var(--muted-foreground)]/70">
-                        Will be applied the next time schedules are regenerated.
+                        
+                        Será aplicado na próxima vez que as agendas forem regeneradas.
                       </p>
                     </div>
                   </div>
@@ -3277,7 +3280,8 @@ export function ChatSettingsDrawer({
                 <div className="flex-1 min-w-0">
                   <span className="text-xs font-medium">Consciência entre chats</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Characters know what happens in their other chats
+                    
+                    Os personagens sabem o que acontece nos outros chats deles
                   </p>
                 </div>
                 <div
@@ -4149,7 +4153,8 @@ export function ChatSettingsDrawer({
                       </div>
                     ) : chatSpriteChoicesLoading ? (
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                        Checking added characters for uploaded sprites...
+                        
+                        Verificando se os personagens adicionados têm sprites enviados...
                       </p>
                     ) : (
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
@@ -4966,7 +4971,8 @@ export function ChatSettingsDrawer({
                   <div className="flex-1 min-w-0">
                     <span className="text-[0.6875rem] font-medium">Editar resumos</span>
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                      Review and edit what characters remember from this chat.
+                      
+                      Revise e edite o que os personagens lembram deste chat.
                     </p>
                   </div>
                   <Pencil size="0.875rem" className="shrink-0 text-[var(--muted-foreground)]" />
@@ -5369,7 +5375,8 @@ export function ChatSettingsDrawer({
                 <div className="flex-1 min-w-0">
                   <span className="text-[0.6875rem] font-medium">Traduzir respostas automaticamente</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Automatically translate AI responses after generation.
+                    
+                    Traduzir automaticamente as respostas da IA após a geração.
                   </p>
                 </div>
                 <div
@@ -6454,7 +6461,8 @@ function ImpersonateSettingsContent({
                 </span>
               </span>
               <span className="mt-0.5 block text-[0.65rem] leading-tight text-[var(--muted-foreground)]">
-                Suppress trackers, routers, and other agent work.
+                
+                Suprimir rastreadores, roteadores e outros trabalhos de agentes.
               </span>
             </span>
             <input
@@ -7075,7 +7083,8 @@ function ScheduleEditor({
                         placeholder="Padrão"
                       />
                       <span className="block text-[0.5rem] text-[var(--muted-foreground)]">
-                        Blank keeps the built-in 1-3 minute range.
+                        
+                        Em branco mantém o intervalo embutido de 1 a 3 minutos.
                       </span>
                     </label>
                     <label className="space-y-1">

@@ -1389,7 +1389,8 @@ export function CharactersPanel() {
 
       {activeChat && !assigningToGroup && !selectionMode && (
         <p className="px-1 text-[0.625rem] text-[var(--muted-foreground)]/60">
-          Click to edit · Use ✓ to assign/remove from chat
+          
+          Clique para editar · Use ✓ para atribuir/remover do chat
         </p>
       )}
 

@@ -4680,7 +4680,7 @@ export function GameSurface({
     try {
       const availableSpotifyTracks = await fetchSpotifySceneCandidates(tags.cleanContent, sceneContext);
       if (availableSpotifyTracks.length === 0) {
-        toast.error("No Spotify tracks were available for this scene.");
+        toast.error("Nenhuma faixa do Spotify estava disponível para esta cena.");
         return;
       }
 
@@ -6164,7 +6164,7 @@ export function GameSurface({
   const retryCombatGeneration = useCallback(() => {
     const messageId = queuedCombatGeneration?.messageId ?? latestAssistantMsg?.id;
     if (!messageId) {
-      toast.error("No current turn is available for combat generation.");
+      toast.error("Nenhum turno atual está disponível para a geração de combate.");
       return;
     }
     setQueuedCombatGeneration({ messageId });
@@ -7058,7 +7058,7 @@ export function GameSurface({
           });
         } catch {
           if (interruptedCommandKey) interruptedInteractiveCommandKeysRef.current.delete(interruptedCommandKey);
-          toast.error("Failed to commit the interrupt. Please try again.");
+          toast.error("Falha ao confirmar a interrupção. Tente novamente.");
           return;
         }
       }
@@ -7074,7 +7074,7 @@ export function GameSurface({
           });
         } catch {
           if (interruptedCommandKey) interruptedInteractiveCommandKeysRef.current.delete(interruptedCommandKey);
-          toast.error("Failed to mark the risky interrupt. Please try again.");
+          toast.error("Falha ao marcar a interrupção arriscada. Tente novamente.");
           return;
         }
       }
@@ -8612,7 +8612,7 @@ export function GameSurface({
                           onClick={handleReturnToPreCombatTurn}
                           disabled={!latestAssistantMsg?.id}
                           className="flex items-center gap-1.5 rounded-lg border border-amber-300/25 bg-amber-500/20 px-3 py-1.5 text-xs font-semibold text-amber-100 shadow-lg backdrop-blur-md transition-colors hover:bg-amber-500/30 disabled:opacity-50"
-                          title="Exit combat and remove the turn that started it"
+                          title="Sair do combate e remover o turno que o iniciou"
                         >
                           <RotateCcw size={13} />
                           
@@ -9135,7 +9135,7 @@ export function GameSurface({
                 borderColor: "rgba(32, 194, 14, 0.35)",
                 boxShadow: "0 0 0 1px rgba(32, 194, 14, 0.35) inset",
               }}
-              title="Cut in without telling the GM it was an interrupt"
+              title="Cortar sem avisar o GM de que foi uma interrupção"
             >
               
               Forçar interrupção
@@ -9143,7 +9143,7 @@ export function GameSurface({
             <button
               onClick={() => confirmInterrupt("risky")}
               className="rounded-lg bg-red-500/20 px-3 py-1.5 text-xs font-semibold text-red-200 ring-1 ring-red-500/40 transition-colors hover:bg-red-500/30"
-              title="Attempt an in-fiction interruption — outcomes can fail"
+              title="Tentar uma interrupção dentro da ficção — os resultados podem falhar"
             >
               
               Sim

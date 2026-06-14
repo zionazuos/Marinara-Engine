@@ -553,7 +553,7 @@ function TrackerPanelAppearanceDrawer({
             help="Hides the old world/player tracker icon strip so the Tracker panel can dock to the edge. The Agents button stays visible."
           />
           <ToggleSetting
-            label="Use expression sprites for tracker portraits"
+            label="Usar sprites de expressão para os retratos do rastreador"
             checked={trackerPanelUseExpressionSprites}
             onChange={setTrackerPanelUseExpressionSprites}
             help="When on, tracker portraits can switch to Expression Engine sprites if that agent is enabled for the chat and the character has matching sprite images."
@@ -2888,7 +2888,7 @@ function ExtensionsSettings() {
         });
         toast.success(`Extension "${name}" installed`);
       } else {
-        toast.error("Only .json, .css, and .js extension files are supported.");
+        toast.error("Apenas arquivos de extensão .json, .css e .js são suportados.");
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to import extension.");
@@ -2900,7 +2900,8 @@ function ExtensionsSettings() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)]">
         <Puzzle size="0.75rem" />
-        Install custom extensions to add new features and styles.
+        
+        Instale extensões personalizadas para adicionar novos recursos e estilos.
       </div>
 
       {/* Import button */}
@@ -4163,7 +4164,8 @@ function AdvancedSettings() {
         {updateCheck.isError && (
           <div className="flex items-center gap-1.5 rounded-lg bg-[var(--destructive)]/10 px-2.5 py-2 text-xs text-[var(--destructive)]">
             <AlertTriangle size="0.8125rem" className="shrink-0" />
-            Could not check for updates. Try again later.
+            
+            Não foi possível verificar atualizações. Tente mais tarde.
           </div>
         )}
 

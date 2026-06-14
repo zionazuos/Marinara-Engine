@@ -1065,7 +1065,7 @@ export function SpriteWandCleanupEditor({
                       value={cleanTolerance}
                       onChange={setCleanTolerance}
                       disabled={loading || applying}
-                      title="How closely pixels must match the sampled cleanup color"
+                      title="Quão próximos os pixels devem estar da cor de limpeza amostrada"
                       className="min-w-[12rem] flex-[1_1_12rem]"
                     />
                     <RangeControl
@@ -1075,7 +1075,7 @@ export function SpriteWandCleanupEditor({
                       value={cleanEdgeGuard}
                       onChange={setCleanEdgeGuard}
                       disabled={loading || applying}
-                      title="How strongly the brush avoids character-like edge pixels"
+                      title="Quão fortemente o pincel evita pixels de borda parecidos com o personagem"
                       className="min-w-[16rem] flex-[1_1_16rem]"
                     />
                     <RangeControl
@@ -1161,7 +1161,7 @@ export function SpriteWandCleanupEditor({
                     value={blurStrength}
                     onChange={setBlurStrength}
                     disabled={loading || applying}
-                    title="How strongly the blur brush smooths alpha edges"
+                    title="Quão fortemente o pincel de desfoque suaviza as bordas alfa"
                     className="min-w-48 flex-1"
                   />
                 )}

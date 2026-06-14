@@ -92,7 +92,8 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
               <div>
                 <h3 className="text-sm font-semibold">Configurar {MODE_META[mode].label}</h3>
                 <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-                  Choose a connection before we create the chat.
+                  
+                  Escolha uma conexão antes de criarmos o chat.
                 </p>
               </div>
             </div>

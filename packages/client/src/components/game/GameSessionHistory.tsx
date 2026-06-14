@@ -559,7 +559,7 @@ export function GameSessionHistory({
             <div className="flex flex-col items-center justify-center gap-2 py-12 text-[var(--muted-foreground)]">
               <ScrollText size={24} className="opacity-50" />
               <span className="text-sm">Nenhuma sessão concluída ainda</span>
-              <span className="text-xs">Conclude your current session to see a summary here.</span>
+              <span className="text-xs">Conclua sua sessão atual para ver um resumo aqui.</span>
             </div>
           ) : (
             sorted.map((session) => {

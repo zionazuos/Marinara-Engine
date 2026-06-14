@@ -345,7 +345,7 @@ export function LorebooksPanel() {
 
       if (!file.type.startsWith("image/")) {
         imageTargetLorebookIdRef.current = null;
-        toast.error("Choose an image file for the lorebook picture");
+        toast.error("Escolha um arquivo de imagem para a imagem do lorebook");
         return;
       }
 

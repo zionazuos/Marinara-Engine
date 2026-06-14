@@ -149,7 +149,7 @@ function SidecarCard() {
         }),
       );
 
-      toast.success("All built-in tracker agents now point to the local model.");
+      toast.success("Todos os agentes de rastreador embutidos agora apontam para o modelo local.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update tracker agent connections.");
     } finally {
@@ -806,7 +806,8 @@ export function ConnectionsPanel() {
 
       {activeChat && (
         <p className="px-1 text-[0.625rem] text-[var(--muted-foreground)]/60">
-          Click to edit · Set active connection in Chat Settings
+          
+          Clique para editar · Defina a conexão ativa em Configurações do Chat
         </p>
       )}
 

@@ -1395,7 +1395,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                     <div className="min-w-0">
                       <span className="block text-xs font-medium text-[var(--foreground)]">Guardião de lorebook</span>
                       <span className="block text-[0.575rem] text-[var(--muted-foreground)]">
-                        Keep a game lorebook updated as the adventure develops
+                        
+                        Manter um lorebook do game atualizado conforme a aventura se desenvolve
                       </span>
                     </div>
                   </div>

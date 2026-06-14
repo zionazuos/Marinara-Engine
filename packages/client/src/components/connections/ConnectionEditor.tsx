@@ -859,7 +859,7 @@ export function ConnectionEditor() {
                   
                   Faça login uma vez: <code className="rounded bg-[var(--secondary)] px-1">claude login</code>
                 </li>
-                <li>API Key and Base URL are not required — leave them blank.</li>
+                <li>Chave de API e URL base não são necessárias — deixe-as em branco.</li>
               </ol>
               <p className="mt-1.5 text-[0.625rem] text-[var(--muted-foreground)]">
                 Subscription auth is the same mechanism Visual Studio Code and other Anthropic-endorsed IDE integrations
@@ -886,7 +886,7 @@ export function ConnectionEditor() {
                   
                   Faça login uma vez: <code className="rounded bg-[var(--secondary)] px-1">codex login</code>
                 </li>
-                <li>API Key and Base URL are not required - leave them blank.</li>
+                <li>Chave de API e URL base não são necessárias - deixe-as em branco.</li>
               </ol>
               <p className="mt-1.5 text-[0.625rem] text-[var(--muted-foreground)]">
                 Marinara reads the local Codex auth file and refreshes the ChatGPT session when possible. Embeddings are
@@ -1123,8 +1123,7 @@ export function ConnectionEditor() {
               {selectedImageService === "runpod_comfyui" && (
                 <div className="mt-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-[0.625rem] text-amber-300/80">
                   <strong>Configuração do RunPod:</strong> Your endpoint ID goes in the <strong>Endpoint ID</strong>  campo abaixo. A chave de API é o seu token de API do RunPod. O JSON de workflow é <strong>required</strong> — the
-                  endpoint executes the workflow you supply. Use <code>%prompt%</code> placeholders in the
-                  CLIPTextEncode node.
+                  endpoint executes the workflow you supply. Use <code>%prompt%</code>  placeholders no nó CLIPTextEncode.
                 </div>
               )}
             </FieldGroup>
@@ -1463,8 +1462,7 @@ export function ConnectionEditor() {
                     </p>
                   )}
                 <p className="text-[0.55rem] text-[var(--muted-foreground)] mt-1">
-                  Export your workflow from ComfyUI using <strong>Save (API Format)</strong> in the menu. Placeholders
-                  like <code>%prompt%</code>, <code>%steps%</code>, <code>%sampler%</code>, and reference-image
+                  Export your workflow from ComfyUI using <strong>Save (API Format)</strong>  no menu. Placeholders como <code>%prompt%</code>, <code>%steps%</code>, <code>%sampler%</code>, and reference-image
                   placeholders will be replaced at generation time.
                 </p>
               </FieldGroup>
@@ -2076,8 +2074,7 @@ export function ConnectionEditor() {
                   )}
                   {claudeDiagResult.modelUsageDetail.some((u) => u.model !== claudeDiagResult.requestedModel) && (
                     <div className="rounded-lg bg-[var(--secondary)]/50 p-2.5 text-[0.6875rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                      <strong className="text-[var(--foreground)]">Por que o Haiku está na lista?</strong> The Claude Agent
-                      SDK runs a <code>UserPromptSubmit</code> hook on every call that uses its small/fast model (Haiku)
+                      <strong className="text-[var(--foreground)]">Por que o Haiku está na lista?</strong>  O Claude Agent SDK roda um <code>UserPromptSubmit</code> hook on every call that uses its small/fast model (Haiku)
                       to auto-generate a session title and optional context for the main model. This is Claude Code
                       session bookkeeping — it&apos;s organic to the subscription path, can&apos;t be cleanly disabled,
                       and doesn&apos;t serve any of your roleplay output. Your actual response always comes from the

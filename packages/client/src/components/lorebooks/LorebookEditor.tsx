@@ -1010,7 +1010,7 @@ export function LorebookEditor() {
   useEffect(() => {
     if (!lorebookId) return;
     if (isError) {
-      toast.error("Lorebook not found — it may have been deleted");
+      toast.error("Lorebook não encontrado — ele pode ter sido excluído");
       closeDetail();
     }
   }, [lorebookId, isError, closeDetail]);
@@ -1346,7 +1346,8 @@ export function LorebookEditor() {
                     <div>
                       <p className="text-xs font-medium">Ativado</p>
                       <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-                        When off, entries in this lorebook won't activate
+                        
+                        Quando desligado, as entradas deste lorebook não serão ativadas
                       </p>
                     </div>
                     <button
@@ -1404,7 +1405,8 @@ export function LorebookEditor() {
                     <div>
                       <p className="text-xs font-medium">Global</p>
                       <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-                        Active in every chat when this lorebook is enabled
+                        
+                        Ativo em todo chat quando este lorebook está ativado
                       </p>
                     </div>
                     <button

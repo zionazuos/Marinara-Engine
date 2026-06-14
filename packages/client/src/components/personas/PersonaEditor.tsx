@@ -553,7 +553,7 @@ export function PersonaEditor() {
       {showUnsavedWarning && (
         <div className="flex items-center gap-3 border-b border-amber-500/30 bg-amber-500/10 px-4 py-2.5">
           <AlertTriangle size="0.9375rem" className="shrink-0 text-amber-500" />
-          <p className="flex-1 text-xs font-medium text-amber-500">You have unsaved changes. Close without saving?</p>
+          <p className="flex-1 text-xs font-medium text-amber-500">Você tem alterações não salvas. Fechar sem salvar?</p>
           <button
             type="button"
             onClick={() => setShowUnsavedWarning(false)}
@@ -653,7 +653,7 @@ export function PersonaEditor() {
             {activeTab === "scenario" && (
               <TextareaTab
                 title="Cenário"
-                subtitle="Your default situation or context within roleplays."
+                subtitle="Sua situação ou contexto padrão dentro dos roleplays."
                 value={formData.scenario}
                 onChange={(v) => updateField("scenario", v)}
                 placeholder="Um aventureiro errante em busca de respostas sobre um artefato misterioso…"
@@ -1180,7 +1180,8 @@ function PersonaSpritesTab({
         {cleaningSprites && (
           <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--muted-foreground)]">
             <Loader2 size="0.75rem" className="animate-spin text-[var(--primary)]" />
-            Running local backgroundremover on saved sprites…
+            
+            Rodando o backgroundremover local nos sprites salvos…
           </div>
         )}
         {lastCleanupBackupId && (
@@ -1779,8 +1780,7 @@ function PersonaStatsTab({
                 &bull; The <strong className="text-[var(--foreground)]">Agente de atributos da persona</strong>  ajusta os valores de forma realista com base no que acontece na narrativa.
               </li>
               <li>
-                &bull; Bars are displayed in the <strong className="text-[var(--foreground)]">Widget do HUD</strong> during
-                chat with color-coded gradients.
+                &bull; Bars are displayed in the <strong className="text-[var(--foreground)]">Widget do HUD</strong>  durante o chat com gradientes codificados por cor.
               </li>
               <li>&bull; Values set here serve as the initial defaults for new conversations.</li>
             </ul>

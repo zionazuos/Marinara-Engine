@@ -111,7 +111,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
         <div className="flex flex-col items-center gap-2 py-8 text-[var(--muted-foreground)]">
           <Sparkles size="1.5rem" className="opacity-40" />
           <p className="text-xs">Nenhuma imagem ainda</p>
-          <p className="text-[0.625rem] opacity-60">Upload images or generate them to build your gallery</p>
+          <p className="text-[0.625rem] opacity-60">Envie imagens ou gere-as para montar sua galeria</p>
         </div>
       )}
 

@@ -588,7 +588,7 @@ export function ConversationInput({
           const translated = await translateText(message);
           if (translated.trim()) message = translated;
         } catch {
-          toast.error("Failed to translate message — sending original");
+          toast.error("Falha ao traduzir a mensagem — enviando a original");
         }
       }
       // Final pass: resolve macros introduced by translation while {{input}} still points to raw.
@@ -694,7 +694,7 @@ export function ConversationInput({
         const translated = await translateText(message);
         if (translated.trim()) message = translated;
       } catch {
-        toast.error("Failed to translate message — sending original");
+        toast.error("Falha ao traduzir a mensagem — enviando a original");
       }
     }
 
@@ -988,7 +988,7 @@ export function ConversationInput({
       return;
     }
     if (hasPendingAttachments) {
-      toast.info("Clear or send attachments before using guided generation.");
+      toast.info("Limpe ou envie os anexos antes de usar a geração guiada.");
       return;
     }
     const text = textareaRef.current?.value?.trim() ?? "";
@@ -1393,7 +1393,7 @@ export function ConversationInput({
   const persistSavedStatusOptions = useCallback(
     async (nextOptions: string[]) => {
       if (!activePersona) {
-        toast.info("Choose a persona before saving status options.");
+        toast.info("Escolha uma persona antes de salvar as opções de status.");
         return;
       }
       await updatePersona.mutateAsync({

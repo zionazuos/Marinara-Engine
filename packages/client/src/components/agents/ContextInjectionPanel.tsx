@@ -274,7 +274,8 @@ export function ContextInjectionPanel({
           )}
           {target && injections.length === 0 && (
             <p className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/35 px-3 py-2 text-center text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-              No cached injections on this assistant message yet.
+              
+              Nenhuma injeção em cache nesta mensagem do assistente ainda.
             </p>
           )}
           {target &&

@@ -280,7 +280,8 @@ export function ExpandedContentModal({
         </div>
         <div className="flex items-center justify-between border-t border-[var(--border)] px-4 py-2.5">
           <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-            Changes auto-save on close. Press Escape to close.
+            
+            As alterações são salvas ao fechar. Pressione Esc para fechar.
           </p>
           <button
             onClick={handleClose}

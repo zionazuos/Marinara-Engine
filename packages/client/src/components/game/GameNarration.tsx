@@ -3392,7 +3392,7 @@ export function GameNarration({
           <button
             onClick={handleResume}
             className="flex items-center gap-1 self-stretch rounded-lg border border-amber-400/40 bg-amber-400/15 px-2 text-xs font-semibold text-amber-100 transition-colors hover:bg-amber-400/25 hover:text-amber-50 sm:px-2.5 dark:border-amber-400/40 dark:bg-amber-400/15 dark:text-amber-100 dark:hover:bg-amber-400/25"
-            title="Resume narration — your interrupt has not been committed."
+            title="Retomar a narração — sua interrupção não foi confirmada."
             aria-label="Retomar"
           >
             <Play size={11} fill="currentColor" />
@@ -4292,7 +4292,7 @@ export function GameNarration({
           {isStreaming && (
             <div className="mt-2 flex items-center gap-1 text-xs text-[var(--foreground)]/50">
               <span className="animate-pulse">●</span>
-              <span>The Game Master is writing the next segment...</span>
+              <span>O Game Master está escrevendo o próximo segmento...</span>
             </div>
           )}
         </div>

@@ -588,7 +588,7 @@ export const ChatInput = memo(function ChatInput({
         const translated = await translateText(message);
         if (translated.trim()) message = translated;
       } catch {
-        toast.error("Failed to translate message — sending original");
+        toast.error("Falha ao traduzir a mensagem — enviando a original");
       }
     }
 
@@ -861,7 +861,7 @@ export const ChatInput = memo(function ChatInput({
       return;
     }
     if (hasPendingAttachments) {
-      toast.info("Clear or send attachments before using guided generation.");
+      toast.info("Limpe ou envie os anexos antes de usar a geração guiada.");
       return;
     }
     const text = textareaRef.current?.value?.trim() ?? "";

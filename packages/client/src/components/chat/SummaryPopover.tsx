@@ -850,7 +850,7 @@ export function SummaryPopover({
                             value={templatePromptDraft}
                             onChange={(event) => setTemplatePromptDraft(event.target.value)}
                             rows={8}
-                            placeholder="Prompt instructions for manual summary generation..."
+                            placeholder="Instruções de prompt para a geração manual de resumo..."
                             className="max-h-48 w-full resize-y rounded-md bg-[var(--card)] px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                           />
                           <div className="flex justify-end gap-1">
@@ -980,7 +980,8 @@ export function SummaryPopover({
                 onClick={handleCreateManualEntry}
                 className="w-full rounded-lg border border-dashed border-[var(--border)] bg-[var(--secondary)]/20 p-5 text-center text-xs italic text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]/35"
               >
-                No summaries yet. Generate one or write your own.
+                
+                Nenhum resumo ainda. Gere um ou escreva o seu próprio.
               </button>
             )}
           </div>

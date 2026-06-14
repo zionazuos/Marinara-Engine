@@ -1002,7 +1002,7 @@ export function ChatArea() {
               await flushPatch();
             } catch {
               if (swipeActionSeq.current === actionId) {
-                toast.error("Could not save tracker changes before switching swipes.");
+                toast.error("Não foi possível salvar as alterações do rastreador antes de trocar de swipe.");
               }
               return;
             }
@@ -2131,7 +2131,8 @@ function AgentInjectionReviewModal({
     <Modal open onClose={onClose} title="Revisão do agente escritor" width="max-w-3xl">
       <div className="flex flex-col gap-3">
         <p className="text-xs leading-relaxed text-[var(--muted-foreground)]">
-          Edit the writer guidance before the main reply starts.
+          
+          Edite a orientação do escritor antes da resposta principal começar.
         </p>
         <div className="flex max-h-[55dvh] flex-col gap-2 overflow-y-auto pr-1">
           {request.injections.map((injection) => (

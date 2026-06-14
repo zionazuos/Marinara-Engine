@@ -467,7 +467,8 @@ export function HomeFaq() {
                     Professora Mari
                   </div>
                   <p className="mt-2 text-sm font-semibold tracking-tight text-[var(--foreground)]">
-                    Start here before you go hunting through Discord logs.
+                    
+                    Comece por aqui antes de sair vasculhando os logs do Discord.
                   </p>
                   <p className="mt-1 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]/85">
                     

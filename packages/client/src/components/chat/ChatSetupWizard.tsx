@@ -760,7 +760,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                     <div>
                       <span className="text-xs font-medium">Gerar agenda</span>
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                        Optional routines for availability and delayed replies
+                        
+                        Rotinas opcionais para disponibilidade e respostas com atraso
                       </p>
                     </div>
                   </div>
