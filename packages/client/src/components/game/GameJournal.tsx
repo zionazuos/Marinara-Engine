@@ -326,7 +326,7 @@ export function GameJournal({
 
 function TimelineView({ entries }: { entries: JournalEntry[] }) {
   if (entries.length === 0) {
-    return <div className="text-center text-xs text-white/40">No journal entries yet.</div>;
+    return <div className="text-center text-xs text-white/40">Nenhuma entrada de diário ainda.</div>;
   }
 
   return (
@@ -468,7 +468,7 @@ function NpcsView({
                         (portraitGenerating || mobilePortraitActionsNpc === entry.npc.name.trim().toLowerCase()) &&
                           "max-md:opacity-100",
                       )}
-                      title="Generate NPC portrait"
+                      title="Gerar retrato de NPC"
                     >
                       {portraitGenerating ? (
                         <Loader2 size="0.6rem" className="animate-spin" />
@@ -628,7 +628,7 @@ function NotesView({ notes, onChange, saved }: { notes: string; onChange: (text:
           {notes.trim() ? (
             <JournalMarkdown text={notes} className="text-xs leading-relaxed text-white/75" />
           ) : (
-            <div className="text-xs text-white/30">Nothing written yet.</div>
+            <div className="text-xs text-white/30">Nada escrito ainda.</div>
           )}
         </div>
       </div>

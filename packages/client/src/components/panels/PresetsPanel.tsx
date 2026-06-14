@@ -246,7 +246,7 @@ export function PresetsPanel() {
         />
         <input
           type="text"
-          placeholder="Search presets…"
+          placeholder="Buscar presets…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-xl bg-[var(--secondary)] py-2 pl-8 pr-3 text-xs text-[var(--foreground)] ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"

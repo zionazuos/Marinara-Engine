@@ -610,7 +610,7 @@ function PlayerControls({ onAction }: { onAction: (text: string) => void }) {
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !isProcessing && handleCustomSubmit()}
-              placeholder="Describe what you do..."
+              placeholder="Descreva o que você faz..."
               disabled={isProcessing}
               className="flex-1 rounded-lg border border-foreground/10 bg-foreground/5 px-3 py-2 text-xs text-foreground/80 placeholder:text-foreground/25 disabled:opacity-30"
             />
@@ -789,7 +789,8 @@ function EncounterModalInner() {
             <div className="flex items-center justify-between border-b border-foreground/5 bg-black/30 px-5 py-3">
               <h2 className="flex items-center gap-2 text-sm font-bold text-foreground/90">
                 <Swords size="1rem" className="text-red-400" />
-                Combat Encounter
+                
+                Encontro de combate
               </h2>
               <div className="flex items-center gap-2">
                 {initialized && !combatResult && (
@@ -917,7 +918,8 @@ function EncounterModalInner() {
                   {isProcessing && (
                     <div className="flex items-center justify-center gap-2 py-2 text-xs text-foreground/40">
                       <Loader2 size="0.875rem" className="animate-spin" />
-                      Processing action...
+                      
+                      Processando ação...
                     </div>
                   )}
 

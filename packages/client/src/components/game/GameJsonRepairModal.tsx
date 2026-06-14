@@ -67,7 +67,7 @@ export function GameJsonRepairModal({ request, onClose, onApplied }: GameJsonRep
         ...(request.applyBody ?? {}),
         rawJson: draft,
       });
-      toast.success("Repaired JSON applied.");
+      toast.success("JSON reparado aplicado.");
       onApplied(result, request);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to apply repaired JSON.";

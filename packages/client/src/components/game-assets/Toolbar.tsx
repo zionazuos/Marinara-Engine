@@ -360,7 +360,7 @@ export function Toolbar({
         <button
           onClick={onOpenFolder}
           className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
-          title="Open in system folder"
+          title="Abrir na pasta do sistema"
         >
           <ExternalLink size="0.875rem" />
         </button>

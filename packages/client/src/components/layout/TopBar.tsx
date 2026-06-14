@@ -63,7 +63,7 @@ export function TopBar() {
       {/* Right section - Panel toggles */}
       <nav
         data-tour="panel-buttons"
-        aria-label="Panel navigation"
+        aria-label="Navegação de painéis"
         className="flex min-w-0 flex-1 items-center justify-end gap-0.5 rounded-xl p-1 max-sm:gap-0 max-sm:p-0.5"
       >
         {/* Browser */}

@@ -228,7 +228,7 @@ export function LorebookFolderRow({
             }
           }}
           onClick={(e) => e.stopPropagation()}
-          placeholder="Untitled folder"
+          placeholder="Pasta sem título"
           className="min-w-0 flex-1 truncate bg-transparent px-1 text-sm font-semibold outline-none transition-colors hover:bg-[var(--accent)]/40 focus:bg-[var(--accent)]/40 focus:ring-1 focus:ring-[var(--ring)] rounded"
         />
 

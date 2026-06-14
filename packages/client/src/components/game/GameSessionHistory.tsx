@@ -444,13 +444,14 @@ export function GameSessionHistory({
                         }
                         rows={5}
                         disabled={savingCurrentSecrets}
-                        placeholder="One plot twist per line"
+                        placeholder="Uma reviravolta por linha"
                         className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
                       />
                     </label>
                     <label className="flex flex-col gap-1">
                       <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        Party Arcs JSON
+                        
+                        JSON de arcos do grupo
                       </span>
                       <textarea
                         value={secretDraft?.partyArcs ?? ""}
@@ -740,7 +741,8 @@ export function GameSessionHistory({
                             </label>
                             <label className="flex flex-col gap-1">
                               <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                Key Discoveries
+                                
+                                Descobertas-chave
                               </span>
                               <textarea
                                 value={draft?.keyDiscoveries ?? ""}
@@ -755,7 +757,8 @@ export function GameSessionHistory({
                             </label>
                             <label className="flex flex-col gap-1">
                               <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                Character Moments
+                                
+                                Momentos do personagem
                               </span>
                               <textarea
                                 value={draft?.characterMoments ?? ""}
@@ -866,7 +869,8 @@ export function GameSessionHistory({
                         <div className="mb-3">
                           <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)]">
                             <Sparkles size={12} />
-                            Key Discoveries
+                            
+                            Descobertas-chave
                           </div>
                           <ul className="flex flex-col gap-1 pl-4">
                             {session.keyDiscoveries.map((discovery, i) => (
@@ -882,7 +886,8 @@ export function GameSessionHistory({
                         <div className="mb-3">
                           <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)]">
                             <Users size={12} />
-                            Character Moments
+                            
+                            Momentos do personagem
                           </div>
                           <ul className="flex flex-col gap-1 pl-4">
                             {session.characterMoments.map((moment, i) => (
@@ -925,7 +930,7 @@ export function GameSessionHistory({
 
                       {session.nextSessionRequest && (
                         <div className="mb-3 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2">
-                          <div className="mb-1 text-xs font-medium text-amber-500">Next Session Request</div>
+                          <div className="mb-1 text-xs font-medium text-amber-500">Pedido da próxima sessão</div>
                           <div className="text-xs leading-relaxed text-[var(--foreground)]">
                             {session.nextSessionRequest}
                           </div>
@@ -956,7 +961,8 @@ export function GameSessionHistory({
       </div>
 
       <div className="border-t border-[var(--border)] px-4 py-2 text-center text-xs text-[var(--muted-foreground)]">
-        Currently in Session {currentSessionNumber}
+        
+        Atualmente em sessão {currentSessionNumber}
       </div>
     </div>
   );

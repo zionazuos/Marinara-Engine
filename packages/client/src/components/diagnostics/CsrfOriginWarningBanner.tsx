@@ -187,7 +187,7 @@ export function CsrfOriginWarningBanner() {
           type="button"
           onClick={dismiss}
           aria-label="Hide warning for this session"
-          title="Hide for this session"
+          title="Ocultar nesta sessão"
           style={{
             flexShrink: 0,
             background: "transparent",

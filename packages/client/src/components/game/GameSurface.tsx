@@ -7486,7 +7486,7 @@ export function GameSurface({
         {
           onSuccess: (result) => {
             onSuccess(result);
-            toast.success("Scene analysis retried.", { duration: 1800 });
+            toast.success("Análise de cena repetida.", { duration: 1800 });
           },
           onError: (err) => console.error("[retry-scene] Failed:", err),
         },
@@ -7497,7 +7497,7 @@ export function GameSurface({
         {
           onSuccess: (result) => {
             onSuccess(result);
-            toast.success("Scene analysis retried.", { duration: 1800 });
+            toast.success("Análise de cena repetida.", { duration: 1800 });
           },
           onError: (err) => console.error("[retry-scene] Failed:", err),
         },
@@ -7896,7 +7896,8 @@ export function GameSurface({
                         <div className="flex items-center gap-2">
                           <button onClick={() => retrySceneAnalysis()} className={SURFACE_BTN}>
                             <RefreshCw size={14} />
-                            Retry Scene Analysis
+                            
+                            Repetir análise de cena
                           </button>
                           <button onClick={() => skipSceneAnalysis()} className={SURFACE_BTN}>
                             
@@ -8123,7 +8124,7 @@ export function GameSurface({
                           className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-white/85 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
                         >
                           <RefreshCw size={13} className={sceneAnalysis.isPending ? "animate-spin" : ""} />
-                          <span>Retry Scene Analysis</span>
+                          <span>Repetir análise de cena</span>
                         </button>
                         {useSpotifyGameMusic && (
                           <button
@@ -8208,8 +8209,8 @@ export function GameSurface({
                             setMobileActionsOpen(false);
                           }}
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                          title="Active World Info"
-                          aria-label="Active World Info"
+                          title="Info de mundo ativa"
+                          aria-label="Info de mundo ativa"
                         >
                           <Globe size={14} />
                         </button>
@@ -8337,7 +8338,7 @@ export function GameSurface({
                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-white/85 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
                               >
                                 <RefreshCw size={13} className={sceneAnalysis.isPending ? "animate-spin" : ""} />
-                                <span>Retry Scene Analysis</span>
+                                <span>Repetir análise de cena</span>
                               </button>
                               {useSpotifyGameMusic && (
                                 <button
@@ -8505,7 +8506,7 @@ export function GameSurface({
                   <div className="pointer-events-auto absolute bottom-32 left-1/2 z-30 -translate-x-1/2">
                     <div className="flex items-center gap-3 rounded-xl bg-black/80 px-4 py-2.5 shadow-lg backdrop-blur-sm">
                       <AlertTriangle size={14} className="shrink-0 text-amber-400" />
-                      <span className="text-xs text-white/70">Image generation failed</span>
+                      <span className="text-xs text-white/70">Falha na geração de imagem</span>
                       <button
                         onClick={() => retryAssetGeneration()}
                         className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white/80 transition-colors hover:bg-white/20 hover:text-white"
@@ -8533,7 +8534,7 @@ export function GameSurface({
                   <div className="pointer-events-auto absolute bottom-32 left-1/2 z-30 -translate-x-1/2">
                     <div className="flex items-center gap-3 rounded-xl bg-black/80 px-4 py-2.5 shadow-lg backdrop-blur-sm">
                       <AlertTriangle size={14} className="shrink-0 text-amber-400" />
-                      <span className="text-xs text-white/70">Scene analysis failed</span>
+                      <span className="text-xs text-white/70">Falha na análise de cena</span>
                       <button
                         onClick={() => retrySceneAnalysis()}
                         className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white/80 transition-colors hover:bg-white/20 hover:text-white"
@@ -8596,7 +8597,7 @@ export function GameSurface({
                           type="button"
                           onClick={() => setCombatLogsOpen(true)}
                           className="flex items-center gap-1.5 rounded-lg border border-white/15 bg-black/65 px-3 py-1.5 text-xs font-semibold text-white/80 shadow-lg backdrop-blur-md transition-colors hover:bg-black/80 hover:text-white"
-                          title="Open combat logs"
+                          title="Abrir registros de combate"
                         >
                           <ScrollText size={13} />
                           
@@ -8621,7 +8622,8 @@ export function GameSurface({
                         <Suspense
                           fallback={
                             <div className="flex h-full items-center justify-center text-sm text-white/70">
-                              Loading combat...
+                              
+                              Carregando combate...
                             </div>
                           }
                         >
@@ -9100,7 +9102,7 @@ export function GameSurface({
 
       {imagePromptReviewModal}
 
-      <Modal open={interruptModalOpen} onClose={closeInterruptModal} title="Attempt to Interrupt?" width="max-w-md">
+      <Modal open={interruptModalOpen} onClose={closeInterruptModal} title="Tentar interromper?" width="max-w-md">
         <div className="flex flex-col gap-4">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/15">
@@ -9131,7 +9133,8 @@ export function GameSurface({
               }}
               title="Cut in without telling the GM it was an interrupt"
             >
-              Force Interrupt
+              
+              Forçar interrupção
             </button>
             <button
               onClick={() => confirmInterrupt("risky")}

@@ -680,7 +680,8 @@ function WidgetEditorModal({
                 onChange={(event) => setDraft((current) => ({ ...current, running: event.target.checked }))}
                 className="h-4 w-4 rounded border-[var(--border)] text-[var(--primary)] focus:ring-[var(--primary)]"
               />
-              Timer is running
+              
+              O cronômetro está rodando
             </label>
           </div>
         )}

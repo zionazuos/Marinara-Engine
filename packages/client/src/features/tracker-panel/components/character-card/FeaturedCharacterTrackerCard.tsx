@@ -214,7 +214,7 @@ export function FeaturedCharacterTrackerCard({
             type="button"
             onClick={onRemove}
             className={FEATURED_REMOVE_BUTTON_CLASS}
-            title="Remove character"
+            title="Remover personagem"
             aria-label={`Remove ${character.name.trim() || "character"}`}
           >
             <X size="0.6875rem" />

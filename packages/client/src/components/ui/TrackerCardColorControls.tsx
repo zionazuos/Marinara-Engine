@@ -431,7 +431,8 @@ export function TrackerCardColorControls({
             <div className="grid gap-1.5 rounded-lg bg-[var(--secondary)]/55 p-1.5 ring-1 ring-[var(--border)]/35">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[0.5625rem] font-semibold uppercase text-[var(--muted-foreground)]">
-                  Source strength
+                  
+                  Força da fonte
                 </span>
                 <span className="font-mono text-[0.5625rem] tabular-nums text-[var(--muted-foreground)]">
                   {paintOpacitySummary}

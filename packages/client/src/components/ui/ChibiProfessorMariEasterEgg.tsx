@@ -41,7 +41,7 @@ function showChibiProfessorMariToast() {
         </button>
         <img
           src={CHIBI_PROFESSOR_MARI_IMAGE}
-          alt="Chibi Professor Mari"
+          alt="Professora Mari Chibi"
           className="h-24 w-20 shrink-0 object-contain"
           onError={(event) => {
             event.currentTarget.hidden = true;

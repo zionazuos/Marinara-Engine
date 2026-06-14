@@ -915,7 +915,7 @@ export function AgentEditor() {
 
           {showTurnDataAccess && (
             <FieldGroup
-              label="Turn Data Access"
+              label="Acesso a dados do turno"
               icon={<Layers size="0.875rem" className="text-[var(--primary)]" />}
               help="Optional current-turn data for custom post-processing agents. Existing agents stay isolated unless these are enabled."
             >
@@ -964,7 +964,7 @@ export function AgentEditor() {
                     <ToggleLeft size="1rem" className="mt-0.5 shrink-0" />
                   )}
                   <span className="min-w-0">
-                    <span className="block font-semibold">Parallel agent results</span>
+                    <span className="block font-semibold">Resultados de agentes paralelos</span>
                     <span className="mt-0.5 block text-[0.625rem] leading-tight">
                       Results from agents that ran alongside the reply.
                     </span>
@@ -1493,7 +1493,7 @@ export function AgentEditor() {
 
           {/* ── Inject as Prompt Section ── */}
           <FieldGroup
-            label="Add as Prompt Section"
+            label="Adicionar como seção de prompt"
             icon={<Layers size="0.875rem" className="text-[var(--primary)]" />}
             help="When enabled, this agent's output becomes available as a marker section in prompt presets. Add the section in your preset to inject the agent's latest data into the prompt."
           >
@@ -1866,7 +1866,7 @@ export function AgentEditor() {
                 {/* ── Lorebooks ── */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <p className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Fixed source override</p>
+                    <p className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Substituição de fonte fixa</p>
                     {/* Description coverage badge — Knowledge Router only.
                         Tells the user how many entries in their selected source lorebooks
                         have descriptions filled in. Routing precision drops sharply when
@@ -2222,7 +2222,7 @@ export function AgentEditor() {
 
           {/* ── Agent Info Card ── */}
           <div className="rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
-            <h3 className="mb-2 text-xs font-semibold text-[var(--foreground)]">About this Agent</h3>
+            <h3 className="mb-2 text-xs font-semibold text-[var(--foreground)]">Sobre este agente</h3>
             <div className="space-y-1.5 text-[0.6875rem] text-[var(--muted-foreground)]">
               <p>
                 <strong className="text-[var(--foreground)]">Type:</strong> {isCustomAgent ? "Custom" : agentDetailId}

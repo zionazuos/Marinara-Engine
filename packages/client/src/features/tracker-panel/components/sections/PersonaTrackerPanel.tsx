@@ -267,7 +267,7 @@ export function PersonaInventoryPanel({
         )}
       >
         {inventory.length === 0 ? (
-          <span className="relative z-[1]">Inventory empty.</span>
+          <span className="relative z-[1]">Inventário vazio.</span>
         ) : (
           inventory.map((item, index) => (
             <PersonaInventoryRow

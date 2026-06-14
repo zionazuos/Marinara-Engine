@@ -349,7 +349,7 @@ export function PersonasPanel() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search personas"
+            placeholder="Buscar personas"
             className="w-full rounded-xl border border-[var(--border)] bg-[var(--secondary)] py-2 pl-8 pr-3 text-xs outline-none transition-colors placeholder:text-[var(--muted-foreground)]/50 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
           />
         </div>
@@ -542,7 +542,7 @@ export function PersonasPanel() {
 
       <ExportFormatDialog
         open={exportDialogOpen}
-        title="Export Personas"
+        title="Exportar personas"
         description="Native keeps Marinara persona metadata. Compatible exports simple persona JSON for other tools."
         compatibleDescription="Exports persona fields directly without the Marinara wrapper."
         onClose={() => setExportDialogOpen(false)}

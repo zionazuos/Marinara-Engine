@@ -67,7 +67,7 @@ function DeleteConfirmationDialog({
         className="mx-4 w-full max-w-xs rounded-xl bg-[var(--card)] p-5 shadow-2xl ring-1 ring-[var(--border)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="mb-4 text-center text-sm font-semibold">How to proceed?</p>
+        <p className="mb-4 text-center text-sm font-semibold">Como proceder?</p>
         <div className="flex flex-col gap-2">
           {canDeleteSwipe && (
             <button

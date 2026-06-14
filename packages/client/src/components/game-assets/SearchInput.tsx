@@ -30,7 +30,7 @@ export function SearchInput({ search, onSearch }: { search: string; onSearch: (v
         <button
           onClick={() => setExpanded(true)}
           className="rounded-lg border border-(--border) bg-(--background) p-1.5 text-(--muted-foreground) transition-colors hover:bg-(--accent) hover:text-(--foreground) sm:hidden"
-          title="Search in folder"
+          title="Buscar na pasta"
         >
           <Search size="0.875rem" />
         </button>

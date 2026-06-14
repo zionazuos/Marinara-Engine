@@ -168,7 +168,7 @@ export function EditAgentModal({ open, onClose, agent }: Props) {
             onChange={(e) => setForm((f) => ({ ...f, connectionId: e.target.value }))}
             className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-sm outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]"
           >
-            <option value="">Use default connection</option>
+            <option value="">Usar conexão padrão</option>
             <option value={LOCAL_SIDECAR_CONNECTION_ID}>Local Model (sidecar)</option>
             {(connections as Array<{ id: string; name: string; provider: string }> | undefined)?.map((conn) => (
               <option key={conn.id} value={conn.id}>

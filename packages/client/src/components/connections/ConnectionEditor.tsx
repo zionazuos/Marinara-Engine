@@ -677,7 +677,7 @@ export function ConnectionEditor() {
   if (!conn) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <p className="text-sm text-[var(--muted-foreground)]">Connection not found</p>
+        <p className="text-sm text-[var(--muted-foreground)]">Conexão não encontrada</p>
       </div>
     );
   }
@@ -702,7 +702,7 @@ export function ConnectionEditor() {
             markDirty();
           }}
           className="min-w-0 flex-1 bg-transparent text-lg font-semibold outline-none placeholder:text-[var(--muted-foreground)]"
-          placeholder="Connection name…"
+          placeholder="Nome da conexão…"
         />
         <div className="flex shrink-0 items-center gap-1.5">
           {saveError && (
@@ -1298,7 +1298,7 @@ export function ConnectionEditor() {
                             markDirty();
                           }}
                           className="mt-2 w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-sm ring-1 ring-[var(--border)] focus:outline-none focus:ring-sky-400/50"
-                          placeholder="Custom model ID…"
+                          placeholder="ID de modelo personalizado…"
                         />
                       </div>
                     ) : (
@@ -1538,7 +1538,7 @@ export function ConnectionEditor() {
           {/* ── Agent Parallel Jobs ── */}
           {localProvider !== "image_generation" && (
             <FieldGroup
-              label="Max Parallel Agent Jobs"
+              label="Máx. de tarefas de agente em paralelo"
               icon={<SlidersHorizontal size="0.875rem" className="text-fuchsia-400" />}
               help="How many agent LLM requests Marinara may run at once for this connection. Higher values can speed up agent-heavy chats on providers that tolerate parallel calls."
             >
@@ -1568,7 +1568,7 @@ export function ConnectionEditor() {
           {/* ── Prompt Preset Override ── */}
           {localProvider !== "image_generation" && (
             <FieldGroup
-              label="Prompt Preset Override"
+              label="Substituição do preset de prompt"
               icon={<FileText size="0.875rem" className="text-violet-400" />}
               help="Optional. When roleplay or visual novel chats use this connection, Marinara assembles this prompt preset instead of the chat's selected prompt preset. Conversation and game mode keep their built-in prompt flows."
             >
@@ -1597,7 +1597,7 @@ export function ConnectionEditor() {
           {/* ── Default Chat Parameters ── */}
           {localProvider !== "image_generation" && (
             <FieldGroup
-              label="Default Chat Parameters"
+              label="Parâmetros padrão do chat"
               icon={<Zap size="0.875rem" className="text-purple-400" />}
               help="Default generation settings for chats that use this connection. Individual chats can still override these in Chat Settings."
             >
@@ -1662,7 +1662,7 @@ export function ConnectionEditor() {
                   <div className="h-5 w-9 rounded-full bg-[var(--border)] transition-colors peer-checked:bg-amber-400/70" />
                   <div className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
                 </div>
-                <span className="text-sm">Enable prompt caching</span>
+                <span className="text-sm">Ativar cache de prompt</span>
               </label>
               <p className="text-[0.625rem] text-[var(--muted-foreground)] px-2">
                 {localProvider === "anthropic"
@@ -1805,7 +1805,8 @@ export function ConnectionEditor() {
               {/* Embedding Base URL Override */}
               <div className="mt-3 pt-3 border-t border-[var(--border)]">
                 <label className="block text-xs font-medium text-[var(--muted-foreground)] mb-1.5">
-                  Embedding Endpoint URL
+                  
+                  URL do endpoint de embedding
                 </label>
                 <input
                   value={localEmbeddingBaseUrl}
@@ -1826,7 +1827,8 @@ export function ConnectionEditor() {
               {/* Embedding Connection Override */}
               <div className="mt-3 pt-3 border-t border-[var(--border)]">
                 <label className="block text-xs font-medium text-[var(--muted-foreground)] mb-1.5">
-                  Embedding Connection
+                  
+                  Conexão de embedding
                 </label>
                 <select
                   value={localEmbeddingConnectionId}
@@ -1836,7 +1838,7 @@ export function ConnectionEditor() {
                   }}
                   className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                 >
-                  <option value="">Same as this connection</option>
+                  <option value="">Igual a esta conexão</option>
                   {import.meta.env.VITE_MARINARA_LITE !== "true" && (
                     <option value={LOCAL_SIDECAR_CONNECTION_ID}>Local Model (sidecar)</option>
                   )}
@@ -1860,7 +1862,7 @@ export function ConnectionEditor() {
 
           {/* ── Test Section ── */}
           <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 space-y-4">
-            <h3 className="text-sm font-semibold">Connection Tests</h3>
+            <h3 className="text-sm font-semibold">Testes de conexão</h3>
             <div className="flex gap-2">
               <button
                 onClick={handleTestConnection}
@@ -1872,7 +1874,8 @@ export function ConnectionEditor() {
                 ) : (
                   <Wifi size="0.8125rem" />
                 )}
-                Test Connection
+                
+                Testar conexão
               </button>
               {localProvider !== "image_generation" && (
                 <button
@@ -1915,13 +1918,14 @@ export function ConnectionEditor() {
                   ) : (
                     <AlertCircle size="0.8125rem" />
                   )}
-                  Diagnose Model Routing
+                  
+                  Diagnosticar roteamento do modelo
                 </button>
               )}
             </div>
 
             <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-              <strong>Test Connection</strong> verifies your API key against the provider catalog or health endpoint.
+              <strong>Testar conexão</strong> verifies your API key against the provider catalog or health endpoint.
               {localProvider !== "image_generation" && (
                 <>
                   {" "}
@@ -1937,7 +1941,7 @@ export function ConnectionEditor() {
               {localProvider === "claude_subscription" && (
                 <>
                   {" "}
-                  <strong>Diagnose Model Routing</strong> sends a real prompt through the Claude Agent SDK and reports
+                  <strong>Diagnosticar roteamento do modelo</strong> sends a real prompt through the Claude Agent SDK and reports
                   which model it actually billed against. Catches silent fast-mode / cooldown downgrades where you ask
                   for Opus and quietly get Sonnet.
                 </>
@@ -1984,7 +1988,7 @@ export function ConnectionEditor() {
             {/* Claude (Subscription) diagnosis result */}
             {claudeDiagResult && (
               <TestResultCard
-                label="Model Routing Diagnosis"
+                label="Diagnóstico de roteamento do modelo"
                 success={claudeDiagResult.success && !claudeDiagResult.billedDifferent}
                 latencyMs={claudeDiagResult.latencyMs}
               >
@@ -2207,7 +2211,7 @@ function ImageGenerationDefaultsPanel({
 
   return (
     <FieldGroup
-      label="Local Image Defaults"
+      label="Padrões de imagem local"
       icon={<SlidersHorizontal size="0.875rem" className="text-sky-400" />}
       help="Connection-scoped defaults for local Stable Diffusion backends. These only apply when this image generation connection is selected for a generation."
     >
@@ -2279,7 +2283,7 @@ function ImageGenerationDefaultsPanel({
                     onCommit={(clipSkip) => updateAutomatic1111({ clipSkip: clipSkip > 0 ? clipSkip : null })}
                   />
                   <NumberSetting
-                    label="Img2Img Denoise"
+                    label="Remoção de ruído Img2Img"
                     value={automatic1111.denoisingStrength}
                     min={0}
                     max={1}
@@ -2330,7 +2334,7 @@ function ImageGenerationDefaultsPanel({
                     onCommit={(steps) => updateNovelAi({ steps })}
                   />
                   <NumberSetting
-                    label="Prompt Guidance"
+                    label="Orientação do prompt"
                     value={novelai.promptGuidance}
                     min={0}
                     max={30}
@@ -2338,7 +2342,7 @@ function ImageGenerationDefaultsPanel({
                     onCommit={(promptGuidance) => updateNovelAi({ promptGuidance })}
                   />
                   <NumberSetting
-                    label="Guidance Rescale"
+                    label="Reescala de orientação"
                     value={novelai.promptGuidanceRescale}
                     min={0}
                     max={1}
@@ -2365,7 +2369,7 @@ function ImageGenerationDefaultsPanel({
                   placeholder="e.g. masterpiece, high quality"
                 />
                 <TextSetting
-                  label="Negative Prefix"
+                  label="Prefixo negativo"
                   value={automatic1111.negativePromptPrefix}
                   onChange={(negativePromptPrefix) => updateAutomatic1111({ negativePromptPrefix })}
                   placeholder="e.g. low quality, blurry"
@@ -2403,7 +2407,7 @@ function ImageGenerationDefaultsPanel({
                   placeholder="e.g. masterpiece, high quality"
                 />
                 <TextSetting
-                  label="Negative Prefix"
+                  label="Prefixo negativo"
                   value={comfyui.negativePromptPrefix}
                   onChange={(negativePromptPrefix) => updateComfyUi({ negativePromptPrefix })}
                   placeholder="e.g. low quality, blurry"
@@ -2454,7 +2458,7 @@ function ImageGenerationDefaultsPanel({
                   placeholder="e.g. masterpiece, best quality"
                 />
                 <TextSetting
-                  label="Negative Prefix"
+                  label="Prefixo negativo"
                   value={novelai.negativePromptPrefix}
                   onChange={(negativePromptPrefix) => updateNovelAi({ negativePromptPrefix })}
                   placeholder="e.g. low quality, blurry"

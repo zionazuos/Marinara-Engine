@@ -260,7 +260,7 @@ function SetupGenerationParametersPanel({
         className="flex w-full items-center justify-between gap-3 text-left"
       >
         <div>
-          <span className="block text-xs font-medium text-[var(--foreground)]">Customize Parameters</span>
+          <span className="block text-xs font-medium text-[var(--foreground)]">Personalizar parâmetros</span>
           <span className="block text-[0.575rem] text-[var(--muted-foreground)]">
             Leave this off to use the selected connection&apos;s saved defaults for this chat.
           </span>
@@ -512,7 +512,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
           <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] px-4 py-3">
             <div className="flex items-center gap-2">
               <MessageCircle size="0.875rem" className="text-[var(--primary)]" />
-              <h3 className="text-sm font-semibold text-[var(--foreground)]">New Conversation</h3>
+              <h3 className="text-sm font-semibold text-[var(--foreground)]">Nova conversa</h3>
             </div>
             <button
               onClick={onFinish}
@@ -540,7 +540,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                     updateChat.mutate({ id: chat.id, name: val });
                   }
                 }}
-                placeholder="Conversation name"
+                placeholder="Nome da conversa"
                 className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-[var(--border)] transition-shadow focus:ring-[var(--primary)]/40 placeholder:text-[var(--muted-foreground)]"
               />
             </div>
@@ -756,7 +756,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                       className={generateSchedule ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}
                     />
                     <div>
-                      <span className="text-xs font-medium">Generate Schedule</span>
+                      <span className="text-xs font-medium">Gerar agenda</span>
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                         Optional routines for availability and delayed replies
                       </p>
@@ -1672,7 +1672,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                     className="flex items-center gap-1.5 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/20"
                   >
                     <Wand2 size="0.75rem" />
-                    <span className="hidden xs:inline sm:inline">Use Settings Presets</span>
+                    <span className="hidden xs:inline sm:inline">Usar presets de configurações</span>
                     <span className="inline xs:hidden sm:hidden">Presets</span>
                   </button>
                   <button

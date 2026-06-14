@@ -103,7 +103,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
       />
 
       {/* Loading state */}
-      {isLoading && <p className="text-center text-xs text-[var(--muted-foreground)]">Loading gallery…</p>}
+      {isLoading && <p className="text-center text-xs text-[var(--muted-foreground)]">Carregando galeria…</p>}
 
       {/* Empty state */}
       {!isLoading && (!images || images.length === 0) && (
@@ -137,9 +137,9 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
                     <button
                       type="button"
                       onClick={() => setLightbox(img)}
-                      aria-label="View image fullscreen"
+                      aria-label="Ver imagem em tela cheia"
                       className="rounded-md bg-white/20 p-1.5 text-white transition-colors hover:bg-white/30"
-                      title="View fullscreen"
+                      title="Ver em tela cheia"
                     >
                       <ZoomIn size="0.75rem" />
                     </button>
@@ -156,7 +156,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
                   <button
                     type="button"
                     onClick={() => setConfirmDeleteId(img.id)}
-                    aria-label="Delete gallery image"
+                    aria-label="Excluir imagem da galeria"
                     className="rounded-md bg-red-500/40 p-1.5 text-white transition-colors hover:bg-red-500/60"
                   >
                     <Trash2 size="0.75rem" />

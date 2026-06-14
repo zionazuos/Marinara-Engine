@@ -1221,7 +1221,8 @@ export const ChatInput = memo(function ChatInput({
           {isReadingAttachments && (
             <div className="flex items-center gap-1.5 rounded-lg bg-foreground/10 px-2 py-1 text-xs text-foreground/60">
               <Loader2 size="0.875rem" className="animate-spin" />
-              Reading file...
+              
+              Lendo arquivo...
             </div>
           )}
         </div>
@@ -1355,7 +1356,7 @@ export const ChatInput = memo(function ChatInput({
                 ? "text-foreground/40 hover:bg-foreground/10 hover:text-foreground/70 active:scale-90"
                 : "text-foreground/25",
             )}
-            title="Translate draft"
+            title="Traduzir rascunho"
           >
             {isTranslatingDraft ? <Loader2 size="0.9375rem" className="animate-spin" /> : <Languages size="1rem" />}
           </button>
@@ -1415,7 +1416,8 @@ export const ChatInput = memo(function ChatInput({
             }
           >
             <div className="flex items-center justify-center border-b border-[var(--border)] px-3 py-2 text-[0.6875rem] font-semibold">
-              Trigger Response
+              
+              Resposta do gatilho
             </div>
             <div className="overflow-y-auto p-1">
               {activeChatCharacters!.map((char) => (

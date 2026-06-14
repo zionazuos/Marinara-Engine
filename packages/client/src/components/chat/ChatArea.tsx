@@ -1716,10 +1716,11 @@ export function ChatArea() {
               <button
                 onClick={() => useUIStore.getState().setHasCompletedOnboarding(false)}
                 className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[0.625rem] text-[var(--muted-foreground)]/40 transition-colors hover:bg-[var(--secondary)]/60 hover:text-[var(--muted-foreground)]"
-                title="Replay tutorial"
+                title="Repetir tutorial"
               >
                 <HelpCircle size="0.75rem" />
-                Replay Tutorial
+                
+                Repetir tutorial
               </button>
 
               <p className="text-[0.625rem] tracking-wide text-[var(--muted-foreground)]/30">v{APP_VERSION}</p>

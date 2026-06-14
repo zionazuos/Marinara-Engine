@@ -411,8 +411,8 @@ export function ConversationView({
         <button
           onClick={() => setMobileWorldInfoOpen(true)}
           className={MOBILE_MENU_BTN}
-          title="Active World Info"
-          aria-label="Active World Info"
+          title="Info de mundo ativa"
+          aria-label="Info de mundo ativa"
         >
           <Globe size="0.875rem" />
         </button>

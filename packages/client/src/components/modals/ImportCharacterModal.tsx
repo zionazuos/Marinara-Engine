@@ -241,7 +241,7 @@ export function ImportCharacterModal({ open, onClose }: Props) {
         reset();
         onClose();
       }}
-      title="Import Character"
+      title="Importar personagem"
     >
       <div className="flex flex-col gap-4">
         {pendingLorebookChoice && (
@@ -249,7 +249,7 @@ export function ImportCharacterModal({ open, onClose }: Props) {
             <div className="flex items-start gap-3">
               <BookOpen className="mt-0.5 shrink-0 text-[var(--primary)]" size="1.125rem" />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-[var(--foreground)]">Embedded lorebook found</p>
+                <p className="text-sm font-semibold text-[var(--foreground)]">Lorebook embutido encontrado</p>
                 <p className="mt-1 text-xs leading-relaxed text-[var(--muted-foreground)]">
                   Import the embedded lorebook as a standalone Marinara lorebook, or keep it only inside the character
                   card.
@@ -280,7 +280,8 @@ export function ImportCharacterModal({ open, onClose }: Props) {
                     onClick={() => void handleFiles(pendingLorebookChoice.files, true)}
                     className="rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-[var(--primary-foreground)] transition-opacity hover:opacity-90"
                   >
-                    Import Lorebook
+                    
+                    Importar lorebook
                   </button>
                 </div>
               </div>

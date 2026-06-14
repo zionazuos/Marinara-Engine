@@ -269,14 +269,14 @@ export function LorebookMakerModal({ open, onClose }: Props) {
 
         {/* Target lorebook */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-[var(--muted-foreground)]">Target Lorebook</label>
+          <label className="text-xs font-medium text-[var(--muted-foreground)]">Lorebook de destino</label>
           <div className="relative">
             <select
               value={targetLorebookId}
               onChange={(e) => setTargetLorebookId(e.target.value)}
               className="w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 pr-8 text-sm outline-none focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
             >
-              <option value="__new__">✦ Create new lorebook</option>
+              <option value="__new__">✦ Criar novo lorebook</option>
               {lorebooks.map((lb) => (
                 <option key={lb.id} value={lb.id}>
                   {lb.name}
@@ -329,7 +329,8 @@ export function LorebookMakerModal({ open, onClose }: Props) {
           ) : (
             <>
               <Wand2 size="1rem" />
-              Generate Lorebook
+              
+              Gerar lorebook
             </>
           )}
         </button>

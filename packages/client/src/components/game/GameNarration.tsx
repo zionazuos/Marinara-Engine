@@ -3510,7 +3510,7 @@ export function GameNarration({
                 type="button"
                 onClick={handleStopGameVoiceButtonClick}
                 className="inline-flex h-5 w-5 items-center justify-center rounded-full text-sky-200 transition-colors hover:bg-[var(--muted)]/40 dark:hover:bg-white/10"
-                title="Stop voice-over"
+                title="Parar narração"
               >
                 <VolumeX size={11} />
               </button>
@@ -3780,7 +3780,7 @@ export function GameNarration({
           {/* Scene analysis failed: show retry / skip inline only when no narration content available */}
           {sceneAnalysisFailed && !active && (
             <div className="flex flex-col items-center gap-2 py-3">
-              <span className="text-sm text-red-300/80">Scene analysis failed</span>
+              <span className="text-sm text-red-300/80">Falha na análise de cena</span>
               <div className="flex gap-2">
                 {onRetryScene && (
                   <button onClick={onRetryScene} className={NARRATION_ACTION_BTN}>
@@ -3802,7 +3802,7 @@ export function GameNarration({
           {/* GM generation failed — show inline retry */}
           {generationFailed && !isStreaming && !scenePreparing && !sceneAnalysisFailed && onRetryGeneration && (
             <div className="flex items-center gap-2 py-3">
-              <span className="text-sm text-red-300/80">Generation failed</span>
+              <span className="text-sm text-red-300/80">Falha na geração</span>
               <button
                 onClick={onRetryGeneration}
                 className="flex items-center gap-1.5 rounded-lg bg-[var(--muted)]/30 px-3 py-1.5 text-xs text-[var(--foreground)]/70 transition-colors hover:bg-[var(--muted)]/50 hover:text-[var(--foreground)] dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/20 dark:hover:text-white"
@@ -3873,7 +3873,7 @@ export function GameNarration({
                                 (activePortraitGenerating || isMobilePortraitActionsVisible(active.speaker)) &&
                                   "max-md:opacity-100",
                               )}
-                              title="Generate NPC portrait"
+                              title="Gerar retrato de NPC"
                             >
                               {activePortraitGenerating ? (
                                 <Loader2 size="0.75rem" className="animate-spin" />
@@ -4336,7 +4336,7 @@ export function GameNarration({
                       type="button"
                       onClick={loadOlderLogs}
                       className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[0.65rem] font-medium text-white/65 transition-colors hover:bg-white/10 hover:text-white"
-                      title="Load older logs"
+                      title="Carregar registros antigos"
                     >
                       Older ({hiddenLogCount})
                     </button>
@@ -4381,7 +4381,7 @@ export function GameNarration({
               }}
             >
               {logEntries.length === 0 && (
-                <p className="text-sm text-[var(--muted-foreground)]">No previous logs yet.</p>
+                <p className="text-sm text-[var(--muted-foreground)]">Nenhum registro anterior ainda.</p>
               )}
               {hiddenLogCount > 0 && (
                 <div className="flex justify-center pb-2">
@@ -4586,7 +4586,7 @@ export function GameNarration({
                                   type="button"
                                   onClick={handleStopGameVoiceButtonClick}
                                   className="inline-flex h-5 w-5 items-center justify-center rounded-full text-sky-200 transition-colors hover:bg-white/10"
-                                  title="Stop voice-over"
+                                  title="Parar narração"
                                 >
                                   <VolumeX size={11} />
                                 </button>
@@ -4780,7 +4780,7 @@ export function GameNarration({
                                       (logPortraitGenerating || isMobilePortraitActionsVisible(seg.speaker)) &&
                                         "max-md:opacity-100",
                                     )}
-                                    title="Generate NPC portrait"
+                                    title="Gerar retrato de NPC"
                                   >
                                     {logPortraitGenerating ? (
                                       <Loader2 size="0.6rem" className="animate-spin" />

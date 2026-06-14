@@ -474,7 +474,7 @@ export function LorebooksPanel() {
 
       <ExportFormatDialog
         open={exportDialogOpen}
-        title="Export Lorebooks"
+        title="Exportar lorebooks"
         description="Native keeps Marinara folders and entry fields. Compatible exports a folderless World Info JSON for other roleplay tools."
         onClose={() => setExportDialogOpen(false)}
         onSelect={handleExportSelected}
@@ -489,7 +489,7 @@ export function LorebooksPanel() {
           />
           <input
             type="text"
-            placeholder="Search lorebooks"
+            placeholder="Buscar lorebooks"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-xl bg-[var(--secondary)] py-2 pl-8 pr-3 text-xs text-[var(--foreground)] ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"

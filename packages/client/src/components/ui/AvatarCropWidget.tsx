@@ -223,7 +223,7 @@ export function AvatarCropWidget({ src, alt, crop, onChange, onRemove, removing 
             type="button"
             onClick={() => setShowFullView(true)}
             className="inline-flex items-center gap-1 rounded-lg bg-[var(--accent)] px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)]"
-            title="Open full image"
+            title="Abrir imagem completa"
           >
             <Maximize2 size="0.625rem" /> Full image
           </button>

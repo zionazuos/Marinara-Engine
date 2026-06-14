@@ -286,7 +286,8 @@ export function RegexScriptEditor() {
   if (!regexDetailId || (!dbRow && !isNew)) {
     return (
       <div className="flex flex-1 items-center justify-center text-sm text-[var(--muted-foreground)]">
-        Regex script not found.
+        
+        Script de regex não encontrado.
       </div>
     );
   }
@@ -300,7 +301,7 @@ export function RegexScriptEditor() {
         <button
           type="button"
           onClick={handleClose}
-          aria-label="Back to regex scripts"
+          aria-label="Voltar para scripts de regex"
           className="rounded-xl p-2 transition-all hover:bg-[var(--accent)] active:scale-95"
         >
           <ArrowLeft size="1.125rem" />
@@ -529,7 +530,7 @@ export function RegexScriptEditor() {
                       markDirty();
                     }}
                     className="flex-1 rounded-lg bg-[var(--secondary)] px-3 py-1.5 font-mono text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-                    placeholder="String to trim…"
+                    placeholder="Texto a aparar…"
                   />
                   <button
                     onClick={() => {
@@ -556,7 +557,7 @@ export function RegexScriptEditor() {
 
           {/* ── Advanced Options ── */}
           <FieldGroup
-            label="Advanced Options"
+            label="Opções avançadas"
             icon={<Info size="0.875rem" className="text-orange-400" />}
             help="Fine-tune when and how the regex runs."
           >
@@ -599,7 +600,7 @@ export function RegexScriptEditor() {
                   }}
                   className="w-20 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                 />
-                <span className="text-[0.625rem] text-[var(--muted-foreground)]">Lower numbers run first</span>
+                <span className="text-[0.625rem] text-[var(--muted-foreground)]">Números menores rodam primeiro</span>
               </div>
 
               {/* Depth range */}
@@ -691,7 +692,8 @@ export function RegexScriptEditor() {
                   <code className="rounded bg-[var(--secondary)] px-1">***</code>
                 </li>
                 <li>
-                  Capitalize replacement: <code className="rounded bg-[var(--secondary)] px-1">\U$1</code>
+                  
+                  Capitalizar substituição: <code className="rounded bg-[var(--secondary)] px-1">\U$1</code>
                 </li>
               </ul>
               {dbRow && (

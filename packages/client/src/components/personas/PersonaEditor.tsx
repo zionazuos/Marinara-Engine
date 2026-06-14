@@ -430,7 +430,7 @@ export function PersonaEditor() {
       />
       <AvatarGenerationModal
         open={avatarGeneratorOpen}
-        title="Generate Persona Avatar"
+        title="Gerar avatar da persona"
         entityName={formData.name}
         defaultAppearance={formData.appearance || formData.description || formData.personality}
         defaultAvatarUrl={avatarPreview}
@@ -475,7 +475,7 @@ export function PersonaEditor() {
                 setAvatarGeneratorOpen(true);
               }}
               className="absolute right-0.5 top-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--card)]/95 text-[var(--primary)] opacity-0 shadow-md ring-1 ring-[var(--border)] transition-opacity hover:bg-[var(--card)] group-hover:opacity-100 max-md:opacity-100"
-              title="Generate avatar"
+              title="Gerar avatar"
             >
               <Wand2 size="0.75rem" />
             </button>
@@ -1011,7 +1011,7 @@ function PersonaSpritesTab({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-sm font-semibold">Persona Sprites</h3>
+        <h3 className="text-sm font-semibold">Sprites da persona</h3>
         <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
           Upload VN-style sprites for your persona. These are used in Game Mode and roleplay with the Expression Engine.
         </p>
@@ -1074,14 +1074,15 @@ function PersonaSpritesTab({
               }
             >
               <Wand2 size="0.8125rem" />
-              Generate Sprite
+              
+              Gerar sprite
             </button>
             <button
               type="button"
               onClick={() => folderInputRef.current?.click()}
               disabled={!!folderProgress}
               className="flex min-w-0 items-center justify-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-1.5 text-center text-[0.6875rem] font-medium leading-tight text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-40 max-md:flex-1 max-md:basis-[calc(50%-0.25rem)] max-md:px-2.5"
-              title="Select a folder of PNGs"
+              title="Selecionar uma pasta de PNGs"
             >
               <FolderOpen size="0.8125rem" />
               Upload Folder
@@ -1144,7 +1145,7 @@ function PersonaSpritesTab({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 rounded-lg bg-[var(--secondary)]/60 px-3 py-2">
-          <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Cleanup strength</span>
+          <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Força da limpeza</span>
           <span className="text-[0.625rem] text-[var(--muted-foreground)]">Suave</span>
           <input
             type="range"
@@ -1552,7 +1553,7 @@ function PersonaColorsTab({
       />
 
       <div className="rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
-        <h4 className="mb-1.5 text-xs font-semibold">How colors work</h4>
+        <h4 className="mb-1.5 text-xs font-semibold">Como as cores funcionam</h4>
         <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
           <li>
             &bull; <strong className="text-[var(--foreground)]">Name color</strong> — Applied to your persona&apos;s
@@ -1695,7 +1696,7 @@ function PersonaStatsTab({
           className="h-4 w-4 rounded accent-emerald-500"
         />
         <div>
-          <p className="text-sm font-medium">Enable Persona Stats</p>
+          <p className="text-sm font-medium">Ativar atributos da persona</p>
           <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
             Tracked by the Persona Stats agent. Stats appear in the HUD and are adjusted based on narrative events.
           </p>
@@ -1758,7 +1759,7 @@ function PersonaStatsTab({
 
           {/* Info */}
           <div className="rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
-            <h4 className="mb-1.5 text-xs font-semibold">How persona stats work</h4>
+            <h4 className="mb-1.5 text-xs font-semibold">Como os atributos da persona funcionam</h4>
             <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
               <li>
                 &bull; <strong className="text-[var(--foreground)]">Barras de status</strong> — Represent your persona&apos;s
@@ -1793,7 +1794,7 @@ function PersonaStatsTab({
             className="h-4 w-4 rounded accent-purple-500"
           />
           <div>
-            <p className="text-sm font-medium">Enable RPG Attributes</p>
+            <p className="text-sm font-medium">Ativar atributos de RPG</p>
             <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
               Attributes are injected into the prompt and tracked via Persona Stats in the game state.
             </p>
@@ -1867,7 +1868,7 @@ function PersonaStatsTab({
 
             {/* Info */}
             <div className="mt-4 rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
-              <h4 className="mb-1.5 text-xs font-semibold">How RPG attributes work</h4>
+              <h4 className="mb-1.5 text-xs font-semibold">Como os atributos de RPG funcionam</h4>
               <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
                 <li>
                   &bull; <strong className="text-[var(--foreground)]">HP</strong> — Injected into the prompt so the AI
@@ -2043,7 +2044,7 @@ function DescriptionTab({
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-sm font-semibold">Description Extensions</h3>
+            <h3 className="text-sm font-semibold">Extensões de descrição</h3>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
               Toggleable additions appended to your main description. Use these for situational details like combat
               skills, relationships, or temporary states.
@@ -2105,7 +2106,7 @@ function DescriptionTab({
                     type="button"
                     onClick={() => removeAltDesc(desc.id)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] transition-colors hover:bg-red-500/15 hover:text-red-400"
-                    title="Remove extension"
+                    title="Remover extensão"
                   >
                     <X size="0.75rem" />
                   </button>

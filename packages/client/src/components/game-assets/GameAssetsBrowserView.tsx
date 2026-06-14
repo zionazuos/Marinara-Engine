@@ -630,7 +630,7 @@ export function GameAssetsBrowserView() {
     try {
       await updateDescription.mutateAsync({ path: selectedPath, description: descriptionValue });
       setEditingDescription(false);
-      toast.success("Description saved");
+      toast.success("Descrição salva");
     } catch (err) {
       toast.error(`Failed to save description: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
@@ -677,7 +677,7 @@ export function GameAssetsBrowserView() {
 
       {canSelectGameAssets && assetSelectionMode && (
         <div className="flex min-h-[36px] items-center gap-3 border-b border-[var(--border)]/40 bg-[var(--primary)]/5 px-4 py-1.5">
-          <span className="text-xs font-medium text-[var(--primary)]">Game asset selection</span>
+          <span className="text-xs font-medium text-[var(--primary)]">Seleção de assets do game</span>
           <span className="text-xs text-[var(--muted-foreground)]">
             {gameAssetExcludedFolders.length === 0
               ? "All folders included"
@@ -841,7 +841,8 @@ export function GameAssetsBrowserView() {
         >
           {isLoading ? (
             <div className="flex flex-1 items-center justify-center text-sm text-[var(--muted-foreground)]">
-              Loading assets...
+              
+              Carregando assets...
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto">
@@ -868,7 +869,7 @@ export function GameAssetsBrowserView() {
             <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
               <div className="rounded-2xl border-2 border-dashed border-[var(--primary)]/30 bg-[var(--primary)]/5 px-8 py-6 text-center">
                 <Upload size="2rem" className="mx-auto mb-2 text-[var(--primary)]" />
-                <p className="text-sm font-medium text-[var(--primary)]">Drop files to upload</p>
+                <p className="text-sm font-medium text-[var(--primary)]">Solte os arquivos para enviar</p>
               </div>
             </div>
           )}
@@ -948,7 +949,8 @@ export function GameAssetsBrowserView() {
                         onClick={() => handleIncludeSubfolders(subfolders)}
                         className="flex w-full items-center justify-between px-3 py-1.5 text-left text-xs font-medium text-[var(--primary)] transition-colors hover:bg-[var(--accent)]"
                       >
-                        Include all subfolders
+                        
+                        Incluir todas as subpastas
                       </button>
                     </>
                   )}

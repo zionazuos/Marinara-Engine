@@ -129,7 +129,7 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close chat files drawer"
+              aria-label="Fechar gaveta de arquivos do chat"
               className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)]"
             >
               <X size="1rem" />
@@ -202,7 +202,7 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close chat files drawer"
+            aria-label="Fechar gaveta de arquivos do chat"
             className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)]"
           >
             <X size="1rem" />

@@ -172,7 +172,7 @@ export function RoleplayHUDActionsMenu({
             </div>
           )}
           {!hasAnyActivity && (
-            <div className="px-3 py-4 text-center text-[0.625rem] text-white/30">No agent activity yet</div>
+            <div className="px-3 py-4 text-center text-[0.625rem] text-white/30">Nenhuma atividade de agente ainda</div>
           )}
           {thoughtBubbles.length > 0 && (
             <>
@@ -238,7 +238,7 @@ export function RoleplayHUDActionsMenu({
             <CustomAgentRunsSection
               runs={injectableCustomRuns}
               loading={customAgentRunsLoading}
-              title="Custom prompt sections"
+              title="Seções de prompt personalizadas"
               emptyText="No saved prompt-section output yet."
               countMode="latest"
               collapsible
@@ -249,7 +249,7 @@ export function RoleplayHUDActionsMenu({
 
       {activeTab === "secret" && showSecretPlotTab && (
         <Suspense
-          fallback={<div className="px-3 py-4 text-center text-[0.625rem] text-white/35">Loading secret plot...</div>}
+          fallback={<div className="px-3 py-4 text-center text-[0.625rem] text-white/35">Carregando enredo secreto...</div>}
         >
           <SecretPlotPanel
             chatId={chatId}

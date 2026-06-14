@@ -281,7 +281,7 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
         <div className="shrink-0 flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
           <div className="flex items-center gap-2">
             <CalendarClock size="1rem" className="text-[var(--muted-foreground)]" />
-            <h3 className="text-sm font-bold">Automatic Summarization</h3>
+            <h3 className="text-sm font-bold">Resumo automático</h3>
             <span className="text-[0.625rem] text-[var(--muted-foreground)]">
               {entries.length} {entries.length === 1 ? "entry" : "entries"} &middot; ~{fmtTokens(totalTokens)} token
               {totalTokens !== 1 ? "s" : ""}
@@ -402,7 +402,7 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
                     <div className="space-y-1">
                       <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Key Details</label>
                       {current.keyDetails.length === 0 && (
-                        <p className="text-[0.6875rem] italic text-[var(--muted-foreground)]">No key details.</p>
+                        <p className="text-[0.6875rem] italic text-[var(--muted-foreground)]">Sem detalhes-chave.</p>
                       )}
                       <div className="space-y-1.5">
                         {current.keyDetails.map((detail, i) => (
@@ -422,7 +422,7 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
                                 updateEntry(entry.kind, entry.key, { ...current, keyDetails: nextDetails });
                               }}
                               className="shrink-0 self-start rounded-md p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
-                              title="Delete key detail"
+                              title="Excluir detalhe-chave"
                             >
                               <Trash2 size="0.75rem" />
                             </button>

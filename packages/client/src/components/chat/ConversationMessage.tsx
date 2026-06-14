@@ -957,7 +957,7 @@ export const ConversationMessage = memo(function ConversationMessage({
             <MsgAction
               icon={<ScrollText size="0.75rem" />}
               onClick={() => setShowGenerationReplay(true)}
-              title="Stored guidance"
+              title="Orientação armazenada"
             />
           )}
           {thinking && (
@@ -1259,7 +1259,7 @@ export const ConversationMessage = memo(function ConversationMessage({
             <MsgAction
               icon={<ScrollText size="0.75rem" />}
               onClick={() => setShowGenerationReplay(true)}
-              title="Stored guidance"
+              title="Orientação armazenada"
             />
           )}
           {thinking && !isUser && (

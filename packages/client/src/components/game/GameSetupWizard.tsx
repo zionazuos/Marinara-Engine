@@ -603,7 +603,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                 type="text"
                 value={gameName}
                 onChange={(e) => setGameName(e.target.value)}
-                placeholder="Name your adventure…"
+                placeholder="Dê um nome à sua aventura…"
                 className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40"
               />
             </div>
@@ -656,7 +656,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   value={customGenre}
                   onChange={(e) => setCustomGenre(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addCustomGenre()}
-                  placeholder="Add custom genre…"
+                  placeholder="Adicionar gênero personalizado…"
                   className="flex-1 rounded-lg bg-[var(--secondary)] px-3 py-1.5 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40"
                 />
                 <button
@@ -676,7 +676,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                 type="text"
                 value={setting}
                 onChange={(e) => setSetting(e.target.value)}
-                placeholder="Describe your world…"
+                placeholder="Descreva seu mundo…"
                 className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40"
               />
               <div className="mt-1.5 flex flex-wrap gap-1">
@@ -748,7 +748,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   value={customTone}
                   onChange={(e) => setCustomTone(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addCustomTone()}
-                  placeholder="Add custom tone…"
+                  placeholder="Adicionar tom personalizado…"
                   className="flex-1 rounded-lg bg-[var(--secondary)] px-3 py-1.5 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40"
                 />
                 <button
@@ -853,7 +853,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
           <>
             {/* GM Mode */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Game Master Mode</label>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Modo Game Master</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => setGmMode("standalone")}
@@ -1139,7 +1139,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                 onChange={(e) => setGmConnectionId(e.target.value || null)}
                 className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all focus:ring-[var(--primary)]/40"
               >
-                <option value="">Select a connection…</option>
+                <option value="">Selecionar uma conexão…</option>
                 {connections.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -1159,7 +1159,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   className="flex w-full items-center justify-between gap-3 text-left"
                 >
                   <div>
-                    <span className="block text-xs font-medium text-[var(--foreground)]">Customize Parameters</span>
+                    <span className="block text-xs font-medium text-[var(--foreground)]">Personalizar parâmetros</span>
                     <span className="block text-[0.575rem] text-[var(--muted-foreground)]">
                       Leave this off to use the selected connection&apos;s saved defaults for the initial world build
                       and game chat.
@@ -1388,7 +1388,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                       className={enableLorebookKeeper ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}
                     />
                     <div className="min-w-0">
-                      <span className="block text-xs font-medium text-[var(--foreground)]">Lorebook Keeper</span>
+                      <span className="block text-xs font-medium text-[var(--foreground)]">Guardião de lorebook</span>
                       <span className="block text-[0.575rem] text-[var(--muted-foreground)]">
                         Keep a game lorebook updated as the adventure develops
                       </span>
@@ -1424,7 +1424,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                       className={enableSpriteGeneration ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}
                     />
                     <div className="flex-1">
-                      <span className="block text-xs font-medium text-[var(--foreground)]">Image Generation</span>
+                      <span className="block text-xs font-medium text-[var(--foreground)]">Geração de imagem</span>
                       <span className="block text-[0.575rem] text-[var(--muted-foreground)]">
                         Auto-generate NPC portraits and location backgrounds during gameplay
                       </span>
@@ -1550,7 +1550,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             {/* Preferences */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">
-                Additional Preferences
+                
+                Preferências adicionais
               </label>
               <textarea
                 value={preferences}
@@ -1721,7 +1722,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             {isLoading ? (
               <>
                 <Loader2 size={14} className="animate-spin" />
-                Generating World…
+                
+                Gerando mundo…
               </>
             ) : (
               <>

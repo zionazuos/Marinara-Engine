@@ -66,7 +66,7 @@ function TextBlock({
     if (!copyValue) return;
     try {
       await copyToClipboard(copyValue);
-      toast.success("Guided command copied.");
+      toast.success("Comando guiado copiado.");
     } catch {
       toast.error("Could not copy guidance.");
     }
@@ -139,7 +139,7 @@ export function GenerationReplayDetailsModal({
       replay?.impersonateBlockAgents === true);
 
   return (
-    <Modal open={open} onClose={onClose} title="Stored guidance" width="max-w-xl">
+    <Modal open={open} onClose={onClose} title="Orientação armazenada" width="max-w-xl">
       <div className="space-y-5">
         {generationGuide && !hasImpersonate && (
           <TextBlock
@@ -155,11 +155,11 @@ export function GenerationReplayDetailsModal({
               /impersonate
             </h3>
             <TextBlock
-              label="Current guidance"
+              label="Orientação atual"
               value={impersonateGuidance ?? "No guidance stored"}
               muted={!impersonateGuidance}
             />
-            {impersonatePromptTemplate && <TextBlock label="Prompt template" value={impersonatePromptTemplate} />}
+            {impersonatePromptTemplate && <TextBlock label="Modelo de prompt" value={impersonatePromptTemplate} />}
             {hasMetadata && (
               <dl className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--muted)]/20 px-3 py-2">
                 {storedText(replay?.impersonatePresetId) && (

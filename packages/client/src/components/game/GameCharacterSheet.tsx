@@ -423,7 +423,7 @@ export function GameCharacterSheet({
                     disabled={isRegenerating || isSaving}
                     className="inline-flex h-8 min-w-8 items-center justify-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)]/90 px-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)] disabled:cursor-wait disabled:opacity-60 sm:h-auto sm:min-w-0 sm:px-3 sm:py-1.5"
                     title="Regenerate this sheet from character and current game context"
-                    aria-label="Regenerate sheet"
+                    aria-label="Regenerar folha"
                   >
                     <RefreshCw size={13} className={cn(isRegenerating && "animate-spin")} />
                     <span className="hidden sm:inline">{isRegenerating ? "Regenerating..." : "Regenerate Sheet"}</span>
@@ -449,8 +449,8 @@ export function GameCharacterSheet({
         <button
           onClick={onClose}
           className="absolute right-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-lg p-0 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)] sm:h-auto sm:w-auto sm:p-1.5"
-          aria-label="Close character sheet"
-          title="Close character sheet"
+          aria-label="Fechar ficha do personagem"
+          title="Fechar ficha do personagem"
         >
           <X className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
         </button>
@@ -536,7 +536,7 @@ export function GameCharacterSheet({
                     <textarea
                       value={draft.shortDescription}
                       onChange={(e) => setDraft((prev) => ({ ...prev, shortDescription: e.target.value }))}
-                      placeholder="Brief character summary"
+                      placeholder="Resumo breve do personagem"
                       rows={3}
                       className={cn(TEXT_INPUT_CLASS, "resize-y")}
                     />
@@ -608,7 +608,7 @@ export function GameCharacterSheet({
                           <button
                             onClick={() => removeAttribute(index)}
                             className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] px-2 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-red-400"
-                            title="Remove attribute"
+                            title="Remover atributo"
                           >
                             <Trash2 size={13} />
                           </button>
@@ -700,7 +700,7 @@ export function GameCharacterSheet({
                           <button
                             onClick={() => removeListItem("strengths", index)}
                             className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] px-2 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-red-400"
-                            title="Remove strength"
+                            title="Remover força"
                           >
                             <Trash2 size={13} />
                           </button>
@@ -737,7 +737,7 @@ export function GameCharacterSheet({
                           <button
                             onClick={() => removeListItem("weaknesses", index)}
                             className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] px-2 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-red-400"
-                            title="Remove weakness"
+                            title="Remover fraqueza"
                           >
                             <Trash2 size={13} />
                           </button>

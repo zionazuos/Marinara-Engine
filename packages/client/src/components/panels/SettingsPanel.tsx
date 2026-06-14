@@ -593,7 +593,8 @@ function TrackerPanelAppearanceDrawer({
           </div>
           <div className="mt-2 grid gap-1.5">
             <span className="inline-flex items-center gap-1 text-[0.6875rem] font-medium">
-              Thought display mode
+              
+              Modo de exibição de pensamentos
               <HelpTooltip text="Choose whether featured character thoughts open inside the tracker card or float beside the portrait. This no longer changes automatically when the panel width changes." />
             </span>
             <div className="grid grid-cols-2 gap-0.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/45 p-0.5">
@@ -631,7 +632,8 @@ function TrackerPanelAppearanceDrawer({
           />
           <div className="mt-2 flex min-h-8 items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1 text-[0.6875rem] font-medium">
-              Temperature unit
+              
+              Unidade de temperatura
               <HelpTooltip text="Changes Tracker Panel and roleplay HUD temperature displays without rewriting the saved world-state temperature." />
             </span>
             <button
@@ -905,7 +907,7 @@ function GeneralSettings() {
         )}
       >
         <div className="flex items-center gap-2">
-          <span className="text-xs">Streaming speed</span>
+          <span className="text-xs">Velocidade de streaming</span>
           <span className="text-xs tabular-nums text-[var(--muted-foreground)]">{streamingSpeed}</span>
           <HelpTooltip text="How fast streaming tokens appear on screen. Lower values give a slower typewriter effect so you can read along. Higher values show text almost instantly." />
         </div>
@@ -942,7 +944,7 @@ function GeneralSettings() {
       {!gameInstantTextReveal && (
         <label className="flex flex-col gap-1.5 rounded-lg p-1 transition-colors hover:bg-[var(--secondary)]/50">
           <div className="flex items-center gap-2">
-            <span className="text-xs">Game narration speed</span>
+            <span className="text-xs">Velocidade da narração do game</span>
             <span className="text-xs tabular-nums text-[var(--muted-foreground)]">{gameTextSpeed}</span>
             <HelpTooltip text="How fast the typewriter effect displays narration text in Game mode. Lower values give a slower cinematic reveal. Higher values show text almost instantly." />
           </div>
@@ -1031,7 +1033,7 @@ function GeneralSettings() {
       </div>
 
       <ToggleSetting
-        label="Confirm before deleting"
+        label="Confirmar antes de excluir"
         checked={confirmBeforeDelete}
         onChange={setConfirmBeforeDelete}
         help="Shows a confirmation dialog before permanently deleting chats, characters, or other items. Recommended to keep on."
@@ -1052,7 +1054,7 @@ function GeneralSettings() {
       </label>
 
       <ToggleSetting
-        label="Bold dialogue in quotes"
+        label="Diálogo em negrito entre aspas"
         checked={boldDialogue ?? true}
         onChange={setBoldDialogue}
         help={
@@ -1128,7 +1130,7 @@ function GeneralSettings() {
 
       <div className="rounded-xl bg-[var(--secondary)]/50 p-4 ring-1 ring-[var(--border)]">
         <div className="mb-3 flex flex-col gap-1">
-          <div className="text-xs font-semibold text-[var(--foreground)]">Image Generation</div>
+          <div className="text-xs font-semibold text-[var(--foreground)]">Geração de imagem</div>
           <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
             Review generated prompts before Game mode sends them, and set default canvases for generated assets.
           </p>
@@ -1181,7 +1183,7 @@ function GeneralSettings() {
           <button
             onClick={() => {
               rescanGameAssets()
-                .then(() => toast.success("Game assets rescanned."))
+                .then(() => toast.success("Assets do game reescaneados."))
                 .catch(() => toast.error("Failed to rescan game assets."));
             }}
             className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
@@ -1258,7 +1260,8 @@ function GeneralSettings() {
             )}
           >
             {assetUploading ? <Loader2 size="0.875rem" className="animate-spin" /> : <Upload size="0.875rem" />}
-            Upload to Server
+            
+            Enviar para o servidor
           </button>
           {assetFiles.length > 0 && (
             <span className="truncate text-[0.625rem] text-[var(--muted-foreground)]">
@@ -1571,7 +1574,7 @@ function AppearanceSettings() {
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-1.5">
           <Paintbrush size="0.75rem" className="text-[var(--muted-foreground)]" />
-          <span className="text-xs font-medium">Text Appearance</span>
+          <span className="text-xs font-medium">Aparência do texto</span>
           <HelpTooltip text="Customize the look of chat message text. Chat Text Color sets the default font color for all non-dialogue text. Background Opacity controls the transparency of roleplay message bubbles." />
         </div>
 
@@ -1703,7 +1706,7 @@ function AppearanceSettings() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5">
           <Image size="0.75rem" className="text-[var(--muted-foreground)]" />
-          <span className="text-xs font-medium">Roleplay Avatars</span>
+          <span className="text-xs font-medium">Avatares de roleplay</span>
           <HelpTooltip text="Choose how avatars sit next to roleplay messages. None hides message avatars. Small Circles keeps the current compact layout. Small Rectangles gives portraits a taller frame. Glued Side Panel embeds a larger portrait strip into the message bubble itself." />
         </div>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1803,7 +1806,7 @@ function AppearanceSettings() {
             </div>
             <div className="grid min-w-0 flex-1 gap-3">
               <label className="flex min-w-0 flex-col gap-1">
-                <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Message avatar scale</span>
+                <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Escala do avatar na mensagem</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="range"
@@ -1820,7 +1823,7 @@ function AppearanceSettings() {
                 </div>
               </label>
               <label className="flex min-w-0 flex-col gap-1">
-                <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Default sprite scale</span>
+                <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Escala padrão do sprite</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="range"
@@ -1872,7 +1875,7 @@ function AppearanceSettings() {
             </div>
             <div className="grid min-w-0 flex-1 gap-3">
               <label className="flex min-w-0 flex-col gap-1">
-                <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Dialogue portrait scale</span>
+                <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Escala do retrato no diálogo</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="range"
@@ -1889,7 +1892,7 @@ function AppearanceSettings() {
                 </div>
               </label>
               <label className="flex min-w-0 flex-col gap-1">
-                <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Full-body sprite scale</span>
+                <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Escala do sprite de corpo inteiro</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="range"
@@ -1913,7 +1916,7 @@ function AppearanceSettings() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5">
           <ScrollText size="0.75rem" className="text-[var(--muted-foreground)]" />
-          <span className="text-xs font-medium">Game Dialogue Display</span>
+          <span className="text-xs font-medium">Exibição de diálogo do game</span>
           <HelpTooltip text="Choose whether Game mode uses the classic VN box or shows a scrollable segment history directly above it." />
         </div>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -2617,18 +2620,19 @@ function ThemesSettings() {
         {/* Quick reference */}
         <details className="group rounded-lg bg-[var(--secondary)]/50 ring-1 ring-[var(--border)]">
           <summary className="cursor-pointer px-3 py-2 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)]">
-            CSS Variable Reference
+            
+            Referência de variáveis CSS
           </summary>
           <div className="border-t border-[var(--border)] px-3 py-2 font-mono text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
             <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
               <span>--background</span>
-              <span className="text-white/40">Page background</span>
+              <span className="text-white/40">Fundo da página</span>
               <span>--foreground</span>
               <span className="text-white/40">Main text</span>
               <span>--primary</span>
               <span className="text-white/40">Accent / buttons</span>
               <span>--primary-foreground</span>
-              <span className="text-white/40">Text on primary</span>
+              <span className="text-white/40">Texto sobre primária</span>
               <span>--secondary</span>
               <span className="text-white/40">Cards / inputs</span>
               <span>--card</span>
@@ -2646,7 +2650,7 @@ function ThemesSettings() {
               <span>--popover</span>
               <span className="text-white/40">Dropdown bg</span>
               <span>--accent</span>
-              <span className="text-white/40">Hover highlights</span>
+              <span className="text-white/40">Destaques ao passar o mouse</span>
             </div>
           </div>
         </details>
@@ -2682,7 +2686,7 @@ function ThemesSettings() {
 
       {/* Active theme: None option */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium">Installed Themes</span>
+        <span className="text-xs font-medium">Temas instalados</span>
         <button
           onClick={() =>
             setActiveTheme.mutate(null, {
@@ -2762,7 +2766,7 @@ function ThemesSettings() {
                     toast.success(`Theme "${t.name}" removed`);
                   } catch (err) {
                     console.error("[ThemesSettings] Failed to remove theme:", err);
-                    toast.error("Failed to remove theme.");
+                    toast.error("Falha ao remover o tema.");
                   }
                 })();
               }}
@@ -2903,7 +2907,7 @@ function ExtensionsSettings() {
 
       {/* Extension list */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium">Installed Extensions</span>
+        <span className="text-xs font-medium">Extensões instaladas</span>
 
         {extensionList.map((ext) => (
           <div
@@ -2936,7 +2940,7 @@ function ExtensionsSettings() {
             <button
               onClick={() => deleteExtension.mutate(ext.id)}
               className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
-              title="Remove extension"
+              title="Remover extensão"
             >
               <Trash2 size="0.6875rem" />
             </button>
@@ -3600,7 +3604,7 @@ function ImportButton({
         if (onImported) {
           onImported(data);
         } else {
-          toast.success("Imported successfully!");
+          toast.success("Importado com sucesso!");
         }
       } else {
         toast.error(`Import failed: ${data.error ?? "Unknown error"}`);
@@ -4012,7 +4016,8 @@ function AdvancedSettings() {
             ) : (
               <>
                 <RefreshCw size="0.8125rem" />
-                Check for Updates
+                
+                Verificar atualizações
               </>
             )}
           </button>
@@ -4329,7 +4334,7 @@ function AdvancedSettings() {
         help="Combines multiple messages from the same sender into a visual group, reducing clutter in the chat."
       />
       <ToggleSetting
-        label="Show message timestamps"
+        label="Mostrar horários das mensagens"
         checked={showTimestamps}
         onChange={setShowTimestamps}
         help="Displays the date and time each message was sent next to it in the chat."
@@ -4347,7 +4352,7 @@ function AdvancedSettings() {
         help="Displays prompt and completion token counts on each AI message. Useful for monitoring context size and cost."
       />
       <ToggleSetting
-        label="Show message numbers"
+        label="Mostrar números das mensagens"
         checked={showMessageNumbers}
         onChange={setShowMessageNumbers}
         help="Displays message numbers in roleplay and conversation chats."
@@ -4381,7 +4386,8 @@ function AdvancedSettings() {
           {creatingBackup ? (
             <>
               <Loader2 size="0.8125rem" className="animate-spin" />
-              Creating backup…
+              
+              Criando backup…
             </>
           ) : (
             <>
@@ -4409,7 +4415,7 @@ function AdvancedSettings() {
         </button>
         {backups && backups.length > 0 && (
           <div className="flex flex-col gap-1 mt-1">
-            <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Existing backups</span>
+            <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Backups existentes</span>
             {backups.map((b) => (
               <div
                 key={b.name}

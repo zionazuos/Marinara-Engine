@@ -724,7 +724,7 @@ export function CharacterEditor() {
         type="button"
         onClick={() => setExportDialogOpen(true)}
         className={headerActionButtonClass}
-        title="Export character"
+        title="Exportar personagem"
       >
         <svg width="1rem" height="1rem" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -758,7 +758,7 @@ export function CharacterEditor() {
           if (!characterId) return;
           duplicateCharacter.mutate(characterId, {
             onSuccess: () => {
-              toast.success("Character duplicated");
+              toast.success("Personagem duplicado");
             },
           });
         }}
@@ -772,7 +772,7 @@ export function CharacterEditor() {
         type="button"
         onClick={handleDelete}
         className="rounded-xl p-2 text-[var(--muted-foreground)] transition-all hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)] max-md:rounded-lg max-md:p-1.5"
-        title="Delete character"
+        title="Excluir personagem"
       >
         <Trash2 size="1rem" />
       </button>
@@ -783,7 +783,7 @@ export function CharacterEditor() {
     <div className="flex flex-1 flex-col overflow-hidden bg-[var(--background)]">
       <ExportFormatDialog
         open={exportDialogOpen}
-        title="Export Character"
+        title="Exportar personagem"
         description="Native keeps Marinara metadata. Compatible exports direct Chara Card V2 JSON for other platforms."
         compatibleDescription="Exports direct Chara Card V2 JSON without the Marinara wrapper."
         showPngOption
@@ -848,7 +848,7 @@ export function CharacterEditor() {
                   setAvatarGeneratorOpen(true);
                 }}
                 className="absolute right-0.5 top-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--card)]/95 text-[var(--primary)] opacity-0 shadow-md ring-1 ring-[var(--border)] transition-opacity hover:bg-[var(--card)] group-hover:opacity-100 max-md:opacity-100"
-                title="Generate avatar"
+                title="Gerar avatar"
               >
                 <Wand2 size="0.75rem" />
               </button>
@@ -1131,7 +1131,7 @@ function CharacterDescriptionTab({
       <div>
         <div className="mb-4 flex items-start justify-between gap-2">
           <div>
-            <h3 className="text-sm font-semibold">Description Extensions</h3>
+            <h3 className="text-sm font-semibold">Extensões de descrição</h3>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
               Toggleable additions appended to this character's main description. Use these for situational states,
               relationships, combat details, or story-phase context.
@@ -1191,7 +1191,7 @@ function CharacterDescriptionTab({
                     type="button"
                     onClick={() => removeAltDesc(desc.id)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                    title="Remove extension"
+                    title="Remover extensão"
                   >
                     <X size="0.75rem" />
                   </button>
@@ -1580,7 +1580,8 @@ function CharacterVersionHistoryPanel({
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
           <History size="0.75rem" />
-          Version history
+          
+          Histórico de versões
         </span>
         <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
           {isLoading ? "Loading" : `${versions.length} saved`}
@@ -1617,7 +1618,7 @@ function CharacterVersionHistoryPanel({
                 onClick={() => handleRestore(version)}
                 disabled={restoreVersion.isPending || deleteVersion.isPending}
                 className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-50"
-                title="Restore this version"
+                title="Restaurar esta versão"
               >
                 {restoreVersion.isPending ? (
                   <Loader2 size="0.75rem" className="animate-spin" />
@@ -1711,7 +1712,8 @@ function CharacterVersionHistoryPanel({
                 ) : (
                   <RotateCcw size="0.75rem" />
                 )}
-                Restore this version
+                
+                Restaurar esta versão
               </button>
             </div>
           </div>
@@ -1750,7 +1752,7 @@ function DialogueTab({
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Dialogue & Greetings"
+        title="Diálogo e saudações"
         subtitle="First message, example dialogue, and alternate greetings."
       />
 
@@ -1830,7 +1832,8 @@ function DialogueTab({
       <label className="block space-y-1.5">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-            Example Dialogue{" "}
+            
+            Exemplo de diálogo{" "}
             <HelpTooltip text="Sample conversations showing how the character talks. Helps the AI learn the character's speaking style, vocabulary, and mannerisms." />
           </span>
           <button
@@ -1865,7 +1868,7 @@ function DialogueTab({
       <ExpandedTextarea
         open={expandedField === "mes_example"}
         onClose={() => setExpandedField(null)}
-        title="Example Dialogue"
+        title="Exemplo de diálogo"
         value={formData.mes_example}
         onChange={(value) => updateField("mes_example", value)}
         placeholder={"<START>\n{{user}}: Hello!\n{{char}}: *waves excitedly* Hey there!"}
@@ -2070,7 +2073,7 @@ function CharacterGalleryTab({ characterId, characterName }: { characterId: stri
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Character Gallery"
+        title="Galeria de personagens"
         subtitle="Keep reference art, alternate outfits, and other character images attached to this character even if chats get deleted."
       />
 
@@ -2139,7 +2142,7 @@ function CharacterGalleryTab({ characterId, characterName }: { characterId: stri
         <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-[var(--border)] py-12 text-center">
           <Camera size="1.75rem" className="text-[var(--muted-foreground)]/40" />
           <div>
-            <p className="text-sm font-medium text-[var(--muted-foreground)]">No character images yet</p>
+            <p className="text-sm font-medium text-[var(--muted-foreground)]">Nenhuma imagem de personagem ainda</p>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]/60">
               Upload images here to keep them tied to {characterName || "this character"} instead of a specific chat.
             </p>
@@ -2537,7 +2540,7 @@ function SpritesTab({
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Character Sprites"
+        title="Sprites do personagem"
         subtitle="Upload VN-style sprites for different expressions. The Expression Engine agent will select the appropriate sprite during roleplay."
       />
 
@@ -2598,7 +2601,8 @@ function SpritesTab({
               }
             >
               <Wand2 size="0.8125rem" />
-              Generate Sprite
+              
+              Gerar sprite
             </button>
             <button
               type="button"
@@ -2668,7 +2672,7 @@ function SpritesTab({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 rounded-lg bg-[var(--secondary)]/60 px-3 py-2">
-          <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Cleanup strength</span>
+          <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Força da limpeza</span>
           <span className="text-[0.625rem] text-[var(--muted-foreground)]">Suave</span>
           <input
             type="range"
@@ -2883,7 +2887,7 @@ function SpritesTab({
 
       {/* Info card */}
       <div className="rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
-        <h4 className="mb-1.5 text-xs font-semibold">How sprites work</h4>
+        <h4 className="mb-1.5 text-xs font-semibold">Como os sprites funcionam</h4>
         <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
           <li>
             • Upload sprites one by one, or use <strong className="text-[var(--foreground)]">Upload Folder</strong> to
@@ -2894,7 +2898,7 @@ function SpritesTab({
             happy_01.png and happy_blush.png are offered to the agent as "happy"
           </li>
           <li>
-            • Enable the <strong className="text-[var(--foreground)]">Expression Engine</strong> agent in the Agents
+            • Enable the <strong className="text-[var(--foreground)]">Motor de expressões</strong> agent in the Agents
             panel
           </li>
           <li>• During roleplay, the agent will detect emotions and display the matching sprite</li>
@@ -3032,7 +3036,7 @@ function StatsTab({
           className="h-4 w-4 rounded accent-purple-500"
         />
         <div>
-          <p className="text-sm font-medium">Enable RPG Stats</p>
+          <p className="text-sm font-medium">Ativar atributos de RPG</p>
           <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
             Stats will be injected into the prompt and tracked by the Character Tracker agent.
           </p>
@@ -3163,7 +3167,7 @@ function ColorsTab({
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Character Colors"
+        title="Cores do personagem"
         subtitle="Customize how this character appears in chats. Colors are applied to the name, dialogue, and message bubble."
       />
 
@@ -3254,7 +3258,7 @@ function ColorsTab({
 
       {/* Info */}
       <div className="rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
-        <h4 className="mb-1.5 text-xs font-semibold">How colors work</h4>
+        <h4 className="mb-1.5 text-xs font-semibold">Como as cores funcionam</h4>
         <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
           <li>
             &bull; <strong className="text-[var(--foreground)]">Name color</strong> — Applied to the character&apos;s
@@ -3359,7 +3363,8 @@ function LorebookTab({ characterId, formData }: { characterId: string | null; fo
               className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--primary)]/15 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/25"
             >
               <Library size="0.75rem" />
-              Edit Linked Lorebook
+              
+              Editar lorebook vinculado
             </button>
           )}
           <span className="text-[0.6875rem] text-[var(--muted-foreground)]">

@@ -51,10 +51,11 @@ export function SceneBanner({ variant, sceneChatId, sceneChatName, originChatId,
               background: "var(--muted)",
               color: "var(--muted-foreground)",
             }}
-            title="Return to conversation"
+            title="Voltar para a conversa"
           >
             <ArrowLeft size={12} />
-            Back to conversation
+            
+            Voltar para a conversa
           </button>
         )}
       </div>
@@ -74,7 +75,8 @@ export function SceneBanner({ variant, sceneChatId, sceneChatName, originChatId,
       <Film size={18} className="shrink-0" style={{ color: "var(--primary)" }} />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium" style={{ color: "var(--card-foreground)" }}>
-          A scene is in progress
+          
+          Uma cena está em andamento
         </p>
         {sceneChatName && (
           <p className="truncate text-xs" style={{ color: "var(--muted-foreground)" }}>
@@ -90,7 +92,7 @@ export function SceneBanner({ variant, sceneChatId, sceneChatName, originChatId,
             background: "var(--primary)",
             color: "var(--primary-foreground)",
           }}
-          title="Go to the active scene"
+          title="Ir para a cena ativa"
         >
           Go to Scene
           <ArrowRight size={12} />
@@ -154,10 +156,11 @@ export function EndSceneBar({
             color: "var(--card-foreground)",
             border: "1px solid var(--border)",
           }}
-          title="Return to conversation"
+          title="Voltar para a conversa"
         >
           <ArrowLeft size={12} />
-          Back to conversation
+          
+          Voltar para a conversa
         </button>
       )}
       {!confirmEnd && (
@@ -180,7 +183,7 @@ export function EndSceneBar({
       )}
       {confirmEnd && (
         <div className="flex items-center gap-1.5">
-          <span className="text-[0.6875rem] text-[var(--foreground)]">End and save summary?</span>
+          <span className="text-[0.6875rem] text-[var(--foreground)]">Encerrar e salvar o resumo?</span>
           <button
             onClick={handleConfirmEnd}
             disabled={isEnding}

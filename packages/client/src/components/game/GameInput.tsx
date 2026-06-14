@@ -430,7 +430,7 @@ export function GameInput({
               <button
                 onClick={onClearPendingMove}
                 className="shrink-0 text-sky-100/60 transition-colors hover:text-sky-100"
-                title="Clear destination"
+                title="Limpar destino"
               >
                 ✕
               </button>
@@ -563,7 +563,7 @@ export function GameInput({
               type="button"
               onClick={() => setQueuedDice(null)}
               className="ml-1 text-[var(--muted-foreground)]/60 transition-colors hover:text-[var(--foreground)]"
-              title="Clear queued roll"
+              title="Limpar rolagem na fila"
             >
               ✕
             </button>
@@ -636,7 +636,7 @@ export function GameInput({
                 ? "text-[var(--foreground)]/50 hover:bg-foreground/10 hover:text-[var(--foreground)]/70"
                 : "text-[var(--muted-foreground)]/40",
             )}
-            title="Translate draft"
+            title="Traduzir rascunho"
           >
             {isTranslatingDraft ? <Loader2 size={18} className="animate-spin" /> : <Languages size={18} />}
           </button>

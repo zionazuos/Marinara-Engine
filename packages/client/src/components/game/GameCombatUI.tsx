@@ -1128,8 +1128,8 @@ export function GameCombatUI({
               type="button"
               onClick={stopCombatVoicePlayback}
               className="inline-flex h-6 w-6 items-center justify-center rounded-full text-sky-100 transition-colors hover:bg-white/10"
-              title="Stop combat voice-over"
-              aria-label="Stop combat voice-over"
+              title="Parar narração de combate"
+              aria-label="Parar narração de combate"
             >
               <VolumeX size={12} />
             </button>
@@ -1139,8 +1139,8 @@ export function GameCombatUI({
             type="button"
             onClick={() => playCombatVoiceKeys(playableCombatVoiceKeys)}
             className="inline-flex h-6 w-6 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-sky-100 disabled:cursor-not-allowed disabled:opacity-40"
-            title="Play combat voice-over"
-            aria-label="Play combat voice-over"
+            title="Reproduzir narração de combate"
+            aria-label="Reproduzir narração de combate"
             disabled={playableCombatVoiceKeys.length === 0}
           >
             <Play size={12} />
@@ -3007,7 +3007,7 @@ function CombatantCard({
             <button
               key={`${buildCombatDialogueLineKey(line)}-${index}`}
               type="button"
-              title="Dismiss dialogue"
+              title="Dispensar diálogo"
               onClick={(event) => {
                 event.stopPropagation();
                 onDismissDialogue(line);

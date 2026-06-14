@@ -343,7 +343,8 @@ export function ChoiceSelectionModal({
                 />
               </button>
               <Save size="0.75rem" />
-              Save as default
+              
+              Salvar como padrão
             </label>
             <div className="flex gap-2">
               <button

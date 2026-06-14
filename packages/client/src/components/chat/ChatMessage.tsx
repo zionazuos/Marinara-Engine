@@ -1958,7 +1958,7 @@ export const ChatMessage = memo(function ChatMessage({
                 <ActionBtn
                   icon={<ScrollText size={MESSAGE_ACTION_ICON_SIZE} />}
                   onClick={() => setShowGenerationReplay(true)}
-                  title="Stored guidance"
+                  title="Orientação armazenada"
                   dark
                 />
               )}
@@ -1974,7 +1974,7 @@ export const ChatMessage = memo(function ChatMessage({
                 <ActionBtn
                   icon={<GitBranch size={MESSAGE_ACTION_ICON_SIZE} />}
                   onClick={() => onBranch(message.id)}
-                  title="Branch from here"
+                  title="Ramificar a partir daqui"
                   dark
                 />
               )}
@@ -2014,7 +2014,7 @@ export const ChatMessage = memo(function ChatMessage({
                       <ActionBtn
                         icon={<RefreshCw size={MESSAGE_ACTION_ICON_SIZE} />}
                         onClick={handleRestartTTS}
-                        title="Restart speaking"
+                        title="Reiniciar fala"
                         className="text-sky-400 hover:text-sky-300"
                         dark
                       />
@@ -2381,7 +2381,7 @@ export const ChatMessage = memo(function ChatMessage({
               <ActionBtn
                 icon={<ScrollText size={MESSAGE_ACTION_ICON_SIZE} />}
                 onClick={() => setShowGenerationReplay(true)}
-                title="Stored guidance"
+                title="Orientação armazenada"
               />
             )}
             {thinking && !isUser && (
@@ -2395,7 +2395,7 @@ export const ChatMessage = memo(function ChatMessage({
               <ActionBtn
                 icon={<GitBranch size={MESSAGE_ACTION_ICON_SIZE} />}
                 onClick={() => onBranch(message.id)}
-                title="Branch from here"
+                title="Ramificar a partir daqui"
               />
             )}
             {onCloneSceneFromHere && (
@@ -2442,7 +2442,7 @@ export const ChatMessage = memo(function ChatMessage({
                     <ActionBtn
                       icon={<RefreshCw size={MESSAGE_ACTION_ICON_SIZE} />}
                       onClick={handleRestartTTS}
-                      title="Restart speaking"
+                      title="Reiniciar fala"
                       className="text-sky-500"
                     />
                   </>

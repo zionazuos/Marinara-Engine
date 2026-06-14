@@ -17,7 +17,7 @@ export function ConversationSoundSetting() {
         <HelpTooltip text="Play a notification ping when you receive a new message while on a different chat." />
       </div>
       <ToggleSetting
-        label="Conversation mode"
+        label="Modo conversa"
         checked={convoNotificationSound}
         onChange={(v) => {
           setConvoNotificationSound(v);

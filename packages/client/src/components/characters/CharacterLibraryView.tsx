@@ -357,10 +357,12 @@ export function CharacterLibraryView() {
             </button>
             <div className="min-w-0">
               <p className="text-[0.625rem] font-semibold uppercase tracking-[0.28em] text-[var(--muted-foreground)]">
-                Character Library
+                
+                Biblioteca de personagens
               </p>
               <h1 className="truncate text-base font-semibold text-[var(--foreground)] md:text-2xl">
-                Browse your characters
+                
+                Navegar pelos seus personagens
               </h1>
               <p className="text-xs text-[var(--muted-foreground)] md:text-sm">
                 {filteredCharacters.length} out of {parsedCharacters.length} card
@@ -435,7 +437,7 @@ export function CharacterLibraryView() {
                 <option value="name-desc">Nome Z-A</option>
                 <option value="newest">Mais recentes</option>
                 <option value="oldest">Mais antigos</option>
-                <option value="favorites">Favorites first</option>
+                <option value="favorites">Favoritos primeiro</option>
               </select>
               <ArrowUpDown
                 size="0.6875rem"
@@ -462,7 +464,7 @@ export function CharacterLibraryView() {
                 <User size="1.5rem" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-[var(--foreground)]">No matching characters</h2>
+                <h2 className="text-lg font-semibold text-[var(--foreground)]">Nenhum personagem correspondente</h2>
                 <p className="mt-1 max-w-md text-sm text-[var(--muted-foreground)]">
                   Try a different search, turn off favorites-only, or import a new card into the library.
                 </p>

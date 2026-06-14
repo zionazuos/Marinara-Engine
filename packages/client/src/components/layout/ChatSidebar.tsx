@@ -1217,7 +1217,8 @@ export function ChatSidebar() {
                 className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-xs font-medium ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] active:scale-[0.98]"
               >
                 <Trash2 size="0.8125rem" />
-                Delete This Branch Only
+                
+                Excluir apenas esta ramificação
               </button>
               <button
                 onClick={() => {
@@ -1338,7 +1339,8 @@ export function ChatSidebar() {
             className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs transition-all hover:bg-[var(--accent)] disabled:opacity-40"
           >
             <Download size="0.75rem" className="text-[var(--muted-foreground)]" />
-            All chats as JSONL zip
+            
+            Todos os chats como zip JSONL
           </button>
           <button
             type="button"
@@ -1347,7 +1349,8 @@ export function ChatSidebar() {
             className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs transition-all hover:bg-[var(--accent)] disabled:opacity-40"
           >
             <Download size="0.75rem" className="text-[var(--muted-foreground)]" />
-            All chats as text zip
+            
+            Todos os chats como zip de texto
           </button>
         </div>
       </Modal>
@@ -1564,8 +1567,8 @@ function UserStatusFooter() {
         <button
           onClick={() => setOpen((v) => !v)}
           className="flex min-w-0 shrink-0 items-center gap-2 rounded-lg px-2 py-1.5 transition-all hover:bg-[var(--sidebar-accent)]/60"
-          title="Change activity status"
-          aria-label="Change activity status"
+          title="Alterar status de atividade"
+          aria-label="Alterar status de atividade"
         >
           <span className={`h-2 w-2 shrink-0 rounded-full ${current.color}`} />
           <span className="max-w-20 truncate text-xs text-[var(--sidebar-foreground)]">{current.label}</span>

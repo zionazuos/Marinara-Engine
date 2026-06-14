@@ -34,7 +34,8 @@ function WorldInfoLoadingFallback() {
   return (
     <div className="flex items-center gap-2 py-4 text-xs text-[var(--muted-foreground)]">
       <Loader2 size="0.75rem" className="animate-spin" />
-      Loading world info...
+      
+      Carregando info do mundo...
     </div>
   );
 }

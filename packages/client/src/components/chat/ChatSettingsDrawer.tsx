@@ -1557,7 +1557,7 @@ export function ChatSettingsDrawer({
           )}
         >
           <div className="flex-1 min-w-0">
-            <span className="text-[0.6875rem] font-medium">Enable Memory Recall</span>
+            <span className="text-[0.6875rem] font-medium">Ativar recuperação de memória</span>
             <p className="text-[0.625rem] text-[var(--muted-foreground)]">
               Recall relevant fragments from earlier in this chat and inject them as context.
             </p>
@@ -1863,7 +1863,7 @@ export function ChatSettingsDrawer({
                   <button
                     onClick={() => setChoiceModalPresetId(chat.promptPresetId!)}
                     className="shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                    title="Edit preset variables"
+                    title="Editar variáveis do preset"
                   >
                     <Pencil size="0.8125rem" />
                   </button>
@@ -1957,7 +1957,7 @@ export function ChatSettingsDrawer({
                       updateMeta.mutate({ id: chat.id, sceneSystemPrompt: scenePromptDraft });
                     }
                   }}
-                  placeholder="Scene system prompt..."
+                  placeholder="Prompt de sistema da cena..."
                   rows={6}
                   className="w-full resize-y rounded-lg bg-[var(--secondary)] px-3 py-2 pr-8 text-xs leading-relaxed outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                 />
@@ -1980,7 +1980,7 @@ export function ChatSettingsDrawer({
                 title="Scene Instructions"
                 value={scenePromptDraft}
                 onChange={setScenePromptDraft}
-                placeholder="Scene system prompt..."
+                placeholder="Prompt de sistema da cena..."
               />
             </Section>
           )}
@@ -2023,7 +2023,7 @@ export function ChatSettingsDrawer({
                           </div>
                         </>
                       ) : (
-                        <span className="flex-1 truncate text-xs text-[var(--muted-foreground)]">Unknown persona</span>
+                        <span className="flex-1 truncate text-xs text-[var(--muted-foreground)]">Persona desconhecida</span>
                       );
                     })()}
                     <button
@@ -2035,7 +2035,7 @@ export function ChatSettingsDrawer({
                     </button>
                   </div>
                 ) : (
-                  <p className="text-[0.6875rem] text-[var(--muted-foreground)]">No persona selected.</p>
+                  <p className="text-[0.6875rem] text-[var(--muted-foreground)]">Nenhuma persona selecionada.</p>
                 )}
 
                 {!showPersonaPicker ? (
@@ -2128,7 +2128,7 @@ export function ChatSettingsDrawer({
               </div>
 
               <div className="mt-2 space-y-1.5">
-                <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Party Characters</label>
+                <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Personagens do grupo</label>
                 {chatCharIds.length === 0 ? (
                   <p className="text-[0.6875rem] text-[var(--muted-foreground)]">No characters in party yet.</p>
                 ) : (
@@ -2197,7 +2197,7 @@ export function ChatSettingsDrawer({
                   }}
                   className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)]/40 hover:text-[var(--primary)]"
                 >
-                  <Plus size="0.75rem" /> Add Character to Party
+                  <Plus size="0.75rem" />  Adicionar personagem ao grupo
                 </button>
               ) : (
                 <PickerDropdown
@@ -2278,7 +2278,7 @@ export function ChatSettingsDrawer({
                         </div>
                       </>
                     ) : (
-                      <span className="flex-1 truncate text-xs text-[var(--muted-foreground)]">Unknown persona</span>
+                      <span className="flex-1 truncate text-xs text-[var(--muted-foreground)]">Persona desconhecida</span>
                     );
                   })()}
                   <button
@@ -2290,7 +2290,7 @@ export function ChatSettingsDrawer({
                   </button>
                 </div>
               ) : (
-                <p className="text-[0.6875rem] text-[var(--muted-foreground)]">No persona selected.</p>
+                <p className="text-[0.6875rem] text-[var(--muted-foreground)]">Nenhuma persona selecionada.</p>
               )}
 
               {/* Persona picker */}
@@ -2595,7 +2595,7 @@ export function ChatSettingsDrawer({
                     search=""
                     onSearchChange={() => {}}
                     onClose={() => setShowGroupPicker(false)}
-                    placeholder="Select a group…"
+                    placeholder="Selecionar um grupo…"
                   >
                     {((characterGroups ?? []) as CharacterGroup[]).map((group) => {
                       const rawIds = group.characterIds ?? [];
@@ -2894,7 +2894,7 @@ export function ChatSettingsDrawer({
                         updateMeta.mutate({ id: chat.id, groupScenarioText: groupScenarioDraft });
                       }
                     }}
-                    title="Group Scenario Override"
+                    title="Substituição de cenário do grupo"
                     value={groupScenarioDraft}
                     onChange={setGroupScenarioDraft}
                     placeholder="Replace individual character scenarios with a shared scenario for this group chat or leave empty to keep them…"
@@ -2907,7 +2907,7 @@ export function ChatSettingsDrawer({
           {/* Autonomous Messaging — conversation mode only */}
           {isConversation && (
             <Section
-              label="Autonomous Messaging"
+              label="Mensagens autônomas"
               icon={<Bot size="0.875rem" />}
               help="Characters can message you unprompted based on their personality, your status, and optional schedules. Chatty characters will reach out sooner when you're inactive."
             >
@@ -3249,7 +3249,7 @@ export function ChatSettingsDrawer({
           {/* Cross-Chat Awareness — conversation mode only */}
           {isConversation && (
             <Section
-              label="Cross-Chat Awareness"
+              label="Consciência entre chats"
               icon={<Link size="0.875rem" />}
               help="Characters remember and reference conversations from other chats they're in. Pulls recent messages from sibling chats and injects them as context."
             >
@@ -3268,7 +3268,7 @@ export function ChatSettingsDrawer({
                 )}
               >
                 <div className="flex-1 min-w-0">
-                  <span className="text-xs font-medium">Cross-Chat Awareness</span>
+                  <span className="text-xs font-medium">Consciência entre chats</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                     Characters know what happens in their other chats
                   </p>
@@ -3367,7 +3367,7 @@ export function ChatSettingsDrawer({
           {/* Connected Conversation — roleplay mode: linked OOC chat + optional in-world DM command */}
           {isRoleplayMode && (
             <Section
-              label="Connected Conversation"
+              label="Conversa conectada"
               icon={<ArrowRightLeft size="0.875rem" />}
               help={
                 'Link to an OOC conversation, and optionally let roleplay characters open direct-message conversations with `[dm: character="Name" message="text"]` when it naturally fits the scene.'
@@ -3447,7 +3447,7 @@ export function ChatSettingsDrawer({
           {/* Connected Conversation — game mode: show linked OOC chat */}
           {isGame && chat.connectedChatId && (
             <Section
-              label="Connected Conversation"
+              label="Conversa conectada"
               icon={<ArrowRightLeft size="0.875rem" />}
               help="Linked to a conversation. `<influence>` tags from the conversation steer the next turn here (one-shot, then consumed). `<note>` tags persist on every turn until cleared. Raw conversation messages are not injected — use `<note>` for facts this chat should keep remembering."
             >
@@ -3481,7 +3481,7 @@ export function ChatSettingsDrawer({
           {/* Connect to Conversation — game mode without existing link */}
           {chatMode === "game" && !chat.connectedChatId && (
             <Section
-              label="Connected Conversation"
+              label="Conversa conectada"
               icon={<ArrowRightLeft size="0.875rem" />}
               help="Link this game to an OOC conversation. The conversation character uses `<influence>` (one-shot) or `<note>` (durable) to bridge content into the game; raw conversation messages are not injected. Game events and roleplay moments flow back into the conversation automatically."
             >
@@ -3493,7 +3493,7 @@ export function ChatSettingsDrawer({
                   }}
                   className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)]/40 hover:text-[var(--primary)]"
                 >
-                  <Plus size="0.75rem" /> Link to Conversation
+                  <Plus size="0.75rem" />  Vincular à conversa
                 </button>
               ) : (
                 <PickerDropdown
@@ -3537,7 +3537,8 @@ export function ChatSettingsDrawer({
           >
             <div className="mb-2 rounded-lg bg-[var(--secondary)]/70 p-3 ring-1 ring-[var(--border)]">
               <label className="mb-1.5 flex items-center gap-1 text-xs font-medium">
-                Lorebook Token Budget{" "}
+                
+                Orçamento de tokens do lorebook{" "}
                 <HelpTooltip
                   text={`Context cap for activated lorebook retrievals in this chat. Default: ${LIMITS.DEFAULT_LOREBOOK_TOKEN_BUDGET}. Set to 0 for unlimited.`}
                 />
@@ -3750,7 +3751,7 @@ export function ChatSettingsDrawer({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 text-xs font-medium">
                         <BookOpen size="0.75rem" className="text-[var(--primary)]" />
-                        <span>Game Lorebook Keeper</span>
+                        <span>Guardião de lorebook do game</span>
                       </div>
                       <p className="mt-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
                         Updates a game-scoped lorebook after End Session finishes and attaches it only to this game.
@@ -3935,7 +3936,7 @@ export function ChatSettingsDrawer({
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 text-[0.6875rem] font-medium">
                           <BookOpen size="0.75rem" className="text-[var(--primary)]" />
-                          <span>Lorebook Keeper</span>
+                          <span>Guardião de lorebook</span>
                         </div>
                         <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
                           Pick a chat-specific target lorebook and optionally keep Lorebook Keeper a few assistant
@@ -3953,13 +3954,13 @@ export function ChatSettingsDrawer({
                         )}
                       >
                         <RefreshCw size="0.75rem" className={cn(agentProcessing && "animate-spin")} />
-                        <span>Backfill Unprocessed</span>
+                        <span>Preencher não processados</span>
                       </button>
                     </div>
 
                     <div className="grid gap-2 sm:grid-cols-2">
                       <label className="flex min-w-0 flex-col gap-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                        <span className="font-medium text-[var(--foreground)]">Target Lorebook</span>
+                        <span className="font-medium text-[var(--foreground)]">Lorebook de destino</span>
                         <select
                           value={lorebookKeeperTargetLorebookId}
                           onChange={(e) =>
@@ -4379,7 +4380,7 @@ export function ChatSettingsDrawer({
                     )}
                   >
                     <div>
-                      <span className="text-[0.6875rem] font-medium">Manual Trackers</span>
+                      <span className="text-[0.6875rem] font-medium">Rastreadores manuais</span>
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                         {metadata.manualTrackers
                           ? "Trackers won't run automatically — use the button in the HUD to trigger them."
@@ -4418,7 +4419,7 @@ export function ChatSettingsDrawer({
                     >
                       <div className="flex-1 min-w-0">
                         <span className="text-[0.6875rem] font-medium flex items-center gap-1.5">
-                          <Vibrate size="0.75rem" /> Love Toys Control
+                          <Vibrate size="0.75rem" />  Controle de brinquedos íntimos
                         </span>
                         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                           Control connected intimate toys based on narrative content
@@ -4467,7 +4468,7 @@ export function ChatSettingsDrawer({
                     >
                       <div className="flex-1 min-w-0">
                         <span className="text-[0.6875rem] font-medium flex items-center gap-1.5">
-                          <Image size="0.75rem" /> Image Generation
+                          <Image size="0.75rem" />  Geração de imagem
                         </span>
                         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                           Auto-generate NPC portraits and location backgrounds during gameplay.
@@ -4789,7 +4790,7 @@ export function ChatSettingsDrawer({
                                           >
                                             <span className="flex min-w-0 items-center gap-1.5">
                                               <Brain size="0.625rem" className="shrink-0 text-[var(--primary)]" />
-                                              <span className="truncate font-medium">Secret Plot tab</span>
+                                              <span className="truncate font-medium">Aba de enredo secreto</span>
                                             </span>
                                             <span
                                               className={cn(
@@ -4933,7 +4934,7 @@ export function ChatSettingsDrawer({
           {/* Automatic Summarization — conversation mode only. Opens a modal to edit per-day and per-week summaries. */}
           {isConversation && (
             <Section
-              label="Automatic Summarization"
+              label="Resumo automático"
               icon={<CalendarClock size="0.875rem" />}
               help="To help keep the request context low, the conversation is automatically summarized. Each day is wrapped up into a day summary. Likewise, day summaries are combined into week summaries. Chat messages that have been summarized are not added to context. Only the week summaries, the day summaries of the current week and today's messages are added to the context. This feature currently can't be disabled."
             >
@@ -4955,7 +4956,7 @@ export function ChatSettingsDrawer({
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <Clock size="0.75rem" className="text-[var(--primary)]" />
-                    <span className="text-xs font-medium">Day Rollover Hour</span>
+                    <span className="text-xs font-medium">Hora de virada do dia</span>
                   </div>
                   <select
                     value={(metadata.dayRolloverHour as number | undefined) ?? 4}
@@ -5053,7 +5054,7 @@ export function ChatSettingsDrawer({
 
           {/* Function Calling */}
           <Section
-            label="Function Calling"
+            label="Chamada de função"
             icon={<Wrench size="0.875rem" />}
             count={activeToolIds.length}
             help="When enabled, the AI can call built-in tools like dice rolls, game state updates, and lorebook searches during conversation."
@@ -5257,7 +5258,8 @@ export function ChatSettingsDrawer({
               {/* Target Language */}
               <div>
                 <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                  Target Language
+                  
+                  Idioma de destino
                   <HelpTooltip
                     text={
                       metadata.translationProvider === "ai"
@@ -5378,7 +5380,7 @@ export function ChatSettingsDrawer({
                 )}
               >
                 <div className="flex-1 min-w-0">
-                  <span className="text-[0.6875rem] font-medium">Translate My Messages</span>
+                  <span className="text-[0.6875rem] font-medium">Traduzir minhas mensagens</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                     Translate your messages to the target language before sending.
                   </p>
@@ -5466,7 +5468,7 @@ export function ChatSettingsDrawer({
                 )}
               >
                 <div>
-                  <span className="text-xs font-medium">Limit Context Messages</span>
+                  <span className="text-xs font-medium">Limitar mensagens de contexto</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                     Only send the last N messages to the model
                   </p>
@@ -5516,7 +5518,7 @@ export function ChatSettingsDrawer({
                 )}
               >
                 <div>
-                  <span className="text-xs font-medium">Exclude Past Reasoning</span>
+                  <span className="text-xs font-medium">Excluir raciocínio anterior</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                     Keep stored thinking/reasoning metadata out of future prompts.
                   </p>
@@ -5921,7 +5923,7 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
 
     try {
       await exportMemories.mutateAsync();
-      toast.success("Memory Recall exported.");
+      toast.success("Recuperação de memória exportada.");
     } catch (err) {
       toast.error(err instanceof Error ? `Export failed: ${err.message}` : "Export failed.");
     }
@@ -5978,7 +5980,7 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Memories for This Chat" width="max-w-3xl">
+    <Modal open={open} onClose={onClose} title="Memórias deste chat" width="max-w-3xl">
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[var(--secondary)]/70 px-3 py-2 ring-1 ring-[var(--border)]">
           <div className="text-[0.6875rem] text-[var(--muted-foreground)]">
@@ -6004,8 +6006,8 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
               onClick={() => void handleExport()}
               disabled={memories.length === 0 || exportMemories.isPending}
               className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-40"
-              title="Export memories"
-              aria-label="Export memories"
+              title="Exportar memórias"
+              aria-label="Exportar memórias"
             >
               <Download size="0.8125rem" />
             </button>
@@ -6014,8 +6016,8 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
               onClick={() => importInputRef.current?.click()}
               disabled={importMemories.isPending}
               className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-40"
-              title="Import memories"
-              aria-label="Import memories"
+              title="Importar memórias"
+              aria-label="Importar memórias"
             >
               <Upload size="0.8125rem" />
             </button>
@@ -6279,7 +6281,7 @@ function ConversationPromptSection({
               <button
                 onClick={resetPrompt}
                 className="flex items-center justify-center rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-[0.625rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                title="Reset to default prompt"
+                title="Restaurar prompt padrão"
               >
                 <Trash2 size="0.625rem" />
               </button>
@@ -6347,7 +6349,8 @@ function ImpersonateSettingsContent({
             className="flex items-center gap-1 rounded-md px-1 py-0.5 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)]/70 hover:text-[var(--foreground)]"
           >
             {defaultOpen ? <ChevronDown size="0.6875rem" /> : <ChevronRight size="0.6875rem" />}
-            Built-in default
+            
+            Padrão embutido
           </button>
           {hasPromptTemplate && (
             <button
@@ -6380,7 +6383,7 @@ function ImpersonateSettingsContent({
               onChange={(e) => setPresetId(e.target.value || null)}
               className="w-full rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
             >
-              <option value="">Use chat default</option>
+              <option value="">Usar padrão do chat</option>
               {presets.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -6399,7 +6402,7 @@ function ImpersonateSettingsContent({
               onChange={(e) => setConnectionId(e.target.value || null)}
               className="w-full rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
             >
-              <option value="">Use chat default</option>
+              <option value="">Usar padrão do chat</option>
               <option value="random">Aleatório</option>
               {connections.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -6435,7 +6438,8 @@ function ImpersonateSettingsContent({
           <label className="flex min-w-0 items-center justify-between gap-3 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-[var(--accent)]/35">
             <span className="min-w-0">
               <span className="flex items-center gap-1.5 text-xs font-semibold">
-                Use CYOA as direction
+                
+                Usar CYOA como direção
                 <span onClick={(e) => e.preventDefault()}>
                   <HelpTooltip text="When enabled, clicking a CYOA option uses it as the direction for an impersonate generation instead of sending the option as a normal user message." />
                 </span>
@@ -7388,7 +7392,8 @@ function ConversationNotesSection({ chatId }: { chatId: string }) {
           </p>
         ) : notesQuery.error ? (
           <p className="rounded-lg bg-[var(--destructive)]/10 px-3 py-3 text-[0.625rem] leading-relaxed text-[var(--destructive)] ring-1 ring-[var(--destructive)]/25">
-            Failed to load notes.
+            
+            Falha ao carregar as notas.
           </p>
         ) : notes.length === 0 ? (
           <p className="rounded-lg bg-[var(--secondary)]/50 px-3 py-3 text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
@@ -7416,7 +7421,7 @@ function ConversationNotesSection({ chatId }: { chatId: string }) {
                   onClick={() => void handleDelete(note)}
                   disabled={deleteNote.isPending}
                   className="shrink-0 rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)] disabled:opacity-40"
-                  title="Delete this note"
+                  title="Excluir esta nota"
                 >
                   <Trash2 size="0.6875rem" />
                 </button>

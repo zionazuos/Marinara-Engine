@@ -1361,7 +1361,7 @@ export function ChatRoleplaySurface({
                     <button
                       onClick={onStartEncounter}
                       className="flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs text-foreground/50 transition-all hover:bg-foreground/10 hover:text-orange-300"
-                      title="Start Combat Encounter"
+                      title="Iniciar encontro de combate"
                     >
                       <Swords size="0.875rem" />
                       <span>Encounter</span>

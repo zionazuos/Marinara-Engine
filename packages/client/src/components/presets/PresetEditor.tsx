@@ -319,7 +319,7 @@ export function PresetEditor() {
   if (!data) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <p className="text-sm text-[var(--muted-foreground)]">Preset not found</p>
+        <p className="text-sm text-[var(--muted-foreground)]">Preset não encontrado</p>
       </div>
     );
   }
@@ -1448,7 +1448,7 @@ function PresetVariablesEditor({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Hash size="0.875rem" className="text-amber-400" />
-          <span className="text-sm font-semibold">Preset Variables</span>
+          <span className="text-sm font-semibold">Variáveis do preset</span>
           <span className="rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[0.5625rem] font-medium text-amber-400">
             {variables.length}
           </span>
@@ -1847,7 +1847,7 @@ function VariableCard({
                     </button>
                   </div>
                   {valueBlank && (
-                    <p className="mt-1 pl-6 text-[0.5625rem] text-[var(--destructive)]">Value cannot be empty.</p>
+                    <p className="mt-1 pl-6 text-[0.5625rem] text-[var(--destructive)]">O valor não pode ficar vazio.</p>
                   )}
                 </div>
               );
@@ -2090,7 +2090,7 @@ function SectionContentTextarea({
           <button
             onClick={() => setShowMacroRef(true)}
             className="rounded p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Macros reference"
+            title="Referência de macros"
           >
             <BookOpen size="0.75rem" />
           </button>
@@ -2278,7 +2278,7 @@ function MacrosReferenceModal({ onClose }: { onClose: () => void }) {
           <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
             <div className="flex items-center gap-2">
               <BookOpen size="1rem" className="text-purple-400" />
-              <h3 className="text-sm font-semibold">Macros Reference</h3>
+              <h3 className="text-sm font-semibold">Referência de macros</h3>
             </div>
             <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-[var(--accent)]">
               <X size="1rem" />
@@ -2443,7 +2443,7 @@ function ReviewTab({ presetId }: { presetId: string }) {
 
   return (
     <>
-      <FieldGroup label="AI Prompt Review">
+      <FieldGroup label="Revisão de prompt por IA">
         <p className="mb-3 text-xs text-[var(--muted-foreground)]">
           Have an AI analyze your prompt preset for clarity, consistency, coverage, and efficiency. This requires an
           active API connection.

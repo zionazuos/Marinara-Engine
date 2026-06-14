@@ -445,8 +445,8 @@ function MapGenerateButton({ onGenerateMap, disabled, onAfterGenerate }: MapGene
       }}
       disabled={disabled}
       className="absolute left-1.5 top-1.5 z-20 flex h-6 w-6 items-center justify-center rounded-md border border-white/15 bg-black/85 text-white/80 shadow-lg shadow-black/35 transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
-      title="Generate another map"
-      aria-label="Generate another map"
+      title="Gerar outro mapa"
+      aria-label="Gerar outro mapa"
     >
       <Wand2 size={11} />
     </button>
@@ -893,7 +893,8 @@ export function MobileMapButton({
                     onClick={handleTravel}
                     className="shrink-0 rounded-lg bg-[var(--primary)] px-3 py-1.5 text-[0.6875rem] font-semibold text-[var(--primary-foreground)] transition-colors active:opacity-80"
                   >
-                    Set destination
+                    
+                    Definir destino
                   </button>
                 )}
                 {selectedNode === currentNode?.id && (

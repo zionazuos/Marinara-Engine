@@ -501,7 +501,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
               className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-3 py-2 text-sm text-[var(--foreground)] transition-colors hover:bg-[var(--secondary)]"
             >
               <Settings2 size="0.875rem" />
-              Runtime Settings
+              
+              Configurações de runtime
               {showRuntimeSettings ? <ChevronUp size="0.875rem" /> : <ChevronDown size="0.875rem" />}
             </button>
           </div>
@@ -625,7 +626,7 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                         >
                           <option value="auto">Descarregar automaticamente</option>
                           <option value="cpu">Somente CPU</option>
-                          <option value="custom">Custom GPU layers</option>
+                          <option value="custom">Camadas de GPU personalizadas</option>
                         </select>
                         <ChevronDown
                           size="0.95rem"
@@ -845,7 +846,7 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                         </div>
                       )}
                       {!!testMessageResult.messageContent && (
-                        <ResponseBlock label="Message Content" value={testMessageResult.messageContent} />
+                        <ResponseBlock label="Conteúdo da mensagem" value={testMessageResult.messageContent} />
                       )}
                       {!!testMessageResult.reasoningContent && (
                         <ResponseBlock label="Reasoning Content" value={testMessageResult.reasoningContent} />

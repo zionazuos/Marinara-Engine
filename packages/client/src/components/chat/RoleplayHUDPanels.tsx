@@ -214,7 +214,7 @@ export function CombinedPlayerPanel({
               />
             </div>
             <div className="space-y-2">
-              {personaStats.length === 0 && <div className={EMPTY_STATE}>No stats tracked</div>}
+              {personaStats.length === 0 && <div className={EMPTY_STATE}>Nenhum atributo rastreado</div>}
               {personaStats.map((bar, idx) => (
                 <StatBarEditable
                   key={bar.name}
@@ -250,7 +250,7 @@ export function CombinedPlayerPanel({
               </span>
             </div>
             <div className="space-y-2">
-              {characters.length === 0 && <div className={EMPTY_STATE}>No characters in scene</div>}
+              {characters.length === 0 && <div className={EMPTY_STATE}>Nenhum personagem na cena</div>}
               {characters.map((char, idx) => (
                 <div key={char.characterId ?? idx} className="rounded-lg bg-[var(--muted)]/20 p-2 space-y-1">
                   <div className="flex items-center gap-1.5">
@@ -268,7 +268,7 @@ export function CombinedPlayerPanel({
                     <button
                       onClick={() => removeCharacter(idx)}
                       className="text-[var(--muted-foreground)]/40 hover:text-red-500 transition-colors shrink-0"
-                      title="Remove character"
+                      title="Remover personagem"
                     >
                       <X size="0.625rem" />
                     </button>
@@ -335,7 +335,7 @@ export function CombinedPlayerPanel({
               </button>
             </div>
             <div className="space-y-1">
-              {inventory.length === 0 && <div className={EMPTY_STATE}>Inventory empty</div>}
+              {inventory.length === 0 && <div className={EMPTY_STATE}>Inventário vazio</div>}
               {inventory.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-1.5 rounded-lg bg-[var(--muted)]/20 px-2 py-1.5">
                   <Package size="0.625rem" className="shrink-0 text-amber-400/60" />
@@ -387,7 +387,7 @@ export function CombinedPlayerPanel({
               </span>
             </div>
             <div className="space-y-2">
-              {quests.length === 0 && <div className={EMPTY_STATE}>No active quests</div>}
+              {quests.length === 0 && <div className={EMPTY_STATE}>Nenhuma missão ativa</div>}
               {quests.map((quest, idx) => (
                 <QuestCardEditable
                   key={quest.questEntryId || idx}
@@ -645,7 +645,7 @@ export function CharactersPanel({
         </div>
       </div>
       <div className="p-2 space-y-2">
-        {characters.length === 0 && <div className={cn(EMPTY_STATE, "py-2")}>No characters in scene</div>}
+        {characters.length === 0 && <div className={cn(EMPTY_STATE, "py-2")}>Nenhum personagem na cena</div>}
         {characters.map((char, idx) => (
           <div key={char.characterId ?? idx} className="rounded-lg bg-[var(--muted)]/20 p-2 space-y-1">
             <div className="flex items-center gap-1.5">
@@ -682,7 +682,7 @@ export function CharactersPanel({
               <button
                 onClick={() => removeCharacter(idx)}
                 className="text-[var(--muted-foreground)]/40 hover:text-red-500 transition-colors shrink-0"
-                title="Remove character"
+                title="Remover personagem"
               >
                 <X size="0.625rem" />
               </button>
@@ -782,7 +782,7 @@ export function InventoryPanel({ items, onUpdate }: InventoryPanelProps) {
         </button>
       </div>
       <div className="p-2 space-y-1">
-        {items.length === 0 && <div className={cn(EMPTY_STATE, "py-2")}>Inventory empty</div>}
+        {items.length === 0 && <div className={cn(EMPTY_STATE, "py-2")}>Inventário vazio</div>}
         {items.map((item, idx) => (
           <div key={idx} className="flex items-center gap-1.5 rounded-lg bg-[var(--muted)]/20 px-2 py-1.5">
             <Package size="0.625rem" className="shrink-0 text-amber-400/60" />
@@ -866,7 +866,7 @@ export function QuestsPanel({ quests, onUpdate, onRerunSingleTracker, isTrackerR
         </span>
       </div>
       <div className="p-2 space-y-2">
-        {quests.length === 0 && <div className={cn(EMPTY_STATE, "py-2")}>No active quests</div>}
+        {quests.length === 0 && <div className={cn(EMPTY_STATE, "py-2")}>Nenhuma missão ativa</div>}
         {quests.map((quest, idx) => (
           <QuestCardEditable
             key={quest.questEntryId || idx}

@@ -296,7 +296,7 @@ export function EchoChamberPanel({ hiddenOnMobile = false }: EchoChamberPanelPro
       {/* Scrollable message area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-2 pb-1.5 scrollbar-thin">
         {visibleMessages.length === 0 ? (
-          <p className="py-1.5 text-center text-[0.625rem] text-white/25">Waiting for reactions…</p>
+          <p className="py-1.5 text-center text-[0.625rem] text-white/25">Aguardando reações…</p>
         ) : (
           <div className="flex flex-col gap-0.5">
             {visibleMessages.map((msg, i) => (

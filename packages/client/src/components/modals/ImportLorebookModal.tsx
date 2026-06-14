@@ -89,7 +89,7 @@ export function ImportLorebookModal({ open, onClose }: Props) {
         reset();
         onClose();
       }}
-      title="Import Lorebook"
+      title="Importar lorebook"
     >
       <div className="flex flex-col gap-4">
         <div

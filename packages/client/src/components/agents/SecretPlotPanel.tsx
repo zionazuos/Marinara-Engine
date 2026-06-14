@@ -292,7 +292,7 @@ export function SecretPlotPanel({
       {open && (
         <div className="border-t border-[var(--border)] px-2 pb-2 pt-1.5">
           {isLoading && (
-            <p className="py-3 text-center text-[0.625rem] text-[var(--muted-foreground)]">Loading plot state...</p>
+            <p className="py-3 text-center text-[0.625rem] text-[var(--muted-foreground)]">Carregando estado do enredo...</p>
           )}
           {isError && (
             <p className="rounded-lg border border-[var(--destructive)]/25 bg-[var(--destructive)]/10 px-3 py-2 text-center text-[0.625rem] text-[var(--destructive)]">
@@ -319,7 +319,8 @@ export function SecretPlotPanel({
                       )}
                     />
                     <span className="truncate text-[0.625rem] font-semibold text-[var(--popover-foreground)]">
-                      Scene direction
+                      
+                      Direção da cena
                     </span>
                     {draft.staleDetected && (
                       <span className="rounded bg-[var(--secondary)]/55 px-1 py-0.5 text-[0.5rem] text-[var(--muted-foreground)]">
@@ -337,7 +338,7 @@ export function SecretPlotPanel({
                         ? "Re-run scene directions for this turn but keep the current arc"
                         : "No assistant message yet"
                     }
-                    aria-label="Re-run scene directions"
+                    aria-label="Reexecutar direções da cena"
                     className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]/55 hover:text-[var(--accent-foreground)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:opacity-40 max-md:h-7 max-md:w-7"
                   >
                     <RefreshCw size="0.625rem" className={cn(turnRerollBusy && "animate-spin")} />
@@ -410,7 +411,7 @@ export function SecretPlotPanel({
                       </div>
                     ))}
                     <label className="flex min-h-6 items-center justify-between gap-2 rounded-md border border-[var(--border)]/60 bg-[var(--secondary)]/25 px-2 py-1 text-[0.5625rem] text-[var(--muted-foreground)]">
-                      <span>Needs momentum shift</span>
+                      <span>Precisa de mudança de ritmo</span>
                       <input
                         type="checkbox"
                         checked={draft.staleDetected}
@@ -511,7 +512,8 @@ export function SecretPlotPanel({
                     </div>
                     <div>
                       <label className="mb-0.5 block text-[0.5625rem] font-medium text-[var(--muted-foreground)]">
-                        Protagonist arc
+                        
+                        Arco do protagonista
                       </label>
                       <textarea
                         value={draft.arcProtagonist}

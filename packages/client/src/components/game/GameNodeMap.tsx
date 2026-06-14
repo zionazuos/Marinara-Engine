@@ -48,7 +48,8 @@ export function GameNodeMap({
   if (nodes.length === 0) {
     return (
       <div className="flex items-center justify-center rounded border border-[var(--border)] bg-gray-900/30 p-4 text-xs text-[var(--muted-foreground)]">
-        No map nodes available
+        
+        Nenhum nó de mapa disponível
       </div>
     );
   }

@@ -266,7 +266,7 @@ export function AgentsPanel() {
         {importError && <div className="text-xs text-red-500 mb-1">{importError}</div>}
         {importSuccess && <div className="text-xs text-green-500 mb-1">{importSuccess}</div>}
         {sortedRegexScripts.length === 0 ? (
-          <p className="text-[0.625rem] text-[var(--muted-foreground)] px-1 py-2">No regex scripts yet.</p>
+          <p className="text-[0.625rem] text-[var(--muted-foreground)] px-1 py-2">Nenhum script de regex ainda.</p>
         ) : (
           sortedRegexScripts.map((script) => {
             const placements = (() => {
@@ -488,7 +488,7 @@ export function AgentsPanel() {
             Create your own AI agents with custom instructions and settings.
           </div>
           {!customAgents.length ? (
-            <p className="text-[0.625rem] text-[var(--muted-foreground)] px-1 py-2">No custom agents yet.</p>
+            <p className="text-[0.625rem] text-[var(--muted-foreground)] px-1 py-2">Nenhum agente personalizado ainda.</p>
           ) : (
             customAgents.map((agent) => {
               return (
@@ -577,7 +577,7 @@ export function AgentsPanel() {
           Define custom functions the AI can call during generation (webhook, script, or static).
         </div>
         {!customTools || (customTools as CustomToolRow[]).length === 0 ? (
-          <p className="text-[0.625rem] text-[var(--muted-foreground)] px-1 py-2">No custom tools yet.</p>
+          <p className="text-[0.625rem] text-[var(--muted-foreground)] px-1 py-2">Nenhuma ferramenta personalizada ainda.</p>
         ) : (
           (customTools as CustomToolRow[]).map((tool) => (
             <div

@@ -858,7 +858,7 @@ export function AppShell() {
         <div
           role="separator"
           aria-orientation="vertical"
-          aria-label="Resize right sidebar"
+          aria-label="Redimensionar barra lateral direita"
           aria-valuemin={RIGHT_PANEL_WIDTH_MIN}
           aria-valuemax={RIGHT_PANEL_WIDTH_MAX}
           aria-valuenow={Math.round(liveRightPanelWidth)}

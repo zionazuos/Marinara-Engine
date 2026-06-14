@@ -527,9 +527,9 @@ export function LorebookEntryRow({
         <div ref={mobileControlsRef} className="relative shrink-0 md:hidden" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
-            aria-label="Entry quick controls"
+            aria-label="Controles rápidos da entrada"
             aria-expanded={showMobileControls}
-            title="Entry quick controls"
+            title="Controles rápidos da entrada"
             onClick={() => setShowMobileControls((current) => !current)}
             className={cn(
               "flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]",

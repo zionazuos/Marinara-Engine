@@ -29,7 +29,7 @@ export function ChatGalleryDrawer({ chat, open, onClose, onIllustrate }: ChatGal
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close gallery drawer"
+            aria-label="Fechar gaveta da galeria"
             className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)]"
           >
             <X size="1rem" />

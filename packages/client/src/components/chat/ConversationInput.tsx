@@ -1426,7 +1426,7 @@ export function ConversationInput({
     async (status: string) => {
       const nextOptions = savedStatusOptions.filter((option) => option.toLowerCase() !== status.toLowerCase());
       await persistSavedStatusOptions(nextOptions);
-      toast.success("Removed saved status");
+      toast.success("Status salvo removido");
     },
     [persistSavedStatusOptions, savedStatusOptions],
   );
@@ -1552,7 +1552,8 @@ export function ConversationInput({
           {isReadingAttachments && (
             <div className="flex items-center gap-1.5 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
               <Loader2 size="0.875rem" className="animate-spin" />
-              Reading file...
+              
+              Lendo arquivo...
             </div>
           )}
         </div>
@@ -1712,7 +1713,7 @@ export function ConversationInput({
                   ? "text-foreground/40 hover:bg-foreground/10 hover:text-foreground/70"
                   : "text-foreground/25",
               )}
-              title="Translate draft"
+              title="Traduzir rascunho"
             >
               {isTranslatingDraft ? <Loader2 size="1rem" className="animate-spin" /> : <Languages size="1rem" />}
             </button>
@@ -1826,7 +1827,8 @@ export function ConversationInput({
                 ))
               ) : (
                 <div className="px-3 py-4 text-center text-[0.6875rem] text-[var(--muted-foreground)]">
-                  No saved statuses yet
+                  
+                  Nenhum status salvo ainda
                 </div>
               )}
             </div>
@@ -1844,7 +1846,8 @@ export function ConversationInput({
             }
           >
             <div className="flex items-center justify-center border-b border-[var(--border)] px-3 py-2 text-[0.6875rem] font-semibold">
-              Trigger Response
+              
+              Resposta do gatilho
             </div>
             <div className="overflow-y-auto p-1">
               {activeChatCharacters!.map((char) => (

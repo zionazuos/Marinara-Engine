@@ -831,7 +831,7 @@ export function TTSConfigCard() {
               className={cn(INPUT_CLS, "cursor-pointer appearance-none")}
             >
               <option value="single">One voice for all characters</option>
-              <option value="per-character">Selected per character</option>
+              <option value="per-character">Selecionado por personagem</option>
             </select>
           </FieldRow>
 
@@ -876,7 +876,7 @@ export function TTSConfigCard() {
                     className={cn(INPUT_CLS, "flex-1 cursor-pointer appearance-none")}
                   >
                     {source === "elevenlabs" && <option value="">Select an ElevenLabs voice</option>}
-                    {fetchingVoices && <option value="">Loading voices…</option>}
+                    {fetchingVoices && <option value="">Carregando vozes…</option>}
                     {!fetchingVoices && voiceOptions.length === 0 && !voicesError && (
                       <option value="">
                         {source === "elevenlabs"
@@ -884,7 +884,7 @@ export function TTSConfigCard() {
                           : "Save config to load voices"}
                       </option>
                     )}
-                    {!fetchingVoices && voicesError && <option value="">Could not load voices</option>}
+                    {!fetchingVoices && voicesError && <option value="">Não foi possível carregar as vozes</option>}
                     {voiceOptions.map((option) => (
                       <option key={option.id} value={option.id}>
                         {option.name === option.id ? option.id : `${option.name} (${option.id})`}
@@ -920,7 +920,7 @@ export function TTSConfigCard() {
           )}
 
           {voiceMode === "per-character" && (
-            <FieldRow label="Character Voices" help="Assign voices to specific characters from your Characters tab.">
+            <FieldRow label="Vozes dos personagens" help="Assign voices to specific characters from your Characters tab.">
               <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-2">
                 <div className="grid gap-2 text-[0.625rem] font-semibold uppercase tracking-wide text-[var(--muted-foreground)] sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto]">
                   <span>Character</span>
@@ -942,7 +942,7 @@ export function TTSConfigCard() {
                       onChange={(e) => handleVoiceAssignmentCharacterChange(index, e.target.value)}
                       className={cn(INPUT_CLS, "cursor-pointer appearance-none py-2 text-xs")}
                     >
-                      <option value="">Select character</option>
+                      <option value="">Selecionar personagem</option>
                       {characterOptions.map((option) => (
                         <option
                           key={option.id}
@@ -970,7 +970,7 @@ export function TTSConfigCard() {
                       type="button"
                       onClick={() => handleRemoveVoiceAssignment(index)}
                       className="flex h-9 items-center justify-center rounded-lg border border-[var(--border)] px-2 text-[var(--muted-foreground)] transition-colors hover:border-rose-400/50 hover:text-rose-300 sm:w-9"
-                      title="Remove character voice"
+                      title="Remover voz do personagem"
                     >
                       <X size="0.75rem" />
                     </button>
@@ -1028,8 +1028,8 @@ export function TTSConfigCard() {
                       disabled={fetchingVoices || voiceOptions.length === 0}
                       className={cn(INPUT_CLS, "min-w-0 flex-1 cursor-pointer appearance-none")}
                     >
-                      {source === "elevenlabs" && <option value="">Select narrator voice</option>}
-                      {fetchingVoices && <option value="">Loading voices…</option>}
+                      {source === "elevenlabs" && <option value="">Selecionar voz do narrador</option>}
+                      {fetchingVoices && <option value="">Carregando vozes…</option>}
                       {!fetchingVoices && voiceOptions.length === 0 && !voicesError && (
                         <option value="">
                           {source === "elevenlabs"
@@ -1037,7 +1037,7 @@ export function TTSConfigCard() {
                             : "Save config to load voices"}
                         </option>
                       )}
-                      {!fetchingVoices && voicesError && <option value="">Could not load voices</option>}
+                      {!fetchingVoices && voicesError && <option value="">Não foi possível carregar as vozes</option>}
                       {voiceOptions.map((option) => (
                         <option key={option.id} value={option.id}>
                           {option.name === option.id ? option.id : `${option.name} (${option.id})`}
@@ -1098,7 +1098,7 @@ export function TTSConfigCard() {
                 {npcDefaultVoicesEnabled && (
                   <div className="space-y-3 pt-1">
                     <NpcDefaultVoicePool
-                      label="Male NPC defaults"
+                      label="Padrões de NPC masculino"
                       options={elevenLabsNpcMaleVoiceOptions}
                       selected={npcDefaultMaleVoices}
                       onToggle={(voiceId, checked) => toggleNpcDefaultVoice("male", voiceId, checked)}
@@ -1213,7 +1213,7 @@ export function TTSConfigCard() {
               }}
             />
             <ToggleRow
-              label="Conversation messages"
+              label="Mensagens da conversa"
               checked={autoplayConvo}
               onChange={(v) => {
                 setAutoplayConvo(v);

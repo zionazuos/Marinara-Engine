@@ -61,7 +61,7 @@ export function GameCheckpoints({ chatId, onClose, onLoaded }: GameCheckpointsPr
       { chatId, label, triggerType: "manual" },
       {
         onSuccess: () => {
-          toast.success("Checkpoint saved");
+          toast.success("Checkpoint salvo");
           setNewLabel("");
           refetch();
         },
@@ -187,7 +187,7 @@ export function GameCheckpoints({ chatId, onClose, onLoaded }: GameCheckpointsPr
                         <button
                           onClick={() => setConfirmLoadId(cp.id)}
                           className="rounded p-1 opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100"
-                          title="Load checkpoint"
+                          title="Carregar checkpoint"
                         >
                           <RotateCcw className="h-3 w-3" />
                         </button>
@@ -195,7 +195,7 @@ export function GameCheckpoints({ chatId, onClose, onLoaded }: GameCheckpointsPr
                           <button
                             onClick={() => handleDelete(cp.id)}
                             className="rounded p-1 opacity-0 transition-opacity hover:bg-destructive/20 group-hover:opacity-100"
-                            title="Delete checkpoint"
+                            title="Excluir checkpoint"
                           >
                             <Trash2 className="h-3 w-3 text-destructive" />
                           </button>

@@ -109,7 +109,8 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
               <div className="rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/8 p-4">
                 <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[var(--foreground)]">
                   <Plug size="0.875rem" className="text-[var(--primary)]" />
-                  No connections found
+                  
+                  Nenhuma conexão encontrada
                 </div>
                 <p className="text-xs text-[var(--muted-foreground)]">
                   Create a connection first, then come back here and we&apos;ll continue without creating a ghost chat.
@@ -119,7 +120,8 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
                   className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-3 py-2 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/20"
                 >
                   <Plug size="0.75rem" />
-                  Open Connections
+                  
+                  Abrir conexões
                 </button>
               </div>
             ) : (
@@ -133,7 +135,7 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
                   disabled={createChat.isPending}
                   className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2.5 text-xs outline-none ring-1 ring-[var(--border)] transition-shadow focus:ring-[var(--primary)]/40"
                 >
-                  <option value="">Select a connection…</option>
+                  <option value="">Selecionar uma conexão…</option>
                   {connectionRows.map((connection) => (
                     <option key={connection.id} value={connection.id}>
                       {connection.name}

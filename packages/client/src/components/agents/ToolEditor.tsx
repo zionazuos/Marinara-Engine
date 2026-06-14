@@ -221,7 +221,8 @@ export function ToolEditor() {
   if (!toolDetailId || (!dbTool && !isNew)) {
     return (
       <div className="flex flex-1 items-center justify-center text-sm text-[var(--muted-foreground)]">
-        Tool not found.
+        
+        Ferramenta não encontrada.
       </div>
     );
   }

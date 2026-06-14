@@ -226,7 +226,7 @@ export function GameInventory({
                     onClick={() => setPageIndex((page) => Math.max(0, page - 1))}
                     disabled={pageIndex === 0}
                     className="flex h-6 w-6 items-center justify-center rounded border border-white/8 bg-white/[0.03] transition-colors hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-35"
-                    title="Previous inventory page"
+                    title="Página anterior do inventário"
                   >
                     <ChevronLeft size={12} />
                   </button>
@@ -265,7 +265,7 @@ export function GameInventory({
           ) : (
             <div className="flex min-h-40 flex-col items-center justify-center rounded border border-dashed border-white/10 bg-white/[0.02] px-4 text-center">
               <Package size={18} className="mb-2 text-white/25" />
-              <div className="text-[0.75rem] font-medium text-white/55">Inventory empty</div>
+              <div className="text-[0.75rem] font-medium text-white/55">Inventário vazio</div>
               <div className="mt-1 text-[0.65rem] text-white/35">Add an item to start tracking supplies.</div>
             </div>
           )}
@@ -355,7 +355,7 @@ export function GameInventory({
                       disabled={amountPending !== null}
                       className="flex h-full w-7 items-center justify-center text-white/65 transition-colors hover:bg-white/[0.07] hover:text-white/90 disabled:cursor-not-allowed disabled:opacity-40"
                       aria-label={`Increase ${selectedInventoryItem.name} amount`}
-                      title="Increase amount"
+                      title="Aumentar quantidade"
                     >
                       <Plus size={12} />
                     </button>

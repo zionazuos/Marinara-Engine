@@ -1278,7 +1278,7 @@ export function SpriteGenerationModal({
 
   return (
     <>
-      <Modal open={open} onClose={onClose} title="Generate Sprites" width="max-w-2xl">
+      <Modal open={open} onClose={onClose} title="Gerar sprites" width="max-w-2xl">
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleReferenceUpload} />
 
         {/* Step 0: Configuration */}
@@ -1356,7 +1356,8 @@ export function SpriteGenerationModal({
             {/* Reference Image */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">
-                Reference Images <span className="text-[var(--muted-foreground)]">(optional, up to 4)</span>
+                
+                Imagens de referência <span className="text-[var(--muted-foreground)]">(optional, up to 4)</span>
               </label>
               {hasCurrentAvatarReference && (
                 <label className="mb-2 flex items-center gap-3 rounded-lg bg-[var(--secondary)]/60 p-2.5 text-xs text-[var(--foreground)] ring-1 ring-[var(--border)]/60">
@@ -1429,7 +1430,8 @@ export function SpriteGenerationModal({
             {/* Appearance Description */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">
-                Appearance Description
+                
+                Descrição da aparência
               </label>
               <textarea
                 value={appearance}
@@ -1452,7 +1454,7 @@ export function SpriteGenerationModal({
                 className="mt-0.5 accent-[var(--primary)]"
               />
               <span className="min-w-0 flex-1">
-                <span className="block font-medium">Prefer transparent PNG</span>
+                <span className="block font-medium">Preferir PNG transparente</span>
                 <span className="mt-0.5 block text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
                   Uses native transparent output when the selected model supports it, removes white-background wording
                   from the prompt, then applies cleanup when transparent preview is enabled.
@@ -1470,7 +1472,7 @@ export function SpriteGenerationModal({
               <>
                 {/* Expression Preset */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Expression Count</label>
+                  <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Quantidade de expressões</label>
                   <div className="flex flex-wrap gap-2">
                     {(Object.keys(EXPRESSION_PRESETS) as PresetKey[]).map((key) => (
                       <button
@@ -1885,7 +1887,8 @@ export function SpriteGenerationModal({
                       }}
                       className="accent-[var(--primary)]"
                     />
-                    Transparent background
+                    
+                    Fundo transparente
                   </label>
                   {noBackground && (
                     <>

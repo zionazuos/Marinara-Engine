@@ -226,7 +226,7 @@ export function AvatarGenerationModal({
             <div className="flex flex-col gap-3">
               <div className="relative aspect-square overflow-hidden rounded-xl bg-[var(--secondary)] ring-1 ring-[var(--border)]">
                 {generatedAvatar ? (
-                  <img src={generatedAvatar} alt="Generated avatar" className="h-full w-full object-cover" />
+                  <img src={generatedAvatar} alt="Avatar gerado" className="h-full w-full object-cover" />
                 ) : defaultAvatarUrl ? (
                   <img src={defaultAvatarUrl} alt="Current avatar" className="h-full w-full object-cover opacity-80" />
                 ) : (
@@ -246,7 +246,7 @@ export function AvatarGenerationModal({
 
           <div className="flex flex-col gap-2 border-t border-[var(--border)]/50 pt-3 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-[0.625rem] text-[var(--muted-foreground)]">
-              {imagePortraitWidth}x{imagePortraitHeight} portrait canvas
+              {imagePortraitWidth}x{imagePortraitHeight}  tela do retrato
             </span>
             <div className="flex justify-end gap-2">
               <button

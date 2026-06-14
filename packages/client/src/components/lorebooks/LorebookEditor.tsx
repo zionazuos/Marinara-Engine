@@ -1278,9 +1278,9 @@ export function LorebookEditor() {
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {/* Character Link */}
                       <LinkedResourcePicker
-                        label="Linked Characters"
+                        label="Personagens vinculados"
                         help="When linked to characters, this lorebook auto-activates in chats that include any of them."
-                        emptyText="No characters selected"
+                        emptyText="Nenhum personagem selecionado"
                         addLabel="Add Character"
                         searchPlaceholder="Search characters..."
                         icon={<Users size="0.875rem" />}
@@ -1306,9 +1306,9 @@ export function LorebookEditor() {
 
                       {/* Persona Link */}
                       <LinkedResourcePicker
-                        label="Linked Personas"
+                        label="Personas vinculadas"
                         help="When linked to personas, this lorebook auto-activates in chats that use any of them."
-                        emptyText="No personas selected"
+                        emptyText="Nenhuma persona selecionada"
                         addLabel="Add Persona"
                         searchPlaceholder="Search personas..."
                         icon={<UserRound size="0.875rem" />}
@@ -1606,7 +1606,7 @@ export function LorebookEditor() {
                     />
                     <input
                       type="text"
-                      placeholder="Search entries…"
+                      placeholder="Buscar entradas…"
                       value={entrySearch}
                       onChange={(e) => setEntrySearch(e.target.value)}
                       className="w-full rounded-xl bg-[var(--secondary)] py-2.5 pl-8 pr-3 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"

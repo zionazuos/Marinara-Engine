@@ -291,8 +291,8 @@ export function TrackerPortraitStage({
               event.stopPropagation();
               updateZoom(TRACKER_PORTRAIT_ZOOM_STEP);
             }}
-            title="Zoom portrait in"
-            aria-label="Zoom portrait in"
+            title="Aproximar retrato"
+            aria-label="Aproximar retrato"
             className={PORTRAIT_VIEW_BUTTON_CLASS}
           >
             <ZoomIn size="0.75rem" />

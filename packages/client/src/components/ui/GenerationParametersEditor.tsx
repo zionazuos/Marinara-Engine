@@ -192,7 +192,8 @@ export function GenerationParametersFields({
       <div className="space-y-2">
         <div>
           <span className="inline-flex items-center gap-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-            Assistant Prefill
+            
+            Pré-preenchimento do assistente
             <HelpTooltip
               text="Optional assistant-role text appended after the final user message. Use this only for models that support assistant prefill/continuation or need a specific opening tag."
               size="0.625rem"
@@ -240,7 +241,8 @@ export function GenerationParametersFields({
         )}
         <div>
           <span className="inline-flex items-center gap-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-            Reasoning Effort
+            
+            Esforço de raciocínio
             <HelpTooltip
               text="How much the model should 'think' before responding. Higher effort produces more thoughtful, nuanced output but uses more tokens and is slower."
               size="0.625rem"
@@ -326,7 +328,8 @@ function CustomParametersInput({
   return (
     <div>
       <span className="inline-flex items-center gap-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-        Custom Parameters
+        
+        Parâmetros personalizados
         <HelpTooltip
           text="Optional raw JSON object merged into the provider request body. This can break requests if the provider does not support a key."
           size="0.625rem"

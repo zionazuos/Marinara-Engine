@@ -181,7 +181,7 @@ export function CharacterMakerModal({ open, onClose }: Props) {
 
         {/* Prompt input */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-[var(--muted-foreground)]">Character Concept</label>
+          <label className="text-xs font-medium text-[var(--muted-foreground)]">Conceito do personagem</label>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -236,7 +236,7 @@ export function CharacterMakerModal({ open, onClose }: Props) {
           <div className="space-y-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
             <div className="flex items-center gap-2">
               <CheckCircle size="0.875rem" className="text-emerald-500" />
-              <span className="text-xs font-medium text-emerald-500">Character Generated!</span>
+              <span className="text-xs font-medium text-emerald-500">Personagem gerado!</span>
             </div>
 
             {/* Preview card */}
@@ -287,7 +287,8 @@ export function CharacterMakerModal({ open, onClose }: Props) {
               ) : (
                 <>
                   <Save size="0.9375rem" />
-                  Save & Edit Character
+                  
+                  Salvar e editar personagem
                 </>
               )}
             </button>

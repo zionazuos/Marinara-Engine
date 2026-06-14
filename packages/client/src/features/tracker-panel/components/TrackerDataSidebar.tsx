@@ -108,7 +108,7 @@ export function TrackerDataSidebar({ fillHeight = false }: { fillHeight?: boolea
         ) : isLoadingGameState ? (
           <TrackerSkeleton />
         ) : !currentGameState ? (
-          <EmptySection>No tracker data yet.</EmptySection>
+          <EmptySection>Nenhum dado de rastreador ainda.</EmptySection>
         ) : !hasFixedTrackerPanel ? (
           <EmptySection>No enabled tracker panels.</EmptySection>
         ) : null}

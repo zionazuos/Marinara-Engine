@@ -225,7 +225,7 @@ export function CharacterTrackerCard({
             type="button"
             onClick={onRemove}
             className={CHARACTER_REMOVE_BUTTON_CLASS}
-            title="Remove character"
+            title="Remover personagem"
             aria-label={`Remove ${visibleText(character.name, "character")}`}
           >
             <X size="0.6875rem" />
@@ -258,8 +258,8 @@ export function CharacterTrackerCard({
         <button
           type="button"
           onClick={onToggleFeatured}
-          title="Feature character card"
-          aria-label="Feature character card"
+          title="Destacar card de personagem"
+          aria-label="Destacar card de personagem"
           aria-pressed={false}
           className={CHARACTER_FEATURE_BUTTON_CLASS}
         >

@@ -371,7 +371,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
   const builtinPresetCount = scanResult?.presets.filter((item) => item.isBuiltin).length ?? 0;
 
   return (
-    <Modal open={open} onClose={handleClose} title="Import from SillyTavern" width="max-w-3xl">
+    <Modal open={open} onClose={handleClose} title="Importar do SillyTavern" width="max-w-3xl">
       <div className="flex flex-col gap-4">
         {(phase === "input" || phase === "scanning") && (
           <>
@@ -401,7 +401,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
                   onClick={handleBrowse}
                   disabled={phase === "scanning" || picking}
                   className="flex items-center justify-center gap-1 rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-medium transition-all hover:bg-[var(--secondary)] active:scale-95 disabled:opacity-50"
-                  title="Browse for folder"
+                  title="Procurar pasta"
                 >
                   {picking ? <Loader2 size="0.875rem" className="animate-spin" /> : <FolderOpen size="0.875rem" />}
                   
@@ -553,7 +553,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
 
               {scanResult.characters.length > 0 && (
                 <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-3">
-                  <p className="text-xs font-medium text-[var(--foreground)]">Imported character tags</p>
+                  <p className="text-xs font-medium text-[var(--foreground)]">Tags de personagem importadas</p>
                   <p className="mt-0.5 text-[0.6875rem] text-[var(--muted-foreground)]">
                     Choose how source-site tags are applied to imported characters.
                   </p>
@@ -758,7 +758,8 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 )}
               >
                 <Import size="0.875rem" />
-                Import Selected
+                
+                Importar selecionados
               </button>
             </div>
           </>
@@ -767,7 +768,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
         {phase === "importing" && (
           <div className="flex flex-col items-center gap-4 py-6">
             <Loader2 size="2rem" className="animate-spin text-[var(--primary)]" />
-            <p className="text-sm font-medium">Importing your data...</p>
+            <p className="text-sm font-medium">Importando seus dados...</p>
             {progress ? (
               <div className="flex w-full flex-col gap-2">
                 <div className="flex items-center justify-between text-xs">

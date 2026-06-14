@@ -138,7 +138,8 @@ export function WorldInfoPanel({
     <>
       <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]">
         <Globe size="0.75rem" />
-        Active World Info
+        
+        Info de mundo ativa
         {isMobile && (
           <button
             onClick={onClose}
@@ -254,7 +255,7 @@ export function AuthorNotesPanel({
         rows={4}
       />
       <div className="mt-2 flex items-center gap-2">
-        <span className="shrink-0 text-[0.625rem] text-[var(--muted-foreground)]">Injection Depth</span>
+        <span className="shrink-0 text-[0.625rem] text-[var(--muted-foreground)]">Profundidade de injeção</span>
         <input
           type="text"
           inputMode="numeric"

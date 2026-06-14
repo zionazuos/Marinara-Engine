@@ -163,7 +163,8 @@ export function QuickConnectionSwitcher({ className }: { className?: string }) {
 
             {sorted.length === 0 && (
               <div className="px-3 py-4 text-center text-[0.6875rem] italic text-[var(--muted-foreground)]">
-                No connections found.
+                
+                Nenhuma conexão encontrada.
               </div>
             )}
           </div>

@@ -424,7 +424,7 @@ export function PeekPromptModal({ data, onClose }: PeekPromptModalProps) {
       >
         <div className="shrink-0 flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
           <div className="flex items-center gap-3">
-            <h3 className="text-sm font-bold">Assembled Prompt</h3>
+            <h3 className="text-sm font-bold">Prompt montado</h3>
             <span className="text-[0.625rem] text-[var(--muted-foreground)]">
               {sections.length} section{sections.length !== 1 ? "s" : ""} &middot; ~{fmtTokens(totalTokens)} tokens
             </span>

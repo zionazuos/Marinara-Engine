@@ -703,7 +703,7 @@ export function SummaryPopover({
           >
             <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--card)]/80 px-3 py-2.5 backdrop-blur-sm">
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-[var(--popover-foreground)]">Summary settings</p>
+                <p className="text-xs font-semibold text-[var(--popover-foreground)]">Configurações de resumo</p>
               </div>
             </div>
 
@@ -778,7 +778,7 @@ export function SummaryPopover({
                         >
                           <SummaryPromptSelectOption
                             active={!activePromptTemplateId}
-                            label="Built-in default"
+                            label="Padrão embutido"
                             onSelect={() => handleSelectPromptTemplate(null)}
                           />
                           {cleanedPromptTemplates.map((template) => (
@@ -1250,7 +1250,7 @@ function SummaryEntryRow({
             disabled={mutationPending}
             className="rounded p-1 text-[var(--destructive)] transition-colors hover:bg-[var(--destructive)]/15 active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
             title="Excluir"
-            aria-label="Delete summary entry"
+            aria-label="Excluir entrada do resumo"
           >
             <Trash2 size="0.75rem" />
           </button>
@@ -1355,7 +1355,7 @@ function SummaryEntryEditor({
 
 function SummaryEntryOriginIcon({ entry }: { entry: ChatSummaryEntry }) {
   if (entry.origin === "automated") {
-    return <Sparkles size="0.75rem" className="shrink-0 text-[var(--primary)]" aria-label="Automated summary" />;
+    return <Sparkles size="0.75rem" className="shrink-0 text-[var(--primary)]" aria-label="Resumo automático" />;
   }
   if (entry.origin === "legacy") {
     return (

@@ -860,7 +860,7 @@ export function CharactersPanel() {
 
       <ExportFormatDialog
         open={exportDialogOpen}
-        title="Export Characters"
+        title="Exportar personagens"
         description="Native keeps Marinara metadata. Compatible exports direct Chara Card V2 JSON for other platforms."
         compatibleDescription="Exports direct Chara Card V2 JSON files without the Marinara wrapper."
         onClose={() => setExportDialogOpen(false)}

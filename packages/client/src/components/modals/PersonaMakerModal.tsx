@@ -150,7 +150,7 @@ export function PersonaMakerModal({ open, onClose }: Props) {
 
         {/* Prompt input */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-[var(--muted-foreground)]">Persona Concept</label>
+          <label className="text-xs font-medium text-[var(--muted-foreground)]">Conceito da persona</label>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -174,7 +174,8 @@ export function PersonaMakerModal({ open, onClose }: Props) {
           ) : (
             <>
               <Wand2 size="0.9375rem" />
-              Generate Persona
+              
+              Gerar persona
             </>
           )}
         </button>

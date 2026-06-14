@@ -240,7 +240,7 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
     try {
       setLastError(null);
       await saveOverride.mutateAsync({ key: selectedKey, template: draft, enabled });
-      toast.success("Prompt override saved.");
+      toast.success("Substituição de prompt salva.");
     } catch (error) {
       const message = getPromptOverrideErrorMessage(error);
       setLastError(message);
@@ -304,7 +304,7 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
           className="w-full rounded-lg bg-[var(--background)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-[var(--border)] focus:ring-[var(--primary)] disabled:opacity-60"
         >
           {loadingEntries && <option value="">Loading prompts...</option>}
-          {!loadingEntries && filteredEntries.length === 0 && <option value="">No registered prompts</option>}
+          {!loadingEntries && filteredEntries.length === 0 && <option value="">Nenhum prompt registrado</option>}
           {filteredEntries.map((entry) => (
             <option key={entry.key} value={entry.key}>
               {humanizePromptKey(entry.key)}
@@ -359,7 +359,7 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
 
       <div className="rounded-lg bg-[var(--background)]/55 p-2.5 ring-1 ring-[var(--border)]/70">
         <div className="mb-1.5 flex items-center justify-between gap-2">
-          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Rendered preview</span>
+          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Pré-visualização renderizada</span>
           <span className="text-[0.5625rem] text-[var(--muted-foreground)]">Example values</span>
         </div>
         <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-md bg-[var(--secondary)]/70 p-2 font-mono text-[0.625rem] leading-relaxed text-[var(--foreground)]">
@@ -424,7 +424,8 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
           ) : (
             <Sparkles size="0.8125rem" />
           )}
-          Reset to Default
+          
+          Restaurar padrão
         </button>
       </div>
 

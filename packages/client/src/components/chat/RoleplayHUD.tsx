@@ -621,7 +621,7 @@ function ActionsGroup({
           "group flex items-center gap-1.5 md:gap-1 rounded-lg border border-[var(--border)] bg-[var(--card)]/80 backdrop-blur-md px-2 py-1.5 md:px-2 md:py-2 md:h-10 transition-all hover:bg-[var(--card)] dark:border-foreground/10 dark:bg-black/40 dark:hover:bg-black/60 cursor-pointer select-none",
           agentsOpen && "bg-[var(--card)] border-[var(--border)] dark:bg-black/60 dark:border-foreground/20",
         )}
-        title="Agents & Actions"
+        title="Agentes e ações"
       >
         <Sparkles
           size="0.875rem"
@@ -664,8 +664,8 @@ function ActionsGroup({
           onClick={() => onRetryFailedAgents?.()}
           disabled={isAgentProcessing}
           className="flex h-8 items-center justify-center gap-1 rounded-lg border border-amber-400/30 bg-amber-500/15 px-2 text-[0.625rem] font-semibold text-amber-200 transition-colors hover:bg-amber-500/25 disabled:cursor-not-allowed disabled:opacity-50 md:h-10"
-          title="Try Illustrator again"
-          aria-label="Try Illustrator again"
+          title="Tentar o ilustrador de novo"
+          aria-label="Tentar o ilustrador de novo"
         >
           <RefreshCw size="0.75rem" className={cn("shrink-0", isAgentProcessing && "animate-spin")} />
           <span className="hidden md:inline">{isAgentProcessing ? "Retrying..." : "Try again"}</span>
@@ -731,7 +731,7 @@ function CombinedPlayerWidget({
         ref={buttonRef}
         onClick={() => setOpen(!open)}
         className={cn(WIDGET, "text-orange-300")}
-        title="Player & Tracker"
+        title="Jogador e rastreador"
       >
         <div className="flex h-7 max-md:h-auto items-center justify-center shrink-0">
           <Swords size="0.875rem" className="text-orange-400/70 max-md:h-4 max-md:w-4" />
@@ -749,7 +749,7 @@ function CombinedPlayerWidget({
         placement={layout === "left" ? "right" : layout === "right" ? "left" : "bottom"}
         className="w-80 max-h-[min(75vh,32rem)]"
       >
-        <Suspense fallback={<DeferredHUDPanelFallback label="Loading trackers…" />}>
+        <Suspense fallback={<DeferredHUDPanelFallback label="Carregando rastreadores…" />}>
           <CombinedPlayerPanel
             showPersona={showPersona}
             showCharacters={showCharacters}
@@ -1019,7 +1019,7 @@ function PersonaStatsWidget({
         placement={layout === "left" ? "right" : layout === "right" ? "left" : "bottom"}
         className="w-60 max-h-80 overflow-y-auto"
       >
-        <Suspense fallback={<DeferredHUDPanelFallback label="Loading persona stats…" />}>
+        <Suspense fallback={<DeferredHUDPanelFallback label="Carregando atributos da persona…" />}>
           <PersonaStatsPanel
             bars={bars}
             onUpdate={onUpdate}
@@ -1105,7 +1105,7 @@ function CustomTrackerWidget({
         placement={layout === "left" ? "right" : layout === "right" ? "left" : "bottom"}
         className="w-72 max-h-80 overflow-y-auto"
       >
-        <Suspense fallback={<DeferredHUDPanelFallback label="Loading custom tracker…" />}>
+        <Suspense fallback={<DeferredHUDPanelFallback label="Carregando rastreador personalizado…" />}>
           <CustomTrackerPanel
             fields={fields}
             onUpdate={onUpdate}
@@ -1244,7 +1244,7 @@ function QuestsWidget({
         placement={layout === "left" ? "right" : layout === "right" ? "left" : "bottom"}
         className="w-72 max-h-96 overflow-y-auto"
       >
-        <Suspense fallback={<DeferredHUDPanelFallback label="Loading quests…" />}>
+        <Suspense fallback={<DeferredHUDPanelFallback label="Carregando missões…" />}>
           <QuestsPanel
             quests={quests}
             onUpdate={onUpdate}
@@ -1477,7 +1477,7 @@ function CombinedWorldWidget({
         placement={layout === "left" ? "right" : layout === "right" ? "left" : "bottom"}
         className="w-64"
       >
-        <Suspense fallback={<DeferredHUDPanelFallback label="Loading world state…" />}>
+        <Suspense fallback={<DeferredHUDPanelFallback label="Carregando estado do mundo…" />}>
           <CombinedWorldPanel
             location={location}
             date={date}

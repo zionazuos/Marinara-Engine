@@ -68,7 +68,7 @@ export function CharacterTrackerPanel({
     if (characters.length === 0) {
       return (
         <div className="p-1">
-          <EmptySection>No characters tracked.</EmptySection>
+          <EmptySection>Nenhum personagem rastreado.</EmptySection>
         </div>
       );
     }
