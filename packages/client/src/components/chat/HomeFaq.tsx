@@ -436,7 +436,8 @@ export function HomeFaq() {
               </span>
             </div>
             <p className="mt-0.5 text-[0.6875rem] leading-snug text-[var(--muted-foreground)]/80">
-              The recurring setup, model, Game Mode, image, and agent questions people keep asking.
+              
+              As perguntas recorrentes sobre configuração, modelo, modo Game, imagem e agentes que as pessoas sempre fazem.
             </p>
           </div>
           <ChevronDown

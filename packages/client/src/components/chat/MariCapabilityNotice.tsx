@@ -74,7 +74,8 @@ export const MariCapabilityNotice = memo(function MariCapabilityNotice() {
         
         A Mari pode editar seus personagens, personas e lorebooks diretamente quando você pede para ela atualizá-los. As edições de personagem mantêm um snapshot de versão recuperável, que você pode reverter pelo histórico do personagem.{" "}
         <strong className="font-semibold">
-          Persona and lorebook edits overwrite without a snapshot, so back them up first
+          
+          Edições de persona e lorebook sobrescrevem sem snapshot, então faça backup delas primeiro
         </strong>{" "}
         if you want to keep the old version.
       </p>

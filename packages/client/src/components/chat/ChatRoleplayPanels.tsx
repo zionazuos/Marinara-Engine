@@ -246,13 +246,14 @@ export function AuthorNotesPanel({
         )}
       </h3>
       <p className="mb-2 text-[0.625rem] text-[var(--muted-foreground)]">
-        Text here is injected into the prompt at the chosen depth every generation.
+        
+        O texto aqui é injetado no prompt na profundidade escolhida a cada geração.
       </p>
       <textarea
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         onBlur={handleSave}
-        placeholder="e.g. Keep the tone dark and suspenseful. The villain is secretly an ally."
+        placeholder="ex.: Mantenha o tom sombrio e cheio de suspense. O vilão é secretamente um aliado."
         className="w-full resize-none rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-2.5 py-2 text-xs text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted-foreground)] focus:ring-2 focus:ring-[var(--ring)]"
         rows={4}
       />

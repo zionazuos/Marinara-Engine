@@ -1559,7 +1559,8 @@ export function ChatSettingsDrawer({
           <div className="flex-1 min-w-0">
             <span className="text-[0.6875rem] font-medium">Ativar recuperação de memória</span>
             <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-              Recall relevant fragments from earlier in this chat and inject them as context.
+              
+              Recupera fragmentos relevantes de antes neste chat e os injeta como contexto.
             </p>
           </div>
           <div
@@ -1833,7 +1834,8 @@ export function ChatSettingsDrawer({
                 </select>
                 {chat.connectionId === "random" && (
                   <p className="mt-1.5 text-[0.625rem] text-amber-400/80">
-                    Each generation will randomly pick from connections marked for the random pool.
+                    
+                    Cada geração escolherá aleatoriamente entre as conexões marcadas para o pool aleatório.
                   </p>
                 )}
               </>
@@ -4074,7 +4076,8 @@ export function ChatSettingsDrawer({
 
                     {chatSpriteSubjects.length === 0 ? (
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                        Add characters to this chat or choose a persona first to enable sprite selection.
+                        
+                        Adicione personagens a este chat ou escolha uma persona primeiro para habilitar a seleção de sprites.
                       </p>
                     ) : chatSpriteSubjectsLoading ? (
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">Carregando donos dos sprites...</p>
@@ -4259,7 +4262,8 @@ export function ChatSettingsDrawer({
                       <div className="min-w-0 flex-1">
                         <div className="text-[0.6875rem] font-medium">Spotify DJ</div>
                         <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                          Choose where the DJ should look for roleplay music when it reacts to the scene.
+                          
+                          Escolha onde o DJ deve procurar música de roleplay quando reage à cena.
                         </p>
                       </div>
                     </div>
@@ -4623,7 +4627,8 @@ export function ChatSettingsDrawer({
 
                         {activeAgentIds.length === 0 && (
                           <p className="text-[0.6875rem] text-[var(--muted-foreground)] px-1">
-                            No per-chat agent overrides. Workspace default agents will be used for this chat.
+                            
+                            Sem substituições de agente por chat. Os agentes padrão do workspace serão usados neste chat.
                           </p>
                         )}
 
@@ -5648,7 +5653,8 @@ export function ChatSettingsDrawer({
                   </div>
                 ) : (
                   <div className="rounded-xl bg-[var(--accent)]/50 px-3 py-2.5 text-[0.6875rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                    Chat Summary context size is managed in the Chat Summary panel after you add the agent.
+                    
+                    O tamanho de contexto do Resumo do Chat é gerenciado no painel Resumo do Chat depois que você adiciona o agente.
                   </div>
                 )}
                 <div>

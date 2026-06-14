@@ -779,7 +779,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                 <div className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-4">
                   <div className="text-sm font-medium text-amber-200">O runtime local falhou ao iniciar</div>
                   <div className="mt-1 text-xs text-[var(--muted-foreground)]/85">
-                    Marinara will keep working without the local model until you retry or change these settings.
+                    
+                    O Marinara continuará funcionando sem o modelo local até você tentar novamente ou mudar estas configurações.
                   </div>
                   <div className="mt-3 flex flex-col gap-1 text-xs text-[var(--muted-foreground)]/75">
                     {failedRuntimeVariant && <span>Runtime: {formatRuntimeVariantLabel(failedRuntimeVariant)}</span>}

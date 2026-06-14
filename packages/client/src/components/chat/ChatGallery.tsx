@@ -89,7 +89,8 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
           role="status"
           aria-live="polite"
         >
-          AI image generation is running. The new image will appear here when it finishes.
+          
+          A geração de imagem por IA está rodando. A nova imagem aparecerá aqui quando terminar.
         </div>
       )}
 

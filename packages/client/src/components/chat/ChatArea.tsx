@@ -1623,7 +1623,7 @@ export function ChatArea() {
                 label="Game"
                 bg="linear-gradient(135deg, #e15c8c, #c94776)"
                 shadowColor="rgba(225,92,140,0.15)"
-                tooltip="AI-managed singleplayer RPG with a Game Master, party, dice, maps, and quests"
+                tooltip="RPG singleplayer gerenciado por IA com Game Master, grupo, dados, mapas e missões"
                 onClick={() => handleQuickStart("game")}
               />
             </div>

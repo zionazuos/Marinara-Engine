@@ -1467,7 +1467,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                       </select>
                       {imageConnections.length === 0 && (
                         <p className="mt-1 text-[0.55rem] text-amber-700 dark:text-amber-400/80">
-                          No image generation connections found. Add one in Settings → Connections.
+                          
+                          Nenhuma conexão de geração de imagem encontrada. Adicione uma em Configurações → Conexões.
                         </p>
                       )}
                       <p className="mt-1 text-[0.55rem] text-[var(--muted-foreground)]">

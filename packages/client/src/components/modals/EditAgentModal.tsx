@@ -117,7 +117,8 @@ export function EditAgentModal({ open, onClose, agent }: Props) {
           </div>
           <div className="flex-1">
             <p className="text-xs text-[var(--muted-foreground)]">
-              Customize this agent's behavior, prompt, and which connection it uses for inference.
+              
+              Personalize o comportamento, o prompt e qual conexão este agente usa para inferência.
             </p>
           </div>
         </div>
@@ -190,7 +191,7 @@ export function EditAgentModal({ open, onClose, agent }: Props) {
             value={form.promptTemplate}
             onChange={(e) => setForm((f) => ({ ...f, promptTemplate: e.target.value }))}
             rows={6}
-            placeholder="Custom instructions for this agent... Leave empty to use the built-in prompt."
+            placeholder="Instruções personalizadas para este agente... Deixe vazio para usar o prompt embutido."
             className="w-full resize-y rounded-lg bg-[var(--secondary)] px-3 py-2 text-sm outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]"
           />
         </label>

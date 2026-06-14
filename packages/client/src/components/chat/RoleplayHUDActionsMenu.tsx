@@ -412,7 +412,8 @@ function CustomAgentRunsSection({
           )}
           {!loading && countMode === "latest" && runs.length > 0 && (
             <div className="px-1 text-[0.5625rem] text-[var(--muted-foreground)]/70">
-              Showing the latest saved output per custom agent with Add as Prompt Section enabled.
+              
+              Mostrando a saída salva mais recente por agente personalizado com Adicionar como seção de prompt ativado.
             </div>
           )}
         </div>

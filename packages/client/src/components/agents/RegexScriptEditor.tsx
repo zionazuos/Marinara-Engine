@@ -583,7 +583,8 @@ export function RegexScriptEditor() {
                 <div>
                   <div className="text-xs font-medium">Apenas prompt</div>
                   <div className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Only apply in the prompt context sent to the AI, not in the displayed message.
+                    
+                    Aplicar apenas no contexto do prompt enviado à IA, não na mensagem exibida.
                   </div>
                 </div>
               </div>

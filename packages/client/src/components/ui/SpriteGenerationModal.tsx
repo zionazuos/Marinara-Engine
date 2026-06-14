@@ -1438,7 +1438,7 @@ export function SpriteGenerationModal({
               <textarea
                 value={appearance}
                 onChange={(e) => setAppearance(e.target.value)}
-                placeholder="blue eyes, blonde hair, anime style, wearing a hoodie, female, chubby..."
+                placeholder="olhos azuis, cabelo loiro, estilo anime, vestindo um moletom, feminino, fofinha..."
                 rows={3}
                 className="w-full resize-none rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40"
               />
@@ -2015,7 +2015,8 @@ export function SpriteGenerationModal({
                 {selectedCount} selected)
               </label>
               <p className="mb-3 text-[0.625rem] text-[var(--muted-foreground)]">
-                Click an item to toggle selection. Edit names as needed. Only selected items will be saved.
+                
+                Clique em um item para alternar a seleção. Edite os nomes conforme necessário. Apenas os itens selecionados serão salvos.
               </p>
               <div
                 className="grid gap-3"

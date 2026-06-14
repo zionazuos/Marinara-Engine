@@ -847,7 +847,7 @@ export function ConnectionEditor() {
                 <span>
                   
                   Roteia o chat pelo seu modelo local <strong>Claude Code</strong> install so it bills against your Anthropic{" "}
-                  <strong>Pro / Max</strong> subscription instead of an API key. Prerequisites on the Marinara host:
+                  <strong>Pro / Max</strong>  assinatura em vez de uma chave de API. Pré-requisitos no host do Marinara:
                 </span>
               </p>
               <ol className="mt-1.5 ml-4 list-decimal space-y-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
@@ -875,8 +875,7 @@ export function ConnectionEditor() {
                 <AlertCircle size="0.75rem" className="mt-px shrink-0" />
                 <span>
                   
-                  Roteia o chat pelo seu modelo local <strong>Codex ChatGPT</strong> login so it uses your ChatGPT account
-                  instead of an OpenAI API key. Prerequisites on the Marinara host:
+                  Roteia o chat pelo seu modelo local <strong>Codex ChatGPT</strong>  login para que ele use sua conta do ChatGPT em vez de uma chave de API da OpenAI. Pré-requisitos no host do Marinara:
                 </span>
               </p>
               <ol className="mt-1.5 ml-4 list-decimal space-y-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
@@ -972,7 +971,8 @@ export function ConnectionEditor() {
             />
             {!isLocalAuthProvider && (
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Your key is encrypted at rest. Leave blank when editing to keep the existing key.
+                
+                Sua chave é criptografada em repouso. Deixe em branco ao editar para manter a chave existente.
               </p>
             )}
             {!isLocalAuthProvider && API_KEY_LINKS[localProvider] && (
@@ -1068,7 +1068,7 @@ export function ConnectionEditor() {
                 <AlertCircle size="0.625rem" className="mt-px shrink-0" />
                 <span>
                   <strong>Usuários do Windows:</strong>  Se o seu proxy ou servidor local não for detectado, o Windows Defender Firewall pode estar bloqueando a conexão. Abra{" "}
-                  <em>Windows Security → Firewall & network protection → Allow an app through firewall</em> and add
+                  <em>Segurança do Windows → Firewall e proteção de rede → Permitir um aplicativo pelo firewall</em> and add
                   Node.js or your proxy application.
                 </span>
               </p>
@@ -1122,8 +1122,7 @@ export function ConnectionEditor() {
               </p>
               {selectedImageService === "runpod_comfyui" && (
                 <div className="mt-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-[0.625rem] text-amber-300/80">
-                  <strong>Configuração do RunPod:</strong> Your endpoint ID goes in the <strong>Endpoint ID</strong> field
-                  below. The API key is your RunPod API token. The workflow JSON is <strong>required</strong> — the
+                  <strong>Configuração do RunPod:</strong> Your endpoint ID goes in the <strong>Endpoint ID</strong>  campo abaixo. A chave de API é o seu token de API do RunPod. O JSON de workflow é <strong>required</strong> — the
                   endpoint executes the workflow you supply. Use <code>%prompt%</code> placeholders in the
                   CLIPTextEncode node.
                 </div>
@@ -1507,7 +1506,8 @@ export function ConnectionEditor() {
                 <span className="text-xs text-[var(--muted-foreground)]">{formatContext(localMaxContext)} tokens</span>
               </div>
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                This is auto-set when selecting a model from the list. Override manually if needed.
+                
+                Isto é definido automaticamente ao selecionar um modelo da lista. Substitua manualmente se necessário.
               </p>
             </FieldGroup>
           )}
@@ -1637,7 +1637,8 @@ export function ConnectionEditor() {
                 </div>
               ) : (
                 <p className="rounded-xl bg-[var(--secondary)]/40 px-3 py-2 text-[0.625rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                  This connection is using the mode defaults from conversation, roleplay, and game setup.
+                  
+                  Esta conexão está usando os padrões de modo da configuração de conversa, roleplay e game.
                 </p>
               )}
             </FieldGroup>
@@ -2068,8 +2069,7 @@ export function ConnectionEditor() {
                     <div className="rounded-lg bg-[var(--destructive)]/10 p-2.5 text-[0.6875rem] text-[var(--destructive)] ring-1 ring-[var(--destructive)]/30">
                       Silent downgrade detected — you asked for <strong>{claudeDiagResult.requestedModel}</strong> but
                       the SDK billed <strong>{claudeDiagResult.modelsBilled.join(", ")}</strong>. This is usually caused
-                      by Claude Code being in <code>cooldown</code> after hitting Opus rate limits, or fast mode being
-                      toggled on in your CLI settings. Run <code>claude /model</code> in your terminal to check.
+                      by Claude Code being in <code>cooldown</code>  após atingir os limites de taxa do Opus, ou o fast mode estar ligado nas configurações do seu CLI. Execute <code>claude /model</code> in your terminal to check.
                     </div>
                   )}
                   {claudeDiagResult.modelUsageDetail.some((u) => u.model !== claudeDiagResult.requestedModel) && (
@@ -2079,8 +2079,7 @@ export function ConnectionEditor() {
                       to auto-generate a session title and optional context for the main model. This is Claude Code
                       session bookkeeping — it&apos;s organic to the subscription path, can&apos;t be cleanly disabled,
                       and doesn&apos;t serve any of your roleplay output. Your actual response always comes from the
-                      model labeled <em>Geração de roleplay</em> above. The Haiku tagalong adds only a few output tokens
-                      per turn and a tiny slice of quota.
+                      model labeled <em>Geração de roleplay</em>  acima. O acompanhante Haiku adiciona apenas alguns tokens de saída por turno e uma fatia minúscula da cota.
                     </div>
                   )}
                   {claudeDiagResult.response && (
@@ -2238,7 +2237,8 @@ function ImageGenerationDefaultsPanel({
                   : "AUTOMATIC1111 / Forge setup"}
             </div>
             <p className="mt-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
-              Prompt prefixes, sampler, scheduler, steps, guidance, seed, clip skip, and denoise.
+              
+              Prefixos de prompt, sampler, scheduler, steps, guidance, seed, clip skip e denoise.
             </p>
           </div>
           <ChevronDown

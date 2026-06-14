@@ -1956,7 +1956,8 @@ function AppearanceSettings() {
           onChange={setWeatherEffects}
         />
         <p className="text-[0.625rem] text-[var(--muted-foreground)] pl-6">
-          Shows animated weather particles based on in-story weather and time of day. Requires the{" "}
+          
+          Mostra partículas de clima animadas com base no clima da história e na hora do dia. Requer o{" "}
           <span className="font-medium">Estado do mundo</span> agent to be enabled so weather data is extracted from the
           narrative.
         </p>
@@ -2801,8 +2802,7 @@ function ThemesSettings() {
         <strong>Dica:</strong> CSS themes can override any CSS variable (e.g.{" "}
         <code className="rounded bg-[var(--secondary)] px-1">--background</code>,{" "}
         <code className="rounded bg-[var(--secondary)] px-1">--primary</code>) or add custom styles. JSON themes should
-        have <code className="rounded bg-[var(--secondary)] px-1">{`{ "name": "...", "css": "..." }`}</code> format.
-        Imported theme files sync to this Marinara server but do not auto-activate.
+        have <code className="rounded bg-[var(--secondary)] px-1">{`{ "name": "...", "css": "..." }`}</code>  formato. Os arquivos de tema importados sincronizam com este servidor Marinara, mas não são ativados automaticamente.
       </div>
     </div>
   );
@@ -2956,7 +2956,8 @@ function ExtensionsSettings() {
 
         {!isLoading && extensionList.length === 0 && (
           <p className="py-2 text-center text-[0.625rem] text-[var(--muted-foreground)]">
-            No extensions installed. Import a .json, .css, or .js extension file above.
+            
+            Nenhuma extensão instalada. Importe um arquivo de extensão .json, .css ou .js acima.
           </p>
         )}
       </div>
@@ -4074,8 +4075,7 @@ function AdvancedSettings() {
             )}
             {commitsBehind > 0 && (
               <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                Commit counts compare this build with {updateCheck.data.targetRef ?? "origin/main"} and may include
-                unreleased development commits, not just tagged releases.
+                Commit counts compare this build with {updateCheck.data.targetRef ?? "origin/main"}  e pode incluir commits de desenvolvimento não lançados, não apenas versões marcadas.
               </p>
             )}
             {isIosClient && (
@@ -4123,7 +4123,8 @@ function AdvancedSettings() {
                 )}
                 {updateCheck.data.versionUpdate && (
                   <span className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Android APK assets are WebView shells, not standalone apps. Start Marinara in Termux first.
+                    
+                    Os assets de APK do Android são cascas de WebView, não apps independentes. Inicie o Marinara no Termux primeiro.
                   </span>
                 )}
                 {manualUpdateHint && (

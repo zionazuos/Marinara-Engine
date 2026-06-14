@@ -928,14 +928,14 @@ export function SummaryPopover({
             {tokenWarning && (
               <div className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-2.5 py-2 text-[0.6875rem] leading-relaxed text-amber-200">
                 
-                Os resumos ativados ficam por volta de {formatTokenCount(enabledTokenEstimate)} tokens. Consider disabling older
-                entries if prompt context feels crowded.
+                Os resumos ativados ficam por volta de {formatTokenCount(enabledTokenEstimate)}  tokens. Considere desativar entradas mais antigas se o contexto do prompt parecer cheio.
               </div>
             )}
 
             {allEntriesDisabled && (
               <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/20 px-2.5 py-2 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]">
-                All summaries are disabled. The model will not receive summary context.
+                
+                Todos os resumos estão desativados. O modelo não receberá contexto de resumo.
               </div>
             )}
 

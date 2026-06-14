@@ -1846,7 +1846,8 @@ export function LorebookEditor() {
                                 >
                                   {folderEntries.length === 0 && (
                                     <p className="py-2 text-[0.625rem] italic text-[var(--muted-foreground)]">
-                                      Empty — drag an entry here or pick this folder from an entry's folder selector.
+                                      
+                                      Vazio — arraste uma entrada para cá ou escolha esta pasta no seletor de pasta de uma entrada.
                                     </p>
                                   )}
                                   {folderEntries.map((entry, eIdx) => {
@@ -2215,7 +2216,8 @@ function VectorizeSection({
           </div>
           {!selectedConnectionId && (
             <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-              Semantic search is off until you choose an embedding connection and vectorize entries.
+              
+              A busca semântica fica desligada até você escolher uma conexão de embedding e vetorizar as entradas.
             </p>
           )}
           {result && (

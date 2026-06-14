@@ -776,7 +776,8 @@ export function TTSConfigCard() {
               />
             </div>
             <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-              Encrypted at rest · Keep the masked value to preserve the current key, or clear it to remove the saved key
+              
+              Criptografado em repouso · Mantenha o valor mascarado para preservar a chave atual, ou limpe-o para remover a chave salva
             </p>
           </FieldRow>
 
@@ -904,7 +905,8 @@ export function TTSConfigCard() {
               </div>
               {!voicesFromProvider && source === "openai" && voices.length > 0 && (
                 <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                  Showing OpenAI built-in voices — save & enable to load from your provider
+                  
+                  Mostrando as vozes embutidas da OpenAI — salve e ative para carregar do seu provedor
                 </p>
               )}
               {!voicesFromProvider && source === "elevenlabs" && !fetchingVoices && (
@@ -990,7 +992,8 @@ export function TTSConfigCard() {
                 </button>
                 {characterOptions.length === 0 && (
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Add characters in the Characters tab before assigning character voices.
+                    
+                    Adicione personagens na aba Personagens antes de atribuir vozes aos personagens.
                   </p>
                 )}
               </div>
@@ -1061,7 +1064,8 @@ export function TTSConfigCard() {
               )}
               {narratorVoiceEnabled && source === "elevenlabs" && !narratorVoice && (
                 <p className="text-[0.625rem] leading-relaxed text-amber-300/80">
-                  Select a narrator voice, or narration will fall back only when a global voice is available.
+                  
+                  Selecione uma voz de narrador, ou a narração só será usada quando houver uma voz global disponível.
                 </p>
               )}
             </div>
@@ -1120,7 +1124,8 @@ export function TTSConfigCard() {
                     </p>
                     {!voicesFromProvider && (
                       <p className="text-[0.625rem] leading-relaxed text-amber-300/80">
-                        Save the ElevenLabs connection and refresh voices to load the provider's default voice list.
+                        
+                        Salve a conexão do ElevenLabs e atualize as vozes para carregar a lista de vozes padrão do provedor.
                       </p>
                     )}
                   </div>

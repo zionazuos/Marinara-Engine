@@ -756,7 +756,7 @@ export function GameSessionHistory({
                                 }
                                 disabled={isSaving}
                                 rows={4}
-                                placeholder="One continuity fact per line, including discoveries, twists, and reveals"
+                                placeholder="Um fato de continuidade por linha, incluindo descobertas, reviravoltas e revelações"
                                 className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
                               />
                             </label>

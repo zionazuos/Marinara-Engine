@@ -3382,7 +3382,7 @@ export function GameNarration({
           <button
             onClick={handleInterrupt}
             className="flex h-full w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--muted)]/20 text-[var(--foreground)]/75 transition-colors hover:bg-[var(--muted)]/40 hover:text-[var(--foreground)] dark:border-white/10 dark:bg-white/5 dark:text-white/75 dark:hover:bg-white/10 dark:hover:text-white"
-            title="Pause the GM so you can write back. Nothing is committed until you send."
+            title="Pause o GM para você poder responder. Nada é confirmado até você enviar."
             aria-label="Interromper"
           >
             <Square size={11} fill="currentColor" />

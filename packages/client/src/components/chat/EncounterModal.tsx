@@ -369,7 +369,8 @@ function EncounterConfig() {
               Grimório
             </h4>
             <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]/70">
-              Attach a spellbook so the AI knows which spells and abilities are available in combat.
+              
+              Anexe um grimório para a IA saber quais magias e habilidades estão disponíveis no combate.
             </p>
             <select
               value={spellbookId ?? ""}

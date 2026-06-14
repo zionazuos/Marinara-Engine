@@ -483,7 +483,7 @@ export function SpotifyMiniPlayer({ mobile = false }: { mobile?: boolean }) {
     onError: (error, _action, context) => {
       if (context?.previous) qc.setQueryData(spotifyKeys.player, context.previous);
       if (isSpotifyRestrictionError(error)) {
-        toast.info("Spotify rejected that command on the current device. Open the Spotify app and try again.");
+        toast.info("O Spotify rejeitou esse comando no dispositivo atual. Abra o app do Spotify e tente novamente.");
         return;
       }
       toast.error(error instanceof Error ? error.message : "Spotify control failed.");

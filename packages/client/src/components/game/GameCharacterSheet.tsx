@@ -765,7 +765,8 @@ export function GameCharacterSheet({
                   </button>
                 </div>
                 <p className="mb-3 text-[0.6875rem] text-[var(--muted-foreground)]">
-                  Add custom details like Skills, Weapon, Element, Specialty, or Faction.
+                  
+                  Adicione detalhes personalizados como Habilidades, Arma, Elemento, Especialidade ou Facção.
                 </p>
                 <div className="space-y-2">
                   {draft.extraEntries.map((entry, index) => (

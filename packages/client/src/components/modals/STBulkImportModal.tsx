@@ -515,8 +515,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
               <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 p-2.5 text-xs text-amber-400">
                 <AlertTriangle size="0.875rem" className="mt-0.5 shrink-0" />
                 <span>
-                  {builtinPresetCount}  preset embutido{builtinPresetCount !== 1 ? "s were" : " was"} detected and left
-                  unchecked by default so only likely custom presets come across unless you opt in.
+                  {builtinPresetCount}  preset embutido{builtinPresetCount !== 1 ? "s were" : " was"}  detectados e deixados desmarcados por padrão, para que só presets provavelmente personalizados venham, a menos que você opte por incluí-los.
                 </span>
               </div>
             )}

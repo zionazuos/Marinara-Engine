@@ -902,7 +902,8 @@ export function AgentEditor() {
               </div>
               {localResultType === "text_rewrite" && (
                 <p className="mt-2 rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-[0.625rem] leading-relaxed text-amber-200">
-                  Text rewrite agents always save as Post-Processing. Their prompt should return JSON like{" "}
+                  
+                  Os agentes de reescrita de texto sempre salvam como Pós-processamento. O prompt deles deve retornar um JSON como{" "}
                   <code className="rounded bg-black/20 px-1 py-0.5">
                     {'{"editedText":"...","changes":[{"description":"..."}]}'}
                   </code>
@@ -1238,7 +1239,8 @@ export function AgentEditor() {
                 </div>
               ) : (
                 <div className="rounded-xl bg-[var(--accent)]/50 px-3 py-2.5 text-[0.6875rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                  Chat Summary context size is managed in the Chat Summary panel inside each chat.
+                  
+                  O tamanho de contexto do Resumo do Chat é gerenciado no painel Resumo do Chat dentro de cada chat.
                 </div>
               )}
               <div>
@@ -1452,7 +1454,8 @@ export function AgentEditor() {
                 <span className="text-[0.6875rem] text-[var(--muted-foreground)]">messages</span>
               </div>
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                The agent runs once every N assistant messages instead of every response. Default: 8.
+                
+                O agente roda uma vez a cada N mensagens do assistente, em vez de a cada resposta. Padrão: 8.
               </p>
             </FieldGroup>
           )}
@@ -1813,7 +1816,8 @@ export function AgentEditor() {
                     </li>
                   </ol>
                   <p className="text-[0.625rem] text-white/30 mt-1">
-                    Requires Spotify Premium. Tokens refresh automatically — no need to reconnect.
+                    
+                    Requer Spotify Premium. Os tokens são atualizados automaticamente — não precisa reconectar.
                   </p>
                   <p className="text-[0.625rem] text-white/30 leading-relaxed">
                     Spotify only accepts <code className="text-white/40">https://</code> redirect URIs or loopback (
@@ -1958,7 +1962,8 @@ export function AgentEditor() {
                   )}
                   {localSourceLorebookIds.length > 0 && (
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                      Fixed selections override chat-active lorebooks for every chat that uses this agent.
+                      
+                      As seleções fixas sobrepõem os lorebooks ativos do chat em todo chat que usa este agente.
                     </p>
                   )}
                   {/* Router-only tip explaining the description fallback behavior.
@@ -2220,7 +2225,8 @@ export function AgentEditor() {
                 ))}
             </div>
             <p className="mt-2 text-[0.625rem] text-[var(--muted-foreground)]">
-              Tool-use must also be enabled per chat via Chat Settings → "Enable Function Calling".
+              
+              O uso de ferramentas também precisa ser ativado por chat em Configurações do Chat → "Ativar chamada de função".
             </p>
           </FieldGroup>
 

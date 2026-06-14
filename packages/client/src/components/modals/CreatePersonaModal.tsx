@@ -46,7 +46,8 @@ export function CreatePersonaModal({ open, onClose }: Props) {
           </div>
           <div className="flex-1">
             <p className="text-xs text-[var(--muted-foreground)]">
-              Personas define your identity and description that get injected into conversations.
+              
+              As personas definem sua identidade e descrição que são injetadas nas conversas.
             </p>
           </div>
         </div>

@@ -1311,7 +1311,7 @@ function ExpandedDrawer({
           onBlur={flushAutosave}
           onCommit={flushAutosave}
           rows={5}
-          placeholder="The content that will be injected into the prompt when this entry activates…"
+          placeholder="O conteúdo que será injetado no prompt quando esta entrada for ativada…"
           title="Editar conteúdo"
         />
         <p className="mt-1 flex items-center gap-1 text-[0.625rem] text-[var(--muted-foreground)]">
@@ -1348,7 +1348,7 @@ function ExpandedDrawer({
           label="No Vector"
           value={form.excludeFromVectorization ?? false}
           onChange={(v) => update({ excludeFromVectorization: v })}
-          tooltip="When enabled, bulk vectorization skips this entry and removes any stored embedding."
+          tooltip="Quando ativado, a vetorização em lote pula esta entrada e remove qualquer embedding armazenado."
         />
       </div>
 

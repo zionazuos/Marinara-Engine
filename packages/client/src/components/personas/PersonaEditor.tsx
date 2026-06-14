@@ -626,7 +626,7 @@ export function PersonaEditor() {
                 subtitle="Your personality traits, temperament, and behavioral patterns."
                 value={formData.personality}
                 onChange={(v) => updateField("personality", v)}
-                placeholder="Calm and analytical, but quick to act when someone's in danger. Has a dry sense of humor…"
+                placeholder="Calmo e analítico, mas rápido para agir quando alguém está em perigo. Tem um humor seco…"
                 rows={8}
               />
             )}
@@ -643,10 +643,10 @@ export function PersonaEditor() {
             {activeTab === "appearance" && (
               <TextareaTab
                 title="Aparência"
-                subtitle="Physical description — height, build, hair, eyes, clothing, distinguishing features."
+                subtitle="Descrição física — altura, constituição, cabelo, olhos, roupas, características marcantes."
                 value={formData.appearance}
                 onChange={(v) => updateField("appearance", v)}
-                placeholder="Average height, dark hair worn loose. Prefers practical clothing — boots, a worn jacket…"
+                placeholder="Altura mediana, cabelo escuro solto. Prefere roupas práticas — botas, uma jaqueta surrada…"
                 rows={8}
               />
             )}
@@ -1776,8 +1776,7 @@ function PersonaStatsTab({
                 physical and mental state (hunger, energy, hygiene, etc.)
               </li>
               <li>
-                &bull; The <strong className="text-[var(--foreground)]">Agente de atributos da persona</strong> adjusts values
-                realistically based on what happens in the narrative.
+                &bull; The <strong className="text-[var(--foreground)]">Agente de atributos da persona</strong>  ajusta os valores de forma realista com base no que acontece na narrativa.
               </li>
               <li>
                 &bull; Bars are displayed in the <strong className="text-[var(--foreground)]">Widget do HUD</strong> during
@@ -1806,7 +1805,8 @@ function PersonaStatsTab({
           <div>
             <p className="text-sm font-medium">Ativar atributos de RPG</p>
             <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-              Attributes are injected into the prompt and tracked via Persona Stats in the game state.
+              
+              Os atributos são injetados no prompt e rastreados via Persona Stats no estado do jogo.
             </p>
           </div>
         </label>
@@ -1978,7 +1978,8 @@ function DescriptionTab({
           <div>
             <h3 className="text-sm font-semibold">Descrição</h3>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
-              Your general description. This is sent in every prompt so the AI knows who you are.
+              
+              Sua descrição geral. Isto é enviado em todo prompt para a IA saber quem você é.
             </p>
           </div>
           <button
@@ -2073,7 +2074,8 @@ function DescriptionTab({
 
         {altDescs.length === 0 ? (
           <p className="text-[0.6875rem] text-[var(--muted-foreground)] italic">
-            No description extensions yet. Add one to toggle extra context on and off.
+            
+            Nenhuma extensão de descrição ainda. Adicione uma para ligar e desligar contexto extra.
           </p>
         ) : (
           <div className="space-y-3">

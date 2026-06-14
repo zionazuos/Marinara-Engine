@@ -559,7 +559,8 @@ export function TrackerCardColorSettings() {
         </p>
       ) : targets.length === 0 ? (
         <p className="rounded-md bg-[var(--secondary)]/42 px-2 py-2 text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-          No active persona or present character IDs are available for this chat.
+          
+          Nenhuma persona ativa ou ID de personagem presente está disponível para este chat.
         </p>
       ) : (
         <>

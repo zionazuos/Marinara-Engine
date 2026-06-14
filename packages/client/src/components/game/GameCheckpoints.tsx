@@ -137,7 +137,8 @@ export function GameCheckpoints({ chatId, onClose, onLoaded }: GameCheckpointsPr
       <div className="flex-1 overflow-y-auto px-2 py-2">
         {!checkpoints?.length ? (
           <p className="py-8 text-center text-xs text-muted-foreground">
-            No checkpoints yet. Auto-saves are created at session boundaries and combat transitions.
+            
+            Nenhum checkpoint ainda. Os salvamentos automáticos são criados nos limites de sessão e nas transições de combate.
           </p>
         ) : (
           <div className="space-y-1">

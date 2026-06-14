@@ -738,7 +738,8 @@ export function ConnectionsPanel() {
       {!isLoading && (!connections || (connections as unknown[]).length === 0) && !linkApiBannerDismissed && (
         <div className="rounded-xl border border-sky-400/20 bg-gradient-to-br from-sky-400/5 to-blue-500/5 p-3 flex flex-col gap-2">
           <p className="text-xs text-[var(--muted-foreground)]">
-            Looking to try new models from a trusted provider? Consider checking out{" "}
+            
+            Quer experimentar novos modelos de um provedor confiável? Considere conferir{" "}
             <a
               href="https://linkapi.ai/"
               target="_blank"

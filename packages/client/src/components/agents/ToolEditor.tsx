@@ -351,7 +351,7 @@ export function ToolEditor() {
                 markDirty();
               }}
               className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-              placeholder="Describe what this tool does — the AI reads this to decide when to call it…"
+              placeholder="Descreva o que esta ferramenta faz — a IA lê isto para decidir quando chamá-la…"
             />
           </FieldGroup>
 

@@ -202,7 +202,7 @@ export function AvatarGenerationModal({
                   onChange={(event) => setAppearance(event.target.value)}
                   rows={7}
                   className="w-full resize-y rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs leading-relaxed text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40"
-                  placeholder="Describe the character's face, hair, build, outfit, mood, and visual style..."
+                  placeholder="Descreva o rosto, cabelo, constituição, roupa, humor e estilo visual do personagem..."
                 />
               </label>
 

@@ -263,7 +263,8 @@ export function AgentsPanel() {
         }
       >
         <div className="text-[0.625rem] text-[var(--muted-foreground)] mb-1.5">
-          Find/replace patterns applied to AI output or user input — like SillyTavern regex scripts.
+          
+          Padrões de busca/substituição aplicados à saída da IA ou à entrada do usuário — como os scripts de regex do SillyTavern.
         </div>
         {importError && <div className="text-xs text-red-500 mb-1">{importError}</div>}
         {importSuccess && <div className="text-xs text-green-500 mb-1">{importSuccess}</div>}
@@ -441,7 +442,8 @@ export function AgentsPanel() {
         <>
           <PanelSection title="Agentes ativados" icon={<Sparkles size="0.8125rem" />}>
             <div className="mb-1.5 text-[0.625rem] text-[var(--muted-foreground)]">
-              Built-ins default to active unless explicitly disabled in their config.
+              
+              Os embutidos ficam ativos por padrão, a menos que sejam explicitamente desativados na configuração deles.
             </div>
             {!activeAgents.length ? (
               <p className="px-1 py-2 text-[0.625rem] text-[var(--muted-foreground)]">Nenhum agente ativo.</p>

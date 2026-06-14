@@ -334,7 +334,8 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
 
           {entries.length === 0 && (
             <div className="rounded-lg border border-dashed border-[var(--border)] px-4 py-8 text-center text-[0.75rem] text-[var(--muted-foreground)]">
-              No summaries yet — come back after your first day of chatting has ended.
+              
+              Nenhum resumo ainda — volte depois que o seu primeiro dia de conversa terminar.
             </div>
           )}
 

@@ -936,7 +936,7 @@ function SectionsTab({
         {!hasLorebookMarker && parentChatHasLorebook && !lorebookWarningDismissed && (
           <div className="flex items-center gap-1.5 rounded-lg bg-amber-400/10 px-2.5 py-1.5 text-[0.6875rem] text-amber-200 ring-1 ring-amber-400/25">
             <AlertTriangle size="0.75rem" className="shrink-0" />
-            <span>Add a lorebook marker when this preset should receive active lorebook entries.</span>
+            <span>Adicione um marcador de lorebook quando este preset deve receber as entradas de lorebook ativas.</span>
             <button
               type="button"
               onClick={dismissLorebookWarning}
@@ -1268,7 +1268,8 @@ function SectionsTab({
                               
                               Tipo de marcador: <strong>{MARKER_LABELS[mc.type as MarkerType] ?? "Unknown"}</strong>
                               <p className="mt-1 text-[var(--muted-foreground)]">
-                                Content is auto-generated at assembly time from your characters, lorebooks, etc.
+                                
+                                O conteúdo é gerado automaticamente no momento da montagem a partir dos seus personagens, lorebooks, etc.
                               </p>
                               {["lorebook", "world_info_before", "world_info_after"].includes(mc.type) && (
                                 <p className="mt-1 text-amber-200">
@@ -2302,8 +2303,7 @@ function MacrosReferenceModal({ onClose }: { onClose: () => void }) {
                 <h4 className="text-[0.6875rem] font-semibold text-purple-400">Blocos condicionais</h4>
                 <p className="mt-1 text-[0.6875rem] text-[var(--muted-foreground)]">
                   
-                  Usar <code>{"{{#if ...}}"}</code>, optional <code>{"{{else}}"}</code>, and <code>{"{{/if}}"}</code> to
-                  switch prompt text by the active speaker, user, or a preset variable.
+                  Usar <code>{"{{#if ...}}"}</code>, optional <code>{"{{else}}"}</code>, and <code>{"{{/if}}"}</code>  para trocar o texto do prompt conforme o falante ativo, o usuário ou uma variável do preset.
                 </p>
               </div>
               <pre className="overflow-x-auto rounded-lg bg-[var(--secondary)] px-3 py-2 text-[0.625rem] leading-relaxed text-amber-300">

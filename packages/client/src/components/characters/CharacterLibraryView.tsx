@@ -469,7 +469,8 @@ export function CharacterLibraryView() {
               <div>
                 <h2 className="text-lg font-semibold text-[var(--foreground)]">Nenhum personagem correspondente</h2>
                 <p className="mt-1 max-w-md text-sm text-[var(--muted-foreground)]">
-                  Try a different search, turn off favorites-only, or import a new card into the library.
+                  
+                  Tente uma busca diferente, desative o modo só favoritos, ou importe um novo card para a biblioteca.
                 </p>
               </div>
             </div>
@@ -593,7 +594,8 @@ export function CharacterLibraryView() {
                 <div>
                   <h2 className="text-lg font-semibold text-[var(--foreground)]">Selecionar um card</h2>
                   <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-                    Pick a character from the grid to see a larger overview before editing.
+                    
+                    Escolha um personagem na grade para ver uma visão geral maior antes de editar.
                   </p>
                 </div>
               </div>

@@ -4133,7 +4133,7 @@ export function GameSurface({
         (signal) => api.post<GameAssetGenerationResult>("/game/generate-assets", payload, { signal }),
         GAME_ASSET_GENERATION_TIMEOUT_MS,
         () => {
-          toast.error("Image generation timed out. The scene will continue without generated assets.");
+          toast.error("A geração de imagem expirou. A cena continuará sem assets gerados.");
         },
       );
     },
@@ -7875,7 +7875,8 @@ export function GameSurface({
                     <>
                       {initialTurnFailed ? (
                         <div className="max-w-sm text-sm text-[var(--muted-foreground)] dark:text-white/60">
-                          Game generation failed. Choose another GM / Party Model or retry this one.
+                          
+                          A geração do game falhou. Escolha outro GM / modelo do grupo ou tente este novamente.
                         </div>
                       ) : (
                         <div className="flex items-center gap-3 text-sm text-[var(--muted-foreground)] dark:text-white/60">

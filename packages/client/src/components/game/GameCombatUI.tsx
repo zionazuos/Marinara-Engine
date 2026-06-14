@@ -2648,7 +2648,7 @@ export function GameCombatUI({
                 }
               }}
               className="min-h-24 w-full resize-none rounded-lg border border-violet-300/20 bg-violet-500/10 px-3 py-2 text-sm leading-relaxed text-white/85 outline-none transition-colors placeholder:text-white/35 focus:border-violet-300/45"
-              placeholder="Example: I kick sand into the Ruin Guard's cracked lens, trying to blind it for a round."
+              placeholder="Exemplo: Eu chuto areia na lente rachada do Guardião da Ruína, tentando cegá-lo por uma rodada."
               autoFocus
             />
 

@@ -1435,7 +1435,8 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
 
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4">
                 <p className="text-center text-xs leading-relaxed text-[var(--muted-foreground)]">
-                  Pick a preset, your persona, and any characters to instantly configure this roleplay.
+                  
+                  Escolha um preset, sua persona e quaisquer personagens para configurar este roleplay instantaneamente.
                 </p>
 
                 {/* Chat Preset */}
@@ -1675,7 +1676,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                   </button>
                   <button
                     onClick={() => setShortcutMode(true)}
-                    title="Apply a saved chat-settings preset and pick a persona + characters in one step"
+                    title="Aplique um preset salvo de configurações do chat e escolha uma persona + personagens em um passo"
                     className="flex items-center gap-1.5 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/20"
                   >
                     <Wand2 size="0.75rem" />

@@ -495,7 +495,7 @@ export function CharacterEditor() {
       return;
     }
     if (avatarUploadInFlightRef.current) {
-      toast.error("Wait for the current avatar upload to finish before removing the avatar.");
+      toast.error("Espere o envio do avatar atual terminar antes de remover o avatar.");
       return;
     }
 
@@ -995,7 +995,7 @@ export function CharacterEditor() {
                 subtitle="Um resumo conciso dos traços de personalidade, temperamento e padrões de comportamento do personagem."
                 value={formData.personality}
                 onChange={(v) => updateField("personality", v)}
-                placeholder="Energetic, curious, and fiercely loyal. Speaks in short bursts. Has a habit of…"
+                placeholder="Energético, curioso e ferozmente leal. Fala em rajadas curtas. Tem o hábito de…"
                 rows={8}
               />
             )}
@@ -1015,7 +1015,7 @@ export function CharacterEditor() {
                 subtitle="Descrição física detalhada — altura, constituição, cabelo, olhos, roupas, características marcantes."
                 value={(formData.extensions.appearance as string) ?? ""}
                 onChange={(v) => updateExtension("appearance", v)}
-                placeholder="Tall and willowy with silver-streaked dark hair. Wears a battered leather coat over…"
+                placeholder="Alto e esguio, com cabelo escuro com mechas prateadas. Veste um casaco de couro surrado por cima…"
                 rows={8}
               />
             )}
@@ -1151,7 +1151,8 @@ function CharacterDescriptionTab({
 
         {altDescs.length === 0 ? (
           <p className="text-[0.6875rem] italic text-[var(--muted-foreground)]">
-            No description extensions yet. Add one to toggle extra character context on and off.
+            
+            Nenhuma extensão de descrição ainda. Adicione uma para ligar e desligar contexto extra do personagem.
           </p>
         ) : (
           <div className="space-y-3">
@@ -1781,7 +1782,7 @@ function DialogueTab({
           onChange={(e) => updateField("first_mes", e.target.value)}
           rows={6}
           className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4 text-sm leading-relaxed outline-none placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-          placeholder="What does the character say when they first meet someone? Use *asterisks* for actions…"
+          placeholder="O que o personagem diz ao conhecer alguém pela primeira vez? Use *asteriscos* para ações…"
         />
       </label>
 
@@ -1866,7 +1867,7 @@ function DialogueTab({
         title="Primeira mensagem"
         value={formData.first_mes}
         onChange={(value) => updateField("first_mes", value)}
-        placeholder="What does the character say when they first meet someone? Use *asterisks* for actions…"
+        placeholder="O que o personagem diz ao conhecer alguém pela primeira vez? Use *asteriscos* para ações…"
       />
       <ExpandedTextarea
         open={expandedField === "mes_example"}
@@ -3050,7 +3051,8 @@ function StatsTab({
         <div>
           <p className="text-sm font-medium">Ativar atributos de RPG</p>
           <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-            Stats will be injected into the prompt and tracked by the Character Tracker agent.
+            
+            Os atributos serão injetados no prompt e rastreados pelo agente Character Tracker.
           </p>
         </div>
       </label>
@@ -3349,7 +3351,7 @@ function LorebookTab({ characterId, formData }: { characterId: string | null; fo
     <div className="space-y-4">
       <SectionHeader
         title="Lorebook do personagem"
-        subtitle="World-building entries embedded in this character. Triggered by keywords in conversation."
+        subtitle="Entradas de construção de mundo embutidas neste personagem. Disparadas por palavras-chave na conversa."
       />
 
       {hasEmbeddedLorebook && (
@@ -3393,7 +3395,8 @@ function LorebookTab({ characterId, formData }: { characterId: string | null; fo
           <div>
             <p className="text-sm font-medium text-[var(--muted-foreground)]">Nenhuma entrada de lorebook</p>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]/60">
-              Import a character with an embedded lorebook, or add entries via the Lorebooks panel.
+              
+              Importe um personagem com um lorebook embutido, ou adicione entradas pelo painel Lorebooks.
             </p>
           </div>
         </div>
