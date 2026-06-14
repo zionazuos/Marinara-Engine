@@ -310,7 +310,7 @@ export function LorebookMakerModal({ open, onClose }: Props) {
               onChange={(e) => setPrompt(e.target.value)}
               rows={3}
               className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-3 text-sm outline-none placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-              placeholder="Describe your world or topic… e.g. 'A steampunk Victorian city built on a floating island with a class-based magic system'"
+              placeholder="Descreva seu mundo ou tema… ex.: 'Uma cidade vitoriana steampunk construída sobre uma ilha flutuante com um sistema de magia baseado em classes'"
             />
           </div>
         </div>

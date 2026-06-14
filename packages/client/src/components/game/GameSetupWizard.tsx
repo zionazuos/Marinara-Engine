@@ -1589,7 +1589,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                 Lorebooks
               </label>
               <p className="mb-2 text-[0.55rem] text-[var(--muted-foreground)]">
-                Attach lorebooks to inject world lore, character info, and other context into game generations.
+                
+                Anexe lorebooks para injetar lore do mundo, info de personagem e outros contextos nas gerações do game.
               </p>
 
               {/* Active lorebooks */}

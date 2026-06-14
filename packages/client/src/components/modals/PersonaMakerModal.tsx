@@ -156,7 +156,7 @@ export function PersonaMakerModal({ open, onClose }: Props) {
             onChange={(e) => setPrompt(e.target.value)}
             rows={3}
             className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-3 text-sm outline-none placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-            placeholder="Describe your persona... e.g. 'A wandering bard with a mysterious past who speaks in riddles and carries a silver lute'"
+            placeholder="Descreva sua persona... ex.: 'Um bardo errante com um passado misterioso que fala por enigmas e carrega um alaúde prateado'"
           />
         </div>
 

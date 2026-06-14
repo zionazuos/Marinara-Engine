@@ -545,7 +545,7 @@ export function PersonasPanel() {
       <ExportFormatDialog
         open={exportDialogOpen}
         title="Exportar personas"
-        description="Native keeps Marinara persona metadata. Compatible exports simple persona JSON for other tools."
+        description="O Nativo mantém os metadados de persona do Marinara. O Compatível exporta um JSON de persona simples para outras ferramentas."
         compatibleDescription="Exports persona fields directly without the Marinara wrapper."
         onClose={() => setExportDialogOpen(false)}
         onSelect={handleExportSelected}

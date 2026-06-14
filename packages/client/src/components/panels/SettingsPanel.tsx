@@ -1133,7 +1133,8 @@ function GeneralSettings() {
         <div className="mb-3 flex flex-col gap-1">
           <div className="text-xs font-semibold text-[var(--foreground)]">Geração de imagem</div>
           <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-            Review generated prompts before Game mode sends them, and set default canvases for generated assets.
+            
+            Revise os prompts gerados antes do modo Game enviá-los e defina canvases padrão para os assets gerados.
           </p>
         </div>
 
@@ -1171,7 +1172,7 @@ function GeneralSettings() {
 
       <PromptOverridesEditor
         title="Modelos de prompt de imagem do game"
-        description="Edit the reusable templates Game Mode uses for NPC portraits, backgrounds, and scene illustrations."
+        description="Edite os modelos reutilizáveis que o modo Game usa para retratos de NPC, fundos e ilustrações de cena."
         help="These templates render before Game Mode sends recurring image-generation requests. One-off prompt review edits still only affect the current request."
         keys={GAME_IMAGE_PROMPT_TEMPLATE_KEYS}
         preferredKey="game.npcPortrait"
@@ -3969,7 +3970,7 @@ function AdvancedSettings() {
       <ExportFormatDialog
         open={exportProfileDialogOpen}
         title="Exportar perfil"
-        description="Native creates a Marinara profile JSON for restoring your data in Marinara. If the JSON would be too large, Marinara will offer a profile ZIP instead."
+        description="O Nativo cria um JSON de perfil do Marinara para restaurar seus dados no Marinara. Se o JSON ficar grande demais, o Marinara oferece um ZIP de perfil no lugar."
         nativeDescription="Keeps Marinara fields, lorebook folders, character/persona metadata, presets, agents, themes, and inline assets for re-import."
         compatibleDescription="Exports direct character JSON, simple persona JSON, and folderless lorebooks for other roleplay tools."
         onClose={() => setExportProfileDialogOpen(false)}

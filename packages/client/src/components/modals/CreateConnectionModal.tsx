@@ -56,7 +56,8 @@ export function CreateConnectionModal({ open, onClose }: Props) {
           </div>
           <div className="flex-1">
             <p className="text-xs text-[var(--muted-foreground)]">
-              Connections define API endpoints and credentials used to communicate with language model providers.
+              
+              As conexões definem os endpoints de API e as credenciais usadas para se comunicar com os provedores de modelos de linguagem.
             </p>
           </div>
         </div>

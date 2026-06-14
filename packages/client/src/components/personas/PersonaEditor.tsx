@@ -419,7 +419,7 @@ export function PersonaEditor() {
       <ExportFormatDialog
         open={exportDialogOpen}
         title="Exportar persona"
-        description="Native keeps Marinara persona metadata. Compatible exports simple persona JSON for other tools."
+        description="O Nativo mantém os metadados de persona do Marinara. O Compatível exporta um JSON de persona simples para outras ferramentas."
         compatibleDescription="Exports persona fields directly without the Marinara wrapper."
         onClose={() => setExportDialogOpen(false)}
         onSelect={(format: ExportFormatChoice) => {
@@ -1014,7 +1014,8 @@ function PersonaSpritesTab({
       <div>
         <h3 className="text-sm font-semibold">Sprites da persona</h3>
         <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
-          Upload VN-style sprites for your persona. These are used in Game Mode and roleplay with the Expression Engine.
+          
+          Envie sprites estilo visual novel para sua persona. Eles são usados no modo Game e no roleplay com o Expression Engine.
         </p>
       </div>
 
@@ -1468,7 +1469,7 @@ function PersonaColorsTab({
     <div className="space-y-6">
       <SectionHeader
         title="Cores da persona"
-        subtitle="Customize how your persona appears in chats. Colors are applied to your name, dialogue, and message bubble."
+        subtitle="Personalize como sua persona aparece nos chats. As cores são aplicadas ao seu nome, diálogo e balão de mensagem."
       />
 
       <button
@@ -1692,7 +1693,7 @@ function PersonaStatsTab({
     <div className="space-y-6">
       <SectionHeader
         title="Barras de status da persona"
-        subtitle="Track your persona's physical and mental needs. These are updated by the Persona Stats agent after each message."
+        subtitle="Acompanhe as necessidades físicas e mentais da sua persona. Elas são atualizadas pelo agente Persona Stats após cada mensagem."
       />
 
       {/* Enable toggle */}
@@ -1706,7 +1707,8 @@ function PersonaStatsTab({
         <div>
           <p className="text-sm font-medium">Ativar atributos da persona</p>
           <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-            Tracked by the Persona Stats agent. Stats appear in the HUD and are adjusted based on narrative events.
+            
+            Rastreado pelo agente Persona Stats. Os atributos aparecem no HUD e são ajustados com base nos eventos da narrativa.
           </p>
         </div>
       </label>

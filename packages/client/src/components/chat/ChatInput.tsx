@@ -570,7 +570,7 @@ export const ChatInput = memo(function ChatInput({
     const chat = useChatStore.getState().activeChat;
     if (chat && !chat.connectionId) {
       toast.error(
-        "It looks like you haven't connected any model yet. Please head to Chat Settings in the top right corner to do that first!",
+        "Parece que você ainda não conectou nenhum modelo. Vá até Configurações do Chat no canto superior direito para fazer isso primeiro!",
       );
       return;
     }

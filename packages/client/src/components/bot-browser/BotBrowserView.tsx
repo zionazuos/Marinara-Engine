@@ -2373,7 +2373,8 @@ export function BotBrowserView() {
             </div>
             <div className="flex flex-col gap-3 p-5 text-sm text-[var(--foreground)]">
               <p>
-                Every character on DataCat is tagged NSFW upstream, so the NSFW filter is locked on for this provider.
+                
+                Todo personagem no DataCat já vem marcado como NSFW na origem, então o filtro NSFW fica travado ligado para este provedor.
               </p>
               <div className="mt-2 flex gap-2">
                 <button

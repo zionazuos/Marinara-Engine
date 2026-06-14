@@ -187,7 +187,7 @@ export function CharacterMakerModal({ open, onClose }: Props) {
             onChange={(e) => setPrompt(e.target.value)}
             rows={3}
             className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-3 text-sm outline-none placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-            placeholder="Describe your character... e.g. 'A cheerful catgirl barista who secretly runs a thieves' guild at night'"
+            placeholder="Descreva seu personagem... ex.: 'Uma catgirl barista alegre que comanda secretamente uma guilda de ladrões à noite'"
           />
         </div>
 

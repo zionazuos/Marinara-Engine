@@ -249,7 +249,8 @@ export function AvatarCropWidget({ src, alt, crop, onChange, onRemove, removing 
         </div>
       </div>
       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-        Drag the square to pan, the corners to resize. The avatar shows exactly the region inside the square.
+        
+        Arraste o quadrado para mover e os cantos para redimensionar. O avatar mostra exatamente a região dentro do quadrado.
       </p>
 
       <div className="flex gap-4 max-md:flex-col max-md:items-center">

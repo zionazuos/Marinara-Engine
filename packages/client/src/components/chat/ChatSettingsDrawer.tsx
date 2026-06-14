@@ -2877,7 +2877,7 @@ export function ChatSettingsDrawer({
                           updateMeta.mutate({ id: chat.id, groupScenarioText: groupScenarioDraft });
                         }
                       }}
-                      placeholder="Replace individual character scenarios with a shared scenario for this group chat or leave empty to keep them…"
+                      placeholder="Substitua os cenários individuais dos personagens por um cenário compartilhado para este chat em grupo, ou deixe vazio para mantê-los…"
                       rows={4}
                       className="w-full resize-y rounded-lg bg-[var(--secondary)] px-3 py-2 pr-8 text-xs leading-relaxed outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                     />
@@ -2900,7 +2900,7 @@ export function ChatSettingsDrawer({
                     title="Substituição de cenário do grupo"
                     value={groupScenarioDraft}
                     onChange={setGroupScenarioDraft}
-                    placeholder="Replace individual character scenarios with a shared scenario for this group chat or leave empty to keep them…"
+                    placeholder="Substitua os cenários individuais dos personagens por um cenário compartilhado para este chat em grupo, ou deixe vazio para mantê-los…"
                   />
                 </div>
               )}
@@ -4146,7 +4146,8 @@ export function ChatSettingsDrawer({
                       </p>
                     ) : (
                       <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                        None of the added characters have uploaded sprites yet. Open a character card to add them first.
+                        
+                        Nenhum dos personagens adicionados tem sprites enviados ainda. Abra um card de personagem para adicioná-los primeiro.
                       </p>
                     )}
 
@@ -5423,7 +5424,8 @@ export function ChatSettingsDrawer({
                 <div className="flex-1 min-w-0">
                   <span className="text-[0.6875rem] font-medium">Mostrar botão de tradução de rascunho</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Add a translate button beside Send so you can translate and edit your message before sending it.
+                    
+                    Adiciona um botão de tradução ao lado de Enviar para você traduzir e editar sua mensagem antes de enviá-la.
                   </p>
                 </div>
                 <div

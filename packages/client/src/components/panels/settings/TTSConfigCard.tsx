@@ -914,7 +914,8 @@ export function TTSConfigCard() {
               )}
               {!voicesFromProvider && source === "pockettts" && voices.length > 0 && (
                 <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                  Showing PocketTTS built-in voices. You can type a custom voice URL or path accepted by your server.
+                  
+                  Mostrando as vozes embutidas do PocketTTS. Você pode digitar uma URL ou caminho de voz personalizado aceito pelo seu servidor.
                 </p>
               )}
             </FieldRow>
@@ -1114,7 +1115,8 @@ export function TTSConfigCard() {
                       note={femaleNpcVoiceFallbackNote}
                     />
                     <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-                      NPCs with unclear gender use a stable pick from both pools. Assigned character voices still win.
+                      
+                      NPCs de gênero indefinido usam uma escolha estável de ambos os conjuntos. Vozes atribuídas a personagens ainda prevalecem.
                     </p>
                     {!voicesFromProvider && (
                       <p className="text-[0.625rem] leading-relaxed text-amber-300/80">

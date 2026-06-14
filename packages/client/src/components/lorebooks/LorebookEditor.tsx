@@ -1046,7 +1046,7 @@ export function LorebookEditor() {
       <ExportFormatDialog
         open={exportDialogOpen}
         title="Exportar lorebook"
-        description="Native keeps Marinara folders and entry fields. Compatible exports a folderless World Info JSON for other roleplay tools."
+        description="O Nativo mantém as pastas e os campos de entrada do Marinara. O Compatível exporta um JSON de World Info sem pastas para outras ferramentas de roleplay."
         onClose={() => setExportDialogOpen(false)}
         onSelect={(format: ExportFormatChoice) => {
           if (!lorebookId) return;
@@ -2180,7 +2180,8 @@ function VectorizeSection({
         </p>
       ) : embeddingConnections.length === 0 ? (
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-          No connections with an embedding model configured. Set an Embedding Model on a connection first.
+          
+          Nenhuma conexão com modelo de embedding configurado. Defina um Modelo de Embedding em uma conexão primeiro.
         </p>
       ) : (
         <>

@@ -1025,7 +1025,7 @@ export function CharacterEditor() {
                 subtitle="The default setting or situation where interactions take place."
                 value={formData.scenario}
                 onChange={(v) => updateField("scenario", v)}
-                placeholder="A bustling port city during a trade festival. The streets are alive with merchants and performers…"
+                placeholder="Uma agitada cidade portuária durante um festival comercial. As ruas estão cheias de mercadores e artistas…"
                 rows={8}
               />
             )}
@@ -1106,7 +1106,7 @@ function CharacterDescriptionTab({
         <div className="flex items-start justify-between gap-2 mb-4">
           <SectionHeader
             title="Descrição"
-            subtitle="The character's general description. This is sent in every prompt as part of the character's identity."
+            subtitle="A descrição geral do personagem. Isso é enviado em todo prompt como parte da identidade do personagem."
           />
           <button
             type="button"
@@ -2079,7 +2079,7 @@ function CharacterGalleryTab({ characterId, characterName }: { characterId: stri
     <div className="space-y-6">
       <SectionHeader
         title="Galeria de personagens"
-        subtitle="Keep reference art, alternate outfits, and other character images attached to this character even if chats get deleted."
+        subtitle="Mantenha arte de referência, roupas alternativas e outras imagens do personagem anexadas a ele mesmo que os chats sejam excluídos."
       />
 
       <ImageUploadDropzone
@@ -2546,7 +2546,7 @@ function SpritesTab({
     <div className="space-y-6">
       <SectionHeader
         title="Sprites do personagem"
-        subtitle="Upload VN-style sprites for different expressions. The Expression Engine agent will select the appropriate sprite during roleplay."
+        subtitle="Envie sprites estilo visual novel para diferentes expressões. O agente Expression Engine selecionará o sprite apropriado durante o roleplay."
       />
 
       <div className="inline-flex rounded-xl bg-[var(--secondary)] p-1 ring-1 ring-[var(--border)]">
@@ -3036,7 +3036,7 @@ function StatsTab({
     <div className="space-y-6">
       <SectionHeader
         title="Atributos de RPG"
-        subtitle="Toggle stat tracking for this character. When enabled, the character's stats are included in the prompt and tracked by agents."
+        subtitle="Ative ou desative o rastreamento de atributos deste personagem. Quando ativado, os atributos dele entram no prompt e são rastreados pelos agentes."
       />
 
       {/* Enable toggle */}
@@ -3180,7 +3180,7 @@ function ColorsTab({
     <div className="space-y-6">
       <SectionHeader
         title="Cores do personagem"
-        subtitle="Customize how this character appears in chats. Colors are applied to the name, dialogue, and message bubble."
+        subtitle="Personalize como este personagem aparece nos chats. As cores são aplicadas ao nome, diálogo e balão de mensagem."
       />
 
       {/* Extract from avatar button */}

@@ -2290,7 +2290,8 @@ function MacrosReferenceModal({ onClose }: { onClose: () => void }) {
           {/* Content */}
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
             <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-              Use these macros in your prompt sections. They will be replaced with actual values at generation time.
+              
+              Use estas macros nas suas seções de prompt. Elas serão substituídas pelos valores reais no momento da geração.
             </p>
             <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
               In group chats, a bracketed block containing character macros like <code>{"{{char}}"}</code> and{" "}

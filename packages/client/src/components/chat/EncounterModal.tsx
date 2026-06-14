@@ -964,7 +964,8 @@ class EncounterErrorBoundary extends Component<{ children: ReactNode; onReset: (
             <AlertTriangle size="2.5rem" className="text-red-400" />
             <h3 className="text-sm font-bold text-foreground/90">Erro de combate</h3>
             <p className="text-center text-xs text-foreground/50">
-              Something went wrong during combat. This is usually caused by the AI returning unexpected data.
+              
+              Algo deu errado durante o combate. Isso geralmente ocorre quando a IA retorna dados inesperados.
             </p>
             <button
               onClick={() => {

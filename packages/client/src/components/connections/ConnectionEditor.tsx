@@ -1041,7 +1041,8 @@ export function ConnectionEditor() {
             )}
             {isOpenAIChatGPTProvider && (
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Marinara sends requests to the ChatGPT Codex endpoint automatically using your local Codex auth.
+                
+                O Marinara envia requisições ao endpoint do ChatGPT Codex automaticamente usando sua autenticação local do Codex.
               </p>
             )}
             {localProvider === "custom" && (
@@ -1731,7 +1732,8 @@ export function ConnectionEditor() {
             </label>
             {isImageGenerationProvider && (
               <p className="px-2 text-[0.625rem] text-[var(--muted-foreground)]">
-                Only one image generation connection should be marked as the default for the Illustrator agent.
+                
+                Apenas uma conexão de geração de imagem deve ser marcada como padrão para o agente Illustrator.
               </p>
             )}
           </FieldGroup>

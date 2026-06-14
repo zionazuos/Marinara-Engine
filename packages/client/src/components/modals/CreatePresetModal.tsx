@@ -66,7 +66,8 @@ export function CreatePresetModal({ open, onClose }: Props) {
           </div>
           <div className="flex-1">
             <p className="text-xs text-[var(--muted-foreground)]">
-              Presets define the system prompt structure and generation parameters used during conversations.
+              
+              Os presets definem a estrutura do prompt de sistema e os parâmetros de geração usados nas conversas.
             </p>
           </div>
         </div>
