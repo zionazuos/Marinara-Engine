@@ -184,7 +184,8 @@ export function RoleplayHUDActionsMenu({
                   onClick={clearThoughtBubbles}
                   className="text-[0.625rem] text-white/30 transition-colors hover:text-white/60"
                 >
-                  Clear all
+                  
+                  Limpar tudo
                 </button>
               </div>
               <div className="flex flex-col gap-1 p-2">

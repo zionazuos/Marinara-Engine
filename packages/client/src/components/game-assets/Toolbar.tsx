@@ -206,7 +206,7 @@ export function Toolbar({
                 ? "bg-[var(--accent)] text-[var(--primary)]"
                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
             )}
-            title="Grid view"
+            title="Visão em grade"
           >
             <Grid3X3 size="0.875rem" />
           </button>
@@ -218,7 +218,7 @@ export function Toolbar({
                 ? "bg-[var(--accent)] text-[var(--primary)]"
                 : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
             )}
-            title="List view"
+            title="Visão em lista"
           >
             <List size="0.875rem" />
           </button>
@@ -323,7 +323,8 @@ export function Toolbar({
               className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
             >
               <Folder size="0.875rem" />
-              New folder
+              
+              Nova pasta
             </button>
             <button
               onClick={() => {

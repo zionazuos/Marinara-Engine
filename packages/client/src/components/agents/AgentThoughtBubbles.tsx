@@ -47,7 +47,8 @@ export function AgentThoughtBubbles({ enabledAgentTypes }: { enabledAgentTypes?:
           {isProcessing && (
             <span className="ml-1.5 text-[var(--muted-foreground)]">
               <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                thinking…
+                
+                pensando…
               </motion.span>
             </span>
           )}
@@ -62,7 +63,7 @@ export function AgentThoughtBubbles({ enabledAgentTypes }: { enabledAgentTypes?:
           <button
             onClick={clearThoughtBubbles}
             className="rounded p-0.5 text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-            title="Dismiss all"
+            title="Dispensar tudo"
           >
             <X size="0.875rem" />
           </button>

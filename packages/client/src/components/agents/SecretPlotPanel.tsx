@@ -378,7 +378,7 @@ export function SecretPlotPanel({
                       >
                         {(draft.sceneDirections.length > 1 || row.fulfilled) && (
                           <div className="mb-1 flex items-center justify-between gap-2 px-1 text-[0.5rem] text-[var(--muted-foreground)]">
-                            <span>Direction {idx + 1}</span>
+                            <span>Direção {idx + 1}</span>
                             <label className="flex shrink-0 items-center gap-1">
                               <input
                                 type="checkbox"
@@ -391,7 +391,8 @@ export function SecretPlotPanel({
                                 }}
                                 className="h-2.5 w-2.5 rounded border-[var(--input)] accent-[var(--primary)]"
                               />
-                              Fulfilled
+                              
+                              Cumprido
                             </label>
                           </div>
                         )}
@@ -443,7 +444,8 @@ export function SecretPlotPanel({
                       )}
                     />
                     <span className="truncate text-[0.625rem] font-semibold text-[var(--popover-foreground)]">
-                      Arc memory
+                      
+                      Memória do arco
                     </span>
                     {draft.arcCompleted && (
                       <span className="rounded bg-[var(--primary)]/15 px-1 py-0.5 text-[0.5rem] font-medium text-[var(--primary)]">

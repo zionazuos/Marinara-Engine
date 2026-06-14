@@ -127,7 +127,8 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
             ) : (
               <div className="space-y-1.5">
                 <label className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]">
-                  Connection
+                  
+                  Conexão
                 </label>
                 <select
                   value={connectionId}
@@ -165,7 +166,8 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
               )}
             >
               {createChat.isPending ? <Loader2 size="0.75rem" className="animate-spin" /> : MODE_META[mode].icon}
-              Create Chat
+              
+              Criar chat
             </button>
           </div>
         </div>

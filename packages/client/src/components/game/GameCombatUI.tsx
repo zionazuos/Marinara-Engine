@@ -1838,7 +1838,8 @@ export function GameCombatUI({
                     : "border-white/10 bg-white/5 text-white/55 hover:bg-white/10",
                 )}
               >
-                Cues
+                
+                Deixas
               </button>
             )}
             <button
@@ -1891,7 +1892,8 @@ export function GameCombatUI({
                     Rodada {round}
                   </span>
                   <span className="min-w-[4.25rem] rounded bg-amber-500/20 px-1.5 py-0.5 text-[0.55rem] font-semibold uppercase tracking-wide text-amber-200">
-                    Your turn
+                    
+                    Sua vez
                   </span>
                 </div>
               </div>
@@ -2077,7 +2079,8 @@ export function GameCombatUI({
                     disabled={!customInstruction.trim() || !onCustomInstruction}
                     className="rounded-lg border border-violet-300/25 bg-violet-500/15 px-3 py-1.5 text-xs font-semibold text-violet-100 transition-colors hover:bg-violet-500/25 disabled:cursor-not-allowed disabled:opacity-45"
                   >
-                    Ask GM
+                    
+                    Perguntar ao GM
                   </button>
                   <button
                     type="button"
@@ -2651,7 +2654,8 @@ export function GameCombatUI({
                 disabled={!customInstruction.trim() || !onCustomInstruction}
                 className="rounded-lg border border-violet-300/25 bg-violet-500/15 px-3 py-1.5 text-xs font-semibold text-violet-100 transition-colors hover:bg-violet-500/25 disabled:cursor-not-allowed disabled:opacity-45"
               >
-                Ask GM
+                
+                Perguntar ao GM
               </button>
               <button
                 type="button"
@@ -2791,7 +2795,8 @@ export function GameCombatUI({
           <div className="border-t border-white/5 px-3 py-2 sm:px-4">
             <div className="mb-1 flex items-center gap-1.5 text-[0.6rem] font-semibold uppercase tracking-wide text-white/40">
               <ScrollText size={11} />
-              Combat Log
+              
+              Registro de combate
             </div>
             <div className="max-h-24 space-y-1 overflow-y-auto pr-1 sm:max-h-32">
               {combatLogEntries.map((entry) => (

@@ -66,7 +66,7 @@ export function QuestObjectiveRow({
         <InlineEdit
           value={objective.text}
           onSave={(text) => onUpdateText(text || "Objective")}
-          placeholder="Objective"
+          placeholder="Objetivo"
           title={`Objective: ${visibleText(objective.text, "Objective")}`}
           showEditHint={false}
           previewLineCount={previewLineCount}

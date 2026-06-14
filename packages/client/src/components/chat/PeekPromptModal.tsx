@@ -450,11 +450,11 @@ export function PeekPromptModal({ data, onClose }: PeekPromptModalProps) {
                   </span>
                 )}
                 <span className="text-[var(--muted-foreground)]">
-                  ~{fmtTokens(totalTokens)} est. tokens
+                  ~{fmtTokens(totalTokens)}  tokens est.
                   {gen?.tokensPrompt != null && <> · {fmtTokens(gen.tokensPrompt)} actual prompt tokens</>}
                   {(gen?.tokensCachedPrompt ?? 0) > 0 && <> · {fmtTokens(gen?.tokensCachedPrompt ?? 0)} cached</>}
                   {(gen?.tokensCacheWritePrompt ?? 0) > 0 && (
-                    <> · {fmtTokens(gen?.tokensCacheWritePrompt ?? 0)} cache write</>
+                    <> · {fmtTokens(gen?.tokensCacheWritePrompt ?? 0)}  escrita de cache</>
                   )}
                 </span>
               </div>

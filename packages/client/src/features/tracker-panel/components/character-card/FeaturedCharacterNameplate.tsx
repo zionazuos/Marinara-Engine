@@ -74,7 +74,7 @@ export function FeaturedCharacterNameplate({
   return (
     <TrackerProfileNameplate
       value={character.name}
-      placeholder="Character"
+      placeholder="Personagem"
       onSave={onUpdate ? (name) => onUpdate({ ...character, name: name || "Character" }) : undefined}
       primaryControl={thoughtControl}
       primaryControlSide={thoughtControlSide}

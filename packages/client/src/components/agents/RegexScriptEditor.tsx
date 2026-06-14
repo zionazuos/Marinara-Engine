@@ -454,7 +454,7 @@ export function RegexScriptEditor() {
 
           {/* ── Flags ── */}
           <FieldGroup
-            label="Regex Flags"
+            label="Flags de regex"
             icon={<Info size="0.875rem" className="text-orange-400" />}
             help="Standard regex flags: g (global), i (case-insensitive), m (multiline), s (dotAll), u (unicode)."
           >
@@ -581,7 +581,7 @@ export function RegexScriptEditor() {
                   )}
                 </button>
                 <div>
-                  <div className="text-xs font-medium">Prompt Only</div>
+                  <div className="text-xs font-medium">Apenas prompt</div>
                   <div className="text-[0.625rem] text-[var(--muted-foreground)]">
                     Only apply in the prompt context sent to the AI, not in the displayed message.
                   </div>
@@ -605,7 +605,7 @@ export function RegexScriptEditor() {
 
               {/* Depth range */}
               <div className="flex items-center gap-3">
-                <span className="text-xs font-medium w-24">Depth Range</span>
+                <span className="text-xs font-medium w-24">Faixa de profundidade</span>
                 <input
                   type="number"
                   value={localMinDepth ?? ""}
@@ -636,7 +636,7 @@ export function RegexScriptEditor() {
 
           {/* ── Live Test ── */}
           <FieldGroup
-            label="Live Test"
+            label="Teste ao vivo"
             icon={<Play size="0.875rem" className="text-orange-400" />}
             help="Test your regex pattern against sample text. Macros use sample User and Character values here."
           >
@@ -676,7 +676,7 @@ export function RegexScriptEditor() {
                 uppercase a capture.
               </p>
               <p>
-                <strong className="text-[var(--foreground)]">Examples:</strong>
+                <strong className="text-[var(--foreground)]">Exemplos:</strong>
               </p>
               <ul className="ml-4 list-disc space-y-0.5">
                 <li>
@@ -684,7 +684,8 @@ export function RegexScriptEditor() {
                   <code className="rounded bg-[var(--secondary)] px-1">$1</code>
                 </li>
                 <li>
-                  Remove OOC: <code className="rounded bg-[var(--secondary)] px-1">\\(OOC:.*?\\)</code> → (empty)
+                  
+                  Remover OOC: <code className="rounded bg-[var(--secondary)] px-1">\\(OOC:.*?\\)</code> → (empty)
                 </li>
                 <li>
                   

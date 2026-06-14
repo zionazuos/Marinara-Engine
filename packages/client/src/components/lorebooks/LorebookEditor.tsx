@@ -1460,7 +1460,7 @@ export function LorebookEditor() {
                   </div>
                   <div className="flex items-end gap-2">
                     <div className="flex items-center justify-between rounded-xl bg-[var(--secondary)] px-3 py-2.5 ring-1 ring-[var(--border)]">
-                      <span className="mr-2 text-xs">Recursive</span>
+                      <span className="mr-2 text-xs">Recursivo</span>
                       <button
                         onClick={() => {
                           setFormRecursive(!formRecursive);
@@ -1477,7 +1477,8 @@ export function LorebookEditor() {
                     {formRecursive && (
                       <div>
                         <label className="mb-1.5 flex items-center gap-1 text-xs font-medium">
-                          Max Depth{" "}
+                          
+                          Profundidade máx{" "}
                           <HelpTooltip text="Maximum number of recursive passes. Each pass scans activated entry content for additional keyword matches. Higher values find more connections but use more processing." />
                         </label>
                         <input
@@ -1652,14 +1653,16 @@ export function LorebookEditor() {
                     title="Create a new folder to group entries"
                   >
                     <FolderPlus size="0.8125rem" />
-                    Add Folder
+                    
+                    Adicionar pasta
                   </button>
                   <button
                     onClick={handleAddEntry}
                     className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2.5 text-xs font-medium text-white shadow-md transition-all hover:shadow-lg active:scale-[0.98]"
                   >
                     <Plus size="0.8125rem" />
-                    Add Entry
+                    
+                    Adicionar entrada
                   </button>
                 </div>
 
@@ -1673,7 +1676,8 @@ export function LorebookEditor() {
                       disabled={visibleEntryIds.length === 0}
                       className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-amber-400 transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
                     >
-                      Select all
+                      
+                      Selecionar tudo
                     </button>
                     <button
                       onClick={() => setSelectedEntryIds(new Set())}
@@ -2167,7 +2171,7 @@ function VectorizeSection({
         </span>
         {missingCount > 0 && <span>{missingCount} still need embeddings.</span>}
         {excludeFromVectorization ? <span>This lorebook excludes every entry.</span> : null}
-        {!excludeFromVectorization && excludedCount > 0 && <span>{excludedCount} excluded.</span>}
+        {!excludeFromVectorization && excludedCount > 0 && <span>{excludedCount}  excluído.</span>}
       </div>
       {excludeFromVectorization ? (
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">

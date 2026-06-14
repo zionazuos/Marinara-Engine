@@ -763,7 +763,8 @@ export function GameAssetsBrowserView() {
               onClick={handleSelectAll}
               className="rounded-md px-2 py-1 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
             >
-              Select all
+              
+              Selecionar tudo
             </button>
             <div className="mx-1 h-3 w-px bg-[var(--border)]" />
             <button
@@ -900,7 +901,8 @@ export function GameAssetsBrowserView() {
                 {subfolders.length > 0 && (
                   <div className="max-h-56 overflow-y-auto py-1">
                     <div className="px-3 py-1 text-[0.625rem] font-medium uppercase text-[var(--muted-foreground)]">
-                      Subfolders
+                      
+                      Subpastas
                     </div>
                     {subfolders.map((child) => {
                       const childStatus = getFolderSelectionStatus(child);

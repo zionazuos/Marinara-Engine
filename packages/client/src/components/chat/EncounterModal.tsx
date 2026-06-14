@@ -196,7 +196,7 @@ function TargetSelection({ attackType, enemies, party, onSelect, onCancel }: Tar
             >
               <span className="text-lg">💥</span>
               <div>
-                <div className="text-xs font-bold text-[var(--foreground)]">All Enemies</div>
+                <div className="text-xs font-bold text-[var(--foreground)]">Todos os inimigos</div>
                 <div className="text-[0.625rem] text-[var(--muted-foreground)]/70">Area of Effect</div>
               </div>
             </button>
@@ -286,7 +286,7 @@ function NarrativeSelect({
           className="rounded-lg border border-[var(--border)] bg-[var(--muted)]/30 px-2 py-1.5 text-xs text-[var(--foreground)]"
         >
           <option value="present">Tempo presente</option>
-          <option value="past">Past Tense</option>
+          <option value="past">Tempo passado</option>
         </select>
         <select
           value={value.person}
@@ -302,7 +302,7 @@ function NarrativeSelect({
           onChange={(e) => onChange({ ...value, narration: e.target.value as any })}
           className="rounded-lg border border-[var(--border)] bg-[var(--muted)]/30 px-2 py-1.5 text-xs text-[var(--foreground)]"
         >
-          <option value="omniscient">Omniscient</option>
+          <option value="omniscient">Onisciente</option>
           <option value="limited">Limitado</option>
         </select>
         <input
@@ -364,7 +364,8 @@ function EncounterConfig() {
           <div className="space-y-2">
             <h4 className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted-foreground)]">
               <Wand2 size="0.75rem" className="text-indigo-400" />
-              Spellbook
+              
+              Grimório
             </h4>
             <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]/70">
               Attach a spellbook so the AI knows which spells and abilities are available in combat.
@@ -909,7 +910,8 @@ function EncounterModalInner() {
                   <div>
                     <h3 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-foreground/50">
                       <Sparkles size="0.875rem" />
-                      Combat Log
+                      
+                      Registro de combate
                     </h3>
                     <CombatLog />
                   </div>

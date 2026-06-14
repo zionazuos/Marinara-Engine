@@ -191,7 +191,7 @@ const EditTextarea = memo(function EditTextarea({
         <button
           type="button"
           onClick={onCancel}
-          aria-label="Cancel edit"
+          aria-label="Cancelar edição"
           className="rounded-md p-1 text-white/40 hover:bg-white/10 hover:text-white/70"
           title="Cancel (Esc)"
         >
@@ -200,7 +200,7 @@ const EditTextarea = memo(function EditTextarea({
         <button
           type="button"
           onClick={handleSave}
-          aria-label="Save edit"
+          aria-label="Salvar edição"
           className="rounded-md p-1 text-emerald-400/70 hover:bg-emerald-400/10 hover:text-emerald-400"
           title="Save (Cmd+Enter)"
         >
@@ -1722,7 +1722,8 @@ export const ChatMessage = memo(function ChatMessage({
               <div className="flex items-center gap-1.5 px-1 mb-1">
                 <span className="h-px flex-1 bg-amber-400/30" />
                 <span className="text-[0.5625rem] font-semibold uppercase tracking-widest text-amber-400/70">
-                  New Start
+                  
+                  Novo início
                 </span>
                 <span className="h-px flex-1 bg-amber-400/30" />
               </div>
@@ -1855,7 +1856,7 @@ export const ChatMessage = memo(function ChatMessage({
                         type="button"
                         onClick={() => openImageLightbox(att.url || att.data, att.prompt)}
                         className="block"
-                        title="Open image"
+                        title="Abrir imagem"
                         aria-label={`Open ${att.filename || att.name || "image"}`}
                       >
                         <img
@@ -1950,7 +1951,7 @@ export const ChatMessage = memo(function ChatMessage({
                 <ActionBtn
                   icon={<Search size={MESSAGE_ACTION_ICON_SIZE} />}
                   onClick={() => onPeekPrompt?.()}
-                  title="Peek prompt"
+                  title="Espiar prompt"
                   dark
                 />
               )}
@@ -2085,7 +2086,7 @@ export const ChatMessage = memo(function ChatMessage({
             <button
               type="button"
               onClick={closeImageLightbox}
-              aria-label="Close image"
+              aria-label="Fechar imagem"
               className="absolute right-3 top-3 rounded-lg bg-black/60 p-2 text-white transition-colors hover:bg-black/80"
             >
               <X size="1rem" />
@@ -2205,7 +2206,8 @@ export const ChatMessage = memo(function ChatMessage({
             <div className="flex items-center gap-1.5 px-2 mb-0.5">
               <span className="h-px flex-1 bg-amber-500/30" />
               <span className="text-[0.5625rem] font-semibold uppercase tracking-widest text-amber-500/70">
-                New Start
+                
+                Novo início
               </span>
               <span className="h-px flex-1 bg-amber-500/30" />
             </div>
@@ -2282,7 +2284,7 @@ export const ChatMessage = memo(function ChatMessage({
                       type="button"
                       onClick={() => openImageLightbox(att.url || att.data, att.prompt)}
                       className="block"
-                      title="Open image"
+                      title="Abrir imagem"
                       aria-label={`Open ${att.filename || att.name || "image"}`}
                     >
                       <img
@@ -2374,7 +2376,7 @@ export const ChatMessage = memo(function ChatMessage({
               <ActionBtn
                 icon={<Search size={MESSAGE_ACTION_ICON_SIZE} />}
                 onClick={() => onPeekPrompt?.()}
-                title="Peek prompt"
+                title="Espiar prompt"
               />
             )}
             {generationReplay && (
@@ -2511,7 +2513,7 @@ export const ChatMessage = memo(function ChatMessage({
           <button
             type="button"
             onClick={closeImageLightbox}
-            aria-label="Close image"
+            aria-label="Fechar imagem"
             className="absolute right-3 top-3 rounded-lg bg-black/60 p-2 text-white transition-colors hover:bg-black/80"
           >
             <X size="1rem" />

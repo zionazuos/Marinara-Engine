@@ -598,7 +598,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
           <>
             {/* Game Name */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Game Name</label>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Nome do game</label>
               <input
                 type="text"
                 value={gameName}
@@ -763,7 +763,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
 
             {/* Difficulty — single-select */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Difficulty</label>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Dificuldade</label>
               <div className="flex gap-1.5">
                 {DIFFICULTIES.map((d) => (
                   <button
@@ -1148,7 +1148,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                 ))}
               </select>
               <p className="mt-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-[0.6875rem] leading-relaxed text-amber-800 dark:border-amber-500/25 dark:text-amber-100">
-                <span className="font-semibold text-amber-900 dark:text-amber-200">Warning!</span> It&apos;s recommended
+                <span className="font-semibold text-amber-900 dark:text-amber-200">Aviso!</span> It&apos;s recommended
                 you use a strong model (any SOTA one; the newest Opus, Gemini, GPT) for the initial generation for the
                 best experience. You can change the model later, after the initial generation (in Chat Settings -&gt;
                 Connection).
@@ -1728,7 +1728,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             ) : (
               <>
                 <Wand2 size={14} />
-                Start Game
+                
+                Iniciar game
               </>
             )}
           </button>

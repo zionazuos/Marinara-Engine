@@ -1829,7 +1829,7 @@ export function BotBrowserView() {
         {/* Auth indicator for login providers */}
         {sourceId === "pygmalion" && pygLoggedIn && (
           <span className="ml-auto flex items-center gap-1 text-[0.65rem] text-emerald-400">
-            <CheckCircle size="0.625rem" /> Logged in
+            <CheckCircle size="0.625rem" />  Conectado
           </span>
         )}
         {sourceId === "chartavern" && ctLoggedIn && (
@@ -1910,7 +1910,7 @@ export function BotBrowserView() {
                     className="flex w-full items-center gap-1.5 rounded-md bg-emerald-500/10 px-2 py-1.5 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20"
                   >
                     
-                    + Adicionar <strong>{tagSearch.trim().toLowerCase()}</strong> as filter
+                    + Adicionar <strong>{tagSearch.trim().toLowerCase()}</strong>  como filtro
                   </button>
                   <button
                     onClick={() => {
@@ -2231,15 +2231,15 @@ export function BotBrowserView() {
                             }}
                             className="rounded border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-xs outline-none"
                           >
-                            <option value="desc">Descending</option>
-                            <option value="asc">Ascending</option>
+                            <option value="desc">Decrescente</option>
+                            <option value="asc">Crescente</option>
                           </select>
                         </div>
                       )}
                       {provider.hasTokenFilters && (
                         <>
                           <div className="flex items-center gap-2">
-                            <label className="w-24 text-xs text-[var(--muted-foreground)]">Min Tokens</label>
+                            <label className="w-24 text-xs text-[var(--muted-foreground)]">Tokens mín</label>
                             <input
                               type="number"
                               value={minTokens}
@@ -2476,7 +2476,7 @@ function LoginModal({
           </div>
           <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-[var(--foreground)]">
             <span className="mr-1.5">🔑</span>
-            <strong>Optional:</strong>{" "}
+            <strong>Opcional:</strong>{" "}
             {isPyg
               ? "Paste your auth token to enable NSFW content and access authenticated character data."
               : "Paste your session cookies to see NSFW-tagged content."}
@@ -2486,7 +2486,7 @@ function LoginModal({
           {isPyg ? (
             <div className="flex flex-col gap-3">
               <div>
-                <label className="mb-1 block text-xs text-[var(--muted-foreground)]">Auth Token</label>
+                <label className="mb-1 block text-xs text-[var(--muted-foreground)]">Token de autenticação</label>
                 <textarea
                   value={pygTokenInput}
                   onChange={(e) => setPygTokenInput(e.target.value)}
@@ -2514,7 +2514,7 @@ function LoginModal({
                     and log in
                   </p>
                   <p>
-                    2. Open DevTools (F12) → <strong>Application</strong> tab → <strong>Armazenamento local</strong>
+                    2. Open DevTools (F12) → <strong>Aplicativo</strong> tab → <strong>Armazenamento local</strong>
                   </p>
                   <p>
                     3. Find the entry named <code className="rounded bg-[var(--accent)] px-1">authn</code>

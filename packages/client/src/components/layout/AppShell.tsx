@@ -701,7 +701,7 @@ export function AppShell() {
       <aside
         data-tour="sidebar"
         data-component="ChatSidebarPanel"
-        aria-label="Chat list"
+        aria-label="Lista de chats"
         className={cn(
           "mari-sidebar flex-shrink-0 overflow-hidden bg-[var(--background)]/80 backdrop-blur-xl",
           sidebarDragWidth == null && "transition-[width] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]",

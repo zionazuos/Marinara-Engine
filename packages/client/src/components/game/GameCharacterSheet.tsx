@@ -434,11 +434,11 @@ export function GameCharacterSheet({
                     onClick={() => setIsEditing(true)}
                     disabled={isRegenerating}
                     className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)]/90 p-0 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)] disabled:opacity-60 sm:h-auto sm:w-auto sm:min-w-0 sm:gap-1.5 sm:px-3 sm:py-1.5"
-                    title="Edit Sheet"
-                    aria-label="Edit sheet"
+                    title="Editar ficha"
+                    aria-label="Editar ficha"
                   >
                     <Pencil size={13} />
-                    <span className="hidden sm:inline">Edit Sheet</span>
+                    <span className="hidden sm:inline">Editar ficha</span>
                   </button>
                 )}
               </>
@@ -517,7 +517,7 @@ export function GameCharacterSheet({
               <div className="border-b border-[var(--border)] px-5 py-4">
                 <SectionHeader
                   icon={<Pencil size={12} />}
-                  title="Sheet Details"
+                  title="Detalhes da ficha"
                   className="text-[var(--muted-foreground)]"
                 />
                 <div className="space-y-3">
@@ -566,7 +566,7 @@ export function GameCharacterSheet({
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       <label className="block space-y-1.5">
-                        <span className={FIELD_LABEL_CLASS}>Current HP</span>
+                        <span className={FIELD_LABEL_CLASS}>HP atual</span>
                         <input
                           type="number"
                           value={draft.hpValue}
@@ -635,7 +635,7 @@ export function GameCharacterSheet({
                 <div className="mb-2.5 flex items-center justify-between gap-3">
                   <SectionHeader
                     icon={<Zap size={12} />}
-                    title="Abilities"
+                    title="Habilidades"
                     className="mb-0 text-[var(--muted-foreground)]"
                   />
                   <button
@@ -675,7 +675,7 @@ export function GameCharacterSheet({
                     <div className="mb-2.5 flex items-center justify-between gap-3">
                       <SectionHeader
                         icon={<Target size={11} />}
-                        title="Strengths"
+                        title="Forças"
                         className="mb-0 text-emerald-500/80"
                       />
                       <button
@@ -712,7 +712,7 @@ export function GameCharacterSheet({
                     <div className="mb-2.5 flex items-center justify-between gap-3">
                       <SectionHeader
                         icon={<AlertTriangle size={11} />}
-                        title="Weaknesses"
+                        title="Fraquezas"
                         className="mb-0 text-red-400/80"
                       />
                       <button
@@ -760,7 +760,8 @@ export function GameCharacterSheet({
                     className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
                   >
                     <Plus size={13} />
-                    Add Detail
+                    
+                    Adicionar detalhe
                   </button>
                 </div>
                 <p className="mb-3 text-[0.6875rem] text-[var(--muted-foreground)]">
@@ -804,7 +805,7 @@ export function GameCharacterSheet({
             <div className="border-b border-[var(--border)] px-5 py-4">
               <SectionHeader
                 icon={<Shield size={12} />}
-                title="Attributes"
+                title="Atributos"
                 className="text-[var(--muted-foreground)]"
               />
               {hasRpgAttributes && (
@@ -886,7 +887,7 @@ export function GameCharacterSheet({
 
           {!isEditing && previewGameCard && previewGameCard.abilities.length > 0 && (
             <div className="border-b border-[var(--border)] px-5 py-4">
-              <SectionHeader icon={<Zap size={12} />} title="Abilities" className="text-[var(--muted-foreground)]" />
+              <SectionHeader icon={<Zap size={12} />} title="Habilidades" className="text-[var(--muted-foreground)]" />
               <div className="space-y-1">
                 {previewGameCard.abilities.map((ability, index) => (
                   <div
@@ -907,7 +908,7 @@ export function GameCharacterSheet({
                 <div className="grid grid-cols-2 gap-3">
                   {previewGameCard.strengths.length > 0 && (
                     <div>
-                      <SectionHeader icon={<Target size={11} />} title="Strengths" className="text-emerald-500/80" />
+                      <SectionHeader icon={<Target size={11} />} title="Forças" className="text-emerald-500/80" />
                       <div className="space-y-0.5">
                         {previewGameCard.strengths.map((strength, index) => (
                           <div key={`${strength}-${index}`} className="text-[0.6875rem] text-[var(--foreground)]/70">
@@ -921,7 +922,7 @@ export function GameCharacterSheet({
                     <div>
                       <SectionHeader
                         icon={<AlertTriangle size={11} />}
-                        title="Weaknesses"
+                        title="Fraquezas"
                         className="text-red-400/80"
                       />
                       <div className="space-y-0.5">

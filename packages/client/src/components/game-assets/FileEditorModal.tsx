@@ -64,7 +64,7 @@ export function FileEditorModal({ node, onClose, initialMode = "edit" }: FileEdi
   const handleSave = useCallback(async () => {
     try {
       await saveFile.mutateAsync({ path: node.path, content });
-      toast.success("File saved");
+      toast.success("Arquivo salvo");
       onClose();
     } catch (err) {
       toast.error(`Save failed: ${err instanceof Error ? err.message : "Unknown error"}`);

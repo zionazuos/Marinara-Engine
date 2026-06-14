@@ -105,7 +105,7 @@ export function WorldTimeTile({
         label="Hora"
         value={display.raw || value}
         onSave={onSave}
-        placeholder="Set time"
+        placeholder="Definir hora"
         className="grid grid-rows-[minmax(0,1fr)_0.625rem] px-1 pb-0.5 pt-0.5 text-center"
         inputClassName="text-center"
         showEditHint={false}

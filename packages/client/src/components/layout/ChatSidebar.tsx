@@ -938,12 +938,12 @@ export function ChatSidebar() {
               value={sort}
               onChange={(e) => setSort(e.target.value as ChatSortOption)}
               className="w-full appearance-none rounded-lg bg-[var(--secondary)] py-2 pl-2.5 pr-7 text-[0.6875rem] text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all focus:ring-[var(--primary)]/40"
-              title="Sort chats"
+              title="Ordenar chats"
             >
               <option value="newest">Ordenar: Mais recentes</option>
               <option value="oldest">Ordenar: Mais antigos</option>
-              <option value="name-asc">Sort: A-Z</option>
-              <option value="name-desc">Sort: Z-A</option>
+              <option value="name-asc">Ordenar: A-Z</option>
+              <option value="name-desc">Ordenar: Z-A</option>
             </select>
             <ArrowUpDown
               size="0.625rem"
@@ -1098,7 +1098,8 @@ export function ChatSidebar() {
                 className="flex flex-1 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[0.6875rem] text-[var(--muted-foreground)] transition-all hover:bg-[var(--sidebar-accent)]/40 hover:text-[var(--foreground)]"
               >
                 <FolderPlus size="0.75rem" />
-                New Folder
+                
+                Nova pasta
               </button>
               {displayChats.length > 0 && (
                 <button
@@ -1194,7 +1195,7 @@ export function ChatSidebar() {
       <UserStatusFooter />
 
       {/* ── Delete Branch Modal ── */}
-      <Modal open={deleteTarget !== null} onClose={() => setDeleteTarget(null)} title="Delete Chat" width="max-w-sm">
+      <Modal open={deleteTarget !== null} onClose={() => setDeleteTarget(null)} title="Excluir chat" width="max-w-sm">
         {deleteTarget && (
           <div className="flex flex-col gap-4">
             <div className="flex items-start gap-3">
@@ -1231,7 +1232,8 @@ export function ChatSidebar() {
                 className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[var(--destructive)]/10 px-3 py-2.5 text-xs font-medium text-[var(--destructive)] ring-1 ring-[var(--destructive)]/20 transition-all hover:bg-[var(--destructive)]/20 active:scale-[0.98]"
               >
                 <Trash2 size="0.8125rem" />
-                Delete All {deleteTarget.branchCount}  Ramificações
+                
+                Excluir tudo {deleteTarget.branchCount}  Ramificações
               </button>
             </div>
           </div>
@@ -1326,7 +1328,8 @@ export function ChatSidebar() {
             className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs transition-all hover:bg-[var(--accent)] disabled:opacity-40"
           >
             <Download size="0.75rem" className="text-[var(--muted-foreground)]" />
-            Text zip
+            
+            Zip de texto
           </button>
           <p className="px-1 pt-2 text-[0.625rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]/60">
             

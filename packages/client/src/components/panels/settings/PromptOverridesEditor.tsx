@@ -341,7 +341,7 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
 
       <label className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Template</span>
+          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Modelo</span>
           <span className="text-[0.5625rem] text-[var(--muted-foreground)]">{draft.length} chars</span>
         </div>
         <textarea

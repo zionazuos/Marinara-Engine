@@ -107,7 +107,7 @@ export function GamePartySidebar({
         {expanded && (
           <div className="flex items-center gap-1.5">
             <Users size={14} className="text-[var(--muted-foreground)]" />
-            <span className="text-xs font-medium text-[var(--foreground)]">Party Chat</span>
+            <span className="text-xs font-medium text-[var(--foreground)]">Chat do grupo</span>
           </div>
         )}
         {!expanded && <Users size={14} className="text-[var(--muted-foreground)]" />}
@@ -343,7 +343,7 @@ export function GamePartySidebar({
                 );
               })
             )}
-            {isStreaming && <div className="text-xs text-[var(--muted-foreground)] animate-pulse">Talking...</div>}
+            {isStreaming && <div className="text-xs text-[var(--muted-foreground)] animate-pulse">Falando...</div>}
             <div ref={endRef} />
           </div>
 

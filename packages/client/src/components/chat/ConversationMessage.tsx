@@ -167,7 +167,7 @@ function MessageContent({
           onImageOpen(url);
         }}
         className="block cursor-zoom-in rounded-lg text-left"
-        title="Open image"
+        title="Abrir imagem"
       >
         <img src={url} alt="GIF" className="max-h-48 max-w-full sm:max-w-xs rounded-lg" loading="lazy" />
       </button>
@@ -886,7 +886,7 @@ export const ConversationMessage = memo(function ConversationMessage({
                       setImageLightbox({ url: att.url || att.data, prompt: att.prompt });
                     }}
                     className="block cursor-zoom-in rounded-lg text-left"
-                    title="Open image"
+                    title="Abrir imagem"
                   >
                     <img
                       src={att.url || att.data}
@@ -951,7 +951,7 @@ export const ConversationMessage = memo(function ConversationMessage({
             />
           )}
           {isLastAssistantMessage && (
-            <MsgAction icon={<Search size="0.75rem" />} onClick={() => onPeekPrompt?.()} title="Peek prompt" />
+            <MsgAction icon={<Search size="0.75rem" />} onClick={() => onPeekPrompt?.()} title="Espiar prompt" />
           )}
           {generationReplay && (
             <MsgAction
@@ -1184,7 +1184,7 @@ export const ConversationMessage = memo(function ConversationMessage({
                       setImageLightbox({ url: att.url || att.data, prompt: att.prompt });
                     }}
                     className="block cursor-zoom-in rounded-lg text-left"
-                    title="Open image"
+                    title="Abrir imagem"
                   >
                     <img
                       src={att.url || att.data}
@@ -1253,7 +1253,7 @@ export const ConversationMessage = memo(function ConversationMessage({
             />
           )}
           {isLastAssistantMessage && !isUser && (
-            <MsgAction icon={<Search size="0.75rem" />} onClick={() => onPeekPrompt?.()} title="Peek prompt" />
+            <MsgAction icon={<Search size="0.75rem" />} onClick={() => onPeekPrompt?.()} title="Espiar prompt" />
           )}
           {generationReplay && (
             <MsgAction
@@ -1339,7 +1339,7 @@ export const ConversationMessage = memo(function ConversationMessage({
             <button
               onClick={() => setImageLightbox(null)}
               className="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white/80 transition-colors hover:bg-black/70 hover:text-white"
-              aria-label="Close image"
+              aria-label="Fechar imagem"
             >
               <X size="1.125rem" />
             </button>

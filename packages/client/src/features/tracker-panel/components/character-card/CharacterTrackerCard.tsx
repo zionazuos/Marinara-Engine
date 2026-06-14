@@ -93,7 +93,7 @@ function CompactThoughtBubble({
             <InlineEdit
               value={value ?? ""}
               onSave={onSave}
-              placeholder="Thoughts"
+              placeholder="Pensamentos"
               className="min-h-4 w-full min-w-0 px-0 py-0 text-[0.59375rem] font-medium italic leading-[1.05] [--foreground:color-mix(in_srgb,var(--tracker-profile-text)_90%,var(--tracker-profile-accent-solid)_10%)] [--muted-foreground:color-mix(in_srgb,var(--tracker-profile-muted-text)_82%,var(--tracker-profile-accent-solid)_18%)] hover:bg-[var(--tracker-profile-accent-solid)]/10"
               showEditHint={false}
               previewLineCount={3}
@@ -238,7 +238,7 @@ export function CharacterTrackerCard({
           <InlineEdit
             value={character.name}
             onSave={(name) => onUpdate({ ...character, name: name || "Character" })}
-            placeholder="Character"
+            placeholder="Personagem"
             className={CHARACTER_NAME_EDIT_CLASS}
             showEditHint={false}
             fitPreview

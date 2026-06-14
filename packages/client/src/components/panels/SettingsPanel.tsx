@@ -379,7 +379,7 @@ function TrackerPanelCardOrderSetting() {
             size="0.6875rem"
             className={cn("shrink-0 text-[var(--muted-foreground)] transition-transform", !orderOpen && "-rotate-90")}
           />
-          <span className="truncate">Card order</span>
+          <span className="truncate">Ordem dos cards</span>
           <span className="shrink-0 rounded-full bg-[var(--secondary)] px-1.5 py-0.5 text-[0.5625rem] font-normal text-[var(--muted-foreground)]">
             {isDefaultOrder ? "Default" : "Custom"}
           </span>
@@ -1064,7 +1064,7 @@ function GeneralSettings() {
 
       <div className="flex flex-col gap-1.5 rounded-lg p-1 transition-colors hover:bg-[var(--secondary)]/50">
         <div className="flex items-center gap-2">
-          <span className="text-xs">Quote style</span>
+          <span className="text-xs">Estilo de aspas</span>
           <HelpTooltip text="Choose how straight and smart quotation marks are unified in chat inputs and displayed AI output." />
         </div>
         <div className="grid grid-cols-2 gap-1.5">
@@ -1145,14 +1145,14 @@ function GeneralSettings() {
           />
 
           <ImageDimensionRow
-            label="Backgrounds"
+            label="Fundos"
             help="Used for Game mode generated backgrounds and special scene illustrations."
             width={imageBackgroundWidth}
             height={imageBackgroundHeight}
             onCommit={setImageBackgroundDimensions}
           />
           <ImageDimensionRow
-            label="Portraits"
+            label="Retratos"
             help="Used for generated character and NPC portraits."
             width={imagePortraitWidth}
             height={imagePortraitHeight}
@@ -1179,7 +1179,7 @@ function GeneralSettings() {
       {/* Game Assets Folders */}
       <div className="rounded-xl bg-[var(--secondary)]/50 p-4 ring-1 ring-[var(--border)]">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <div className="text-xs font-semibold text-[var(--foreground)]">Game Assets</div>
+          <div className="text-xs font-semibold text-[var(--foreground)]">Assets do game</div>
           <button
             onClick={() => {
               rescanGameAssets()
@@ -1452,7 +1452,7 @@ function AppearanceSettings() {
           className="rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]"
         >
           <option value="dark">Escuro</option>
-          <option value="light">Light</option>
+          <option value="light">Claro</option>
         </select>
       </label>
 
@@ -1770,7 +1770,8 @@ function AppearanceSettings() {
             <div className="flex h-20 w-full shrink-0 items-end justify-center gap-3 overflow-hidden rounded-md bg-black/30 ring-1 ring-[var(--border)]/70 sm:w-28">
               {roleplayAvatarStyle === "none" ? (
                 <div className="mb-2 flex h-10 min-w-20 items-center justify-center rounded-md border border-dashed border-white/20 px-2 text-[0.625rem] font-medium text-white/35">
-                  No avatars
+                  
+                  Nenhum avatar
                 </div>
               ) : (
                 <div
@@ -1852,7 +1853,7 @@ function AppearanceSettings() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5">
           <Image size="0.75rem" className="text-[var(--muted-foreground)]" />
-          <span className="text-xs font-medium">Game VN Art</span>
+          <span className="text-xs font-medium">Arte VN do game</span>
           <HelpTooltip text="Scales Game mode dialogue portraits separately from the center full-body sprites. Oversized art is still clamped per viewport." />
         </div>
         <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/45 p-3">
@@ -1991,7 +1992,8 @@ function AppearanceSettings() {
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
               )}
             >
-              Light
+              
+              Claro
             </button>
           </div>
         </div>
@@ -2063,7 +2065,7 @@ function AppearanceSettings() {
           className="text-[0.625rem] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors self-start"
         >
           
-          Redefinir {activeGradientScheme === "dark" ? "Dark" : "Light"} to default
+          Redefinir {activeGradientScheme === "dark" ? "Dark" : "Light"}  para o padrão
         </button>
       </div>
 
@@ -2387,7 +2389,7 @@ function BackgroundPicker({ selected, onSelect }: { selected: string | null; onS
                               ? "bg-[var(--primary)]/20 text-[var(--primary)]"
                               : "text-[var(--muted-foreground)]/60 hover:text-[var(--primary)]",
                           )}
-                          title="Edit tags"
+                          title="Editar tags"
                         >
                           <Tag size="0.5625rem" />
                         </button>
@@ -2628,7 +2630,7 @@ function ThemesSettings() {
               <span>--background</span>
               <span className="text-white/40">Fundo da página</span>
               <span>--foreground</span>
-              <span className="text-white/40">Main text</span>
+              <span className="text-white/40">Texto principal</span>
               <span>--primary</span>
               <span className="text-white/40">Accent / buttons</span>
               <span>--primary-foreground</span>
@@ -2640,15 +2642,15 @@ function ThemesSettings() {
               <span>--border</span>
               <span className="text-white/40">Bordas</span>
               <span>--muted-foreground</span>
-              <span className="text-white/40">Dimmed text</span>
+              <span className="text-white/40">Texto esmaecido</span>
               <span>--sidebar</span>
-              <span className="text-white/40">Sidebar bg</span>
+              <span className="text-white/40">Fundo da barra lateral</span>
               <span>--sidebar-border</span>
               <span className="text-white/40">Sidebar border</span>
               <span>--destructive</span>
               <span className="text-white/40">Error / delete</span>
               <span>--popover</span>
-              <span className="text-white/40">Dropdown bg</span>
+              <span className="text-white/40">Fundo do dropdown</span>
               <span>--accent</span>
               <span className="text-white/40">Destaques ao passar o mouse</span>
             </div>
@@ -2679,7 +2681,7 @@ function ThemesSettings() {
           onClick={() => fileRef.current?.click()}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-[var(--border)] p-3 text-xs text-[var(--muted-foreground)] transition-all hover:border-[var(--primary)]/40 hover:bg-[var(--secondary)]/50"
         >
-          <Download size="0.875rem" /> Import File
+          <Download size="0.875rem" />  Importar arquivo
         </button>
       </div>
       <input ref={fileRef} type="file" accept=".css,.json" className="hidden" onChange={handleImportTheme} />
@@ -4011,7 +4013,8 @@ function AdvancedSettings() {
             {updateCheck.isFetching ? (
               <>
                 <Loader2 size="0.8125rem" className="animate-spin" />
-                Checking…
+                
+                Verificando…
               </>
             ) : (
               <>
@@ -4083,7 +4086,8 @@ function AdvancedSettings() {
                 {applyUpdate.isPending ? (
                   <>
                     <Loader2 size="0.8125rem" className="animate-spin" />
-                    Updating…
+                    
+                    Atualizando…
                   </>
                 ) : (
                   <>
@@ -4162,12 +4166,14 @@ function AdvancedSettings() {
             {refreshingSpa ? (
               <>
                 <Loader2 size="0.8125rem" className="animate-spin" />
-                Refreshing…
+                
+                Atualizando…
               </>
             ) : (
               <>
                 <RefreshCw size="0.8125rem" />
-                Refresh App
+                
+                Atualizar app
               </>
             )}
           </button>
@@ -4364,7 +4370,7 @@ function AdvancedSettings() {
         help="Uses the current draft as direction when regenerating a message or manually triggering a character response."
       />
       <ToggleSetting
-        label="Debug mode"
+        label="Modo de depuração"
         checked={debugMode}
         onChange={setDebugMode}
         help="Logs the prompt and response payloads sent to the model in the server console for debugging."
@@ -4404,7 +4410,8 @@ function AdvancedSettings() {
           {exportingProfile ? (
             <>
               <Loader2 size="0.8125rem" className="animate-spin" />
-              Exporting…
+              
+              Exportando…
             </>
           ) : (
             <>
@@ -4444,7 +4451,8 @@ function AdvancedSettings() {
       <div className="rounded-xl border border-[var(--destructive)]/30 bg-[var(--destructive)]/5 p-3 flex flex-col gap-2">
         <div className="flex items-center gap-2 text-xs font-semibold text-[var(--destructive)]">
           <AlertTriangle size="0.875rem" />
-          Danger Zone
+          
+          Zona de perigo
         </div>
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
           Permanently clear selected categories of local data. Professor Mari is always preserved, and Marinara resets

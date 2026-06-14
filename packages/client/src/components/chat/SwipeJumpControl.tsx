@@ -95,8 +95,8 @@ export function SwipeJumpControl({
           setSwipeByDisplayIndex(activeSwipeIndex + 2);
         }}
         disabled={activeSwipeIndex >= swipeCount - 1}
-        aria-label="Next swipe"
-        title="Next swipe"
+        aria-label="Próximo swipe"
+        title="Próximo swipe"
       >
         <ChevronRight size={iconSize} />
       </button>

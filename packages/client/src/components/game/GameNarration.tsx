@@ -3383,7 +3383,7 @@ export function GameNarration({
             onClick={handleInterrupt}
             className="flex h-full w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--muted)]/20 text-[var(--foreground)]/75 transition-colors hover:bg-[var(--muted)]/40 hover:text-[var(--foreground)] dark:border-white/10 dark:bg-white/5 dark:text-white/75 dark:hover:bg-white/10 dark:hover:text-white"
             title="Pause the GM so you can write back. Nothing is committed until you send."
-            aria-label="Interrupt"
+            aria-label="Interromper"
           >
             <Square size={11} fill="currentColor" />
           </button>
@@ -3612,7 +3612,8 @@ export function GameNarration({
       >
         <div className="mb-1 flex items-center">
           <span className="text-[0.6rem] font-semibold uppercase tracking-wide text-[var(--foreground)]/75 dark:text-white/80">
-            Narration
+            
+            Narração
           </span>
           {voiceButton}
         </div>
@@ -4079,7 +4080,8 @@ export function GameNarration({
               {/* Narration: centered, no avatar */}
               <div className="mb-2 flex items-center justify-between gap-2">
                 <span className="rounded-full bg-[var(--muted)]/30 px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-[var(--foreground)]/90 dark:bg-white/10 dark:text-white/90">
-                  Narration
+                  
+                  Narração
                 </span>
               </div>
 
@@ -4919,7 +4921,8 @@ export function GameNarration({
                           {actionButtons}
                           <div className="mb-1 flex items-center">
                             <span className="text-[0.6rem] font-semibold uppercase tracking-wide text-white/80">
-                              Narration
+                              
+                              Narração
                             </span>
                             {voiceButton}
                           </div>

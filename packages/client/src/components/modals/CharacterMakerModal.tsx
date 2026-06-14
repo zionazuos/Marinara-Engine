@@ -200,7 +200,8 @@ export function CharacterMakerModal({ open, onClose }: Props) {
           {streaming ? (
             <>
               <Loader2 size="0.9375rem" className="animate-spin" />
-              Generating…
+              
+              Gerando…
             </>
           ) : (
             <>
@@ -215,7 +216,7 @@ export function CharacterMakerModal({ open, onClose }: Props) {
           <div className="max-h-48 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--card)] p-3">
             <div className="flex items-center gap-1.5 mb-2">
               <Sparkles size="0.75rem" className="animate-pulse text-violet-400" />
-              <span className="text-[0.625rem] font-medium text-violet-400">Generating…</span>
+              <span className="text-[0.625rem] font-medium text-violet-400">Gerando…</span>
             </div>
             <pre className="whitespace-pre-wrap text-xs text-[var(--muted-foreground)] font-mono">
               {streamText.slice(-500)}
@@ -267,7 +268,7 @@ export function CharacterMakerModal({ open, onClose }: Props) {
             {/* Preview sections */}
             <div className="grid gap-2 text-xs">
               {generated.personality && <PreviewSection label="Personalidade" text={generated.personality} />}
-              {generated.backstory && <PreviewSection label="Backstory" text={generated.backstory} />}
+              {generated.backstory && <PreviewSection label="História de fundo" text={generated.backstory} />}
               {generated.appearance && <PreviewSection label="Aparência" text={generated.appearance} />}
               {generated.first_mes && <PreviewSection label="Primeira mensagem" text={generated.first_mes} />}
             </div>

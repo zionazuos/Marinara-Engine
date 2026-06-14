@@ -440,7 +440,8 @@ function DirectorCadenceCard({
       </div>
       <div className="flex items-center justify-between gap-2 border-t border-[var(--border)] px-2 py-1.5">
         <span className="min-w-0 text-[0.5625rem] text-[var(--muted-foreground)]">
-          Runs every <span className="font-medium text-[var(--popover-foreground)]">{intervalLabel}</span>
+          
+          Roda a cada <span className="font-medium text-[var(--popover-foreground)]">{intervalLabel}</span>
         </span>
         <div className="flex shrink-0 items-center rounded-md border border-[var(--border)] bg-[var(--secondary)]/35">
           <button

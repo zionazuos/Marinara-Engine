@@ -55,7 +55,7 @@ export function ImagePreviewModal({ node, onClose }: { node: TreeNode; onClose: 
               setShowInfo(!showInfo);
             }}
             className="absolute right-2 top-2 rounded-full bg-black/50 p-1.5 text-white/80 backdrop-blur-sm transition-colors hover:bg-black/70 hover:text-white"
-            title="File info"
+            title="Info do arquivo"
           >
             <Info size="0.875rem" />
           </button>
@@ -66,7 +66,7 @@ export function ImagePreviewModal({ node, onClose }: { node: TreeNode; onClose: 
             className="ml-4 w-64 overflow-y-auto rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h4 className="mb-3 text-sm font-semibold text-[var(--foreground)]">File Info</h4>
+            <h4 className="mb-3 text-sm font-semibold text-[var(--foreground)]">Info do arquivo</h4>
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
                 <span className="text-[var(--muted-foreground)]">Nome</span>
@@ -78,7 +78,7 @@ export function ImagePreviewModal({ node, onClose }: { node: TreeNode; onClose: 
               </div>
               {info.width != null && info.height != null && (
                 <div className="flex justify-between">
-                  <span className="text-[var(--muted-foreground)]">Dimensions</span>
+                  <span className="text-[var(--muted-foreground)]">Dimensões</span>
                   <span className="text-[var(--foreground)]">
                     {info.width} × {info.height}
                   </span>

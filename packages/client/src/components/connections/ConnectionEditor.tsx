@@ -855,7 +855,8 @@ export function ConnectionEditor() {
                   <code className="rounded bg-[var(--secondary)] px-1">npm i -g @anthropic-ai/claude-code</code>
                 </li>
                 <li>
-                  Sign in once: <code className="rounded bg-[var(--secondary)] px-1">claude login</code>
+                  
+                  Faça login uma vez: <code className="rounded bg-[var(--secondary)] px-1">claude login</code>
                 </li>
                 <li>API Key and Base URL are not required — leave them blank.</li>
               </ol>
@@ -881,7 +882,8 @@ export function ConnectionEditor() {
                   Install Codex CLI: <code className="rounded bg-[var(--secondary)] px-1">npm i -g @openai/codex</code>
                 </li>
                 <li>
-                  Sign in once: <code className="rounded bg-[var(--secondary)] px-1">codex login</code>
+                  
+                  Faça login uma vez: <code className="rounded bg-[var(--secondary)] px-1">codex login</code>
                 </li>
                 <li>API Key and Base URL are not required - leave them blank.</li>
               </ol>
@@ -1363,7 +1365,8 @@ export function ConnectionEditor() {
                   Context: <strong className="text-sky-400">{formatContext(selectedModelInfo.context)}</strong>
                 </span>
                 <span className="text-[var(--muted-foreground)]">
-                  Max Output: <strong className="text-sky-400">{formatContext(selectedModelInfo.maxOutput)}</strong>
+                  
+                  Saída máx: <strong className="text-sky-400">{formatContext(selectedModelInfo.maxOutput)}</strong>
                 </span>
               </div>
             )}
@@ -1672,7 +1675,7 @@ export function ConnectionEditor() {
               {localProvider === "anthropic" && localEnableCaching && (
                 <label className="mt-2 flex items-center justify-between gap-3 rounded-xl bg-[var(--secondary)]/40 px-3 py-2 ring-1 ring-[var(--border)]">
                   <div className="min-w-0">
-                    <span className="block text-sm font-medium">Cache depth</span>
+                    <span className="block text-sm font-medium">Profundidade do cache</span>
                     <span className="block text-[0.625rem] text-[var(--muted-foreground)]">
                       Messages back from the newest turn.
                     </span>
@@ -1733,7 +1736,7 @@ export function ConnectionEditor() {
           {/* ── Claude (Subscription) — Fast Mode toggle ── */}
           {localProvider === "claude_subscription" && (
             <FieldGroup
-              label="Fast Mode"
+              label="Modo rápido"
               icon={<Zap size="0.875rem" className="text-amber-400" />}
               help="When enabled, asks the Claude Agent SDK to use its faster routing tier — quicker responses but the SDK may use a smaller model behind the scenes (Sonnet/Haiku) even if you've selected Opus. Currently a no-op on every modern Claude model: Opus 4.7 has no faster variant to route to, and Anthropic dropped support for downgrading on the rest. The toggle is here for the day Anthropic re-enables it. Leave off."
             >
@@ -1903,7 +1906,8 @@ export function ConnectionEditor() {
                   ) : (
                     <ImageIcon size="0.8125rem" />
                   )}
-                  Test Image
+                  
+                  Imagem de teste
                 </button>
               )}
               {localProvider === "claude_subscription" && (
@@ -1935,7 +1939,7 @@ export function ConnectionEditor() {
               {localProvider === "image_generation" && (
                 <>
                   {" "}
-                  <strong>Test Image</strong> generates a 512×512 test image (requires saving first).
+                  <strong>Imagem de teste</strong> generates a 512×512 test image (requires saving first).
                 </>
               )}
               {localProvider === "claude_subscription" && (
@@ -1970,7 +1974,7 @@ export function ConnectionEditor() {
 
             {/* Image test result */}
             {imgTestResult && (
-              <TestResultCard label="Test Image" success={imgTestResult.success} latencyMs={imgTestResult.latencyMs}>
+              <TestResultCard label="Imagem de teste" success={imgTestResult.success} latencyMs={imgTestResult.latencyMs}>
                 {imgTestResult.success && imgTestResult.base64 && imgTestResult.mimeType ? (
                   <img
                     src={`data:${imgTestResult.mimeType};base64,${imgTestResult.base64}`}
@@ -2382,7 +2386,7 @@ function ImageGenerationDefaultsPanel({
                     onChange={(sampler) => updateAutomatic1111({ sampler })}
                   />
                   <ChoiceSetting
-                    label="Scheduler"
+                    label="Agendador"
                     value={automatic1111.scheduler}
                     options={SD_WEBUI_SCHEDULER_OPTIONS}
                     onChange={(scheduler) => updateAutomatic1111({ scheduler })}
@@ -2420,7 +2424,7 @@ function ImageGenerationDefaultsPanel({
                     onChange={(sampler) => updateComfyUi({ sampler })}
                   />
                   <ChoiceSetting
-                    label="Scheduler"
+                    label="Agendador"
                     value={comfyui.scheduler}
                     options={COMFYUI_SCHEDULER_OPTIONS}
                     onChange={(scheduler) => updateComfyUi({ scheduler })}

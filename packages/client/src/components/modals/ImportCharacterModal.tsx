@@ -273,7 +273,8 @@ export function ImportCharacterModal({ open, onClose }: Props) {
                     onClick={() => void handleFiles(pendingLorebookChoice.files, false)}
                     className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
                   >
-                    No Import
+                    
+                    Sem importação
                   </button>
                   <button
                     type="button"

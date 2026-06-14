@@ -874,7 +874,7 @@ function SectionsTab({
             onClick={() => setShowAddMenu(!showAddMenu)}
             className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-400 to-violet-500 px-3 py-2 text-xs font-medium text-white shadow-md transition-all hover:shadow-lg active:scale-[0.98]"
           >
-            <Plus size="0.8125rem" /> Add Section
+            <Plus size="0.8125rem" />  Adicionar seção
           </button>
           {showAddMenu && (
             <>
@@ -958,7 +958,7 @@ function SectionsTab({
               onClick={handleAddGroup}
               className="flex items-center gap-1 rounded-lg bg-sky-400/15 px-2 py-1 text-[0.625rem] font-medium text-sky-400 hover:bg-sky-400/25 active:scale-95"
             >
-              <Plus size="0.625rem" /> New Group
+              <Plus size="0.625rem" />  Novo grupo
             </button>
           </div>
           <p className="text-[0.625rem] text-[var(--muted-foreground)]">
@@ -1102,7 +1102,7 @@ function SectionsTab({
                         onClick={() => moveSectionByOffset(idx, 1)}
                         disabled={idx === sections.length - 1 || onReorderSections.isPending}
                         className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30"
-                        title="Move down"
+                        title="Mover para baixo"
                         aria-label={`Move ${section.name} down`}
                       >
                         <ArrowDown size="0.75rem" />
@@ -1206,7 +1206,7 @@ function SectionsTab({
                         >
                           <option value="system">Sistema</option>
                           <option value="user">Usuário</option>
-                          <option value="assistant">Assistant</option>
+                          <option value="assistant">Assistente</option>
                         </select>
                       </div>
 
@@ -1278,7 +1278,7 @@ function SectionsTab({
 
                       {/* Position & Depth */}
                       <div className="flex flex-wrap items-center gap-3 text-xs">
-                        <label className="text-[var(--muted-foreground)]">Position:</label>
+                        <label className="text-[var(--muted-foreground)]">Posição:</label>
                         <select
                           value={section.injectionPosition ?? "ordered"}
                           onChange={(e) =>
@@ -1624,7 +1624,7 @@ function VariableCard({
             onClick={onMoveDown}
             disabled={!canMoveDown || isReordering}
             className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30"
-            title="Move down"
+            title="Mover para baixo"
             aria-label={`Move ${varName || "variable"} down`}
           >
             <ArrowDown size="0.75rem" />
@@ -1741,7 +1741,7 @@ function VariableCard({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                       <Shuffle size="0.75rem" className="text-amber-400" />
-                      <span className="text-[0.625rem] font-medium text-[var(--foreground)]">Random Pick</span>
+                      <span className="text-[0.625rem] font-medium text-[var(--foreground)]">Escolha aleatória</span>
                     </div>
                     <button
                       onClick={() => update({ randomPick: !isRandomPick })}
@@ -1768,7 +1768,8 @@ function VariableCard({
                   {!isRandomPick && (
                     <div className="flex items-center gap-2">
                       <label className="shrink-0 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                        Separator
+                        
+                        Separador
                       </label>
                       <input
                         value={separatorValue}
@@ -1811,7 +1812,7 @@ function VariableCard({
                         updateOpts(next);
                       }}
                       className="flex-1 rounded bg-[var(--background)] px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400/50"
-                      placeholder="Label…"
+                      placeholder="Rótulo…"
                     />
                     <OptionFieldInput
                       value={opt.value}
@@ -1826,7 +1827,7 @@ function VariableCard({
                           ? "bg-[var(--destructive)]/10 ring-1 ring-[var(--destructive)]/30 placeholder:text-[var(--destructive)]/40"
                           : "bg-[var(--background)] focus:ring-amber-400/50",
                       )}
-                      placeholder="Value…"
+                      placeholder="Valor…"
                     />
                     <button
                       onClick={() => setExpandedOptIdx(oi)}
@@ -1863,7 +1864,7 @@ function VariableCard({
               }}
               className="flex items-center gap-1 rounded-lg px-2 py-1 text-[0.625rem] font-medium text-amber-400 hover:bg-amber-400/10 active:scale-[0.98]"
             >
-              <Plus size="0.625rem" /> Add Option
+              <Plus size="0.625rem" />  Adicionar opção
             </button>
           </div>
 

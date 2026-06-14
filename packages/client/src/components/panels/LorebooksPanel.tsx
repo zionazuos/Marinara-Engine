@@ -500,7 +500,7 @@ export function LorebooksPanel() {
             value={sort}
             onChange={(e) => setSort(e.target.value as typeof sort)}
             className="h-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--secondary)] py-2 pl-2.5 pr-7 text-[0.6875rem] outline-none transition-colors focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-            title="Sort order"
+            title="Ordem de classificação"
           >
             <option value="name-asc">A-Z</option>
             <option value="name-desc">Z-A</option>

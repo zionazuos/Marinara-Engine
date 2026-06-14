@@ -548,7 +548,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
             {/* Connection picker */}
             <div className="space-y-1.5">
               <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
-                Connection
+                
+                Conexão
               </label>
               <select
                 value={chat.connectionId ?? ""}
@@ -556,7 +557,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                 className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-[var(--border)] transition-shadow focus:ring-[var(--primary)]/40"
               >
                 <option value="">Nenhum</option>
-                <option value="random">🎲 Random</option>
+                <option value="random">🎲 Aleatório</option>
                 {connectionOptions.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -1128,7 +1129,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
           className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2.5 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
         >
           <option value="">Nenhum</option>
-          <option value="random">🎲 Random</option>
+          <option value="random">🎲 Aleatório</option>
           {connectionOptions.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -1417,7 +1418,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                 </button>
                 <div className="flex items-center gap-1.5">
                   <Wand2 size="0.875rem" className="text-[var(--primary)]" />
-                  <h3 className="text-sm font-semibold text-[var(--foreground)]">Quick Setup</h3>
+                  <h3 className="text-sm font-semibold text-[var(--foreground)]">Configuração rápida</h3>
                 </div>
                 <button
                   onClick={onFinish}
@@ -1436,7 +1437,8 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                 {/* Chat Preset */}
                 <div className="space-y-1.5">
                   <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
-                    Chat Preset
+                    
+                    Preset do chat
                   </label>
                   <select
                     value={shortcutPresetId}
@@ -1595,7 +1597,8 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                   {shortcutApplying ? (
                     <>
                       <Loader2 size="0.75rem" className="animate-spin" />
-                      Applying…
+                      
+                      Aplicando…
                     </>
                   ) : (
                     <>

@@ -172,7 +172,7 @@ export function QuestRow({
               aria-label="Adicionar objetivo"
             >
               <Plus size="0.625rem" className="justify-self-center" />
-              <span className="truncate font-medium">Objective</span>
+              <span className="truncate font-medium">Objetivo</span>
             </button>
           )}
         </div>

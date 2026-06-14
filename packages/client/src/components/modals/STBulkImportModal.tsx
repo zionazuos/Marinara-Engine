@@ -613,7 +613,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
 
               <SelectableImportCategory
                 icon={<Users size="0.875rem" />}
-                label="Group Chats"
+                label="Chats em grupo"
                 items={scanResult.groupChats}
                 selectedIds={selection.groupChats}
                 onToggleItem={(itemId, checked) => toggleCategoryItem("groupChats", itemId, checked)}
@@ -689,7 +689,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
 
               <SelectableImportCategory
                 icon={<Image size="0.875rem" />}
-                label="Backgrounds"
+                label="Fundos"
                 items={scanResult.backgrounds}
                 selectedIds={selection.backgrounds}
                 onToggleItem={(itemId, checked) => toggleCategoryItem("backgrounds", itemId, checked)}
@@ -788,7 +788,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.625rem] text-[var(--muted-foreground)]">
                   {progress.imported.characters > 0 && <span>{progress.imported.characters} characters</span>}
                   {progress.imported.chats > 0 && <span>{progress.imported.chats} chats</span>}
-                  {progress.imported.groupChats > 0 && <span>{progress.imported.groupChats} group chats</span>}
+                  {progress.imported.groupChats > 0 && <span>{progress.imported.groupChats}  chats em grupo</span>}
                   {progress.imported.presets > 0 && <span>{progress.imported.presets} presets</span>}
                   {progress.imported.lorebooks > 0 && <span>{progress.imported.lorebooks} lorebooks</span>}
                   {progress.imported.backgrounds > 0 && <span>{progress.imported.backgrounds} backgrounds</span>}
@@ -827,7 +827,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 <StatCard icon={<MessageSquare size="0.875rem" />} label="Chats" count={importResult.imported.chats} />
                 <StatCard
                   icon={<Users size="0.875rem" />}
-                  label="Group Chats"
+                  label="Chats em grupo"
                   count={importResult.imported.groupChats}
                 />
                 <StatCard icon={<FileText size="0.875rem" />} label="Presets" count={importResult.imported.presets} />
@@ -838,7 +838,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 />
                 <StatCard
                   icon={<Image size="0.875rem" />}
-                  label="Backgrounds"
+                  label="Fundos"
                   count={importResult.imported.backgrounds}
                 />
                 <StatCard

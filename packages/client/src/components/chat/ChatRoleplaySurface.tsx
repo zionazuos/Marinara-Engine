@@ -1240,7 +1240,8 @@ export function ChatRoleplaySurface({
                       ) : (
                         <ChevronUp size="0.75rem" />
                       )}
-                      Load More
+                      
+                      Carregar mais
                     </button>
                   </div>
                 )}
@@ -1364,7 +1365,7 @@ export function ChatRoleplaySurface({
                       title="Iniciar encontro de combate"
                     >
                       <Swords size="0.875rem" />
-                      <span>Encounter</span>
+                      <span>Encontro</span>
                     </button>
                   </div>
                 )}

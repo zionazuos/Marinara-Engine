@@ -45,7 +45,8 @@ export function AgentDebugPanel() {
       >
         <Bug size="0.875rem" className="shrink-0 text-amber-500" />
         <span className="flex-1 text-xs font-medium text-[var(--foreground)]">
-          Agent Debug
+          
+          Depuração de agente
           <span className="ml-1.5 text-[var(--muted-foreground)]">
             ({debugLog.length} event{debugLog.length !== 1 ? "s" : ""})
           </span>

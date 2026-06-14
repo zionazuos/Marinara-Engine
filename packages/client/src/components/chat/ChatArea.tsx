@@ -1644,7 +1644,8 @@ export function ChatArea() {
             <div className="flex w-full max-w-2xl flex-col items-center gap-2">
               <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-center text-[0.625rem] leading-tight text-[var(--muted-foreground)]/55 sm:text-xs">
                 <span>
-                  Created by{" "}
+                  
+                  Criado por{" "}
                   <a
                     href="https://spicymarinara.github.io/"
                     target="_blank"
@@ -2213,7 +2214,8 @@ function QuickStartCard({
     >
       {showComingSoon && (
         <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--secondary)] px-2 py-0.5 text-[0.5625rem] font-semibold uppercase tracking-wider text-[var(--muted-foreground)] shadow-md animate-fade-in-up">
-          Coming Soon
+          
+          Em breve
         </span>
       )}
       <div

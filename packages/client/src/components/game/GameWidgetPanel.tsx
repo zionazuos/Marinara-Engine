@@ -530,7 +530,7 @@ function WidgetEditorModal({
               />
             </label>
             <label className="space-y-1.5">
-              <span className="text-xs font-medium text-[var(--muted-foreground)]">Maximum value</span>
+              <span className="text-xs font-medium text-[var(--muted-foreground)]">Valor máximo</span>
               <input
                 type="number"
                 min={1}

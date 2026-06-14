@@ -57,7 +57,7 @@ export function CreatePersonaModal({ open, onClose }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoFocus
-            placeholder="My Persona..."
+            placeholder="Minha persona..."
             onKeyDown={(e) => {
               if (e.key === "Enter") handleCreate();
             }}

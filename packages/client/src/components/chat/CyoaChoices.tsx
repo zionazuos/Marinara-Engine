@@ -224,7 +224,8 @@ export function CyoaChoices({ messages }: Props) {
         </div>
         {impersonateCyoaChoices && (
           <span className="rounded-full border border-purple-400/20 bg-purple-500/10 px-1.5 py-0.5 text-[0.5625rem] font-semibold text-purple-700 dark:text-purple-200">
-            Impersonate
+            
+            Personificar
           </span>
         )}
         <button

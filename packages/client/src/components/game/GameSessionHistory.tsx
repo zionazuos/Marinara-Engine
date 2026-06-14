@@ -421,7 +421,8 @@ export function GameSessionHistory({
                     </label>
                     <label className="flex flex-col gap-1">
                       <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        Story Arc
+                        
+                        Arco da história
                       </span>
                       <textarea
                         value={secretDraft?.storyArc ?? ""}
@@ -435,7 +436,8 @@ export function GameSessionHistory({
                     </label>
                     <label className="flex flex-col gap-1">
                       <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        Plot Twists
+                        
+                        Reviravoltas
                       </span>
                       <textarea
                         value={secretDraft?.plotTwists ?? ""}
@@ -540,9 +542,9 @@ export function GameSessionHistory({
                       )}
                     </div>
                     <SpoilerTextSection label="World Overview" value={currentSecrets.worldOverview} />
-                    <SpoilerTextSection label="Story Arc" value={currentSecrets.storyArc} />
-                    <SpoilerListSection label="Plot Twists" values={currentSecrets.plotTwists} />
-                    <SpoilerJsonSection label="Party Arcs" value={currentSecrets.partyArcs} />
+                    <SpoilerTextSection label="Arco da história" value={currentSecrets.storyArc} />
+                    <SpoilerListSection label="Reviravoltas" values={currentSecrets.plotTwists} />
+                    <SpoilerJsonSection label="Arcos do grupo" value={currentSecrets.partyArcs} />
                     <SpoilerJsonSection label="Mapas" value={currentSecrets.maps} />
                     <SpoilerJsonSection label="NPCs" value={currentSecrets.npcs} />
                     <SpoilerJsonSection label="Character Cards" value={currentSecrets.characterCards} />
@@ -727,7 +729,8 @@ export function GameSessionHistory({
                             </label>
                             <label className="flex flex-col gap-1">
                               <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                Party State
+                                
+                                Estado do grupo
                               </span>
                               <textarea
                                 value={draft?.partyState ?? ""}
@@ -788,7 +791,8 @@ export function GameSessionHistory({
                             </label>
                             <label className="flex flex-col gap-1">
                               <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                NPC Updates
+                                
+                                Atualizações de NPC
                               </span>
                               <textarea
                                 value={draft?.npcUpdates ?? ""}
@@ -917,7 +921,7 @@ export function GameSessionHistory({
 
                       {session.npcUpdates.length > 0 && (
                         <div className="mb-3">
-                          <div className="mb-1 text-xs font-medium text-[var(--muted-foreground)]">NPC Updates</div>
+                          <div className="mb-1 text-xs font-medium text-[var(--muted-foreground)]">Atualizações de NPC</div>
                           <ul className="flex flex-col gap-1 pl-4">
                             {session.npcUpdates.map((update, i) => (
                               <li key={i} className="list-disc text-xs text-[var(--foreground)]">

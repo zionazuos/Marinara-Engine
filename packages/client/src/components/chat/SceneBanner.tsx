@@ -94,7 +94,8 @@ export function SceneBanner({ variant, sceneChatId, sceneChatName, originChatId,
           }}
           title="Ir para a cena ativa"
         >
-          Go to Scene
+          
+          Ir para a cena
           <ArrowRight size={12} />
         </button>
       )}
@@ -178,7 +179,8 @@ export function EndSceneBar({
           title="End the scene and generate a summary"
         >
           <Film size={14} />
-          End Scene
+          
+          Encerrar cena
         </button>
       )}
       {confirmEnd && (

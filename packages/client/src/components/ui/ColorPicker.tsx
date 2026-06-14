@@ -275,7 +275,7 @@ export function ColorPicker({
                       backgroundColor: value && !value.startsWith("linear-gradient") ? value : "#6c5ce7",
                     }}
                   />
-                  <span className="min-w-0 text-xs font-medium text-[var(--foreground)]">Pick color</span>
+                  <span className="min-w-0 text-xs font-medium text-[var(--foreground)]">Escolher cor</span>
                   <Pipette size="0.75rem" className="ml-auto shrink-0 text-[var(--muted-foreground)]" />
                   <input
                     ref={nativeRef}
@@ -333,7 +333,7 @@ export function ColorPicker({
               {/* Stops */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Color Stops</p>
+                  <p className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Pontos de cor</p>
                   <button
                     type="button"
                     onClick={addStop}

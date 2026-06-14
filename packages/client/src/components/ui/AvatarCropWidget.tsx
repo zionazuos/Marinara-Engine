@@ -216,7 +216,7 @@ export function AvatarCropWidget({ src, alt, crop, onChange, onRemove, removing 
     <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4">
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-          <Crop size="0.75rem" /> Avatar Crop
+          <Crop size="0.75rem" />  Recorte do avatar
         </span>
         <div className="flex items-center gap-1.5">
           <button
@@ -225,7 +225,7 @@ export function AvatarCropWidget({ src, alt, crop, onChange, onRemove, removing 
             className="inline-flex items-center gap-1 rounded-lg bg-[var(--accent)] px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)]"
             title="Abrir imagem completa"
           >
-            <Maximize2 size="0.625rem" /> Full image
+            <Maximize2 size="0.625rem" />  Imagem completa
           </button>
           <button
             type="button"

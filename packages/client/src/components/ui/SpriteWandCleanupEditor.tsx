@@ -912,7 +912,7 @@ export function SpriteWandCleanupEditor({
               onClick={() => handleSelectTool("pan")}
               disabled={loading || applying}
               className={navigationButtonClass(tool === "pan")}
-              aria-label="Pan"
+              aria-label="Deslocar"
               aria-pressed={tool === "pan"}
               title="Drag around while zoomed in"
             >
@@ -924,8 +924,8 @@ export function SpriteWandCleanupEditor({
               onClick={zoomOut}
               disabled={loading || applying}
               className={navigationButtonClass()}
-              aria-label="Zoom out"
-              title="Zoom out"
+              aria-label="Afastar"
+              title="Afastar"
             >
               <ZoomOut size="0.875rem" />
             </button>
@@ -934,7 +934,7 @@ export function SpriteWandCleanupEditor({
               onClick={fitCanvasToStage}
               disabled={loading || applying}
               className="h-7 rounded-md px-2 text-[0.6875rem] font-medium tabular-nums text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-45"
-              title="Fit to view"
+              title="Ajustar à tela"
             >
               {Math.round(zoom * 100)}%
             </button>
@@ -967,7 +967,7 @@ export function SpriteWandCleanupEditor({
                   Padrões
                 </button>
                 <RangeControl
-                  label="Tolerance"
+                  label="Tolerância"
                   min={4}
                   max={128}
                   value={wandTolerance}
@@ -983,7 +983,7 @@ export function SpriteWandCleanupEditor({
                   title="Reach farther into matching debris"
                 />
                 <RangeControl
-                  label="Softness"
+                  label="Suavidade"
                   min={0}
                   max={100}
                   value={wandSoftness}
@@ -1059,7 +1059,7 @@ export function SpriteWandCleanupEditor({
                 {tool === "clean" && (
                   <>
                     <RangeControl
-                      label="Tolerance"
+                      label="Tolerância"
                       min={4}
                       max={128}
                       value={cleanTolerance}
@@ -1069,7 +1069,7 @@ export function SpriteWandCleanupEditor({
                       className="min-w-[12rem] flex-[1_1_12rem]"
                     />
                     <RangeControl
-                      label="Edge Guard"
+                      label="Proteção de borda"
                       min={0}
                       max={100}
                       value={cleanEdgeGuard}
@@ -1093,7 +1093,7 @@ export function SpriteWandCleanupEditor({
                 {tool === "brush" && brushToolMode === "paint" && (
                   <div
                     className="flex min-w-fit items-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs"
-                    title="Brush color"
+                    title="Cor do pincel"
                   >
                     <span className="shrink-0 whitespace-nowrap font-medium text-[var(--foreground)]">Cor</span>
                     <input
@@ -1105,7 +1105,7 @@ export function SpriteWandCleanupEditor({
                       }}
                       disabled={loading || applying}
                       className="h-7 w-9 cursor-pointer rounded-md border border-[var(--border)] bg-transparent p-0.5 disabled:opacity-45"
-                      aria-label="Brush color"
+                      aria-label="Cor do pincel"
                     />
                     <span className="font-mono text-[0.6875rem] uppercase text-[var(--muted-foreground)]">
                       {brushColor}
@@ -1155,7 +1155,7 @@ export function SpriteWandCleanupEditor({
                 )}
                 {tool === "blur" && (
                   <RangeControl
-                    label="Strength"
+                    label="Força"
                     min={0}
                     max={100}
                     value={blurStrength}

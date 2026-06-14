@@ -88,7 +88,8 @@ export function ContinuityIssueChecklist({ content, compact = false }: Continuit
               className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[0.5625rem] text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
             >
               <RotateCcw size="0.625rem" />
-              Review all
+              
+              Revisar tudo
             </button>
           )}
           <button

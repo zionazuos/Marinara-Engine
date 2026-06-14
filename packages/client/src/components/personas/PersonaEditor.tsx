@@ -631,7 +631,7 @@ export function PersonaEditor() {
             )}
             {activeTab === "backstory" && (
               <TextareaTab
-                title="Backstory"
+                title="História de fundo"
                 subtitle="Your character's history, origin story, and formative life events."
                 value={formData.backstory}
                 onChange={(v) => updateField("backstory", v)}
@@ -1040,7 +1040,8 @@ function PersonaSpritesTab({
               : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
           )}
         >
-          Full-body
+          
+          Corpo inteiro
         </button>
       </div>
 
@@ -1061,7 +1062,8 @@ function PersonaSpritesTab({
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h4 className="text-xs font-semibold flex items-center gap-1.5">
             <Upload size="0.8125rem" className="text-[var(--primary)]" />
-            Add Sprite
+            
+            Adicionar sprite
           </h4>
           <div className="flex flex-wrap items-center gap-2 md:justify-end">
             <button
@@ -1136,7 +1138,8 @@ function PersonaSpritesTab({
                     className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[var(--foreground)] transition-colors hover:bg-[var(--secondary)] disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <ImageDown size="0.75rem" />
-                    All sprites
+                    
+                    Todos os sprites
                   </button>
                 </div>
               )}
@@ -1157,7 +1160,7 @@ function PersonaSpritesTab({
             disabled={cleaningSprites}
             className="min-w-40 flex-1 accent-[var(--primary)] disabled:opacity-50"
           />
-          <span className="text-[0.625rem] text-[var(--muted-foreground)]">Aggressive</span>
+          <span className="text-[0.625rem] text-[var(--muted-foreground)]">Agressivo</span>
           <span className="w-8 text-right text-[0.6875rem] tabular-nums text-[var(--muted-foreground)]">
             {savedCleanupStrength}
           </span>
@@ -1166,7 +1169,8 @@ function PersonaSpritesTab({
         {folderProgress && (
           <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--muted-foreground)]">
             <Loader2 size="0.75rem" className="animate-spin text-[var(--primary)]" />
-            Uploading {folderProgress.done}/{folderProgress.total} sprites…
+            
+            Enviando {folderProgress.done}/{folderProgress.total} sprites…
           </div>
         )}
         {cleaningSprites && (
@@ -1235,7 +1239,7 @@ function PersonaSpritesTab({
 
         {category === "expressions" && suggestedExpressions.length > 0 && (
           <div>
-            <p className="text-[0.625rem] text-[var(--muted-foreground)] mb-1.5">Quick add:</p>
+            <p className="text-[0.625rem] text-[var(--muted-foreground)] mb-1.5">Adição rápida:</p>
             <div className="flex flex-wrap gap-1">
               {suggestedExpressions.slice(0, 12).map((expr) => (
                 <button
@@ -1382,7 +1386,8 @@ function PersonaSpritesTab({
                   ) : (
                     <Trash2 size="0.875rem" />
                   )}
-                  Delete All {category === "full-body" ? "Full-Body" : "Expressions"}
+                  
+                  Excluir tudo {category === "full-body" ? "Full-Body" : "Expressions"}
                 </button>
               ) : null}
               <div className="ml-auto flex shrink-0 items-center gap-2">
@@ -1556,7 +1561,7 @@ function PersonaColorsTab({
         <h4 className="mb-1.5 text-xs font-semibold">Como as cores funcionam</h4>
         <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
           <li>
-            &bull; <strong className="text-[var(--foreground)]">Name color</strong> — Applied to your persona&apos;s
+            &bull; <strong className="text-[var(--foreground)]">Cor do nome</strong> — Applied to your persona&apos;s
             display name in chat. Gradients use CSS linear-gradient.
           </li>
           <li>
@@ -1564,7 +1569,7 @@ function PersonaColorsTab({
             quotation marks is automatically colored with this value, and can optionally be bolded from Settings.
           </li>
           <li>
-            &bull; <strong className="text-[var(--foreground)]">Box color</strong> — Sets the background color of your
+            &bull; <strong className="text-[var(--foreground)]">Cor da caixa</strong> — Sets the background color of your
             persona&apos;s message bubble.
           </li>
           <li>&bull; Leave any field empty to use the default theme colors.</li>
@@ -1734,7 +1739,7 @@ function PersonaStatsTab({
                       value={bar.name}
                       onChange={(e) => updateBar(i, "name", e.target.value)}
                       className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--input)] px-2 py-1 text-xs font-medium"
-                      placeholder="Stat name"
+                      placeholder="Nome do atributo"
                     />
                     <span className="text-[0.625rem] text-[var(--muted-foreground)]">max:</span>
                     <input
@@ -1770,7 +1775,7 @@ function PersonaStatsTab({
                 realistically based on what happens in the narrative.
               </li>
               <li>
-                &bull; Bars are displayed in the <strong className="text-[var(--foreground)]">HUD widget</strong> during
+                &bull; Bars are displayed in the <strong className="text-[var(--foreground)]">Widget do HUD</strong> during
                 chat with color-coded gradients.
               </li>
               <li>&bull; Values set here serve as the initial defaults for new conversations.</li>
@@ -1824,7 +1829,7 @@ function PersonaStatsTab({
             {/* Attributes */}
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Attributes</h3>
+                <h3 className="text-sm font-semibold">Atributos</h3>
                 <button
                   type="button"
                   onClick={addRpgAttribute}
@@ -1875,7 +1880,7 @@ function PersonaStatsTab({
                   knows your persona&apos;s current health.
                 </li>
                 <li>
-                  &bull; <strong className="text-[var(--foreground)]">Attributes</strong> — Custom stats (STR, DEX,
+                  &bull; <strong className="text-[var(--foreground)]">Atributos</strong> — Custom stats (STR, DEX,
                   etc.) that define your persona&apos;s capabilities.
                 </li>
                 <li>

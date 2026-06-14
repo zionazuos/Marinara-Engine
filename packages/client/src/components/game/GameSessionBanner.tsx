@@ -43,7 +43,8 @@ export function GameSessionBanner({
             className="flex items-center gap-1 rounded bg-red-500/20 px-2 py-1 text-xs text-red-300 hover:bg-red-500/30 transition-colors"
           >
             <Square size={12} />
-            End Session
+            
+            Encerrar sessão
           </button>
         ) : (
           <button
@@ -51,7 +52,8 @@ export function GameSessionBanner({
             className="flex items-center gap-1 rounded bg-emerald-500/20 px-2 py-1 text-xs text-emerald-300 hover:bg-emerald-500/30 transition-colors"
           >
             <Play size={12} />
-            New Session
+            
+            Nova sessão
           </button>
         )}
       </div>

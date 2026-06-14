@@ -148,7 +148,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
                       onClick={() => pinImage(img)}
                       aria-label="Pin image to chat"
                       className="rounded-md bg-white/20 p-1.5 text-white transition-colors hover:bg-white/30"
-                      title="Pin to chat"
+                      title="Fixar no chat"
                     >
                       <Pin size="0.75rem" />
                     </button>
@@ -224,7 +224,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
                   }}
                   aria-label="Pin image to chat"
                   className="rounded-lg bg-black/60 p-2 text-white transition-colors hover:bg-black/80"
-                  title="Pin to chat"
+                  title="Fixar no chat"
                 >
                   <Minimize2 size="0.875rem" />
                 </button>
@@ -239,7 +239,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
                 <button
                   type="button"
                   onClick={() => setLightbox(null)}
-                  aria-label="Close image"
+                  aria-label="Fechar imagem"
                   className="rounded-lg bg-black/60 p-2 text-white transition-colors hover:bg-black/80"
                 >
                   <X size="0.875rem" />

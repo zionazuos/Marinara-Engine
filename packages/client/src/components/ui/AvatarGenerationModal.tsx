@@ -285,7 +285,8 @@ export function AvatarGenerationModal({
                 )}
               >
                 {saving ? <Loader2 size="0.875rem" className="animate-spin" /> : <Camera size="0.875rem" />}
-                Use Avatar
+                
+                Usar avatar
               </button>
             </div>
           </div>

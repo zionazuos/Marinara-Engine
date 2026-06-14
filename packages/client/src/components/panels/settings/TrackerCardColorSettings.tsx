@@ -521,7 +521,8 @@ export function TrackerCardColorSettings() {
       <div className="flex min-h-5 items-center justify-between gap-2 px-0.5">
         <span className="inline-flex min-w-0 items-center gap-1 text-[0.625rem] font-medium text-[var(--foreground)]">
           <Palette size="0.6875rem" className="text-[var(--primary)]" />
-          Card colors
+          
+          Cores do card
         </span>
         {saveMessage && (
           <span

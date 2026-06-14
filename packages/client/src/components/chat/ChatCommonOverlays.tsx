@@ -87,7 +87,8 @@ function DeleteConfirmationDialog({
             onClick={onDeleteMore}
             className="rounded-lg bg-[var(--secondary)] px-4 py-2 text-xs font-medium transition-colors hover:bg-[var(--accent)]"
           >
-            Delete more
+            
+            Excluir mais
           </button>
           <button
             onClick={onClose}

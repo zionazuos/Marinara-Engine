@@ -324,7 +324,8 @@ export function LorebookMakerModal({ open, onClose }: Props) {
           {streaming ? (
             <>
               <Loader2 size="1rem" className="animate-spin" />
-              Generating…
+              
+              Gerando…
             </>
           ) : (
             <>

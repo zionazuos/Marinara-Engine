@@ -7937,7 +7937,8 @@ export function GameSurface({
                   className="group flex items-center gap-2 rounded-xl bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:shadow-lg hover:shadow-[var(--primary)]/30 disabled:opacity-50 disabled:hover:scale-100"
                 >
                   <Play size={18} className="transition-transform group-hover:scale-110" />
-                  Start Game
+                  
+                  Iniciar game
                 </button>
               )}
             </div>
@@ -8030,7 +8031,7 @@ export function GameSurface({
                     <button
                       onClick={handleRequestEndSession}
                       className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/80 backdrop-blur-md transition-colors hover:bg-black/60 hover:text-white"
-                      title="End Session"
+                      title="Encerrar sessão"
                     >
                       <Square size={13} />
                     </button>
@@ -8090,7 +8091,7 @@ export function GameSurface({
                   <button
                     onClick={openGameAssetsBrowser}
                     className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/80 backdrop-blur-md transition-colors hover:bg-black/60 hover:text-white"
-                    title="Game Assets"
+                    title="Assets do game"
                   >
                     <Folder size={14} />
                   </button>
@@ -8116,7 +8117,7 @@ export function GameSurface({
                           className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-white/85 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
                         >
                           <RotateCcw size={13} />
-                          <span>Retry Turn</span>
+                          <span>Repetir turno</span>
                         </button>
                         <button
                           onClick={handleRetryScene}
@@ -8221,7 +8222,7 @@ export function GameSurface({
                               setMobileActionsOpen(false);
                             }}
                             className="flex h-8 w-8 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/10"
-                            title="End Session"
+                            title="Encerrar sessão"
                           >
                             <Square size={13} />
                           </button>
@@ -8298,7 +8299,7 @@ export function GameSurface({
                             setMobileActionsOpen(false);
                           }}
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                          title="Game Assets"
+                          title="Assets do game"
                         >
                           <Folder size={14} />
                         </button>
@@ -8326,7 +8327,7 @@ export function GameSurface({
                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-white/85 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
                               >
                                 <RotateCcw size={13} />
-                                <span>Retry Turn</span>
+                                <span>Repetir turno</span>
                               </button>
                               <button
                                 onClick={() => {
@@ -8897,13 +8898,13 @@ export function GameSurface({
                       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
                         <div className="flex items-center gap-2">
                           <ScrollText size={16} className="text-[var(--muted-foreground)]" />
-                          <span className="text-sm font-semibold text-[var(--foreground)]">Combat Logs</span>
+                          <span className="text-sm font-semibold text-[var(--foreground)]">Registros de combate</span>
                         </div>
                         <button
                           type="button"
                           onClick={() => setCombatLogsOpen(false)}
                           className="rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                          title="Close logs"
+                          title="Fechar registros"
                         >
                           <X size={16} />
                         </button>

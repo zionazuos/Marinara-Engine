@@ -188,7 +188,7 @@ export function CombinedPlayerPanel({
     <>
       <div className="flex items-center justify-between border-b border-[var(--border)] px-3 py-1.5">
         <span className="text-[0.625rem] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider flex items-center gap-1">
-          <Swords size="0.625rem" /> Trackers
+          <Swords size="0.625rem" />  Rastreadores
         </span>
         <button
           onClick={onClose}
@@ -343,7 +343,7 @@ export function CombinedPlayerPanel({
                     value={item.name}
                     onSave={(value) => updateItem(idx, { ...item, name: value })}
                     className="flex-1"
-                    placeholder="Item name"
+                    placeholder="Nome do item"
                   />
                   <input
                     type="number"
@@ -355,7 +355,7 @@ export function CombinedPlayerPanel({
                   <button
                     onClick={() => removeItem(idx)}
                     className="text-[var(--muted-foreground)]/40 hover:text-red-500 transition-colors shrink-0"
-                    title="Remove item"
+                    title="Remover item"
                   >
                     <X size="0.5625rem" />
                   </button>
@@ -430,7 +430,7 @@ export function CombinedPlayerPanel({
                     value={field.name}
                     onSave={(value) => updateCustomField(idx, { ...field, name: value })}
                     className="flex-1 min-w-0"
-                    placeholder="Field name"
+                    placeholder="Nome do campo"
                   />
                   <span className="text-[var(--muted-foreground)]/40 text-[0.5rem]">=</span>
                   <InlineEdit
@@ -790,7 +790,7 @@ export function InventoryPanel({ items, onUpdate }: InventoryPanelProps) {
               value={item.name}
               onSave={(value) => updateItem(idx, { ...item, name: value })}
               className="flex-1 min-w-0"
-              placeholder="Item name"
+              placeholder="Nome do item"
             />
             <input
               type="number"
@@ -802,7 +802,7 @@ export function InventoryPanel({ items, onUpdate }: InventoryPanelProps) {
             <button
               onClick={() => removeItem(idx)}
               className="text-[var(--muted-foreground)]/40 hover:text-red-500 transition-colors shrink-0"
-              title="Remove item"
+              title="Remover item"
             >
               <X size="0.5625rem" />
             </button>
@@ -937,7 +937,7 @@ export function CustomTrackerPanel({
               value={field.name}
               onSave={(value) => updateField(idx, { ...field, name: value })}
               className="flex-1 min-w-0"
-              placeholder="Field name"
+              placeholder="Nome do campo"
             />
             <span className="text-[var(--muted-foreground)]/40 text-[0.5rem]">=</span>
             <InlineEdit
@@ -1328,7 +1328,7 @@ function StatBarEditable({
             value={stat.name}
             onSave={onUpdateName}
             className="!text-[0.625rem] !font-medium !text-[var(--foreground)]/80"
-            placeholder="Stat name"
+            placeholder="Nome do atributo"
           />
         ) : (
           <span className="text-[0.625rem] font-medium text-[var(--foreground)]/80">{stat.name}</span>
@@ -1422,7 +1422,7 @@ function QuestCardEditable({
           value={quest.name}
           onSave={(value) => onUpdate({ ...quest, name: value })}
           className={cn("flex-1 !font-medium", quest.completed && "line-through opacity-50")}
-          placeholder="Quest name"
+          placeholder="Nome da missão"
         />
         {total > 0 && (
           <span className="text-[0.5625rem] text-[var(--muted-foreground)]/60">
@@ -1452,7 +1452,7 @@ function QuestCardEditable({
                 value={objective.text}
                 onSave={(value) => updateObjectiveText(idx, value)}
                 className={cn("flex-1", objective.completed && "line-through opacity-50")}
-                placeholder="Objective"
+                placeholder="Objetivo"
               />
               <button
                 onClick={() => removeObjective(idx)}

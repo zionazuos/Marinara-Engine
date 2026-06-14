@@ -207,7 +207,8 @@ export function AgentsPanel() {
               : "text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
           )}
         >
-          By Category
+          
+          Por categoria
         </button>
         <button
           onClick={() => setViewMode("status")}
@@ -218,7 +219,8 @@ export function AgentsPanel() {
               : "text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
           )}
         >
-          By Status
+          
+          Por status
         </button>
       </div>
 
@@ -354,7 +356,7 @@ export function AgentsPanel() {
                 </button>
                 <button
                   className="mt-0.5 shrink-0 text-[var(--muted-foreground)] transition-colors hover:text-[var(--primary)]"
-                  title="Edit script"
+                  title="Editar script"
                   onClick={() => openRegexDetail(script.id)}
                 >
                   <Pencil size="0.8125rem" />
@@ -529,7 +531,7 @@ export function AgentsPanel() {
                   </button>
                   <button
                     className="mt-0.5 shrink-0 text-[var(--muted-foreground)] transition-colors hover:text-[var(--primary)]"
-                    title="Edit agent"
+                    title="Editar agente"
                     onClick={() => openAgentDetail(agent.id)}
                   >
                     <Pencil size="0.8125rem" />
@@ -596,14 +598,14 @@ export function AgentsPanel() {
               </span>
               <button
                 className="mt-0.5 shrink-0 text-[var(--muted-foreground)] transition-colors hover:text-[var(--primary)]"
-                title="Edit tool"
+                title="Editar ferramenta"
                 onClick={() => openToolDetail(tool.id)}
               >
                 <Pencil size="0.8125rem" />
               </button>
               <button
                 className="mt-0.5 shrink-0 text-[var(--muted-foreground)] transition-colors hover:text-[var(--destructive)]"
-                title="Delete tool"
+                title="Excluir ferramenta"
                 onClick={async () => {
                   if (
                     await showConfirmDialog({
@@ -684,7 +686,7 @@ function renderAgentCard({
       )}
       <button
         className="mt-0.5 shrink-0 text-[var(--muted-foreground)] transition-colors hover:text-[var(--primary)]"
-        title="Edit agent"
+        title="Editar agente"
         onClick={() => openAgentDetail(custom ? id : type)}
       >
         <Pencil size="0.8125rem" />

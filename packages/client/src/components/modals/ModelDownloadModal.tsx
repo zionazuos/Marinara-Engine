@@ -608,7 +608,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
 
                 <div className="flex flex-col gap-2">
                   <div className="text-xs font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-                    GPU Offload
+                    
+                    Offload da GPU
                   </div>
                   {activeBackend === "mlx" ? (
                     <div className="rounded-xl border border-[var(--border)] bg-[var(--card)]/60 px-3 py-2 text-sm text-[var(--muted-foreground)]/75">
@@ -869,7 +870,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
               {runtimeDiagnostics && (
                 <div className="rounded-xl border border-[var(--border)] bg-[var(--card)]/50 p-3">
                   <div className="text-xs font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-                    Diagnostics
+                    
+                    Diagnósticos
                   </div>
                   <div className="mt-2 flex flex-col gap-1 text-xs text-[var(--muted-foreground)]/75">
                     {runtimeDiagnostics.gpuVendors.length > 0 && (
@@ -993,7 +995,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                   </div>
                   {model.quantization === "q8_0" && (
                     <span className="rounded-full bg-purple-500/15 px-2 py-0.5 text-[0.625rem] font-medium text-purple-300">
-                      Recommended
+                      
+                      Recomendado
                     </span>
                   )}
                 </label>

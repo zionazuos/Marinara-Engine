@@ -77,7 +77,7 @@ export function CreatePresetModal({ open, onClose }: Props) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoFocus
-            placeholder="My Preset..."
+            placeholder="Meu preset..."
             onKeyDown={(e) => {
               if (e.key === "Enter") handleCreate();
             }}

@@ -171,7 +171,7 @@ export function GenerationParametersFields({
       </div>
       <div className="grid grid-cols-2 gap-2">
         <ParamInput
-          label="Frequency"
+          label="Frequência"
           help="Penalizes tokens based on how often they've already appeared. Positive values reduce repetition; negative values encourage it."
           value={value.frequencyPenalty}
           onChange={(nextValue) => set("frequencyPenalty", nextValue)}
@@ -267,7 +267,8 @@ export function GenerationParametersFields({
         </div>
         <div>
           <span className="inline-flex items-center gap-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-            Verbosity
+            
+            Verbosidade
             <HelpTooltip
               text="Controls how long and detailed responses should be. Low keeps things concise; high encourages elaborate, descriptive output."
               size="0.625rem"

@@ -908,7 +908,8 @@ export function ConversationView({
               className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)] disabled:opacity-50"
             >
               {isFetchingNextPage ? <Loader2 size="0.75rem" className="animate-spin" /> : <ChevronUp size="0.75rem" />}
-              Load More
+              
+              Carregar mais
             </button>
           </div>
         )}
@@ -932,7 +933,8 @@ export function ConversationView({
                   return names.slice(0, -1).join(", ") + " & " + names[names.length - 1];
                 })()}
               </span>
-              . Say hi!
+              
+              . Mande um oi!
             </p>
           </div>
         )}
@@ -1074,7 +1076,7 @@ export function ConversationView({
               />
             </span>
             <span className="italic">
-              {liveTypingName} {liveTypingVerb} typing...
+              {liveTypingName} {liveTypingVerb}  digitando...
             </span>
           </div>
         )}

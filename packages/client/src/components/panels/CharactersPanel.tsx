@@ -634,13 +634,13 @@ export function CharactersPanel() {
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
             className="h-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--secondary)] py-2 pl-2.5 pr-7 text-[0.6875rem] outline-none transition-colors focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-            title="Sort order"
+            title="Ordem de classificação"
           >
             <option value="name-asc">A-Z</option>
             <option value="name-desc">Z-A</option>
             <option value="newest">Mais recentes</option>
             <option value="oldest">Mais antigos</option>
-            <option value="favorites">Favorites</option>
+            <option value="favorites">Favoritos</option>
           </select>
           <ArrowUpDown
             size="0.625rem"
@@ -904,7 +904,7 @@ export function CharactersPanel() {
                     if (e.key === "Enter") handleCreateGroup();
                     if (e.key === "Escape") setCreatingGroup(false);
                   }}
-                  placeholder="Group name…"
+                  placeholder="Nome do grupo…"
                   className="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]/50"
                 />
                 <button
@@ -1475,7 +1475,8 @@ export function CharactersPanel() {
                 }}
                 className="rounded-lg bg-[var(--primary)] px-3 py-1.5 text-xs font-medium text-[var(--primary-foreground)] transition-colors hover:opacity-90"
               >
-                Add Message
+                
+                Adicionar mensagem
               </button>
             </div>
           </div>

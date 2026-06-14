@@ -1753,7 +1753,7 @@ export function ChatSettingsDrawer({
 
           {/* Chat Name */}
           <Section
-            label="Chat Name"
+            label="Nome do chat"
             icon={<LetterText size="0.875rem" />}
             help="This name is only visible to you — it won't be sent to the AI or affect the conversation in any way."
           >
@@ -1785,7 +1785,7 @@ export function ChatSettingsDrawer({
 
           {/* Connection */}
           <Section
-            label="Connection"
+            label="Conexão"
             icon={<Plug size="0.875rem" />}
             help={
               isGame
@@ -1805,7 +1805,7 @@ export function ChatSettingsDrawer({
                     className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                   >
                     <option value="">Nenhum</option>
-                    <option value="random">🎲 Random</option>
+                    <option value="random">🎲 Aleatório</option>
                     {textConnectionsList.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
@@ -1823,7 +1823,7 @@ export function ChatSettingsDrawer({
                   className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                 >
                   <option value="">Nenhum</option>
-                  <option value="random">🎲 Random</option>
+                  <option value="random">🎲 Aleatório</option>
                   {textConnectionsList.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -2696,7 +2696,7 @@ export function ChatSettingsDrawer({
           {/* Group Chat Settings — only when 2+ characters, game mode handles it internally */}
           {chatCharIds.length > 1 && !isGame && !isConversation && (
             <Section
-              label="Group Chat"
+              label="Chat em grupo"
               icon={<Users size="0.875rem" />}
               help={
                 isConversation
@@ -2785,7 +2785,8 @@ export function ChatSettingsDrawer({
                           : "text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
                       )}
                     >
-                      Sequential
+                      
+                      Sequencial
                     </button>
                     <button
                       onClick={() => updateMeta.mutate({ id: chat.id, groupResponseOrder: "smart" })}
@@ -3004,7 +3005,7 @@ export function ChatSettingsDrawer({
                   )}
                 >
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-medium">Schedules</span>
+                    <span className="text-xs font-medium">Agendas</span>
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                       Optional character routines for availability and delays
                     </p>
@@ -3152,7 +3153,7 @@ export function ChatSettingsDrawer({
                   {/* Selfie resolution picker */}
                   {(metadata.imageGenConnectionId as string) && (
                     <div className="mt-2 space-y-1">
-                      <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Resolution</span>
+                      <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Resolução</span>
                       <div className="flex flex-wrap gap-1.5">
                         {[
                           { label: "512x512", w: 512, h: 512 },
@@ -3592,7 +3593,7 @@ export function ChatSettingsDrawer({
                         <button
                           onClick={() => pinLorebookToChat(lb.id)}
                           className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--primary)]/15 hover:text-[var(--primary)]"
-                          title="Add to chat"
+                          title="Adicionar ao chat"
                         >
                           <Plus size="0.6875rem" />
                         </button>
@@ -4154,7 +4155,7 @@ export function ChatSettingsDrawer({
                       <div className="rounded-lg bg-[var(--background)]/75 px-3 py-2 ring-1 ring-[var(--border)]">
                         <div className="flex items-center gap-2">
                           <Image size="0.75rem" className="text-[var(--muted-foreground)]" />
-                          <span className="flex-1 text-[0.6875rem] text-[var(--muted-foreground)]">Sprite Layout</span>
+                          <span className="flex-1 text-[0.6875rem] text-[var(--muted-foreground)]">Layout do sprite</span>
                           <button
                             onClick={() => onToggleSpriteArrange?.()}
                             className={cn(
@@ -5282,7 +5283,8 @@ export function ChatSettingsDrawer({
               {metadata.translationProvider === "ai" && (
                 <div>
                   <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                    Connection
+                    
+                    Conexão
                     <HelpTooltip text="Which AI connection to use for translation" size="0.625rem" />
                   </label>
                   <select
@@ -5542,7 +5544,7 @@ export function ChatSettingsDrawer({
 
           {/* Impersonate (global settings applied to /impersonate generations) */}
           <Section
-            label="Impersonate"
+            label="Personificar"
             icon={<Drama size="0.875rem" />}
             help="Global settings applied to every /impersonate generation across all chats."
           >
@@ -5871,7 +5873,8 @@ export function ChatSettingsDrawer({
                 onClick={handleFirstMesConfirm}
                 className="rounded-lg bg-[var(--primary)] px-3 py-1.5 text-xs font-medium text-[var(--primary-foreground)] transition-colors hover:opacity-90"
               >
-                Add Message
+                
+                Adicionar mensagem
               </button>
             </div>
           </div>
@@ -6275,7 +6278,8 @@ function ConversationPromptSection({
               className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-1.5 text-[0.625rem] font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)]"
             >
               <Pencil size="0.625rem" />
-              Edit Prompt
+              
+              Editar prompt
             </button>
             {customPrompt && (
               <button
@@ -6394,7 +6398,7 @@ function ImpersonateSettingsContent({
 
           <label className="min-w-0 space-y-1">
             <div className="flex items-center gap-1.5">
-              <span className="text-[0.6875rem] font-semibold">Connection</span>
+              <span className="text-[0.6875rem] font-semibold">Conexão</span>
               <HelpTooltip text="Use a specific connection (model/provider) for impersonate generations only. Useful for routing impersonate to a cheaper or faster model." />
             </div>
             <select
@@ -7009,7 +7013,8 @@ function ScheduleEditor({
                   <div className="grid gap-2 sm:grid-cols-3">
                     <label className="space-y-1">
                       <span className="block text-[0.55rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        Inactivity
+                        
+                        Inatividade
                       </span>
                       <input
                         type="number"
@@ -7027,7 +7032,8 @@ function ScheduleEditor({
                     </label>
                     <label className="space-y-1">
                       <span className="block text-[0.55rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        Idle Delay
+                        
+                        Atraso de idle
                       </span>
                       <input
                         type="number"
@@ -7045,7 +7051,8 @@ function ScheduleEditor({
                     </label>
                     <label className="space-y-1">
                       <span className="block text-[0.55rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        DND Delay
+                        
+                        Atraso DND
                       </span>
                       <input
                         type="number"

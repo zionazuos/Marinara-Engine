@@ -382,7 +382,7 @@ function MapZoomControls({ zoom, onZoomOut, onZoomIn }: MapZoomControlsProps) {
         }}
         disabled={atMin}
         className="flex h-full w-5 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
-        title="Zoom out"
+        title="Afastar"
         aria-label="Afastar mapa"
       >
         <Minus size={11} />
@@ -501,7 +501,7 @@ export function GameMapPanel({
         data-tour="game-map"
         className="flex w-52 flex-col items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--card)]/92 p-3 text-[var(--muted-foreground)] shadow-lg backdrop-blur-sm"
       >
-        <span className="text-[0.625rem]">No map yet</span>
+        <span className="text-[0.625rem]">Nenhum mapa ainda</span>
         {onGenerateMap && (
           <button
             onClick={onGenerateMap}
@@ -589,7 +589,7 @@ export function GameMapPanel({
             value={selectedMapId ?? ""}
             onChange={(event) => onViewedMapChange?.(event.target.value)}
             className="min-w-0 flex-1 rounded-md border border-white/10 bg-black/35 px-1.5 py-1 text-[0.625rem] text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
-            title="View map"
+            title="Ver mapa"
           >
             {mapOptions.map((option, index) => {
               const id = getMapId(option, index) ?? `map-${index + 1}`;
@@ -786,7 +786,7 @@ export function MobileMapButton({
                       setSelectedNode(null);
                     }}
                     className="mt-1 w-full rounded-md border border-white/10 bg-black/35 px-1.5 py-1 text-[0.625rem] text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
-                    title="View map"
+                    title="Ver mapa"
                   >
                     {mapOptions.map((option, index) => {
                       const id = getMapId(option, index) ?? `map-${index + 1}`;
@@ -815,7 +815,7 @@ export function MobileMapButton({
             <div className="flex-1 overflow-auto p-3">
               {!map ? (
                 <div className="flex flex-col items-center justify-center gap-3 py-8 text-[var(--muted-foreground)]">
-                  <span className="text-xs">No map yet</span>
+                  <span className="text-xs">Nenhum mapa ainda</span>
                   {onGenerateMap && (
                     <button
                       onClick={() => {

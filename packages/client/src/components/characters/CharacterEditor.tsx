@@ -705,7 +705,7 @@ export function CharacterEditor() {
         title="Start new chat"
       >
         <MessageCircle size="1rem" />
-        <span className="max-sm:hidden">Start Chat</span>
+        <span className="max-sm:hidden">Iniciar chat</span>
       </button>
 
       <button
@@ -1000,7 +1000,7 @@ export function CharacterEditor() {
             )}
             {activeTab === "backstory" && (
               <TextareaTab
-                title="Backstory"
+                title="História de fundo"
                 subtitle="The character's history, origin story, and formative life events."
                 value={(formData.extensions.backstory as string) ?? ""}
                 onChange={(v) => updateExtension("backstory", v)}
@@ -1364,7 +1364,7 @@ function MetadataTab({
             value={formData.creator}
             onChange={(e) => updateField("creator", e.target.value)}
             className="w-full rounded-xl border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-            placeholder="Your name"
+            placeholder="Seu nome"
           />
         </label>
         <div className="space-y-1.5">
@@ -1418,7 +1418,8 @@ function MetadataTab({
               onClick={removeAllTags}
               className="rounded-lg px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
             >
-              Remove All
+              
+              Remover tudo
             </button>
           )}
         </div>
@@ -2002,7 +2003,7 @@ function AdvancedTab({
             >
               <option value="system">Sistema</option>
               <option value="user">Usuário</option>
-              <option value="assistant">Assistant</option>
+              <option value="assistant">Assistente</option>
             </select>
           </label>
         </div>
@@ -2567,7 +2568,8 @@ function SpritesTab({
               : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
           )}
         >
-          Full-body
+          
+          Corpo inteiro
         </button>
       </div>
 
@@ -2588,7 +2590,8 @@ function SpritesTab({
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h4 className="text-xs font-semibold flex items-center gap-1.5">
             <Upload size="0.8125rem" className="text-[var(--primary)]" />
-            Add Sprite
+            
+            Adicionar sprite
           </h4>
           <div className="flex flex-wrap items-center gap-2 md:justify-end">
             <button
@@ -2663,7 +2666,8 @@ function SpritesTab({
                     className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[var(--foreground)] transition-colors hover:bg-[var(--secondary)] disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <ImageDown size="0.75rem" />
-                    All sprites
+                    
+                    Todos os sprites
                   </button>
                 </div>
               )}
@@ -2684,7 +2688,7 @@ function SpritesTab({
             disabled={cleaningSprites}
             className="min-w-40 flex-1 accent-[var(--primary)] disabled:opacity-50"
           />
-          <span className="text-[0.625rem] text-[var(--muted-foreground)]">Aggressive</span>
+          <span className="text-[0.625rem] text-[var(--muted-foreground)]">Agressivo</span>
           <span className="w-8 text-right text-[0.6875rem] tabular-nums text-[var(--muted-foreground)]">
             {savedCleanupStrength}
           </span>
@@ -2694,7 +2698,8 @@ function SpritesTab({
         {folderProgress && (
           <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--muted-foreground)]">
             <Loader2 size="0.75rem" className="animate-spin text-[var(--primary)]" />
-            Uploading {folderProgress.done}/{folderProgress.total} sprites…
+            
+            Enviando {folderProgress.done}/{folderProgress.total} sprites…
           </div>
         )}
         {cleaningSprites && (
@@ -2764,7 +2769,7 @@ function SpritesTab({
         {/* Quick expression buttons */}
         {category === "expressions" && suggestedExpressions.length > 0 && (
           <div>
-            <p className="text-[0.625rem] text-[var(--muted-foreground)] mb-1.5">Quick add:</p>
+            <p className="text-[0.625rem] text-[var(--muted-foreground)] mb-1.5">Adição rápida:</p>
             <div className="flex flex-wrap gap-1">
               {suggestedExpressions.slice(0, 12).map((expr) => (
                 <button
@@ -2932,7 +2937,8 @@ function SpritesTab({
                   ) : (
                     <Trash2 size="0.875rem" />
                   )}
-                  Delete All {category === "full-body" ? "Full-Body" : "Expressions"}
+                  
+                  Excluir tudo {category === "full-body" ? "Full-Body" : "Expressions"}
                 </button>
               ) : null}
               <div className="ml-auto flex shrink-0 items-center gap-2">
@@ -3023,7 +3029,7 @@ function StatsTab({
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="RPG Stats"
+        title="Atributos de RPG"
         subtitle="Toggle stat tracking for this character. When enabled, the character's stats are included in the prompt and tracked by agents."
       />
 
@@ -3066,7 +3072,7 @@ function StatsTab({
           {/* Attributes */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Attributes</h3>
+              <h3 className="text-sm font-semibold">Atributos</h3>
               <button
                 type="button"
                 onClick={addAttribute}
@@ -3117,7 +3123,7 @@ function StatsTab({
                 knows the character&apos;s current health.
               </li>
               <li>
-                &bull; <strong className="text-[var(--foreground)]">Attributes</strong> — Custom stats (STR, DEX, etc.)
+                &bull; <strong className="text-[var(--foreground)]">Atributos</strong> — Custom stats (STR, DEX, etc.)
                 that define the character&apos;s capabilities.
               </li>
               <li>
@@ -3261,7 +3267,7 @@ function ColorsTab({
         <h4 className="mb-1.5 text-xs font-semibold">Como as cores funcionam</h4>
         <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
           <li>
-            &bull; <strong className="text-[var(--foreground)]">Name color</strong> — Applied to the character&apos;s
+            &bull; <strong className="text-[var(--foreground)]">Cor do nome</strong> — Applied to the character&apos;s
             display name in chat. Gradients use CSS linear-gradient.
           </li>
           <li>
@@ -3269,7 +3275,7 @@ function ColorsTab({
             quotation marks is automatically colored with this value, and can optionally be bolded from Settings.
           </li>
           <li>
-            &bull; <strong className="text-[var(--foreground)]">Box color</strong> — Sets the background color of the
+            &bull; <strong className="text-[var(--foreground)]">Cor da caixa</strong> — Sets the background color of the
             character&apos;s message bubble in roleplay mode.
           </li>
           <li>&bull; Leave any field empty to use the default theme colors.</li>

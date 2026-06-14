@@ -357,7 +357,7 @@ export function ToolEditor() {
 
           {/* ── Parameters ── */}
           <FieldGroup
-            label="Parameters"
+            label="Parâmetros"
             icon={<Code2 size="0.875rem" className="text-[var(--primary)]" />}
             help="The input arguments the AI can pass when calling this tool. Each parameter has a name, type, and description."
           >

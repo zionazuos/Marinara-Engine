@@ -923,7 +923,7 @@ export function TTSConfigCard() {
             <FieldRow label="Vozes dos personagens" help="Assign voices to specific characters from your Characters tab.">
               <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-2">
                 <div className="grid gap-2 text-[0.625rem] font-semibold uppercase tracking-wide text-[var(--muted-foreground)] sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto]">
-                  <span>Character</span>
+                  <span>Personagem</span>
                   <span>Voz</span>
                   <span className="hidden sm:block" />
                 </div>
@@ -1203,7 +1203,7 @@ export function TTSConfigCard() {
 
           {/* Auto-play */}
           <div className="space-y-1">
-            <span className="text-xs font-medium">Auto-play</span>
+            <span className="text-xs font-medium">Reprodução automática</span>
             <ToggleRow
               label="Roleplay messages"
               checked={autoplayRP}

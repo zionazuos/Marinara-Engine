@@ -194,7 +194,8 @@ export function ChoiceSelectionModal({
               <h4 className="mb-1 text-xs font-semibold text-[var(--foreground)]">{v.question}</h4>
               <div className="mb-2 flex items-center gap-2">
                 <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                  Variable: <code className="text-amber-400">{`{{${v.variableName}}}`}</code>
+                  
+                  Variável: <code className="text-amber-400">{`{{${v.variableName}}}`}</code>
                 </p>
                 {v.options.length === 1 && !v.multiSelect && (
                   <span className="flex items-center gap-0.5 rounded bg-purple-400/15 px-1.5 py-0.5 text-[0.5625rem] font-medium text-purple-400">
@@ -205,7 +206,7 @@ export function ChoiceSelectionModal({
                   <span className="flex items-center gap-0.5 rounded bg-purple-400/15 px-1.5 py-0.5 text-[0.5625rem] font-medium text-purple-400">
                     {v.randomPick ? (
                       <>
-                        <Shuffle size="0.5625rem" /> Random pick
+                        <Shuffle size="0.5625rem" />  Escolha aleatória
                       </>
                     ) : (
                       <>

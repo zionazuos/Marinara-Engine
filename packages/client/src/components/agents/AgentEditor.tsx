@@ -692,7 +692,7 @@ export function AgentEditor() {
             markDirty();
           }}
           className="flex-1 bg-transparent text-lg font-semibold outline-none placeholder:text-[var(--muted-foreground)] max-md:text-base"
-          placeholder="Agent name…"
+          placeholder="Nome do agente…"
         />
         <div className="flex items-center gap-1.5 max-md:w-full max-md:justify-end max-md:border-t max-md:border-[var(--border)]/30 max-md:pt-2">
           {saveError && (
@@ -2333,7 +2333,7 @@ function ToolCard({
       </div>
       {expanded && (
         <div className="border-t border-[var(--border)] px-3 py-2.5 space-y-1.5">
-          <p className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Parameters:</p>
+          <p className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Parâmetros:</p>
           {Object.entries(params).map(([name, prop]) => {
             const p = prop as { type?: string; description?: string; enum?: string[] };
             const isRequired = required.includes(name);

@@ -174,7 +174,7 @@ function SidecarCard() {
           <BrainCircuit size="1rem" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium">Local Model</div>
+          <div className="text-sm font-medium">Modelo local</div>
           <div className="text-[0.6875rem] text-[var(--muted-foreground)]">
             {isDownloaded
               ? `${activeModelName ?? "Model"} • ${backendLabel}${modelSize ? ` • ${formatBytes(modelSize)}` : ""}${
@@ -685,7 +685,7 @@ export function ConnectionsPanel() {
             autoFocus
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
-            placeholder="Folder name"
+            placeholder="Nome da pasta"
             onKeyDown={(e) => {
               if (e.key === "Enter") handleCreateFolder();
               if (e.key === "Escape") {
@@ -709,7 +709,8 @@ export function ConnectionsPanel() {
           className="flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[0.6875rem] text-[var(--muted-foreground)] transition-all hover:bg-[var(--sidebar-accent)]/40 hover:text-[var(--foreground)]"
         >
           <FolderPlus size="0.75rem" />
-          New Folder
+          
+          Nova pasta
         </button>
       )}
 

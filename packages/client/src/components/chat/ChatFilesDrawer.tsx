@@ -137,7 +137,8 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
           </div>
           <div className="border-b border-[var(--border)] px-4 py-3">
             <p className="mb-1.5 text-[0.625rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-              Export Chat
+              
+              Exportar chat
             </p>
             <div className="flex gap-2">
               <button
@@ -161,7 +162,8 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
           </div>
           <div className="border-b border-[var(--border)] px-4 py-3">
             <p className="mb-1.5 text-[0.625rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-              Import Chat
+              
+              Importar chat
             </p>
             <button
               type="button"
@@ -212,7 +214,8 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
         {/* Export tools */}
         <div className="border-b border-[var(--border)] px-4 py-3">
           <p className="mb-1.5 text-[0.625rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-            Export Chat
+            
+            Exportar chat
           </p>
           <div className="flex gap-2">
             <button
@@ -234,14 +237,15 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
             </button>
           </div>
           <p className="mt-2 text-center text-[0.625rem] text-[var(--muted-foreground)]/60">
-            {chatFiles.length} chat file{chatFiles.length !== 1 ? "s" : ""}  neste grupo
+            {chatFiles.length}  arquivo de chat{chatFiles.length !== 1 ? "s" : ""}  neste grupo
           </p>
         </div>
 
         {/* Import tools */}
         <div className="border-b border-[var(--border)] px-4 py-3">
           <p className="mb-1.5 text-[0.625rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-            Import Chat
+            
+            Importar chat
           </p>
           <button
             type="button"

@@ -298,7 +298,7 @@ export function QuickSwitcherMobile() {
                   )}
                   title={isRandom ? "Random pool active — click to disable" : "Use random connection from pool"}
                 >
-                  <span>🎲 Random</span>
+                  <span>🎲 Aleatório</span>
                   {isRandom && <span className="ml-auto text-[0.6875rem]">active</span>}
                 </button>
                 <div className="mx-2 my-1 h-px bg-[var(--border)]" />

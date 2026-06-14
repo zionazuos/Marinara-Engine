@@ -473,7 +473,7 @@ export function GameInput({
                 )}
               >
                 <MessageCircle size={14} className="shrink-0" />
-                <span className="flex-1">Talk to GM</span>
+                <span className="flex-1">Falar com o GM</span>
                 {addressMode === "gm" && <span className="text-[0.625rem] uppercase tracking-wide">Ligado</span>}
               </button>
             </div>

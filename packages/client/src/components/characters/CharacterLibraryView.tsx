@@ -424,7 +424,8 @@ export function CharacterLibraryView() {
               )}
             >
               <Star size="0.8125rem" className={favoritesOnly ? "fill-current" : ""} />
-              Favorites
+              
+              Favoritos
             </button>
 
             <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">

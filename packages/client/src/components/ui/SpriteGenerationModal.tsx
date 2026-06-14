@@ -1313,7 +1313,8 @@ export function SpriteGenerationModal({
                   setSelectedExpressions([...FULL_BODY_POSE_PRESETS[preset]]);
                 }}
               >
-                Full-body
+                
+                Corpo inteiro
               </button>
             </div>
             {error && (
@@ -1579,7 +1580,7 @@ export function SpriteGenerationModal({
                 {!fullBodyExpressionMode && (
                   <>
                     <div>
-                      <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Pose Count</label>
+                      <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Quantidade de poses</label>
                       <div className="flex flex-wrap gap-2">
                         {(Object.keys(EXPRESSION_PRESETS) as PresetKey[]).map((key) => (
                           <button
@@ -1830,7 +1831,7 @@ export function SpriteGenerationModal({
                         key={`row-cut-${index}`}
                         className="flex items-center gap-2 text-[0.6875rem] text-[var(--muted-foreground)]"
                       >
-                        <span className="w-28 shrink-0 text-[var(--foreground)]">Row cut {index + 1}</span>
+                        <span className="w-28 shrink-0 text-[var(--foreground)]">Corte de linha {index + 1}</span>
                         <input
                           type="range"
                           min={-12}
@@ -1848,7 +1849,7 @@ export function SpriteGenerationModal({
                         key={`col-cut-${index}`}
                         className="flex items-center gap-2 text-[0.6875rem] text-[var(--muted-foreground)]"
                       >
-                        <span className="w-28 shrink-0 text-[var(--foreground)]">Column cut {index + 1}</span>
+                        <span className="w-28 shrink-0 text-[var(--foreground)]">Corte de coluna {index + 1}</span>
                         <input
                           type="range"
                           min={-12}
@@ -1903,7 +1904,7 @@ export function SpriteGenerationModal({
                           onChange={(e) => setCleanupStrength(Number(e.target.value))}
                           className="w-full accent-[var(--primary)]"
                         />
-                        <span className="text-[0.6875rem] text-[var(--muted-foreground)]">Aggressive</span>
+                        <span className="text-[0.6875rem] text-[var(--muted-foreground)]">Agressivo</span>
                       </div>
                       <span className="text-[0.6875rem] text-[var(--muted-foreground)]">{cleanupStrength}</span>
                       <button
@@ -1996,7 +1997,8 @@ export function SpriteGenerationModal({
                           className="inline-flex items-center gap-1 rounded-lg bg-[var(--primary)] px-2.5 py-1 text-[0.6875rem] font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
                         >
                           {frameApplying ? <Loader2 size={12} className="animate-spin" /> : <Crop size={12} />}
-                          Apply Frame
+                          
+                          Aplicar quadro
                         </button>
                       </div>
                     </div>
@@ -2077,7 +2079,8 @@ export function SpriteGenerationModal({
                 className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)] hover:bg-[var(--secondary)]"
               >
                 <ArrowLeft size={14} />
-                Regenerate
+                
+                Regenerar
               </button>
               <button
                 onClick={handleSave}

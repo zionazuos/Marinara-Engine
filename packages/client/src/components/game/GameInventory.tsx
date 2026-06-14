@@ -297,7 +297,7 @@ export function GameInventory({
                   }}
                   disabled={renamePending}
                   className="min-w-0 flex-1 rounded border border-white/10 bg-black/40 px-2 py-1.5 text-[0.7rem] text-white/85 outline-none transition-colors focus:border-amber-400/40"
-                  placeholder="Item name"
+                  placeholder="Nome do item"
                 />
                 <button
                   onClick={() => void handleRename(selectedInventoryItem.name)}

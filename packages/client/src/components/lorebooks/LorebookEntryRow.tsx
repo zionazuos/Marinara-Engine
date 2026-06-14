@@ -588,7 +588,7 @@ export function LorebookEntryRow({
                 }}
               />
               <MobileNumber
-                label="Probability"
+                label="Probabilidade"
                 value={localProbability}
                 onCommit={(n) => {
                   const clamped = Math.max(0, Math.min(100, n));
@@ -1266,7 +1266,7 @@ function ExpandedDrawer({
 
             <div className="space-y-2 rounded-lg bg-[var(--secondary)]/45 p-2 ring-1 ring-[var(--border)]">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.6875rem] font-medium">Generation</span>
+                <span className="text-[0.6875rem] font-medium">Geração</span>
                 <FilterModeSelect
                   value={form.generationTriggerFilterMode ?? "any"}
                   onChange={(value) => update({ generationTriggerFilterMode: value })}
@@ -1364,7 +1364,7 @@ function ExpandedDrawer({
         >
           <option value="system">Sistema</option>
           <option value="user">Usuário</option>
-          <option value="assistant">Assistant</option>
+          <option value="assistant">Assistente</option>
         </select>
       </FieldGroup>
 
@@ -1389,7 +1389,7 @@ function ExpandedDrawer({
           />
           <NumberField label="Atraso" value={form.delay ?? 0} onChange={(v) => update({ delay: v || null })} min={0} />
           <NumberField
-            label="Ephemeral"
+            label="Efêmero"
             value={form.ephemeral ?? 0}
             onChange={(v) => update({ ephemeral: v || null })}
             min={0}
@@ -1399,7 +1399,7 @@ function ExpandedDrawer({
 
       {/* Group & Tag */}
       <FieldGroup
-        label="Group & Tag"
+        label="Grupo e tag"
         icon={Settings2}
         help="Group entries together so only one from the group activates at a time. Tags are for your own organization."
       >
@@ -1411,7 +1411,7 @@ function ExpandedDrawer({
               onChange={(e) => update({ group: e.target.value })}
               onBlur={flushAutosave}
               className="w-full rounded-lg bg-[var(--secondary)] px-2 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-              placeholder="Group name"
+              placeholder="Nome do grupo"
             />
           </div>
           <div>

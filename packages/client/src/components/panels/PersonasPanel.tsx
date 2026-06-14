@@ -358,7 +358,7 @@ export function PersonasPanel() {
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
             className="h-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--secondary)] py-2 pl-2.5 pr-7 text-[0.6875rem] outline-none transition-colors focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-            title="Sort order"
+            title="Ordem de classificação"
           >
             <option value="name-asc">A-Z</option>
             <option value="name-desc">Z-A</option>
@@ -592,7 +592,7 @@ export function PersonasPanel() {
                       setNewGroupName("");
                     }
                   }}
-                  placeholder="Group name…"
+                  placeholder="Nome do grupo…"
                   className="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]/50"
                 />
                 <button onClick={handleCreateGroup} className="rounded p-0.5 text-emerald-400 hover:bg-emerald-400/10">
@@ -917,7 +917,7 @@ export function PersonasPanel() {
                         activatePersona.mutate(persona.id);
                       }}
                       className="rounded-lg p-1.5 text-emerald-400 transition-all active:scale-90 hover:bg-emerald-400/10"
-                      title="Set as active"
+                      title="Definir como ativo"
                     >
                       <Star size="0.75rem" />
                     </button>

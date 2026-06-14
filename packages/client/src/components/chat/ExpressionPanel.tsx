@@ -95,7 +95,8 @@ export function ExpressionPanel({ characterIds, messages, characterMap, isRolepl
             isRoleplay ? "text-white/50" : "text-[var(--muted-foreground)]",
           )}
         >
-          Expressions
+          
+          Expressões
         </span>
         <button
           onClick={() => setCollapsed(true)}

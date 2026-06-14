@@ -43,7 +43,7 @@ export function ImageInfoPopover({ node, onClose }: { node: TreeNode; onClose: (
       className="fixed z-[60] rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 shadow-xl max-sm:inset-x-0 max-sm:bottom-0 max-sm:rounded-b-none max-sm:border-b-0 sm:right-4 sm:top-20 sm:w-64"
     >
       <div className="mb-3 flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-[var(--foreground)]">File Info</h4>
+        <h4 className="text-sm font-semibold text-[var(--foreground)]">Info do arquivo</h4>
         <button
           type="button"
           aria-label="Fechar"
@@ -65,7 +65,7 @@ export function ImageInfoPopover({ node, onClose }: { node: TreeNode; onClose: (
           </div>
           {info.width != null && info.height != null && (
             <div className="flex justify-between">
-              <span className="text-[var(--muted-foreground)]">Dimensions</span>
+              <span className="text-[var(--muted-foreground)]">Dimensões</span>
               <span className="text-[var(--foreground)]">
                 {info.width} × {info.height}
               </span>

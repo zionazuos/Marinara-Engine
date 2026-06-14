@@ -212,7 +212,7 @@ function ThoughtBubble({
             <InlineEdit
               value={value ?? ""}
               onSave={onSave}
-              placeholder="Thoughts"
+              placeholder="Pensamentos"
               className={cn(
                 "px-0 py-0 font-medium italic [--foreground:color-mix(in_srgb,var(--foreground)_94%,var(--primary)_6%)] [--muted-foreground:color-mix(in_srgb,var(--muted-foreground)_82%,var(--foreground)_18%)] hover:bg-[var(--primary)]/12",
                 compactThoughtBubble && "w-fit max-w-full",
@@ -328,7 +328,7 @@ export function InlineThoughtBubble({
             <InlineEdit
               value={value ?? ""}
               onSave={onSave}
-              placeholder="Thoughts"
+              placeholder="Pensamentos"
               className={cn(
                 "w-full px-0 py-0 font-medium italic [--foreground:color-mix(in_srgb,var(--foreground)_94%,var(--primary)_6%)] [--muted-foreground:color-mix(in_srgb,var(--muted-foreground)_82%,var(--foreground)_18%)] hover:bg-[var(--primary)]/12",
                 isFeaturedVariant &&

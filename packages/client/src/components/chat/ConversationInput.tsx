@@ -1594,7 +1594,7 @@ export function ConversationInput({
               ? "bg-foreground/10 text-foreground/75"
               : "text-foreground/40 hover:bg-foreground/10 hover:text-foreground/70",
           )}
-          title="Attach file"
+          title="Anexar arquivo"
         >
           <Plus size="1rem" />
         </button>

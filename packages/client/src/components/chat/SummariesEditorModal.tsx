@@ -400,7 +400,7 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
 
                     {/* Key details rows */}
                     <div className="space-y-1">
-                      <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Key Details</label>
+                      <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Detalhes-chave</label>
                       {current.keyDetails.length === 0 && (
                         <p className="text-[0.6875rem] italic text-[var(--muted-foreground)]">Sem detalhes-chave.</p>
                       )}
