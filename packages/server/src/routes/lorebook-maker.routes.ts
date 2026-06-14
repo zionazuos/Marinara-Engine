@@ -204,7 +204,12 @@ export async function lorebookMakerRoutes(app: FastifyInstance) {
           let batchResponse = "";
           for await (const chunk of provider.chat(
             [
-              { role: "system", content: SYSTEM_PROMPT },
+              {
+                role: "system",
+                content:
+                  SYSTEM_PROMPT +
+                  "\n\nIDIOMA: escreva TODOS os valores de texto em linguagem natural (nomes de entradas, conteúdo, descrições, etc.) em português do Brasil (pt-BR), de forma natural e fluente. Mantenha as CHAVES do JSON e a sintaxe estrutural exatamente em inglês.",
+              },
               { role: "user", content: userPrompt },
             ],
             {

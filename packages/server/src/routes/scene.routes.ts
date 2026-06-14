@@ -370,6 +370,7 @@ export async function sceneRoutes(app: FastifyInstance) {
         role: "system",
         content: [
           `You are summarizing a roleplay scene that just concluded between ${personaName} and the character(s).`,
+          `IDIOMA: escreva todo o resumo em português do Brasil (pt-BR), de forma natural e fluente.`,
           ``,
           `<characters>`,
           characterCtx,
@@ -741,6 +742,7 @@ export async function sceneRoutes(app: FastifyInstance) {
         role: "system",
         content: [
           `You are a creative scene planner for an immersive roleplay experience.`,
+          `IDIOMA: escreva todos os valores de texto em linguagem natural (firstMessage, scenario, descrições, etc.) em português do Brasil (pt-BR), de forma natural e fluente. Mantenha as CHAVES do JSON e a sintaxe estrutural exatamente em inglês.`,
           `${personaName} wants to start a roleplay scene with the character(s).`,
           ``,
           `<characters>`,

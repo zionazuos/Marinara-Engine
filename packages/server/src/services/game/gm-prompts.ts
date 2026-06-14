@@ -176,16 +176,21 @@ const PROMPT_LANGUAGE_LOOKUP = new Map<string, string>([
   ["deutsch", "German"],
   ["polish", "Polish"],
   ["polski", "Polish"],
-  ["portuguese", "Portuguese"],
-  ["português", "Portuguese"],
-  ["portugues", "Portuguese"],
+  ["portuguese", "português do Brasil (pt-BR)"],
+  ["português", "português do Brasil (pt-BR)"],
+  ["portugues", "português do Brasil (pt-BR)"],
+  ["português do brasil", "português do Brasil (pt-BR)"],
+  ["pt-br", "português do Brasil (pt-BR)"],
   ["russian", "Russian"],
   ["русский", "Russian"],
 ]);
 
+// Localização PT-BR: idioma padrão do game quando nenhum é definido no wizard.
+const DEFAULT_PROMPT_LANGUAGE = "português do Brasil (pt-BR)";
+
 function normalizePromptLanguage(language?: string | null): string | null {
   const trimmed = language?.trim();
-  if (!trimmed) return null;
+  if (!trimmed) return DEFAULT_PROMPT_LANGUAGE;
   return PROMPT_LANGUAGE_LOOKUP.get(trimmed.toLowerCase()) ?? trimmed;
 }
 

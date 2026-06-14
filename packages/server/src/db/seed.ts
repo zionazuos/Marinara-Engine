@@ -75,5 +75,5 @@ const DEFAULT_CHOICES: Record<string, string> = {
   tense: `present`,
   length: `flexible, based on the current scene. During a conversation between the user's protagonist {{user}} and a character played by you, you have two options: (1) ONLY respond with a dialogue line plus an optional dialogue tag/action beat, and stop, creating space for a dynamic back-and-forth. (2) Continue into a longer response provided the conversation is concluded, interrupted, includes a longer monologue, or an exchange between multiple NPCs. In action, when the user's agency is high, keep it concise (up to 150 words), and leave room for user input. In case you'd like to progress, for instance, in scene transitions, establishing shots, and plot developments, build content (unlimited, above 150 words), but allow the user to react to it
 `,
-  language: `English`,
+  language: `português do Brasil (pt-BR)`,
 };

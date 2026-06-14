@@ -35,6 +35,36 @@ interface RuntimeAgentData {
   endToken?: string;
 }
 
+// ──────────────────────────────────────────────
+// Localização PT-BR: diretiva global de idioma.
+// Injetada na mensagem de sistema final de toda geração
+// (roleplay e conversa) para garantir que a IA responda
+// sempre em português do Brasil, sem mexer em tags/comandos.
+// ──────────────────────────────────────────────
+export const PT_BR_LANGUAGE_DIRECTIVE = `<idioma_resposta>
+IMPORTANTE: Escreva TODAS as suas respostas — narração, diálogos, descrições, pensamentos e qualquer texto voltado ao usuário — em português do Brasil (pt-BR), com naturalidade e fluência, independentemente do idioma destas instruções, do card do personagem ou do preset.
+NÃO traduza nem altere tags de sistema, comandos entre colchetes (ex.: [scene: ...], [selfie], [state: ...], [choices: ...]), blocos XML estruturais, nomes de campos, JSON, código ou macros ({{...}}) — mantenha-os exatamente como especificado. Apenas o texto em linguagem natural deve estar em português.
+</idioma_resposta>`;
+
+/** Anexa a diretiva de idioma PT-BR à mensagem de sistema final (ou cria uma). */
+function injectLanguageDirective(messages: ChatMLMessage[]): ChatMLMessage[] {
+  const systemIdx = messages.findIndex((m) => m.role === "system");
+  if (systemIdx >= 0) {
+    messages[systemIdx] = {
+      ...messages[systemIdx]!,
+      content: `${messages[systemIdx]!.content}\n\n${PT_BR_LANGUAGE_DIRECTIVE}`,
+    };
+  } else if (messages.length > 0) {
+    messages[0] = {
+      ...messages[0]!,
+      content: `${messages[0]!.content}\n\n${PT_BR_LANGUAGE_DIRECTIVE}`,
+    };
+  } else {
+    messages.unshift({ role: "system", content: PT_BR_LANGUAGE_DIRECTIVE });
+  }
+  return messages;
+}
+
 interface ChoiceOptionValue {
   value: string;
 }
@@ -482,6 +512,9 @@ export async function assemblePrompt(input: AssemblerInput): Promise<AssemblerOu
       .join("\n\n");
     finalMessages = [{ role: "user", content: combined }];
   }
+
+  // ── Localização PT-BR: injeta diretiva global de idioma ──
+  finalMessages = injectLanguageDirective(finalMessages);
 
   // ── Final: Drop any messages with empty/whitespace-only content ──
   finalMessages = finalMessages.filter((m) => m.content?.trim());

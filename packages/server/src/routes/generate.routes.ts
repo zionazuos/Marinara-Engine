@@ -65,6 +65,7 @@ import { resolveSpotifyCredentials, spotifyHasScope } from "../services/spotify/
 import { buildSpotifyDjConstraints } from "../services/spotify/spotify-dj-constraints.js";
 import {
   assemblePrompt,
+  PT_BR_LANGUAGE_DIRECTIVE,
   buildPromptMacroContext,
   collectCharacterDepthPromptEntries,
   getCharacterDescriptionWithExtensions,
@@ -3566,6 +3567,10 @@ export async function generateRoutes(app: FastifyInstance) {
             memoryLines.push(`</important_memories>`);
             conversationSystemPrompt += "\n\n" + memoryLines.join("\n");
           }
+
+          // Localização PT-BR: força a conversa a responder em português do Brasil
+          // (o modo roleplay já recebe a diretiva via assemblePrompt).
+          conversationSystemPrompt += "\n\n" + PT_BR_LANGUAGE_DIRECTIVE;
 
           conversationSystemPrompt = resolvePromptMacros(conversationSystemPrompt);
 

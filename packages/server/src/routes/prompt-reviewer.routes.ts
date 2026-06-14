@@ -158,7 +158,12 @@ ${assembledView}`;
 
       for await (const chunk of provider.chat(
         [
-          { role: "system", content: SYSTEM_PROMPT },
+          {
+            role: "system",
+            content:
+              SYSTEM_PROMPT +
+              "\n\nIDIOMA: escreva todo o feedback e os valores de texto em linguagem natural em português do Brasil (pt-BR). Mantenha quaisquer CHAVES de JSON e sintaxe estrutural exatamente em inglês.",
+          },
           { role: "user", content: userPrompt },
         ],
         {

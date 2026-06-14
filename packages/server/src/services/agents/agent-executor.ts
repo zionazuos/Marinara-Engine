@@ -891,7 +891,11 @@ function buildAgentMessages(
   contextSize = 5,
 ): ChatMessage[] {
   // ── 1. System message — already contains <role>, <lore>, <agents>, and extras ──
-  const messages: ChatMessage[] = [{ role: "system", content: systemPrompt }];
+  // Localização PT-BR: agentes devem produzir valores de texto em português do Brasil,
+  // preservando chaves de JSON, tags, enums e sintaxe estrutural em inglês.
+  const ptBrAgentDirective =
+    "\n\nIDIOMA: escreva todos os valores de texto em linguagem natural (nomes, descrições, locais, clima, missões, falas, resumos, etc.) em português do Brasil (pt-BR). NÃO traduza nem altere chaves de JSON, tags, identificadores, enums ou sintaxe estrutural — mantenha-os exatamente como especificado.";
+  const messages: ChatMessage[] = [{ role: "system", content: systemPrompt + ptBrAgentDirective }];
 
   // ── 2. Chat history as proper multi-turn messages ──
   // Slice to this agent's own contextSize (the shared pool may be larger)
