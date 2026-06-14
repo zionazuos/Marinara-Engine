@@ -263,7 +263,8 @@ function TutorialCard({
           onClick={onSkip}
           className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
         >
-          Skip
+          
+          Pular
         </button>
         <button
           onClick={onNext}

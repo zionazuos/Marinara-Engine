@@ -444,7 +444,7 @@ export function PersonaEditor() {
           type="button"
           onClick={handleClose}
           className="rounded-xl p-2 transition-all hover:bg-[var(--accent)] active:scale-95"
-          title="Back"
+          title="Voltar"
         >
           <ArrowLeft size="1.125rem" />
         </button>
@@ -488,7 +488,7 @@ export function PersonaEditor() {
             value={formData.name}
             onChange={(e) => updateField("name", e.target.value)}
             className="w-full bg-transparent text-lg font-bold outline-none"
-            placeholder="Persona name"
+            placeholder="Nome da persona"
           />
           <input
             value={formData.comment}
@@ -497,7 +497,8 @@ export function PersonaEditor() {
             placeholder="Comment (e.g. 'Modern AU version')"
           />
           <p className="flex items-center gap-1 truncate text-xs text-[var(--muted-foreground)]">
-            Your persona
+            
+            Sua persona
             <HelpTooltip text="This is how the AI sees you. Fill in description, personality, backstory, and appearance — just like a character card. The active persona is injected into every prompt." />
           </p>
         </div>
@@ -558,7 +559,8 @@ export function PersonaEditor() {
             onClick={() => setShowUnsavedWarning(false)}
             className="rounded-lg px-3 py-1 text-xs font-medium text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)]"
           >
-            Keep editing
+            
+            Continuar editando
           </button>
           <button
             type="button"
@@ -575,7 +577,8 @@ export function PersonaEditor() {
             }}
             className="rounded-lg bg-gradient-to-r from-emerald-400 to-teal-500 px-3 py-1 text-xs font-medium text-white shadow-sm transition-all hover:shadow-md"
           >
-            Save & close
+            
+            Salvar e fechar
           </button>
         </div>
       )}
@@ -618,7 +621,7 @@ export function PersonaEditor() {
             )}
             {activeTab === "personality" && (
               <TextareaTab
-                title="Personality"
+                title="Personalidade"
                 subtitle="Your personality traits, temperament, and behavioral patterns."
                 value={formData.personality}
                 onChange={(v) => updateField("personality", v)}
@@ -638,7 +641,7 @@ export function PersonaEditor() {
             )}
             {activeTab === "appearance" && (
               <TextareaTab
-                title="Appearance"
+                title="Aparência"
                 subtitle="Physical description — height, build, hair, eyes, clothing, distinguishing features."
                 value={formData.appearance}
                 onChange={(v) => updateField("appearance", v)}
@@ -648,7 +651,7 @@ export function PersonaEditor() {
             )}
             {activeTab === "scenario" && (
               <TextareaTab
-                title="Scenario"
+                title="Cenário"
                 subtitle="Your default situation or context within roleplays."
                 value={formData.scenario}
                 onChange={(v) => updateField("scenario", v)}
@@ -1142,7 +1145,7 @@ function PersonaSpritesTab({
 
         <div className="flex flex-wrap items-center gap-2 rounded-lg bg-[var(--secondary)]/60 px-3 py-2">
           <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Cleanup strength</span>
-          <span className="text-[0.625rem] text-[var(--muted-foreground)]">Soft</span>
+          <span className="text-[0.625rem] text-[var(--muted-foreground)]">Suave</span>
           <input
             type="range"
             min={0}
@@ -1181,7 +1184,8 @@ function PersonaSpritesTab({
               className="flex items-center gap-1.5 rounded-md bg-[var(--card)] px-2.5 py-1 text-[0.6875rem] font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
             >
               {restoringCleanup ? <Loader2 size="0.75rem" className="animate-spin" /> : <RotateCcw size="0.75rem" />}
-              Undo Cleanup
+              
+              Desfazer limpeza
             </button>
           </div>
         )}
@@ -1223,7 +1227,8 @@ function PersonaSpritesTab({
             className="flex items-center gap-1.5 rounded-xl bg-[var(--primary)] px-4 py-2 text-xs font-medium text-[var(--primary-foreground)] shadow-sm transition-all hover:shadow-md disabled:opacity-40"
           >
             <Plus size="0.8125rem" />
-            Upload
+            
+            Enviar
           </button>
         </div>
 
@@ -1303,7 +1308,7 @@ function PersonaSpritesTab({
                     type="button"
                     onClick={() => setFramingSprite(sprite)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                    title="Frame"
+                    title="Quadro"
                   >
                     <Crop size="0.6875rem" />
                   </button>
@@ -1311,7 +1316,7 @@ function PersonaSpritesTab({
                     type="button"
                     onClick={() => void downloadSpriteFile(sprite)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                    title="Download"
+                    title="Baixar"
                   >
                     <ImageDown size="0.6875rem" />
                   </button>
@@ -1319,7 +1324,7 @@ function PersonaSpritesTab({
                     type="button"
                     onClick={() => startUpload(sprite.expression)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                    title="Replace"
+                    title="Substituir"
                   >
                     <Upload size="0.6875rem" />
                   </button>
@@ -1327,7 +1332,7 @@ function PersonaSpritesTab({
                     type="button"
                     onClick={() => setDeleteSpriteRequest(sprite)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                    title="Delete"
+                    title="Excluir"
                   >
                     <Trash2 size="0.6875rem" />
                   </button>
@@ -1356,7 +1361,7 @@ function PersonaSpritesTab({
           onClose={() => {
             if (!deletingSprites) setDeleteSpriteRequest(null);
           }}
-          title="Delete Sprite"
+          title="Excluir sprite"
           width="max-w-sm"
         >
           <div className="space-y-4">
@@ -1386,7 +1391,8 @@ function PersonaSpritesTab({
                   disabled={!!deletingSprites}
                   className="rounded-lg px-2.5 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-50 sm:px-3 sm:text-sm"
                 >
-                  Cancel
+                  
+                  Cancelar
                 </button>
                 <button
                   type="button"
@@ -1395,7 +1401,8 @@ function PersonaSpritesTab({
                   className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--destructive)] px-2.5 py-2 text-xs font-medium text-white transition-colors hover:bg-[var(--destructive)]/85 disabled:opacity-50 sm:px-3 sm:text-sm"
                 >
                   {deletingSprites === "single" && <Loader2 size="0.875rem" className="animate-spin" />}
-                  Delete
+                  
+                  Excluir
                 </button>
               </div>
             </div>
@@ -1471,7 +1478,7 @@ function PersonaColorsTab({
       </button>
 
       <div className="rounded-xl border border-[var(--border)] bg-black/30 p-4 space-y-3">
-        <p className="text-[0.625rem] font-medium uppercase tracking-widest text-[var(--muted-foreground)]">Preview</p>
+        <p className="text-[0.625rem] font-medium uppercase tracking-widest text-[var(--muted-foreground)]">Pré-visualização</p>
         <div className="flex gap-3 flex-row-reverse">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-500 to-neutral-600 ring-2 ring-white/15">
             <User size="1rem" className="text-white" />
@@ -1700,14 +1707,15 @@ function PersonaStatsTab({
           {/* Stat bars */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Status Bars</h3>
+              <h3 className="text-sm font-semibold">Barras de status</h3>
               <button
                 type="button"
                 onClick={addBar}
                 className="flex items-center gap-1 rounded-lg bg-emerald-500/15 px-2.5 py-1 text-[0.6875rem] font-medium text-emerald-400 transition-colors hover:bg-emerald-500/25"
               >
                 <Plus size="0.75rem" />
-                Add
+                
+                Adicionar
               </button>
             </div>
 
@@ -1753,7 +1761,7 @@ function PersonaStatsTab({
             <h4 className="mb-1.5 text-xs font-semibold">How persona stats work</h4>
             <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
               <li>
-                &bull; <strong className="text-[var(--foreground)]">Status bars</strong> — Represent your persona&apos;s
+                &bull; <strong className="text-[var(--foreground)]">Barras de status</strong> — Represent your persona&apos;s
                 physical and mental state (hunger, energy, hygiene, etc.)
               </li>
               <li>
@@ -1822,7 +1830,8 @@ function PersonaStatsTab({
                   className="flex items-center gap-1 rounded-lg bg-purple-500/15 px-2.5 py-1 text-[0.6875rem] font-medium text-purple-400 transition-colors hover:bg-purple-500/25"
                 >
                   <Plus size="0.75rem" />
-                  Add
+                  
+                  Adicionar
                 </button>
               </div>
 
@@ -1836,7 +1845,7 @@ function PersonaStatsTab({
                       value={attr.name}
                       onChange={(e) => updateRpgAttribute(i, "name", e.target.value)}
                       className="w-20 rounded-lg border border-[var(--border)] bg-[var(--input)] px-2 py-1 text-xs font-medium"
-                      placeholder="Name"
+                      placeholder="Nome"
                     />
                     <input
                       type="number"
@@ -1956,7 +1965,7 @@ function DescriptionTab({
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-sm font-semibold">Description</h3>
+            <h3 className="text-sm font-semibold">Descrição</h3>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
               Your general description. This is sent in every prompt so the AI knows who you are.
             </p>
@@ -1965,7 +1974,7 @@ function DescriptionTab({
             type="button"
             onClick={() => setExpandedField("description")}
             className="shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Expand editor"
+            title="Expandir editor"
           >
             <Maximize2 size="0.875rem" />
           </button>
@@ -2016,7 +2025,7 @@ function DescriptionTab({
                 addTag();
               }
             }}
-            placeholder="Add tag…"
+            placeholder="Adicionar tag…"
             className="flex-1 rounded-xl border border-[var(--border)] bg-[var(--secondary)] px-3 py-1.5 text-xs outline-none focus:border-emerald-400/40"
           />
           <button
@@ -2024,7 +2033,8 @@ function DescriptionTab({
             onClick={addTag}
             className="rounded-xl bg-emerald-400/15 px-3 py-1.5 text-xs font-medium text-emerald-400 transition-all hover:bg-emerald-400/25"
           >
-            Add
+            
+            Adicionar
           </button>
         </div>
       </div>
@@ -2045,7 +2055,8 @@ function DescriptionTab({
             className="flex items-center gap-1 rounded-lg bg-emerald-500/15 px-2.5 py-1 text-[0.6875rem] font-medium text-emerald-400 transition-colors hover:bg-emerald-500/25"
           >
             <Plus size="0.75rem" />
-            Add
+            
+            Adicionar
           </button>
         </div>
 
@@ -2103,7 +2114,7 @@ function DescriptionTab({
                     type="button"
                     onClick={() => setExpandedField(desc.id)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)]"
-                    title="Expand editor"
+                    title="Expandir editor"
                   >
                     <Maximize2 size="0.75rem" />
                   </button>
@@ -2128,7 +2139,7 @@ function DescriptionTab({
       <ExpandedTextarea
         open={expandedField === "description"}
         onClose={() => setExpandedField(null)}
-        title="Description"
+        title="Descrição"
         value={formData.description}
         onChange={(value) => updateField("description", value)}
         placeholder="Describe who you are, your role in the story, and your key traits…"
@@ -2184,7 +2195,7 @@ function TextareaTab({
           type="button"
           onClick={() => setExpanded(true)}
           className="shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-          title="Expand editor"
+          title="Expandir editor"
         >
           <Maximize2 size="0.875rem" />
         </button>

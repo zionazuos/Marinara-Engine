@@ -531,7 +531,7 @@ export function SpotifyMiniPlayer({ mobile = false }: { mobile?: boolean }) {
             type="button"
             onClick={() => toast.dismiss(id)}
             className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
-            aria-label="Dismiss"
+            aria-label="Dispensar"
           >
             <X size="0.875rem" />
           </button>
@@ -845,7 +845,7 @@ export function SpotifyMiniPlayer({ mobile = false }: { mobile?: boolean }) {
             type="button"
             onClick={() => runControl.mutate({ type: "previous", deviceId })}
             className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[oklch(0.82_0.01_145)] transition-colors hover:text-[oklch(0.96_0.006_145)]"
-            title="Previous"
+            title="Anterior"
           >
             <SkipBack size="0.8125rem" />
           </button>
@@ -867,7 +867,7 @@ export function SpotifyMiniPlayer({ mobile = false }: { mobile?: boolean }) {
             type="button"
             onClick={() => runControl.mutate({ type: "next", deviceId })}
             className="inline-flex h-7 w-7 items-center justify-center rounded-full text-[oklch(0.82_0.01_145)] transition-colors hover:text-[oklch(0.96_0.006_145)]"
-            title="Next"
+            title="Próximo"
           >
             <SkipForward size="0.8125rem" />
           </button>
@@ -977,7 +977,7 @@ export function SpotifyMiniPlayer({ mobile = false }: { mobile?: boolean }) {
                   setCollapsed(true);
                 }}
                 className="rounded-full p-1 text-[oklch(0.70_0.012_145)] hover:text-[oklch(0.96_0.006_145)]"
-                title="Close player"
+                title="Fechar player"
               >
                 <X size="0.875rem" />
               </button>

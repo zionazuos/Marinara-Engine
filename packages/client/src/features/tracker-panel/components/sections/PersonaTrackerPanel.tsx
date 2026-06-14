@@ -231,11 +231,12 @@ export function PersonaInventoryPanel({
           className="relative z-[1] shrink-0 text-[color-mix(in_srgb,var(--tracker-profile-label-muted-text)_42%,var(--tracker-profile-label-icon)_58%)]"
         />
         <span className="relative z-[1] min-w-0 flex-1 truncate font-semibold uppercase tracking-[0.06em] text-[color-mix(in_srgb,var(--tracker-profile-label-muted-text)_62%,var(--tracker-profile-label-text)_38%)]">
-          Inventory
+          
+          Inventário
         </span>
         {addMode && (
           <span className="relative z-[1]">
-            <AddRowButton title="Add item" onClick={onAddInventoryItem} />
+            <AddRowButton title="Adicionar item" onClick={onAddInventoryItem} />
           </span>
         )}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,color-mix(in_srgb,var(--tracker-profile-dialogue-border)_42%,transparent),transparent)] opacity-80" />
@@ -357,7 +358,7 @@ export function PersonaInventoryPanel({
                         {addMode && (
                           <InlineAddRow
                             onClick={onAddPersonaStat}
-                            title="Add stat"
+                            title="Adicionar atributo"
                             className="shrink-0 rounded-[5px] border border-[color-mix(in_srgb,var(--tracker-profile-dialogue-border)_32%,transparent)] bg-[image:var(--tracker-profile-field-material)] [background-blend-mode:var(--tracker-profile-field-material-blend)]"
                           />
                         )}

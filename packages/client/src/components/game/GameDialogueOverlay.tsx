@@ -52,7 +52,7 @@ export function GameDialogueOverlay({
       <div className="flex items-center justify-between bg-sky-900/60 px-4 py-2">
         <div className="flex items-center gap-2">
           <MessageCircle size={16} className="text-sky-300" />
-          <span className="text-sm font-medium text-sky-300">Dialogue</span>
+          <span className="text-sm font-medium text-sky-300">Diálogo</span>
           <span className="text-sm text-[var(--foreground)]">
             {npcEmoji} {npcName}
           </span>
@@ -62,7 +62,8 @@ export function GameDialogueOverlay({
           className="flex items-center gap-1 rounded px-2 py-1 text-xs text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
         >
           <X size={14} />
-          End Dialogue
+          
+          Encerrar diálogo
         </button>
       </div>
 

@@ -548,12 +548,13 @@ export function LorebookEntryRow({
                   onClick={() => setShowMobileControls(false)}
                   className="rounded px-1.5 py-0.5 text-[0.625rem] text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
                 >
-                  Done
+                  
+                  Concluído
                 </button>
               </div>
 
               <MobileSelect
-                label="Position"
+                label="Posição"
                 value={String(localPosition)}
                 onChange={(v) => {
                   const n = Number(v);
@@ -568,7 +569,7 @@ export function LorebookEntryRow({
               />
               {showDepthInput && (
                 <MobileNumber
-                  label="Depth"
+                  label="Profundidade"
                   value={localDepth}
                   onCommit={(n) => {
                     setLocalDepth(n);
@@ -579,7 +580,7 @@ export function LorebookEntryRow({
                 />
               )}
               <MobileNumber
-                label="Order"
+                label="Ordem"
                 value={localOrder}
                 onCommit={(n) => {
                   setLocalOrder(n);
@@ -600,7 +601,7 @@ export function LorebookEntryRow({
               />
               {folders.length > 0 && (
                 <MobileSelect
-                  label="Folder"
+                  label="Pasta"
                   value={entry.folderId ?? ""}
                   onChange={(v) => patch({ folderId: v === "" ? null : v })}
                   options={[{ value: "", label: "(none)" }, ...folders.map((f) => ({ value: f.id, label: f.name }))]}
@@ -614,8 +615,8 @@ export function LorebookEntryRow({
         {entry.locked && (
           <span
             className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-sky-400/15 text-sky-400 ring-1 ring-sky-400/20"
-            title="Locked entry"
-            aria-label="Locked entry"
+            title="Entrada bloqueada"
+            aria-label="Entrada bloqueada"
           >
             <Lock size="0.75rem" />
           </span>
@@ -703,7 +704,7 @@ export function LorebookEntryRow({
         {/* Delete button (visible on hover, always on mobile) */}
         <button
           type="button"
-          aria-label="Delete entry"
+          aria-label="Excluir entrada"
           onClick={handleDelete}
           className="shrink-0 rounded p-1 opacity-0 transition-all hover:bg-[var(--destructive)]/15 group-hover:opacity-100 max-md:opacity-100"
         >
@@ -1176,7 +1177,7 @@ function ExpandedDrawer({
 
       {/* Description */}
       <FieldGroup
-        label="Description"
+        label="Descrição"
         icon={FileText}
         help="Brief summary of what this entry is about. Used by the Knowledge Router agent to decide whether to inject this entry — not sent to the main AI as content."
       >
@@ -1192,7 +1193,7 @@ function ExpandedDrawer({
 
       {/* Keys */}
       <FieldGroup
-        label="Primary Keys"
+        label="Chaves primárias"
         icon={Key}
         help="Keywords that trigger this entry. When any of these words appear in the chat, this entry's content is injected into the AI's context."
       >
@@ -1233,7 +1234,7 @@ function ExpandedDrawer({
           <div className="grid gap-3 lg:grid-cols-3">
             <div className="space-y-2 rounded-lg bg-[var(--secondary)]/45 p-2 ring-1 ring-[var(--border)]">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.6875rem] font-medium">Characters</span>
+                <span className="text-[0.6875rem] font-medium">Personagens</span>
                 <FilterModeSelect
                   value={form.characterFilterMode ?? "any"}
                   onChange={(value) => update({ characterFilterMode: value })}
@@ -1299,7 +1300,7 @@ function ExpandedDrawer({
 
       {/* Content */}
       <FieldGroup
-        label="Content"
+        label="Conteúdo"
         icon={FileText}
         help="The text that gets injected into the AI's context when this entry activates. Write it as you'd want the AI to know it."
       >
@@ -1310,7 +1311,7 @@ function ExpandedDrawer({
           onCommit={flushAutosave}
           rows={5}
           placeholder="The content that will be injected into the prompt when this entry activates…"
-          title="Edit Content"
+          title="Editar conteúdo"
         />
         <p className="mt-1 flex items-center gap-1 text-[0.625rem] text-[var(--muted-foreground)]">
           <Hash size="0.5625rem" />~{estimateTokens(form.content ?? "").toLocaleString()} tokens
@@ -1321,7 +1322,7 @@ function ExpandedDrawer({
           so they are intentionally omitted from this block to avoid duplication. */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         <ToggleButton
-          label="Whole Words"
+          label="Palavras inteiras"
           value={form.matchWholeWords ?? false}
           onChange={(v) => update({ matchWholeWords: v })}
         />
@@ -1331,13 +1332,13 @@ function ExpandedDrawer({
           onChange={(v) => update({ caseSensitive: v })}
         />
         <ToggleButton
-          label="Locked"
+          label="Bloqueado"
           value={form.locked ?? false}
           onChange={(v) => update({ locked: v })}
           tooltip="Prevents the Lorebook Keeper agent from modifying this entry."
         />
         <ToggleButton
-          label="No Recursion"
+          label="Sem recursão"
           value={form.preventRecursion ?? false}
           onChange={(v) => update({ preventRecursion: v })}
           tooltip="When enabled, this entry's content won't trigger additional entries during recursive scanning."
@@ -1352,7 +1353,7 @@ function ExpandedDrawer({
 
       {/* Role (position/depth/order/probability live on the row header). */}
       <FieldGroup
-        label="Role"
+        label="Papel"
         icon={Settings2}
         help="Which role this entry's content is attributed to in the prompt (only meaningful when injected at depth)."
       >
@@ -1361,32 +1362,32 @@ function ExpandedDrawer({
           onChange={(e) => update({ role: e.target.value as "system" | "user" | "assistant" })}
           className="w-full max-w-xs rounded-lg bg-[var(--secondary)] px-2 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
         >
-          <option value="system">System</option>
-          <option value="user">User</option>
+          <option value="system">Sistema</option>
+          <option value="user">Usuário</option>
           <option value="assistant">Assistant</option>
         </select>
       </FieldGroup>
 
       {/* Timing */}
       <FieldGroup
-        label="Timing"
+        label="Tempo"
         icon={Settings2}
         help="Sticky = stays active for N messages after triggering. Cooldown = waits N messages before it can trigger again. Delay = waits N messages before first activation. Ephemeral = auto-disables after N activations (0 = unlimited)."
       >
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <NumberField
-            label="Sticky"
+            label="Fixo"
             value={form.sticky ?? 0}
             onChange={(v) => update({ sticky: v || null })}
             min={0}
           />
           <NumberField
-            label="Cooldown"
+            label="Tempo de espera"
             value={form.cooldown ?? 0}
             onChange={(v) => update({ cooldown: v || null })}
             min={0}
           />
-          <NumberField label="Delay" value={form.delay ?? 0} onChange={(v) => update({ delay: v || null })} min={0} />
+          <NumberField label="Atraso" value={form.delay ?? 0} onChange={(v) => update({ delay: v || null })} min={0} />
           <NumberField
             label="Ephemeral"
             value={form.ephemeral ?? 0}
@@ -1404,7 +1405,7 @@ function ExpandedDrawer({
       >
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-[0.6875rem] text-[var(--muted-foreground)]">Group</label>
+            <label className="mb-1 block text-[0.6875rem] text-[var(--muted-foreground)]">Grupo</label>
             <input
               value={form.group ?? ""}
               onChange={(e) => update({ group: e.target.value })}

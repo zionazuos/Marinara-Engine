@@ -707,23 +707,23 @@ export function ConnectionEditor() {
         <div className="flex shrink-0 items-center gap-1.5">
           {saveError && (
             <span className="mr-2 flex items-center gap-1 text-[0.625rem] font-medium text-red-400">
-              <AlertCircle size="0.6875rem" /> <span className="max-md:hidden">Save failed</span>
+              <AlertCircle size="0.6875rem" /> <span className="max-md:hidden">Falha ao salvar</span>
             </span>
           )}
           {savedFlash && !dirty && (
             <span className="mr-2 flex items-center gap-1 text-[0.625rem] font-medium text-emerald-400">
-              <Check size="0.6875rem" /> <span className="max-md:hidden">Saved</span>
+              <Check size="0.6875rem" /> <span className="max-md:hidden">Salvo</span>
             </span>
           )}
           {dirty && !saveError && (
-            <span className="mr-2 text-[0.625rem] font-medium text-amber-400 max-md:hidden">Unsaved</span>
+            <span className="mr-2 text-[0.625rem] font-medium text-amber-400 max-md:hidden">Não salvo</span>
           )}
           <button
             onClick={handleSave}
             disabled={updateConnection.isPending || saveConnectionDefaults.isPending}
             className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 px-4 py-2 text-xs font-medium text-white shadow-md transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
           >
-            <Save size="0.8125rem" /> <span className="max-md:hidden">Save</span>
+            <Save size="0.8125rem" /> <span className="max-md:hidden">Salvar</span>
           </button>
           <button
             onClick={handleDelete}
@@ -737,19 +737,21 @@ export function ConnectionEditor() {
       {/* Unsaved warning */}
       {showUnsavedWarning && (
         <div className="flex flex-wrap items-center justify-between gap-2 bg-amber-500/10 px-4 py-2 text-xs text-amber-400">
-          <span>You have unsaved changes.</span>
+          <span>Você tem alterações não salvas.</span>
           <div className="flex gap-2">
             <button
               onClick={() => setShowUnsavedWarning(false)}
               className="rounded-lg px-3 py-1 hover:bg-[var(--accent)]"
             >
-              Keep editing
+              
+              Continuar editando
             </button>
             <button
               onClick={() => closeConnectionDetail()}
               className="rounded-lg px-3 py-1 text-[var(--destructive)] hover:bg-[var(--destructive)]/15"
             >
-              Discard
+              
+              Descartar
             </button>
             <button
               onClick={async () => {
@@ -758,7 +760,8 @@ export function ConnectionEditor() {
               }}
               className="rounded-lg bg-amber-500/20 px-3 py-1 hover:bg-amber-500/30"
             >
-              Save & close
+              
+              Salvar e fechar
             </button>
           </div>
         </div>
@@ -797,7 +800,7 @@ export function ConnectionEditor() {
 
           {/* ── Provider ── */}
           <FieldGroup
-            label="Provider"
+            label="Provedor"
             icon={<Globe size="0.875rem" className="text-sky-400" />}
             help="The AI service you want to connect to. Each provider has its own models, pricing, and features. OpenAI and Anthropic are the most popular."
           >
@@ -941,7 +944,7 @@ export function ConnectionEditor() {
 
           {/* ── API Key ── */}
           <FieldGroup
-            label="API Key"
+            label="Chave de API"
             icon={<Key size="0.875rem" className="text-sky-400" />}
             help="Your authentication key from the AI provider. You can get one from their website. It's like a password that lets Marinara talk to the AI service."
           >
@@ -993,14 +996,14 @@ export function ConnectionEditor() {
             {isOpenAIChatGPTProvider && (
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
                 Authentication is read from your local{" "}
-                <code className="rounded bg-[var(--secondary)] px-1">codex login</code> session.
+                <code className="rounded bg-[var(--secondary)] px-1">codex login</code>  sessão.
               </p>
             )}
           </FieldGroup>
 
           {/* ── Base URL ── */}
           <FieldGroup
-            label="Base URL"
+            label="URL base"
             icon={<Globe size="0.875rem" className="text-sky-400" />}
             help="The API endpoint URL. Usually auto-filled for known providers. Only change this if you're using a proxy, local server, or custom endpoint."
           >
@@ -1022,7 +1025,8 @@ export function ConnectionEditor() {
             />
             {providerDef?.defaultBaseUrl && !localBaseUrl && !isLocalAuthProvider && (
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Default: {providerDef.defaultBaseUrl}
+                
+                Padrão: {providerDef.defaultBaseUrl}
               </p>
             )}
             {localProvider === "claude_subscription" && (
@@ -1069,7 +1073,7 @@ export function ConnectionEditor() {
           {/* ── Image Service (only for image_generation provider) ── */}
           {localProvider === "image_generation" && (
             <FieldGroup
-              label="Service"
+              label="Serviço"
               icon={<Globe size="0.875rem" className="text-sky-400" />}
               help="Pick the backend type once, then point Base URL to any host or port. Provider-specific features such as ComfyUI workflow JSON and checkpoint fetching use this selection."
             >
@@ -1124,7 +1128,7 @@ export function ConnectionEditor() {
 
           {/* ── Model Selection ── */}
           <FieldGroup
-            label="Model"
+            label="Modelo"
             icon={<Server size="0.875rem" className="text-sky-400" />}
             help="The specific AI model to use. You can pick from the list or type a custom model ID directly."
           >
@@ -1280,7 +1284,8 @@ export function ConnectionEditor() {
                           }}
                           className="mt-2 w-full rounded-lg bg-sky-400/10 px-3 py-1.5 text-xs font-medium text-sky-400 hover:bg-sky-400/20"
                         >
-                          Done
+                          
+                          Concluído
                         </button>
                       </div>
                     ) : filteredModels.length === 0 ? (
@@ -1948,7 +1953,7 @@ export function ConnectionEditor() {
 
             {/* Message test result */}
             {msgResult && (
-              <TestResultCard label="Test Message" success={msgResult.success} latencyMs={msgResult.latencyMs}>
+              <TestResultCard label="Mensagem de teste" success={msgResult.success} latencyMs={msgResult.latencyMs}>
                 {msgResult.success ? (
                   <div className="mt-1.5 rounded-lg bg-[var(--secondary)] p-2.5 text-xs leading-relaxed">
                     {msgResult.response}
@@ -2242,7 +2247,8 @@ function ImageGenerationDefaultsPanel({
                 className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--card)] px-2.5 py-1.5 text-[0.625rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
               >
                 <RotateCcw size="0.6875rem" />
-                Reset
+                
+                Redefinir
               </button>
             </div>
 
@@ -2251,7 +2257,7 @@ function ImageGenerationDefaultsPanel({
               {service === "automatic1111" ? (
                 <>
                   <NumberSetting
-                    label="Steps"
+                    label="Passos"
                     value={automatic1111.steps}
                     min={1}
                     max={150}
@@ -2284,7 +2290,7 @@ function ImageGenerationDefaultsPanel({
               ) : service === "comfyui" ? (
                 <>
                   <NumberSetting
-                    label="Steps"
+                    label="Passos"
                     value={comfyui.steps}
                     min={1}
                     max={150}
@@ -2299,7 +2305,7 @@ function ImageGenerationDefaultsPanel({
                     onCommit={(cfgScale) => updateComfyUi({ cfgScale })}
                   />
                   <NumberSetting
-                    label="Denoise"
+                    label="Remover ruído"
                     value={comfyui.denoisingStrength}
                     min={0}
                     max={1}
@@ -2317,7 +2323,7 @@ function ImageGenerationDefaultsPanel({
               ) : (
                 <>
                   <NumberSetting
-                    label="Steps"
+                    label="Passos"
                     value={novelai.steps}
                     min={1}
                     max={150}
@@ -2353,7 +2359,7 @@ function ImageGenerationDefaultsPanel({
             {service === "automatic1111" ? (
               <>
                 <TextSetting
-                  label="Prompt Prefix"
+                  label="Prefixo do prompt"
                   value={automatic1111.promptPrefix}
                   onChange={(promptPrefix) => updateAutomatic1111({ promptPrefix })}
                   placeholder="e.g. masterpiece, high quality"
@@ -2385,13 +2391,13 @@ function ImageGenerationDefaultsPanel({
                     onChange={(event) => updateAutomatic1111({ restoreFaces: event.target.checked })}
                     className="h-4 w-4 accent-sky-400"
                   />
-                  <span className="text-xs text-[var(--foreground)]">Restore faces</span>
+                  <span className="text-xs text-[var(--foreground)]">Restaurar rostos</span>
                 </label>
               </>
             ) : service === "comfyui" ? (
               <>
                 <TextSetting
-                  label="Prompt Prefix"
+                  label="Prefixo do prompt"
                   value={comfyui.promptPrefix}
                   onChange={(promptPrefix) => updateComfyUi({ promptPrefix })}
                   placeholder="e.g. masterpiece, high quality"
@@ -2442,7 +2448,7 @@ function ImageGenerationDefaultsPanel({
             ) : (
               <>
                 <TextSetting
-                  label="Prompt Prefix"
+                  label="Prefixo do prompt"
                   value={novelai.promptPrefix}
                   onChange={(promptPrefix) => updateNovelAi({ promptPrefix })}
                   placeholder="e.g. masterpiece, best quality"

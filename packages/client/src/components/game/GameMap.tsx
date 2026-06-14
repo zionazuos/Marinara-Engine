@@ -293,7 +293,7 @@ function DayTimeIndicator({ day, timeOfDay, onDayChange, size = "desktop", class
             "h-full bg-transparent text-center font-semibold text-white outline-none",
             size === "mobile" ? "w-14 px-2.5 text-[0.6875rem]" : "w-11 px-1.5 text-[0.625rem]",
           )}
-          aria-label="Edit game day"
+          aria-label="Editar dia do game"
         />
         <span className={dividerClassName} aria-hidden="true" />
         <TimeOfDayIndicator timeOfDay={timeOfDay} size={size} className={timeClassName} />
@@ -316,7 +316,7 @@ function DayTimeIndicator({ day, timeOfDay, onDayChange, size = "desktop", class
       title={`Day ${safeDay}. ${timeLabel}. Tap to edit day.`}
       aria-label={`Day ${safeDay}. ${timeLabel}. Tap to edit day.`}
     >
-      <span className={dayClassName}>Day {safeDay}</span>
+      <span className={dayClassName}>Dia {safeDay}</span>
       <span className={dividerClassName} aria-hidden="true" />
       <TimeOfDayIndicator timeOfDay={timeOfDay} size={size} className={timeClassName} />
     </button>
@@ -383,7 +383,7 @@ function MapZoomControls({ zoom, onZoomOut, onZoomIn }: MapZoomControlsProps) {
         disabled={atMin}
         className="flex h-full w-5 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
         title="Zoom out"
-        aria-label="Zoom out map"
+        aria-label="Afastar mapa"
       >
         <Minus size={11} />
       </button>
@@ -396,8 +396,8 @@ function MapZoomControls({ zoom, onZoomOut, onZoomIn }: MapZoomControlsProps) {
         }}
         disabled={atMax}
         className="flex h-full w-5 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
-        title="Zoom in"
-        aria-label="Zoom in map"
+        title="Aproximar"
+        aria-label="Aproximar mapa"
       >
         <Plus size={11} />
       </button>
@@ -509,7 +509,8 @@ export function GameMapPanel({
             className="flex items-center gap-1 rounded-md bg-[var(--primary)] px-2 py-1 text-[0.625rem] font-medium text-[var(--primary-foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:opacity-50"
           >
             <Wand2 size={10} />
-            Generate
+            
+            Gerar
           </button>
         )}
       </div>
@@ -729,8 +730,8 @@ export function MobileMapButton({
         <button
           onClick={() => setOpen(true)}
           className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-black/60 text-white/80 shadow-lg backdrop-blur-md transition-colors active:bg-white/10"
-          aria-label="Open map"
-          title="Open map"
+          aria-label="Abrir mapa"
+          title="Abrir mapa"
         >
           <MapIcon size={18} />
         </button>
@@ -825,7 +826,8 @@ export function MobileMapButton({
                       className="flex items-center gap-1 rounded-md bg-[var(--primary)] px-3 py-1.5 text-xs font-medium text-[var(--primary-foreground)] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <Wand2 size={12} />
-                      Generate
+                      
+                      Gerar
                     </button>
                   )}
                 </div>
@@ -895,7 +897,7 @@ export function MobileMapButton({
                   </button>
                 )}
                 {selectedNode === currentNode?.id && (
-                  <span className="shrink-0 text-[0.625rem] text-emerald-400/70">You are here</span>
+                  <span className="shrink-0 text-[0.625rem] text-emerald-400/70">Você está aqui</span>
                 )}
               </div>
             )}

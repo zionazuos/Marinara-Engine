@@ -109,7 +109,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
       {!isLoading && (!images || images.length === 0) && (
         <div className="flex flex-col items-center gap-2 py-8 text-[var(--muted-foreground)]">
           <Sparkles size="1.5rem" className="opacity-40" />
-          <p className="text-xs">No images yet</p>
+          <p className="text-xs">Nenhuma imagem ainda</p>
           <p className="text-[0.625rem] opacity-60">Upload images or generate them to build your gallery</p>
         </div>
       )}
@@ -178,13 +178,15 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
                 onClick={() => setConfirmDeleteId(null)}
                 className="flex-1 rounded-lg bg-[var(--secondary)] px-4 py-2 text-xs transition-colors hover:bg-[var(--accent)]"
               >
-                Cancel
+                
+                Cancelar
               </button>
               <button
                 onClick={() => handleDelete(confirmDeleteId)}
                 className="flex-1 rounded-lg bg-red-500/20 px-4 py-2 text-xs text-red-400 transition-colors hover:bg-red-500/30"
               >
-                Delete
+                
+                Excluir
               </button>
             </div>
           </div>

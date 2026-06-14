@@ -428,7 +428,8 @@ export function ImportCharacterModal({ open, onClose }: Props) {
             }}
             className="rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Close
+            
+            Fechar
           </button>
         </div>
       </div>

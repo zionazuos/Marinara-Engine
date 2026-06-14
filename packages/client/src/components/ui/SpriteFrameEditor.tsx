@@ -147,14 +147,14 @@ export function SpriteFrameEditor({ imageUrl, label, applying = false, onApply, 
           <div className="flex items-center justify-between gap-3">
             <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]">
               <Crop size="0.875rem" className="shrink-0 text-[var(--primary)]" />
-              <span className="truncate capitalize">Frame {label}</span>
+              <span className="truncate capitalize">Quadro {label}</span>
             </span>
             <button
               type="button"
               onClick={onClose}
               className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
               aria-label="Close frame editor"
-              title="Close"
+              title="Fechar"
             >
               <X size="0.875rem" />
             </button>
@@ -189,7 +189,8 @@ export function SpriteFrameEditor({ imageUrl, label, applying = false, onApply, 
               className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[0.6875rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:text-[var(--foreground)]"
             >
               <RotateCcw size="0.75rem" />
-              Reset
+              
+              Redefinir
             </button>
             <button
               type="button"

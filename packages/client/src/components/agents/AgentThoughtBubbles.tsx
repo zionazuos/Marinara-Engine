@@ -42,7 +42,8 @@ export function AgentThoughtBubbles({ enabledAgentTypes }: { enabledAgentTypes?:
       >
         <Sparkles size="0.875rem" className="shrink-0 text-[var(--primary)]" />
         <span className="flex-1 text-xs font-medium text-[var(--foreground)]">
-          Agents
+          
+          Agentes
           {isProcessing && (
             <span className="ml-1.5 text-[var(--muted-foreground)]">
               <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }}>

@@ -623,8 +623,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                           }
                           className="w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--card)]/80 px-3 py-2 pr-10 text-sm text-[var(--foreground)] outline-none transition-colors focus:border-purple-400/50 focus:ring-1 focus:ring-purple-400/20"
                         >
-                          <option value="auto">Auto offload</option>
-                          <option value="cpu">CPU only</option>
+                          <option value="auto">Descarregar automaticamente</option>
+                          <option value="cpu">Somente CPU</option>
                           <option value="custom">Custom GPU layers</option>
                         </select>
                         <ChevronDown
@@ -650,7 +650,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                             onClick={handleApplyCustomGpuLayers}
                             className="flex shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--card)]/70 px-4 py-2 text-sm text-[var(--foreground)] transition-colors hover:bg-[var(--card)]"
                           >
-                            Apply
+                            
+                            Aplicar
                           </button>
                         </div>
                       )}
@@ -696,7 +697,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
 
                   <label className="flex flex-col gap-1.5">
                     <span className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-                      Temperature
+                      
+                      Temperatura
                     </span>
                     <input
                       value={temperatureInput}
@@ -770,8 +772,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                   </div>
                   <div className="mt-3 flex flex-col gap-1 text-xs text-[var(--muted-foreground)]/75">
                     {failedRuntimeVariant && <span>Runtime: {formatRuntimeVariantLabel(failedRuntimeVariant)}</span>}
-                    {startupError && <span>Error: {startupError}</span>}
-                    {logPath && <span>Log: {logPath}</span>}
+                    {startupError && <span>Erro: {startupError}</span>}
+                    {logPath && <span>Registro: {logPath}</span>}
                   </div>
                   <div className="mt-3 flex gap-2 max-sm:flex-col">
                     <button
@@ -779,7 +781,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                       className="flex items-center justify-center gap-2 rounded-xl bg-amber-500/15 px-4 py-2.5 text-sm font-medium text-amber-200 transition-colors hover:bg-amber-500/25"
                     >
                       <Loader2 size="0.875rem" />
-                      Retry Startup
+                      
+                      Repetir inicialização
                     </button>
                     {canReinstallRuntime && (
                       <button
@@ -848,7 +851,7 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                         <ResponseBlock label="Reasoning Content" value={testMessageResult.reasoningContent} />
                       )}
                       {!testMessageResult.messageContent && !testMessageResult.reasoningContent && (
-                        <ResponseBlock label="Response" value={testMessageResult.response} />
+                        <ResponseBlock label="Resposta" value={testMessageResult.response} />
                       )}
                     </div>
                   ) : (
@@ -1112,7 +1115,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-4 py-2.5 text-sm text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)]"
             >
               <X size="0.875rem" />
-              Cancel Setup
+              
+              Cancelar configuração
             </button>
           ) : (
             <>
@@ -1127,7 +1131,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                 disabled={!canFinish}
                 className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-purple-500/15 px-4 py-2.5 text-sm font-medium text-purple-300 transition-colors hover:bg-purple-500/25 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-purple-500/15"
               >
-                Done
+                
+                Concluído
               </button>
             </>
           )}

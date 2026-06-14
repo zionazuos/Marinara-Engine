@@ -58,7 +58,7 @@ export function CreatePresetModal({ open, onClose }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Create Preset" width="max-w-sm">
+    <Modal open={open} onClose={onClose} title="Criar preset" width="max-w-sm">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-400 to-violet-500 shadow-lg shadow-purple-400/20">
@@ -72,7 +72,7 @@ export function CreatePresetModal({ open, onClose }: Props) {
         </div>
 
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-[var(--muted-foreground)]">Name *</span>
+          <span className="text-xs font-medium text-[var(--muted-foreground)]">Nome *</span>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -86,7 +86,7 @@ export function CreatePresetModal({ open, onClose }: Props) {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-[var(--muted-foreground)]">Description</span>
+          <span className="text-xs font-medium text-[var(--muted-foreground)]">Descrição</span>
           <input
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -106,7 +106,8 @@ export function CreatePresetModal({ open, onClose }: Props) {
             }}
             className="rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             onClick={handleCreate}
@@ -114,7 +115,8 @@ export function CreatePresetModal({ open, onClose }: Props) {
             className="flex items-center gap-1.5 rounded-lg bg-[var(--primary)] px-4 py-2 text-xs font-medium text-[var(--primary-foreground)] transition-all hover:opacity-90 disabled:opacity-50"
           >
             {createPreset.isPending ? <Loader2 size="0.75rem" className="animate-spin" /> : <FileText size="0.75rem" />}
-            Create
+            
+            Criar
           </button>
         </div>
       </div>

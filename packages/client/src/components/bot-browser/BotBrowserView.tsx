@@ -1793,9 +1793,9 @@ export function BotBrowserView() {
           onClick={closeBotBrowser}
           className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
         >
-          <ArrowLeft size="0.875rem" /> Back
+          <ArrowLeft size="0.875rem" />  Voltar
         </button>
-        <h2 className="text-sm font-semibold text-[var(--foreground)]">Browser</h2>
+        <h2 className="text-sm font-semibold text-[var(--foreground)]">Navegador</h2>
         <div className="relative ml-2">
           <button
             onClick={() => setSourceOpen((v) => !v)}
@@ -1853,7 +1853,8 @@ export function BotBrowserView() {
                     onClick={clearAllTags}
                     className="rounded px-1.5 py-0.5 text-[0.6rem] text-[var(--destructive)] hover:bg-[var(--destructive)]/10"
                   >
-                    Clear
+                    
+                    Limpar
                   </button>
                 )}
                 <button
@@ -1908,7 +1909,8 @@ export function BotBrowserView() {
                     onClick={addCustomTag}
                     className="flex w-full items-center gap-1.5 rounded-md bg-emerald-500/10 px-2 py-1.5 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20"
                   >
-                    + Add <strong>{tagSearch.trim().toLowerCase()}</strong> as filter
+                    
+                    + Adicionar <strong>{tagSearch.trim().toLowerCase()}</strong> as filter
                   </button>
                   <button
                     onClick={() => {
@@ -2074,7 +2076,7 @@ export function BotBrowserView() {
                         : "border-[var(--border)] bg-[var(--secondary)] hover:bg-[var(--accent)]",
                     )}
                   >
-                    <SlidersHorizontal size="0.75rem" /> Filters
+                    <SlidersHorizontal size="0.75rem" />  Filtros
                     {hasActiveFeatures && (
                       <span className="rounded-full bg-[var(--primary)]/20 px-1.5 text-[0.6rem] font-semibold">
                         {activeFeatureCount}
@@ -2148,9 +2150,9 @@ export function BotBrowserView() {
                           else if (sourceId === "chartavern") handleCtLogout();
                         }}
                         className="flex items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-2.5 py-2 text-[0.65rem] text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--destructive)]"
-                        title="Log out"
+                        title="Sair"
                       >
-                        <LogOut size="0.625rem" /> Logout
+                        <LogOut size="0.625rem" />  Sair
                       </button>
                     </div>
                   ) : (
@@ -2158,7 +2160,7 @@ export function BotBrowserView() {
                       onClick={() => setShowLoginModal(true)}
                       className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-xs transition-colors hover:bg-[var(--accent)]"
                     >
-                      <LogIn size="0.75rem" /> Log In
+                      <LogIn size="0.75rem" />  Entrar
                     </button>
                   ))}
                 {sourceId === "wyvern" && (
@@ -2170,7 +2172,7 @@ export function BotBrowserView() {
                 <button
                   onClick={doSearch}
                   className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-2 text-xs transition-colors hover:bg-[var(--accent)]"
-                  title="Refresh"
+                  title="Atualizar"
                 >
                   <RefreshCw size="0.75rem" />
                 </button>
@@ -2249,7 +2251,7 @@ export function BotBrowserView() {
                             />
                           </div>
                           <div className="flex items-center gap-2">
-                            <label className="w-24 text-xs text-[var(--muted-foreground)]">Max Output Tokens</label>
+                            <label className="w-24 text-xs text-[var(--muted-foreground)]">Máximo de tokens de saída</label>
                             <input
                               type="number"
                               value={maxTokens}
@@ -2280,7 +2282,7 @@ export function BotBrowserView() {
                     onClick={doSearch}
                     className="flex items-center gap-1.5 rounded-lg bg-[var(--primary)]/15 px-4 py-2 text-xs font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/25"
                   >
-                    <RefreshCw size="0.75rem" /> Retry
+                    <RefreshCw size="0.75rem" />  Tentar de novo
                   </button>
                 </div>
               ) : results.length === 0 ? (
@@ -2301,10 +2303,12 @@ export function BotBrowserView() {
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
                         className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
                       >
-                        Previous
+                        
+                        Anterior
                       </button>
                       <span className="text-xs text-[var(--muted-foreground)]">
-                        Page {page}
+                        
+                        Página {page}
                         {totalPages > 1 && totalPages < 9000 ? ` of ${totalPages}` : ""}
                       </span>
                       <button
@@ -2312,7 +2316,8 @@ export function BotBrowserView() {
                         onClick={() => setPage((p) => p + 1)}
                         className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
                       >
-                        Next
+                        
+                        Próximo
                       </button>
                     </div>
                   )}
@@ -2508,13 +2513,13 @@ function LoginModal({
                     and log in
                   </p>
                   <p>
-                    2. Open DevTools (F12) → <strong>Application</strong> tab → <strong>Local Storage</strong>
+                    2. Open DevTools (F12) → <strong>Application</strong> tab → <strong>Armazenamento local</strong>
                   </p>
                   <p>
                     3. Find the entry named <code className="rounded bg-[var(--accent)] px-1">authn</code>
                   </p>
                   <p>
-                    4. Copy its <strong>Value</strong> (a long string, ~705 characters) and paste it above
+                    4. Copy its <strong>Valor</strong> (a long string, ~705 characters) and paste it above
                   </p>
                 </div>
               </details>
@@ -2538,7 +2543,7 @@ function LoginModal({
                     onClick={onPygLogout}
                     className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-4 py-2 text-xs font-medium transition-colors hover:bg-[var(--accent)]"
                   >
-                    <LogOut size="0.75rem" /> Log Out
+                    <LogOut size="0.75rem" />  Sair
                   </button>
                 )}
                 <a
@@ -2547,14 +2552,14 @@ function LoginModal({
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-4 py-2 text-xs font-medium transition-colors hover:bg-[var(--accent)]"
                 >
-                  <ExternalLink size="0.75rem" /> Website
+                  <ExternalLink size="0.75rem" />  Site
                 </a>
               </div>
             </div>
           ) : isCt ? (
             <div className="flex flex-col gap-3">
               <div>
-                <label className="mb-1 block text-xs text-[var(--muted-foreground)]">Cookie String</label>
+                <label className="mb-1 block text-xs text-[var(--muted-foreground)]">String de cookie</label>
                 <textarea
                   value={cookie}
                   onChange={(e) => setCookie(e.target.value)}
@@ -2586,7 +2591,7 @@ function LoginModal({
                     3. Find the <code className="rounded bg-[var(--accent)] px-1">session</code> cookie
                   </p>
                   <p>
-                    4. Copy its <strong>Value</strong> and paste it above
+                    4. Copy its <strong>Valor</strong> and paste it above
                   </p>
                 </div>
               </details>
@@ -2610,7 +2615,7 @@ function LoginModal({
                     onClick={onCtLogout}
                     className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-4 py-2 text-xs font-medium transition-colors hover:bg-[var(--accent)]"
                   >
-                    <LogOut size="0.75rem" /> Log Out
+                    <LogOut size="0.75rem" />  Sair
                   </button>
                 )}
                 <a
@@ -2811,7 +2816,7 @@ function DetailView({
             </div>
             <div className="flex flex-col gap-2 max-md:flex-1">
               <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/60 p-2.5">
-                <p className="mb-2 text-[0.6875rem] font-semibold text-[var(--foreground)]">Imported tags</p>
+                <p className="mb-2 text-[0.6875rem] font-semibold text-[var(--foreground)]">Tags importadas</p>
                 <div className="flex flex-col gap-1.5">
                   {TAG_IMPORT_OPTIONS.map((option) => (
                     <label
@@ -2912,10 +2917,10 @@ function DetailView({
                 {displayDetail.description && (
                   <DefSection title="Description / Personality" content={displayDetail.description} />
                 )}
-                {displayDetail.personality && <DefSection title="Personality" content={displayDetail.personality} />}
-                {displayDetail.scenario && <DefSection title="Scenario" content={displayDetail.scenario} />}
+                {displayDetail.personality && <DefSection title="Personalidade" content={displayDetail.personality} />}
+                {displayDetail.scenario && <DefSection title="Cenário" content={displayDetail.scenario} />}
                 {displayDetail.firstMessage && (
-                  <DefSection title="First Message" content={displayDetail.firstMessage} />
+                  <DefSection title="Primeira mensagem" content={displayDetail.firstMessage} />
                 )}
                 {displayDetail.alternateGreetings && displayDetail.alternateGreetings.length > 0 && (
                   <div>

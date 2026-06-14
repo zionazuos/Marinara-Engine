@@ -78,7 +78,8 @@ export function ExportFormatDialog({
             className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
           >
             <X size="0.875rem" />
-            Cancel
+            
+            Cancelar
           </button>
         </div>
       </div>

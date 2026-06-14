@@ -261,7 +261,7 @@ export function SecretPlotPanel({
             Story guidance
           </span>
           {hasUnsavedChanges && (
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" title="Unsaved edit" />
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" title="Edição não salva" />
           )}
         </button>
         <span className="flex shrink-0 items-center gap-1.5">
@@ -323,7 +323,8 @@ export function SecretPlotPanel({
                     </span>
                     {draft.staleDetected && (
                       <span className="rounded bg-[var(--secondary)]/55 px-1 py-0.5 text-[0.5rem] text-[var(--muted-foreground)]">
-                        Motion
+                        
+                        Movimento
                       </span>
                     )}
                   </button>
@@ -364,7 +365,8 @@ export function SecretPlotPanel({
                           className="inline-flex min-h-6 items-center gap-1 rounded-md border border-[var(--border)]/70 bg-[var(--card)] px-2 py-1 text-[0.5625rem] font-medium text-[var(--popover-foreground)] transition-colors hover:bg-[var(--accent)]/45 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)]"
                         >
                           <Plus size="0.625rem" />
-                          Add direction
+                          
+                          Adicionar direção
                         </button>
                       </div>
                     )}
@@ -400,7 +402,7 @@ export function SecretPlotPanel({
                             setSaved(false);
                             setDraft((current) => (current ? { ...current, sceneDirections: next } : current));
                           }}
-                          placeholder="Direction..."
+                          placeholder="Direção..."
                           rows={2}
                           spellCheck={false}
                           className="min-h-12 w-full resize-y rounded-md border border-[var(--input)] bg-[var(--secondary)]/45 px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted-foreground)] focus:border-[var(--ring)] focus:ring-1 focus:ring-[var(--ring)]"
@@ -444,12 +446,14 @@ export function SecretPlotPanel({
                     </span>
                     {draft.arcCompleted && (
                       <span className="rounded bg-[var(--primary)]/15 px-1 py-0.5 text-[0.5rem] font-medium text-[var(--primary)]">
-                        Complete
+                        
+                        Concluído
                       </span>
                     )}
                     {!draft.arcCompleted && hasArcMemory && (
                       <span className="rounded bg-[var(--secondary)]/55 px-1 py-0.5 text-[0.5rem] text-[var(--muted-foreground)]">
-                        Active
+                        
+                        Ativo
                       </span>
                     )}
                   </button>
@@ -490,7 +494,8 @@ export function SecretPlotPanel({
                             }}
                             className="h-2.5 w-2.5 rounded border-[var(--input)] accent-[var(--primary)]"
                           />
-                          Complete
+                          
+                          Concluído
                         </label>
                       </div>
                       <textarea

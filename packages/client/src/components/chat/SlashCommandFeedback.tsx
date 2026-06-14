@@ -83,7 +83,7 @@ export function SlashCommandFeedback({ feedback, onDismiss, className }: SlashCo
         <button
           onClick={onDismiss}
           className="shrink-0 rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-          aria-label="Dismiss"
+          aria-label="Dispensar"
         >
           <X size="0.875rem" />
         </button>

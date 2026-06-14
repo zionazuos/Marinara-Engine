@@ -300,7 +300,8 @@ export function TrackerCardColorControls({
           <div className="grid gap-1.5 rounded-lg bg-[var(--secondary)]/65 p-1.5 ring-1 ring-[var(--border)]/40">
             <div className="grid min-w-0 gap-1">
               <span className="px-0.5 text-[0.5625rem] font-semibold uppercase text-[var(--muted-foreground)]">
-                Source
+                
+                Fonte
               </span>
               <div className="grid grid-cols-3 gap-0.5 rounded-md bg-[var(--background)]/35 p-0.5">
                 {MODE_OPTIONS.map((option) => {
@@ -329,7 +330,8 @@ export function TrackerCardColorControls({
 
             <div className="grid min-w-0 gap-1">
               <span className="px-0.5 text-[0.5625rem] font-semibold uppercase text-[var(--muted-foreground)]">
-                Stage
+                
+                Estágio
               </span>
               <div className="grid grid-cols-4 gap-0.5 rounded-md bg-[var(--background)]/35 p-0.5">
                 {PORTRAIT_STAGE_BACKGROUND_OPTIONS.map((option) => {
@@ -362,7 +364,8 @@ export function TrackerCardColorControls({
           <div className="grid gap-1.5 rounded-lg bg-[var(--secondary)]/65 p-1.5 ring-1 ring-[var(--border)]/40">
             <div className="grid min-w-0 gap-1">
               <span className="px-0.5 text-[0.5625rem] font-semibold uppercase text-[var(--muted-foreground)]">
-                Finish
+                
+                Concluir
               </span>
               <div className="grid grid-cols-3 gap-0.5 rounded-md bg-[var(--background)]/35 p-0.5">
                 {FINISH_PRESETS.map((preset) => {
@@ -482,7 +485,8 @@ export function TrackerCardColorControls({
             <div className="rounded-lg bg-[var(--secondary)]/55 p-1.5 ring-1 ring-[var(--border)]/35">
               <div className="mb-1.5 flex items-center justify-between gap-2">
                 <span className="text-[0.5625rem] font-semibold uppercase text-[var(--muted-foreground)]">
-                  Custom paint
+                  
+                  Pintura personalizada
                 </span>
                 <span className="font-mono text-[0.5625rem] tabular-nums text-[var(--muted-foreground)]">
                   {paintOpacitySummary}

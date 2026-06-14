@@ -78,7 +78,7 @@ export function ContinuityIssueChecklist({ content, compact = false }: Continuit
       })}
       <div className="flex items-center justify-between gap-2 pt-1">
         <span className={cn("text-[var(--muted-foreground)]", compact ? "text-[0.5625rem]" : "text-[0.625rem]")}>
-          {selectedCount} of {issues.length} selected
+          {selectedCount} of {issues.length}  selecionado(s)
         </span>
         <div className="flex items-center gap-1">
           {acceptedOnly && (

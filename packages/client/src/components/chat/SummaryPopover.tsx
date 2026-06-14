@@ -662,7 +662,7 @@ export function SummaryPopover({
           <div className="min-w-0">
             <div className="flex min-w-0 items-center gap-1.5 text-sm font-semibold">
               <ScrollText size="0.8125rem" className="shrink-0 text-[var(--muted-foreground)]" />
-              <span className="truncate">Chat Summary</span>
+              <span className="truncate">Resumo do chat</span>
             </div>
             <p className="truncate text-[0.625rem] text-[var(--muted-foreground)]">
               {hasEntries
@@ -689,7 +689,7 @@ export function SummaryPopover({
               type="button"
               onClick={onClose}
               className="rounded-md p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-              aria-label="Close summary"
+              aria-label="Fechar resumo"
             >
               <X size="0.75rem" />
             </button>
@@ -833,7 +833,8 @@ export function SummaryPopover({
                         className="flex w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-[var(--border)] bg-[var(--accent)]/35 px-2 py-1.5 text-[0.625rem] font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
                       >
                         <Plus size="0.6875rem" />
-                        New template
+                        
+                        Novo modelo
                       </button>
 
                       {(templateNameDraft || templatePromptDraft) && (
@@ -858,7 +859,8 @@ export function SummaryPopover({
                               onClick={resetTemplateDraft}
                               className="rounded-md px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
                             >
-                              Cancel
+                              
+                              Cancelar
                             </button>
                             <button
                               type="button"
@@ -877,7 +879,7 @@ export function SummaryPopover({
                 </div>
 
                 <div className="space-y-1 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/25 p-2">
-                  <p className="px-1 text-xs font-semibold text-[var(--popover-foreground)]">Display</p>
+                  <p className="px-1 text-xs font-semibold text-[var(--popover-foreground)]">Exibição</p>
                   <SummarySettingsToggle
                     label="Hide summarised messages"
                     checked={summaryPopoverSettings.hideSummarisedMessages}
@@ -990,14 +992,14 @@ export function SummaryPopover({
                 <p className="truncate text-[0.625rem] text-[var(--muted-foreground)]">{sourceDetail}</p>
               </div>
               <div className="min-w-0 text-right">
-                <p className="truncate text-xs font-semibold text-[var(--foreground)]">Active Prompt</p>
+                <p className="truncate text-xs font-semibold text-[var(--foreground)]">Prompt ativo</p>
                 <p className="truncate text-[0.625rem] text-[var(--muted-foreground)]">{promptTemplateSummary}</p>
               </div>
             </div>
 
             {sourceMode === "last" ? (
               <label className="flex items-center justify-between gap-2 text-[0.6875rem] text-[var(--muted-foreground)]">
-                <span>Messages</span>
+                <span>Mensagens</span>
                 <input
                   type="number"
                   min={MIN_SUMMARY_MESSAGES}
@@ -1026,7 +1028,8 @@ export function SummaryPopover({
               <div className="space-y-1.5">
                 <div className="grid grid-cols-2 gap-2">
                   <label className="space-y-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                    From
+                    
+                    De
                     <input
                       type="number"
                       min={1}
@@ -1095,7 +1098,8 @@ export function SummaryPopover({
               title="Write summary entry"
             >
               <PenLine size="0.8125rem" />
-              Write
+              
+              Escrever
             </button>
             <button
               type="button"
@@ -1210,7 +1214,8 @@ function SummaryEntryRow({
             <span className="min-w-0 truncate text-xs font-semibold">{entry.title}</span>
             {editing && (
               <span className="shrink-0 rounded bg-[var(--primary)]/15 px-1.5 py-0.5 text-[0.5625rem] font-semibold text-[var(--primary)]">
-                Editing
+                
+                Editando
               </span>
             )}
           </div>
@@ -1234,7 +1239,7 @@ function SummaryEntryRow({
             type="button"
             onClick={onStartEdit}
             className="rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] active:scale-90"
-            title="Edit"
+            title="Editar"
             aria-label="Edit summary entry"
           >
             <PenLine size="0.75rem" />
@@ -1244,7 +1249,7 @@ function SummaryEntryRow({
             onClick={onDelete}
             disabled={mutationPending}
             className="rounded p-1 text-[var(--destructive)] transition-colors hover:bg-[var(--destructive)]/15 active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
-            title="Delete"
+            title="Excluir"
             aria-label="Delete summary entry"
           >
             <Trash2 size="0.75rem" />
@@ -1329,7 +1334,8 @@ function SummaryEntryEditor({
             onClick={onCancel}
             className="rounded-md px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             type="button"
@@ -1338,7 +1344,8 @@ function SummaryEntryEditor({
             className="flex items-center gap-1 rounded-md bg-[var(--secondary)] px-2.5 py-1 text-[0.625rem] font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Save size="0.625rem" />
-            Save
+            
+            Salvar
           </button>
         </div>
       </div>
@@ -1499,8 +1506,8 @@ function SummaryPromptTemplateRow({
           type="button"
           onClick={onEdit}
           className="shrink-0 rounded p-1 text-[var(--muted-foreground)] opacity-80 transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-          title="Edit template"
-          aria-label="Edit template"
+          title="Editar modelo"
+          aria-label="Editar modelo"
         >
           <PenLine size="0.625rem" />
         </button>

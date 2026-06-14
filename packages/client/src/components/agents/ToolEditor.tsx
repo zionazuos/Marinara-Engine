@@ -236,7 +236,7 @@ export function ToolEditor() {
         <button
           type="button"
           onClick={handleClose}
-          aria-label="Back to tools"
+          aria-label="Voltar para ferramentas"
           className="rounded-xl p-2 transition-all hover:bg-[var(--accent)] active:scale-95"
         >
           <ArrowLeft size="1.125rem" />
@@ -256,21 +256,21 @@ export function ToolEditor() {
         <div className="flex items-center gap-1.5">
           {saveError && (
             <span className="mr-2 flex items-center gap-1 text-[0.625rem] font-medium text-red-400">
-              <AlertCircle size="0.6875rem" /> Error
+              <AlertCircle size="0.6875rem" />  Erro
             </span>
           )}
           {savedFlash && !dirty && (
             <span className="mr-2 flex items-center gap-1 text-[0.625rem] font-medium text-emerald-400">
-              <Check size="0.6875rem" /> Saved
+              <Check size="0.6875rem" />  Salvo
             </span>
           )}
-          {dirty && !saveError && <span className="mr-2 text-[0.625rem] font-medium text-amber-400">Unsaved</span>}
+          {dirty && !saveError && <span className="mr-2 text-[0.625rem] font-medium text-amber-400">Não salvo</span>}
           {dbTool && (
             <button
               onClick={handleDelete}
               className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium text-[var(--destructive)] transition-all hover:bg-[var(--destructive)]/15 active:scale-[0.98]"
             >
-              <Trash2 size="0.8125rem" /> Delete
+              <Trash2 size="0.8125rem" />  Excluir
             </button>
           )}
           <button
@@ -278,7 +278,7 @@ export function ToolEditor() {
             disabled={isPending}
             className="flex items-center gap-1.5 rounded-xl bg-[var(--primary)] px-4 py-2 text-xs font-medium text-[var(--primary-foreground)] shadow-md transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
           >
-            <Save size="0.8125rem" /> Save
+            <Save size="0.8125rem" />  Salvar
           </button>
         </div>
       </div>
@@ -286,19 +286,21 @@ export function ToolEditor() {
       {/* Unsaved warning */}
       {showUnsavedWarning && (
         <div className="flex items-center justify-between bg-amber-500/10 px-4 py-2 text-xs text-amber-400">
-          <span>You have unsaved changes.</span>
+          <span>Você tem alterações não salvas.</span>
           <div className="flex gap-2">
             <button
               onClick={() => setShowUnsavedWarning(false)}
               className="rounded-lg px-3 py-1 hover:bg-[var(--accent)]"
             >
-              Keep editing
+              
+              Continuar editando
             </button>
             <button
               onClick={() => closeToolDetail()}
               className="rounded-lg px-3 py-1 text-[var(--destructive)] hover:bg-[var(--destructive)]/15"
             >
-              Discard
+              
+              Descartar
             </button>
             <button
               onClick={async () => {
@@ -307,7 +309,8 @@ export function ToolEditor() {
               }}
               className="rounded-lg bg-amber-500/20 px-3 py-1 hover:bg-amber-500/30"
             >
-              Save & close
+              
+              Salvar e fechar
             </button>
           </div>
         </div>
@@ -336,7 +339,7 @@ export function ToolEditor() {
 
           {/* ── Description ── */}
           <FieldGroup
-            label="Description"
+            label="Descrição"
             icon={<Info size="0.875rem" className="text-[var(--primary)]" />}
             help="Tell the AI what this tool does. Be descriptive — the AI reads this to decide when and how to call your tool."
           >
@@ -407,7 +410,8 @@ export function ToolEditor() {
                           }}
                           className="rounded"
                         />
-                        Required
+                        
+                        Obrigatório
                       </label>
                     </div>
                     <input
@@ -440,7 +444,7 @@ export function ToolEditor() {
                 }}
                 className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)]/40 hover:text-[var(--primary)]"
               >
-                <Plus size="0.75rem" /> Add Parameter
+                <Plus size="0.75rem" />  Adicionar parâmetro
               </button>
             </div>
           </FieldGroup>
@@ -483,7 +487,8 @@ export function ToolEditor() {
                 <div>
                   <div className="font-medium">Script tools are disabled on this server.</div>
                   <div className="mt-1 text-amber-100/80">
-                    Set <code className="rounded bg-black/20 px-1">CUSTOM_TOOL_SCRIPT_ENABLED=true</code> in{" "}
+                    
+                    Definir <code className="rounded bg-black/20 px-1">CUSTOM_TOOL_SCRIPT_ENABLED=true</code> in{" "}
                     <code className="rounded bg-black/20 px-1">.env</code> and restart Marinara before saving Script
                     tools.
                   </div>
@@ -514,7 +519,7 @@ export function ToolEditor() {
           )}
 
           {localExecType === "webhook" && (
-            <FieldGroup label="Webhook URL" icon={<Globe size="0.875rem" className="text-[var(--primary)]" />}>
+            <FieldGroup label="URL do webhook" icon={<Globe size="0.875rem" className="text-[var(--primary)]" />}>
               <input
                 value={localWebhookUrl}
                 onChange={(e) => {
@@ -533,7 +538,7 @@ export function ToolEditor() {
           )}
 
           {localExecType === "script" && (
-            <FieldGroup label="Script Body" icon={<Code2 size="0.875rem" className="text-[var(--primary)]" />}>
+            <FieldGroup label="Corpo do script" icon={<Code2 size="0.875rem" className="text-[var(--primary)]" />}>
               <textarea
                 value={localScriptBody}
                 onChange={(e) => {
@@ -550,7 +555,7 @@ export function ToolEditor() {
                 Write JavaScript. Has access to <code className="rounded bg-[var(--secondary)] px-1">args</code>,{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">JSON</code>,{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">Math</code>,{" "}
-                <code className="rounded bg-[var(--secondary)] px-1">Date</code>. Must{" "}
+                <code className="rounded bg-[var(--secondary)] px-1">Data</code>. Must{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">return</code> a result.
               </p>
             </FieldGroup>

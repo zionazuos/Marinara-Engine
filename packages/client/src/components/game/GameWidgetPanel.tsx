@@ -544,7 +544,7 @@ function WidgetEditorModal({
 
         {widget.type === "counter" && (
           <label className="space-y-1.5">
-            <span className="text-xs font-medium text-[var(--muted-foreground)]">Count</span>
+            <span className="text-xs font-medium text-[var(--muted-foreground)]">Quantidade</span>
             <input
               type="number"
               value={draft.count}
@@ -573,7 +573,7 @@ function WidgetEditorModal({
                 >
                   {allowStructureEdit ? (
                     <label className="space-y-1.5">
-                      <span className="text-xs font-medium text-[var(--muted-foreground)]">Stat</span>
+                      <span className="text-xs font-medium text-[var(--muted-foreground)]">Atributo</span>
                       <input
                         type="text"
                         value={stat.name}
@@ -585,20 +585,20 @@ function WidgetEditorModal({
                             ),
                           }))
                         }
-                        placeholder="Name"
+                        placeholder="Nome"
                         className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--foreground)] outline-none transition focus:border-[var(--primary)]"
                       />
                     </label>
                   ) : (
                     <div className="space-y-1.5">
-                      <span className="text-xs font-medium text-[var(--muted-foreground)]">Stat</span>
+                      <span className="text-xs font-medium text-[var(--muted-foreground)]">Atributo</span>
                       <div className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--foreground)]/75">
                         {stat.name}
                       </div>
                     </div>
                   )}
                   <label className="space-y-1.5">
-                    <span className="text-xs font-medium text-[var(--muted-foreground)]">Value</span>
+                    <span className="text-xs font-medium text-[var(--muted-foreground)]">Valor</span>
                     <input
                       type="text"
                       value={stat.value}
@@ -642,7 +642,7 @@ function WidgetEditorModal({
                 className="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] px-3 py-2 text-sm text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
               >
                 <Plus size={14} />
-                <span>Add Stat</span>
+                <span>Adicionar atributo</span>
               </button>
             )}
           </div>
@@ -650,7 +650,7 @@ function WidgetEditorModal({
 
         {widget.type === "list" && (
           <label className="space-y-1.5">
-            <span className="text-xs font-medium text-[var(--muted-foreground)]">Items</span>
+            <span className="text-xs font-medium text-[var(--muted-foreground)]">Itens</span>
             <textarea
               value={draft.items}
               onChange={(event) => setDraft((current) => ({ ...current, items: event.target.value }))}
@@ -705,7 +705,8 @@ function WidgetEditorModal({
             disabled={isSaving}
             className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-50"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             type="button"
@@ -877,7 +878,7 @@ export function GameWidgetSessionPrepModal({
                       className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-50"
                     >
                       <Pencil size={12} />
-                      <span>Edit</span>
+                      <span>Editar</span>
                     </button>
                     <button
                       type="button"
@@ -886,7 +887,7 @@ export function GameWidgetSessionPrepModal({
                       className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--destructive)]/25 px-3 py-1.5 text-xs font-medium text-[var(--destructive)] transition-colors hover:bg-[var(--destructive)]/10 disabled:opacity-50"
                     >
                       <Trash2 size={12} />
-                      <span>Remove</span>
+                      <span>Remover</span>
                     </button>
                   </div>
                 </div>
@@ -1078,7 +1079,7 @@ function ListWidget({ widget }: { widget: HudWidget }) {
   return (
     <div className="space-y-0.5">
       {items.length === 0 ? (
-        <p className="text-[0.5625rem] italic text-white/30">Empty</p>
+        <p className="text-[0.5625rem] italic text-white/30">Vazio</p>
       ) : (
         items.slice(0, 8).map((item, i) => (
           <div key={i} className="flex items-center gap-1.5 text-[0.5625rem]">
@@ -1112,7 +1113,8 @@ function InventoryGridWidget({ widget }: { widget: HudWidget }) {
               !activeCategory ? "bg-white/15 text-white/80" : "text-white/40 hover:text-white/60",
             )}
           >
-            All
+            
+            Todos
           </button>
           {categories.map((cat) => (
             <button

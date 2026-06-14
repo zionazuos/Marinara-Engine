@@ -286,7 +286,7 @@ function ConversationToolbarMenu({
     <>
       <div className="hidden items-center gap-1.5 md:flex">{desktopChildren}</div>
       <div className="relative shrink-0 md:hidden" ref={btnRef}>
-        <button onClick={() => setOpen(!open)} className={HEADER_BTN} title="More options" aria-label="More options">
+        <button onClick={() => setOpen(!open)} className={HEADER_BTN} title="Mais opções" aria-label="Mais opções">
           <MoreHorizontal size="0.875rem" />
         </button>
         {open &&
@@ -422,7 +422,7 @@ export function ConversationView({
       <button onClick={onOpenFiles} className={compact ? MOBILE_MENU_BTN : HEADER_BTN} title="Manage Chat Files">
         <FolderOpen size="0.875rem" />
       </button>
-      <button onClick={onOpenGallery} className={compact ? MOBILE_MENU_BTN : HEADER_BTN} title="Gallery">
+      <button onClick={onOpenGallery} className={compact ? MOBILE_MENU_BTN : HEADER_BTN} title="Galeria">
         <ImageIcon size="0.875rem" />
       </button>
       {onSwitchChat && (
@@ -434,7 +434,7 @@ export function ConversationView({
           <ArrowRightLeft size="0.875rem" />
         </button>
       )}
-      <button onClick={onOpenSettings} className={compact ? MOBILE_MENU_BTN : HEADER_BTN} title="Chat Settings">
+      <button onClick={onOpenSettings} className={compact ? MOBILE_MENU_BTN : HEADER_BTN} title="Configurações do chat">
         <Settings2 size="0.875rem" />
       </button>
     </>

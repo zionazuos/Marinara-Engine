@@ -559,7 +559,8 @@ function TrackerPanelAppearanceDrawer({
           />
           <div className="mt-2 grid gap-1.5">
             <span className="inline-flex items-center gap-1 text-[0.6875rem] font-medium">
-              Desktop size
+              
+              Tamanho desktop
               <HelpTooltip text="Choose the designed desktop width for the Tracker panel. Compact favors quick scanning, Standard balances density, and Expanded gives character cards more room." />
             </span>
             <div className="grid grid-cols-3 gap-0.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/45 p-0.5">
@@ -854,7 +855,8 @@ function GeneralSettings() {
 
       <label className="flex flex-col gap-1">
         <span className="inline-flex items-center gap-1 text-xs font-medium">
-          Language
+          
+          Idioma
           <HelpTooltip text="Choose the app language. Only English is available right now, but this setting is persisted so future translation PRs can extend it cleanly." />
         </span>
         <select
@@ -917,8 +919,8 @@ function GeneralSettings() {
           className="w-full accent-[var(--primary)]"
         />
         <div className="flex justify-between text-[0.625rem] text-[var(--muted-foreground)]">
-          <span>Slow</span>
-          <span>Fast</span>
+          <span>Lento</span>
+          <span>Rápido</span>
         </div>
       </label>
 
@@ -954,8 +956,8 @@ function GeneralSettings() {
             className="w-full accent-[var(--primary)]"
           />
           <div className="flex justify-between text-[0.625rem] text-[var(--muted-foreground)]">
-            <span>Slow</span>
-            <span>Fast</span>
+            <span>Lento</span>
+            <span>Rápido</span>
           </div>
         </label>
       )}
@@ -979,15 +981,15 @@ function GeneralSettings() {
           className="w-full accent-[var(--primary)]"
         />
         <div className="flex justify-between text-[0.625rem] text-[var(--muted-foreground)]">
-          <span>Short</span>
-          <span>Long</span>
+          <span>Curto</span>
+          <span>Longo</span>
         </div>
       </label>
 
       {/* Send on Enter — inline toggles per mode */}
       <div className="flex flex-col gap-1.5 rounded-lg p-1 transition-colors hover:bg-[var(--secondary)]/50">
         <div className="flex items-center gap-2">
-          <span className="text-xs">Send on Enter</span>
+          <span className="text-xs">Enviar com Enter</span>
           <HelpTooltip text="Choose which chat modes send on Enter. When off, Enter creates a new line and you have to press the send button manually." />
         </div>
         <div className="flex items-center gap-1.5">
@@ -1011,7 +1013,8 @@ function GeneralSettings() {
                 : "bg-[var(--secondary)] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] hover:bg-[var(--accent)]",
             )}
           >
-            Conversations
+            
+            Conversas
           </button>
           <button
             onClick={() => setEnterToSendGame(!enterToSendGame)}
@@ -1184,7 +1187,8 @@ function GeneralSettings() {
             className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
           >
             <RefreshCw size="0.75rem" />
-            Rescan
+            
+            Reescanear
           </button>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -1202,7 +1206,7 @@ function GeneralSettings() {
 
         <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <label className="flex min-w-0 flex-col gap-1">
-            <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Type</span>
+            <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Tipo</span>
             <select
               value={assetCategory}
               onChange={(e) => handleAssetCategoryChange(e.target.value as GameAssetCategoryId)}
@@ -1216,7 +1220,7 @@ function GeneralSettings() {
             </select>
           </label>
           <label className="flex min-w-0 flex-col gap-1">
-            <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Folder</span>
+            <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Pasta</span>
             <input
               value={assetSubcategory}
               onChange={(e) => setAssetSubcategory(e.target.value)}
@@ -1240,7 +1244,8 @@ function GeneralSettings() {
             className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)]"
           >
             <Upload size="0.875rem" />
-            Choose Files
+            
+            Escolher arquivos
           </button>
           <button
             onClick={handleGameAssetUpload}
@@ -1397,7 +1402,7 @@ function AppearanceSettings() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5">
           <Paintbrush size="0.75rem" className="text-[var(--muted-foreground)]" />
-          <span className="text-xs font-medium">Visual Style</span>
+          <span className="text-xs font-medium">Estilo visual</span>
           <HelpTooltip text="Choose how the entire app looks. 'Marinara' uses a retro Y2K aesthetic with glow effects. 'SillyTavern' uses a clean, minimal look inspired by the original SillyTavern." />
         </div>
         <div className="grid grid-cols-2 gap-2">
@@ -1434,7 +1439,8 @@ function AppearanceSettings() {
 
       <label className="flex flex-col gap-1">
         <span className="text-xs font-medium inline-flex items-center gap-1">
-          Color Scheme{" "}
+          
+          Esquema de cores{" "}
           <HelpTooltip text="Switch between dark and light mode. Dark mode is easier on the eyes in low-light environments." />
         </span>
         <select
@@ -1442,14 +1448,15 @@ function AppearanceSettings() {
           onChange={(e) => setTheme(e.target.value as "dark" | "light")}
           className="rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]"
         >
-          <option value="dark">Dark</option>
+          <option value="dark">Escuro</option>
           <option value="light">Light</option>
         </select>
       </label>
 
       <label className="flex flex-col gap-1">
         <span className="text-xs font-medium inline-flex items-center gap-1">
-          Font{" "}
+          
+          Fonte{" "}
           <HelpTooltip text="Choose the font used across the app. 'Default (Inter)' is optimized for screen readability. Drop .ttf, .otf, .woff, or .woff2 font files into the data/fonts/ folder to add custom fonts." />
         </span>
         <select
@@ -1523,7 +1530,8 @@ function AppearanceSettings() {
 
       <label className="flex flex-col gap-1">
         <span className="text-xs font-medium inline-flex items-center gap-1">
-          Display Size{" "}
+          
+          Tamanho de exibição{" "}
           <HelpTooltip text="Adjusts the base font size across the whole app on this device. Larger sizes improve readability. Default is 17px." />
         </span>
         <select
@@ -1531,12 +1539,12 @@ function AppearanceSettings() {
           onChange={(e) => setFontSize(Number(e.target.value) as 12 | 14 | 16 | 17 | 19 | 22)}
           className="rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]"
         >
-          <option value="12">Tiny</option>
-          <option value="14">Small</option>
-          <option value="16">Medium</option>
-          <option value="17">Default</option>
-          <option value="19">Large</option>
-          <option value="22">Huge</option>
+          <option value="12">Minúsculo</option>
+          <option value="14">Pequeno</option>
+          <option value="16">Médio</option>
+          <option value="17">Padrão</option>
+          <option value="19">Grande</option>
+          <option value="22">Enorme</option>
         </select>
       </label>
 
@@ -1619,7 +1627,8 @@ function AppearanceSettings() {
           }}
           className="text-[0.625rem] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors self-start"
         >
-          Reset to default
+          
+          Restaurar padrão
         </button>
 
         {/* Text Stroke */}
@@ -1630,7 +1639,7 @@ function AppearanceSettings() {
           </span>
           <div className="flex items-center gap-3">
             <label className="flex flex-col gap-1 flex-1">
-              <span className="text-[0.625rem] text-[var(--muted-foreground)]">Width</span>
+              <span className="text-[0.625rem] text-[var(--muted-foreground)]">Largura</span>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -1668,7 +1677,8 @@ function AppearanceSettings() {
             }}
             className="text-[0.625rem] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors self-start"
           >
-            Reset to default
+            
+            Restaurar padrão
           </button>
         </div>
       </div>
@@ -1930,7 +1940,7 @@ function AppearanceSettings() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5">
           <CloudRain size="0.75rem" className="text-[var(--muted-foreground)]" />
-          <span className="text-xs font-medium">Effects</span>
+          <span className="text-xs font-medium">Efeitos</span>
           <HelpTooltip text="Visual effects that enhance the roleplay atmosphere. Weather particles like rain, snow, and fog appear based on the story context." />
         </div>
         <ToggleSetting
@@ -1940,7 +1950,7 @@ function AppearanceSettings() {
         />
         <p className="text-[0.625rem] text-[var(--muted-foreground)] pl-6">
           Shows animated weather particles based on in-story weather and time of day. Requires the{" "}
-          <span className="font-medium">World State</span> agent to be enabled so weather data is extracted from the
+          <span className="font-medium">Estado do mundo</span> agent to be enabled so weather data is extracted from the
           narrative.
         </p>
       </div>
@@ -1965,7 +1975,8 @@ function AppearanceSettings() {
                   : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
               )}
             >
-              Dark
+              
+              Escuro
             </button>
             <button
               type="button"
@@ -2048,7 +2059,8 @@ function AppearanceSettings() {
           }}
           className="text-[0.625rem] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors self-start"
         >
-          Reset {activeGradientScheme === "dark" ? "Dark" : "Light"} to default
+          
+          Redefinir {activeGradientScheme === "dark" ? "Dark" : "Light"} to default
         </button>
       </div>
 
@@ -2067,7 +2079,7 @@ function AppearanceSettings() {
               onClick={() => setChatBackground(null)}
               className="flex items-center gap-1 rounded-md px-2 py-0.5 text-[0.625rem] text-[var(--destructive)] transition-colors hover:bg-[var(--destructive)]/10"
             >
-              <X size="0.625rem" /> Remove
+              <X size="0.625rem" />  Remover
             </button>
           )}
         </div>
@@ -2322,7 +2334,7 @@ function BackgroundPicker({ selected, onSelect }: { selected: string | null; onS
                                 setRenamingFile(itemKey);
                               }}
                               className="shrink-0 rounded-md p-0.5 text-[var(--muted-foreground)] opacity-0 transition-opacity hover:text-[var(--primary)] group-hover:opacity-100"
-                              title="Rename"
+                              title="Renomear"
                             >
                               <Pencil size="0.5625rem" />
                             </button>
@@ -2392,7 +2404,7 @@ function BackgroundPicker({ selected, onSelect }: { selected: string | null; onS
                             }
                             if (e.key === "Escape") setEditingTags(null);
                           }}
-                          placeholder="Add tag…"
+                          placeholder="Adicionar tag…"
                           className="w-full min-w-0 rounded border border-[var(--border)] bg-[var(--background)] px-1.5 py-0.5 text-[0.625rem] text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
                           autoFocus
                           list={`tag-suggestions-${itemKey}`}
@@ -2409,7 +2421,8 @@ function BackgroundPicker({ selected, onSelect }: { selected: string | null; onS
                           disabled={!tagInput.trim()}
                           className="shrink-0 rounded bg-[var(--primary)] px-1.5 py-0.5 text-[0.5625rem] text-[var(--primary-foreground)] disabled:opacity-40"
                         >
-                          Add
+                          
+                          Adicionar
                         </button>
                       </div>
                     )}
@@ -2569,7 +2582,8 @@ function ThemesSettings() {
               title={livePreview ? "Disable live preview" : "Enable live preview"}
             >
               {livePreview ? <Eye size="0.6875rem" /> : <EyeOff size="0.6875rem" />}
-              Preview
+              
+              Pré-visualização
             </button>
             <button
               onClick={handleSave}
@@ -2620,7 +2634,7 @@ function ThemesSettings() {
               <span>--card</span>
               <span className="text-white/40">Card background</span>
               <span>--border</span>
-              <span className="text-white/40">Borders</span>
+              <span className="text-white/40">Bordas</span>
               <span>--muted-foreground</span>
               <span className="text-white/40">Dimmed text</span>
               <span>--sidebar</span>
@@ -2655,7 +2669,7 @@ function ThemesSettings() {
           onClick={openNewTheme}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-[var(--primary)]/30 bg-[var(--primary)]/5 p-3 text-xs text-[var(--primary)] transition-all hover:border-[var(--primary)]/50 hover:bg-[var(--primary)]/10"
         >
-          <Plus size="0.875rem" /> Create Theme
+          <Plus size="0.875rem" />  Criar tema
         </button>
         <button
           onClick={() => fileRef.current?.click()}
@@ -2686,7 +2700,8 @@ function ThemesSettings() {
           )}
         >
           <Palette size="0.75rem" />
-          Default Theme
+          
+          Tema padrão
           {activeCustomTheme === null && <Check size="0.75rem" className="ml-auto" />}
         </button>
 
@@ -2735,7 +2750,7 @@ function ThemesSettings() {
                 URL.revokeObjectURL(url);
               }}
               className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-emerald-500/10 hover:text-emerald-400"
-              title="Export theme"
+              title="Exportar tema"
             >
               <Download size="0.6875rem" />
             </button>
@@ -2752,7 +2767,7 @@ function ThemesSettings() {
                 })();
               }}
               className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
-              title="Remove theme"
+              title="Remover tema"
             >
               <Trash2 size="0.6875rem" />
             </button>
@@ -2772,7 +2787,7 @@ function ThemesSettings() {
 
       {/* Info box */}
       <div className="rounded-lg bg-[var(--secondary)]/50 p-2.5 text-[0.625rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-        <strong>Tip:</strong> CSS themes can override any CSS variable (e.g.{" "}
+        <strong>Dica:</strong> CSS themes can override any CSS variable (e.g.{" "}
         <code className="rounded bg-[var(--secondary)] px-1">--background</code>,{" "}
         <code className="rounded bg-[var(--secondary)] px-1">--primary</code>) or add custom styles. JSON themes should
         have <code className="rounded bg-[var(--secondary)] px-1">{`{ "name": "...", "css": "..." }`}</code> format.
@@ -2937,7 +2952,7 @@ function ExtensionsSettings() {
 
       {/* Info box */}
       <div className="rounded-lg bg-[var(--secondary)]/50 p-2.5 text-[0.625rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-        <strong>JSON format:</strong>{" "}
+        <strong>Formato JSON:</strong>{" "}
         <code className="rounded bg-[var(--secondary)] px-1">{`{ "name": "...", "description": "...", "css": "..." }`}</code>
         . Extensions can inject custom CSS and/or JavaScript to modify the UI.
       </div>
@@ -3767,7 +3782,7 @@ function AdvancedSettings() {
           const writable = await handle.createWritable();
           await writable.write(blob);
           await writable.close();
-          toast.success("Backup saved!");
+          toast.success("Backup salvo!");
           qc.invalidateQueries({ queryKey: ["backups"] });
           return;
         } catch (err) {
@@ -3953,7 +3968,7 @@ function AdvancedSettings() {
       <div className="flex flex-col gap-2 rounded-lg bg-[var(--secondary)]/40 p-2.5 ring-1 ring-[var(--border)]">
         <div className="flex items-center gap-1.5">
           <Power size="0.75rem" className="text-[var(--muted-foreground)]" />
-          <span className="text-xs font-medium">Admin Access</span>
+          <span className="text-xs font-medium">Acesso de administrador</span>
         </div>
         <div className="flex min-w-0 flex-wrap gap-2">
           <input
@@ -3970,7 +3985,8 @@ function AdvancedSettings() {
           >
             <span className="flex min-w-0 items-center justify-center gap-1.5">
               <Save size="0.75rem" className="shrink-0" />
-              Save
+              
+              Salvar
             </span>
           </button>
         </div>
@@ -3980,7 +3996,7 @@ function AdvancedSettings() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5">
           <RefreshCw size="0.75rem" className="text-[var(--muted-foreground)]" />
-          <span className="text-xs font-medium">Updates</span>
+          <span className="text-xs font-medium">Atualizações</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -4031,7 +4047,8 @@ function AdvancedSettings() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-[0.625rem] text-[var(--primary)] hover:underline"
                 >
-                  Release notes <ExternalLink size="0.625rem" />
+                  
+                  Notas da versão <ExternalLink size="0.625rem" />
                 </a>
               )}
             </div>
@@ -4066,7 +4083,8 @@ function AdvancedSettings() {
                 ) : (
                   <>
                     <Download size="0.8125rem" />
-                    Apply Update
+                    
+                    Aplicar atualização
                   </>
                 )}
               </button>
@@ -4175,7 +4193,7 @@ function AdvancedSettings() {
                 onChange={(e) => handleQuickRepliesMenuChange(e.target.checked)}
                 className="h-3.5 w-3.5 shrink-0 rounded border-[var(--border)] accent-[var(--primary)]"
               />
-              <span className="min-w-0 text-xs">Quick replies</span>
+              <span className="min-w-0 text-xs">Respostas rápidas</span>
             </label>
             <span className="shrink-0" onClick={(e) => e.preventDefault()}>
               <HelpTooltip text="Adds alternate draft actions beside Send. One action appears directly; multiple actions open from the ellipsis." />
@@ -4493,7 +4511,8 @@ function AdvancedSettings() {
                 disabled={isClearing}
                 className="flex-1 rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-medium transition-all hover:bg-[var(--secondary)] active:scale-95 disabled:opacity-50"
               >
-                Cancel
+                
+                Cancelar
               </button>
               <button
                 onClick={() => runExpunge(confirmAction)}

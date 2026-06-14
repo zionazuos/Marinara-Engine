@@ -93,7 +93,8 @@ function DeleteConfirmationDialog({
             onClick={onClose}
             className="rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Cancel
+            
+            Cancelar
           </button>
         </div>
       </div>
@@ -125,7 +126,7 @@ function MultiSelectBar({
   return (
     <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 flex-col items-stretch gap-2 rounded-xl bg-[var(--card)] px-5 py-3 shadow-2xl ring-1 ring-[var(--border)]">
       <div className="flex items-center gap-3">
-        <span className="text-xs font-medium text-[var(--muted-foreground)]">{selectedCount} selected</span>
+        <span className="text-xs font-medium text-[var(--muted-foreground)]">{selectedCount}  selecionado(s)</span>
         <button
           onClick={onDelete}
           disabled={selectedCount === 0}
@@ -138,7 +139,8 @@ function MultiSelectBar({
           onClick={onCancel}
           className="rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
         >
-          Cancel
+          
+          Cancelar
         </button>
       </div>
       <div className="flex items-center justify-center gap-2">
@@ -156,7 +158,8 @@ function MultiSelectBar({
           disabled={selectedCount === 0}
           className="rounded-lg px-3 py-1 text-[11px] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
         >
-          Unselect all
+          
+          Desmarcar tudo
         </button>
         <button
           onClick={onSelectAllBelow}

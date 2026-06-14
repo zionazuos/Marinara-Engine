@@ -53,7 +53,7 @@ export function TopBar() {
             closeAllDetails();
           }}
           className="rounded-lg p-2 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)] hover:text-[var(--primary)] active:scale-95"
-          title="Home"
+          title="Início"
         >
           <Home size="1.125rem" />
         </button>
@@ -75,7 +75,7 @@ export function TopBar() {
               ? "bg-[var(--accent)] text-[var(--primary)] shadow-sm"
               : "text-[var(--muted-foreground)] hover:text-[var(--primary)]",
           )}
-          title="Browser"
+          title="Navegador"
         >
           <Bot size="0.9375rem" />
           {isBotBrowserActive && (
@@ -91,7 +91,7 @@ export function TopBar() {
               ? "bg-[var(--accent)] text-[var(--primary)] shadow-sm"
               : "text-[var(--muted-foreground)] hover:text-[var(--primary)]",
           )}
-          title="Characters"
+          title="Personagens"
         >
           <Users size="0.9375rem" />
           {isCharactersPanelActive && (
@@ -138,7 +138,7 @@ export function TopBar() {
               ? "bg-[var(--accent)] text-[var(--primary)] shadow-sm"
               : "text-[var(--muted-foreground)] hover:text-[var(--primary)]",
           )}
-          title="Settings"
+          title="Configurações"
         >
           <Settings size="0.9375rem" />
           {rightPanelOpen && rightPanel === "settings" && (

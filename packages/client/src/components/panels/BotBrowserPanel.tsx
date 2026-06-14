@@ -73,7 +73,8 @@ export function BotBrowserPanel() {
         )}
       >
         <Globe size="0.875rem" />
-        Browse Online
+        
+        Procurar online
       </button>
 
       {/* Search */}
@@ -90,7 +91,7 @@ export function BotBrowserPanel() {
 
       {/* Character list */}
       {isLoading ? (
-        <div className="py-4 text-center text-xs text-[var(--muted-foreground)]">Loading...</div>
+        <div className="py-4 text-center text-xs text-[var(--muted-foreground)]">Carregando...</div>
       ) : filtered.length === 0 ? (
         <div className="py-4 text-center text-xs text-[var(--muted-foreground)]">
           {search ? "No matches" : "No imported characters yet"}

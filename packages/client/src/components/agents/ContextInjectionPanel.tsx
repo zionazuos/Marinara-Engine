@@ -307,7 +307,7 @@ export function ContextInjectionPanel({
                         {agentLabel(inj.agentType, inj.agentName)}
                       </span>
                       {dirty && (
-                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" title="Unsaved edit" />
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" title="Edição não salva" />
                       )}
                     </button>
                     <div className="flex shrink-0 items-center gap-1">

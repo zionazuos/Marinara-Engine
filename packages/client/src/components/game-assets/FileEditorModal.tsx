@@ -143,7 +143,8 @@ export function FileEditorModal({ node, onClose, initialMode = "edit" }: FileEdi
                       : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
                   )}
                 >
-                  Preview
+                  
+                  Pré-visualização
                 </button>
                 <button
                   onClick={() => setMode("edit")}
@@ -154,7 +155,8 @@ export function FileEditorModal({ node, onClose, initialMode = "edit" }: FileEdi
                       : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
                   )}
                 >
-                  Edit
+                  
+                  Editar
                 </button>
               </div>
             )}
@@ -171,7 +173,8 @@ export function FileEditorModal({ node, onClose, initialMode = "edit" }: FileEdi
         <div className="flex-1 overflow-hidden">
           {isLoading ? (
             <div className="flex h-full items-center justify-center text-sm text-[var(--muted-foreground)]">
-              Loading...
+              
+              Carregando...
             </div>
           ) : mode === "preview" && isMd ? (
             <div className="h-full overflow-y-auto p-6">
@@ -209,7 +212,8 @@ export function FileEditorModal({ node, onClose, initialMode = "edit" }: FileEdi
               onClick={handleRequestClose}
               className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
             >
-              Cancel
+              
+              Cancelar
             </button>
             <button
               onClick={handleSave}

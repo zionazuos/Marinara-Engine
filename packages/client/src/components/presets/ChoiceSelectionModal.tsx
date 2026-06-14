@@ -209,7 +209,7 @@ export function ChoiceSelectionModal({
                       </>
                     ) : (
                       <>
-                        <ListChecks size="0.5625rem" /> Multi-select
+                        <ListChecks size="0.5625rem" />  Seleção múltipla
                       </>
                     )}
                   </span>
@@ -350,7 +350,8 @@ export function ChoiceSelectionModal({
                 onClick={onClose}
                 className="rounded-xl px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] hover:bg-[var(--accent)]"
               >
-                Skip
+                
+                Pular
               </button>
               <button
                 onClick={handleConfirm}

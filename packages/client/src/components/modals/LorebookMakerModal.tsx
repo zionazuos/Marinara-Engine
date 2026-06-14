@@ -293,7 +293,7 @@ export function LorebookMakerModal({ open, onClose }: Props) {
         {/* Entry count + Prompt */}
         <div className="flex gap-3">
           <div className="w-24 space-y-1.5">
-            <label className="text-xs font-medium text-[var(--muted-foreground)]">Entries</label>
+            <label className="text-xs font-medium text-[var(--muted-foreground)]">Entradas</label>
             <input
               type="number"
               value={entryCount}
@@ -341,7 +341,8 @@ export function LorebookMakerModal({ open, onClose }: Props) {
               <div className="flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-400">
                 <Loader2 size="0.75rem" className="animate-spin" />
                 <span>
-                  Batch {batchProgress.batch}/{batchProgress.totalBatches}
+                  
+                  Lote {batchProgress.batch}/{batchProgress.totalBatches}
                   {batchProgress.entriesSoFar > 0 && ` · ${batchProgress.entriesSoFar} entries so far`}
                 </span>
               </div>
@@ -409,7 +410,8 @@ export function LorebookMakerModal({ open, onClose }: Props) {
                 {saving ? (
                   <>
                     <Loader2 size="0.875rem" className="animate-spin" />
-                    Saving…
+                    
+                    Salvando…
                   </>
                 ) : (
                   <>

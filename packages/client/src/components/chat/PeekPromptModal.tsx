@@ -308,7 +308,8 @@ function ChatHistorySection({ entries, rawContent }: { entries: ChatHistoryEntry
             "bg-green-500/20 text-green-400",
           )}
         >
-          Chat History
+          
+          Histórico do chat
         </span>
         <span className="text-[0.625rem] text-[var(--muted-foreground)]">
           {entries.length} message{entries.length !== 1 ? "s" : ""}

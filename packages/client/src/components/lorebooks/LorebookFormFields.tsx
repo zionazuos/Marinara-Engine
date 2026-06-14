@@ -73,7 +73,8 @@ export function KeysEditor({ keys, onChange }: { keys: string[]; onChange: (keys
           onClick={addKey}
           className="rounded-lg bg-[var(--accent)] px-2 py-1.5 text-[0.6875rem] font-medium transition-colors hover:bg-[var(--accent)]/80"
         >
-          Add
+          
+          Adicionar
         </button>
       </div>
     </div>
@@ -196,7 +197,7 @@ export function ExpandableTextarea({
         <button
           onClick={() => setExpanded(true)}
           className="absolute right-2 top-2 rounded-md p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-          title="Expand editor"
+          title="Expandir editor"
         >
           <Maximize2 size="0.8125rem" />
         </button>
@@ -285,7 +286,8 @@ export function ExpandedContentModal({
             onClick={handleClose}
             className="rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-1.5 text-xs font-medium text-white shadow-md hover:shadow-lg active:scale-[0.98]"
           >
-            Done
+            
+            Concluído
           </button>
         </div>
       </div>

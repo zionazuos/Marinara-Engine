@@ -1599,7 +1599,7 @@ export function ChatSettingsDrawer({
       <div className="absolute right-0 top-0 z-50 flex h-full w-80 max-md:w-full flex-col border-l border-[var(--border)] bg-[var(--background)] shadow-2xl animate-fade-in-up max-md:pt-[env(safe-area-inset-top)]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-          <h3 className="text-sm font-bold">Chat Settings</h3>
+          <h3 className="text-sm font-bold">Configurações do chat</h3>
           <button
             onClick={onClose}
             className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)]"
@@ -1640,7 +1640,7 @@ export function ChatSettingsDrawer({
                   title="Apply a chat-settings preset to this chat"
                   className="flex-1 min-w-0 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                 >
-                  {presetList.length === 0 && <option value="">Loading…</option>}
+                  {presetList.length === 0 && <option value="">Carregando…</option>}
                   {presetList.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.isDefault ? "Default" : p.name}
@@ -1804,7 +1804,7 @@ export function ChatSettingsDrawer({
                     onChange={(e) => setConnection(e.target.value || null)}
                     className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                   >
-                    <option value="">None</option>
+                    <option value="">Nenhum</option>
                     <option value="random">🎲 Random</option>
                     {textConnectionsList.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -1822,7 +1822,7 @@ export function ChatSettingsDrawer({
                   onChange={(e) => setConnection(e.target.value || null)}
                   className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                 >
-                  <option value="">None</option>
+                  <option value="">Nenhum</option>
                   <option value="random">🎲 Random</option>
                   {textConnectionsList.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -1842,7 +1842,7 @@ export function ChatSettingsDrawer({
           {/* Preset — hidden for conversation mode and game mode */}
           {!isConversation && !isGame && !metadata.sceneSystemPrompt && (
             <Section
-              label="Prompt Preset"
+              label="Preset de prompt"
               icon={<Sliders size="0.875rem" />}
               help="Presets control how the system prompt is structured and what generation parameters are used. Different presets produce different AI behaviors."
             >
@@ -1852,7 +1852,7 @@ export function ChatSettingsDrawer({
                   onChange={(e) => setPreset(e.target.value || null)}
                   className="flex-1 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                 >
-                  <option value="">None</option>
+                  <option value="">Nenhum</option>
                   {((presets ?? []) as Array<{ id: string; name: string; isDefault?: boolean | string }>).map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -1881,7 +1881,7 @@ export function ChatSettingsDrawer({
           {/* Extra Prompt — game mode only */}
           {isGame && (
             <Section
-              label="Extra Prompt"
+              label="Prompt extra"
               icon={<Feather size="0.875rem" />}
               help="Additional instructions added to game generation prompts. Use this to suggest a writing style, ban themes, request specific behaviors, etc. Does not affect scene analysis."
             >
@@ -1903,7 +1903,7 @@ export function ChatSettingsDrawer({
                   <button
                     onClick={() => setExtraPromptExpanded(true)}
                     className="absolute right-1.5 top-1.5 rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                    title="Expand editor"
+                    title="Expandir editor"
                   >
                     <Maximize2 size="0.75rem" />
                   </button>
@@ -1919,7 +1919,8 @@ export function ChatSettingsDrawer({
                     }}
                     className="rounded-lg bg-[var(--secondary)] px-2.5 py-1 text-[0.625rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)]"
                   >
-                    Clear
+                    
+                    Limpar
                   </button>
                 )}
               </div>
@@ -1932,7 +1933,7 @@ export function ChatSettingsDrawer({
                     updateMeta.mutate({ id: chat.id, gameExtraPrompt: extraPromptDraft || null });
                   }
                 }}
-                title="Extra Prompt"
+                title="Prompt extra"
                 value={extraPromptDraft}
                 onChange={setExtraPromptDraft}
                 placeholder="Additional instructions for game generation..."
@@ -1963,7 +1964,7 @@ export function ChatSettingsDrawer({
                 <button
                   onClick={() => setScenePromptExpanded(true)}
                   className="absolute right-1.5 top-1.5 rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                  title="Expand editor"
+                  title="Expandir editor"
                 >
                   <Maximize2 size="0.75rem" />
                 </button>
@@ -1987,7 +1988,7 @@ export function ChatSettingsDrawer({
           {/* Party (game mode) */}
           {isGame && (
             <Section
-              label="Party"
+              label="Grupo"
               icon={<Users size="0.875rem" />}
               count={chatCharIds.length + (chat.personaId ? 1 : 0)}
               help="Your in-game party. Pick a persona to play as and manage which characters join the adventure."
@@ -2067,7 +2068,7 @@ export function ChatSettingsDrawer({
                       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--muted-foreground)]">
                         <X size="0.625rem" />
                       </div>
-                      <span className="flex-1 truncate text-xs">None</span>
+                      <span className="flex-1 truncate text-xs">Nenhum</span>
                       {!chat.personaId && <Check size="0.625rem" className="ml-auto shrink-0 text-[var(--primary)]" />}
                     </button>
                     {personas
@@ -2324,7 +2325,7 @@ export function ChatSettingsDrawer({
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--muted-foreground)]">
                       <X size="0.625rem" />
                     </div>
-                    <span className="flex-1 truncate text-xs">None</span>
+                    <span className="flex-1 truncate text-xs">Nenhum</span>
                     {!chat.personaId && <Check size="0.625rem" className="ml-auto shrink-0 text-[var(--primary)]" />}
                   </button>
                   {personas
@@ -2387,7 +2388,7 @@ export function ChatSettingsDrawer({
           {/* Characters — only show added ones + add button */}
           {!isGame && (
             <Section
-              label="Characters"
+              label="Personagens"
               icon={<Users size="0.875rem" />}
               count={chatCharIds.length}
               help="Characters in this chat. Each character has their own personality that the AI roleplays as."
@@ -2509,7 +2510,7 @@ export function ChatSettingsDrawer({
                   }}
                   className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)]/40 hover:text-[var(--primary)]"
                 >
-                  <Plus size="0.75rem" /> Add Character
+                  <Plus size="0.75rem" />  Adicionar personagem
                 </button>
               ) : (
                 <PickerDropdown
@@ -2706,7 +2707,7 @@ export function ChatSettingsDrawer({
               {/* Mode selector */}
               {!isConversation && (
                 <div className="space-y-2">
-                  <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Mode</label>
+                  <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Modo</label>
                   <div className="flex rounded-lg ring-1 ring-[var(--border)]">
                     <button
                       onClick={() => updateMeta.mutate({ id: chat.id, groupChatMode: "merged" })}
@@ -2795,7 +2796,8 @@ export function ChatSettingsDrawer({
                           : "text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
                       )}
                     >
-                      Smart
+                      
+                      Inteligente
                     </button>
                     <button
                       onClick={() => updateMeta.mutate({ id: chat.id, groupResponseOrder: "manual" })}
@@ -2879,7 +2881,7 @@ export function ChatSettingsDrawer({
                     <button
                       onClick={() => setGroupScenarioExpanded(true)}
                       className="absolute right-1.5 top-1.5 rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                      title="Expand editor"
+                      title="Expandir editor"
                     >
                       <Maximize2 size="0.75rem" />
                     </button>
@@ -3082,7 +3084,7 @@ export function ChatSettingsDrawer({
           {/* Commands — conversation mode only */}
           {isConversation && (
             <Section
-              label="Commands"
+              label="Comandos"
               icon={<Sparkles size="0.875rem" />}
               help="Allow characters to use hidden command tags for actions that happen outside the visible message."
             >
@@ -3101,7 +3103,8 @@ export function ChatSettingsDrawer({
                   <div className="min-w-0 flex-1">
                     <span className="flex items-center gap-1.5 text-xs font-medium">
                       <Sparkles size="0.75rem" className="text-[var(--primary)]" />
-                      Commands
+                      
+                      Comandos
                     </span>
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                       Allow models to interact with you via commands. This way, they can send you selfies, play songs
@@ -3311,7 +3314,7 @@ export function ChatSettingsDrawer({
                       <button
                         onClick={() => disconnectChat.mutate(chat.id)}
                         className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                        title="Disconnect"
+                        title="Desconectar"
                       >
                         <Unlink size="0.6875rem" />
                       </button>
@@ -3381,12 +3384,12 @@ export function ChatSettingsDrawer({
                           <span className="truncate text-xs font-medium">
                             {linked ? getConnectedChatDisplayName(linked) : "Unknown chat"}
                           </span>
-                          <p className="text-[0.625rem] text-[var(--muted-foreground)]">Conversation</p>
+                          <p className="text-[0.625rem] text-[var(--muted-foreground)]">Conversa</p>
                         </div>
                         <button
                           onClick={() => disconnectChat.mutate(chat.id)}
                           className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                          title="Disconnect"
+                          title="Desconectar"
                         >
                           <Unlink size="0.6875rem" />
                         </button>
@@ -3457,12 +3460,12 @@ export function ChatSettingsDrawer({
                       <span className="truncate text-xs font-medium">
                         {linked ? getConnectedChatDisplayName(linked) : "Unknown chat"}
                       </span>
-                      <p className="text-[0.625rem] text-[var(--muted-foreground)]">Conversation</p>
+                      <p className="text-[0.625rem] text-[var(--muted-foreground)]">Conversa</p>
                     </div>
                     <button
                       onClick={() => disconnectChat.mutate(chat.id)}
                       className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                      title="Disconnect"
+                      title="Desconectar"
                     >
                       <Unlink size="0.6875rem" />
                     </button>
@@ -3608,7 +3611,7 @@ export function ChatSettingsDrawer({
                 }}
                 className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)]/40 hover:text-[var(--primary)]"
               >
-                <Plus size="0.75rem" /> Add Lorebook
+                <Plus size="0.75rem" />  Adicionar lorebook
               </button>
             ) : (
               <PickerDropdown
@@ -3651,7 +3654,7 @@ export function ChatSettingsDrawer({
           {/* Agents — hidden for conversation mode */}
           {!isConversation && (
             <Section
-              label="Agents"
+              label="Agentes"
               icon={<Sparkles size="0.875rem" />}
               count={isGame ? gameAgentFeatureCount : activeAgentIds.length}
               help="When enabled, AI agents run automatically during generation to enrich the chat with world state tracking, expression detection, and more."
@@ -3754,7 +3757,8 @@ export function ChatSettingsDrawer({
                       </p>
                       {gameLorebookKeeperLorebook && (
                         <p className="mt-0.5 truncate text-[0.55rem] text-[var(--primary)]/70">
-                          Target: {gameLorebookKeeperLorebook.name}
+                          
+                          Alvo: {gameLorebookKeeperLorebook.name}
                         </p>
                       )}
                     </div>
@@ -3814,7 +3818,8 @@ export function ChatSettingsDrawer({
                       <div className="space-y-2 rounded-lg bg-[var(--background)]/55 p-3 ring-1 ring-[var(--border)]">
                         <label className="flex flex-col gap-1">
                           <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                            Music source
+                            
+                            Fonte de música
                           </span>
                           <select
                             value={gameSpotifySourceType}
@@ -3904,7 +3909,7 @@ export function ChatSettingsDrawer({
 
                         {gameSpotifySourceType === "artist" && (
                           <label className="flex flex-col gap-1">
-                            <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Artist</span>
+                            <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Artista</span>
                             <input
                               value={gameSpotifyArtistDraft}
                               onChange={(event) => setGameSpotifyArtistDraft(event.target.value)}
@@ -4170,13 +4175,15 @@ export function ChatSettingsDrawer({
                                 : "cursor-not-allowed opacity-40 text-[var(--muted-foreground)]",
                             )}
                           >
-                            Reset
+                            
+                            Redefinir
                           </button>
                         </div>
 
                         <div className="mt-2 flex items-center gap-2">
                           <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                            Default Side
+                            
+                            Lado padrão
                           </span>
                           <div className="flex rounded-md ring-1 ring-[var(--border)]">
                             <button
@@ -4188,7 +4195,8 @@ export function ChatSettingsDrawer({
                                   : "text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
                               )}
                             >
-                              Left
+                              
+                              Esquerda
                             </button>
                             <button
                               onClick={() => setSpriteSide("right")}
@@ -4199,14 +4207,15 @@ export function ChatSettingsDrawer({
                                   : "text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
                               )}
                             >
-                              Right
+                              
+                              Direita
                             </button>
                           </div>
                         </div>
 
                         <div className="mt-3 grid gap-3 sm:grid-cols-2">
                           <SpriteRangeSlider
-                            label="Size"
+                            label="Tamanho"
                             value={spriteScalePercent}
                             min={50}
                             max={175}
@@ -4215,7 +4224,7 @@ export function ChatSettingsDrawer({
                             onChange={setSpriteScale}
                           />
                           <SpriteRangeSlider
-                            label="Opacity"
+                            label="Opacidade"
                             value={spriteOpacityPercent}
                             min={15}
                             max={100}
@@ -4247,7 +4256,7 @@ export function ChatSettingsDrawer({
                     </div>
 
                     <label className="flex flex-col gap-1">
-                      <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Music source</span>
+                      <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Fonte de música</span>
                       <select
                         value={spotifySourceType}
                         onChange={(event) => {
@@ -4335,7 +4344,7 @@ export function ChatSettingsDrawer({
 
                     {spotifySourceType === "artist" && (
                       <label className="flex flex-col gap-1">
-                        <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Artist</span>
+                        <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Artista</span>
                         <input
                           value={spotifyArtistDraft}
                           onChange={(event) => setSpotifyArtistDraft(event.target.value)}
@@ -4840,7 +4849,7 @@ export function ChatSettingsDrawer({
                           const inactiveCustom = customAgents.filter((a) => !activeAgentIds.includes(a.id));
                           return (
                             <AgentCategorySection
-                              label="Custom Agents"
+                              label="Agentes personalizados"
                               icon={<Settings2 size="0.75rem" />}
                               description="Your custom-created agents."
                               count={activeCustom.length}
@@ -4913,7 +4922,7 @@ export function ChatSettingsDrawer({
           {/* Memory Recall — conversation mode: show here; roleplay: shown after Function Calling */}
           {isConversation && import.meta.env.VITE_MARINARA_LITE !== "true" && (
             <Section
-              label="Memory Recall"
+              label="Recuperação de memória"
               icon={<Brain size="0.875rem" />}
               help="When enabled, relevant fragments from this chat are automatically recalled and injected into the prompt as memories. Uses the local embedding model when available, or the configured embedding connection."
             >
@@ -5008,7 +5017,7 @@ export function ChatSettingsDrawer({
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                     How many recent messages to keep word-for-word, even once they&apos;re summarized. Helps characters
                     pick up the actual flow of last night&apos;s conversation instead of just the gist. Set to{" "}
-                    <span className="font-medium">0</span> to disable.
+                    <span className="font-medium">0</span>  para desativar.
                   </p>
                 </div>
               </div>
@@ -5132,7 +5141,7 @@ export function ChatSettingsDrawer({
                       }}
                       className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)]/40 hover:text-[var(--primary)]"
                     >
-                      <Plus size="0.75rem" /> Add Functions
+                      <Plus size="0.75rem" />  Adicionar funções
                     </button>
                   ) : (
                     <PickerDropdown
@@ -5152,7 +5161,7 @@ export function ChatSettingsDrawer({
                               }}
                               className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-medium text-[var(--primary-foreground)] transition-opacity hover:opacity-90"
                             >
-                              <Plus size="0.75rem" /> Add {pendingToolIds.length} Function
+                              <Plus size="0.75rem" />  Adicionar {pendingToolIds.length}  Função
                               {pendingToolIds.length > 1 ? "s" : ""}
                             </button>
                           </div>
@@ -5215,7 +5224,7 @@ export function ChatSettingsDrawer({
           {/* Memory Recall — roleplay/game modes: show after Function Calling */}
           {!isConversation && import.meta.env.VITE_MARINARA_LITE !== "true" && (
             <Section
-              label="Memory Recall"
+              label="Recuperação de memória"
               icon={<Brain size="0.875rem" />}
               help="When enabled, relevant fragments from this chat are automatically recalled and injected into the prompt as memories. Uses the local embedding model when available, or the configured embedding connection."
             >
@@ -5225,14 +5234,14 @@ export function ChatSettingsDrawer({
 
           {/* Translation */}
           <Section
-            label="Translation"
+            label="Tradução"
             icon={<Languages size="0.875rem" />}
             help="Configure translation for this chat here, including provider, target language, and automatic response translation for Game mode."
           >
             <div className="space-y-3">
               {/* Provider */}
               <div>
-                <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Provider</label>
+                <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Provedor</label>
                 <select
                   value={metadata.translationProvider ?? "google"}
                   onChange={(e) => updateMeta.mutate({ id: chat.id, translationProvider: e.target.value })}
@@ -5436,7 +5445,7 @@ export function ChatSettingsDrawer({
 
           {/* Context Message Limit */}
           <Section
-            label="Context Limit"
+            label="Limite de contexto"
             icon={<MessageSquare size="0.875rem" />}
             help="Limit how many messages are included in the context sent to the AI model. When off, all messages are sent (up to the model's context window). When on, only the last N messages are included."
           >
@@ -5590,12 +5599,13 @@ export function ChatSettingsDrawer({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[0.6875rem] font-semibold text-[var(--foreground)]">Agent Budget</label>
+              <label className="block text-[0.6875rem] font-semibold text-[var(--foreground)]">Orçamento do agente</label>
               <div className="grid gap-3 sm:grid-cols-2">
                 {agentAddPreview.agent.id !== "chat-summary" ? (
                   <div>
                     <label className="mb-1 block text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                      Context Size
+                      
+                      Tamanho do contexto
                     </label>
                     <div className="flex items-center gap-3">
                       <input
@@ -5629,7 +5639,8 @@ export function ChatSettingsDrawer({
                 )}
                 <div>
                   <label className="mb-1 block text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                    Max Output Tokens
+                    
+                    Máximo de tokens de saída
                   </label>
                   <div className="flex items-center gap-3">
                     <input
@@ -5806,7 +5817,8 @@ export function ChatSettingsDrawer({
                 disabled={addingAgentToChat}
                 className="rounded-lg px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Cancel
+                
+                Cancelar
               </button>
               <button
                 onClick={confirmAddAgent}
@@ -5832,11 +5844,12 @@ export function ChatSettingsDrawer({
           >
             <div className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3">
               <MessageCircle size="0.875rem" className="text-[var(--muted-foreground)]" />
-              <span className="text-sm font-semibold text-[var(--foreground)]">First Message</span>
+              <span className="text-sm font-semibold text-[var(--foreground)]">Primeira mensagem</span>
             </div>
             <div className="px-4 py-3">
               <p className="text-sm text-[var(--foreground)]">
-                Add <strong>{firstMesConfirm.charName}</strong>'s first message to the chat?
+                
+                Adicionar <strong>{firstMesConfirm.charName}</strong>'s first message to the chat?
               </p>
               <p className="mt-2 max-h-32 overflow-y-auto rounded-lg bg-[var(--accent)]/50 px-3 py-2 text-xs leading-relaxed text-[var(--muted-foreground)]">
                 {firstMesConfirm.message.length > 300
@@ -5849,7 +5862,8 @@ export function ChatSettingsDrawer({
                 onClick={() => setFirstMesConfirm(null)}
                 className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
               >
-                Skip
+                
+                Pular
               </button>
               <button
                 onClick={handleFirstMesConfirm}
@@ -6066,7 +6080,7 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
                             ? "Embedding unavailable"
                             : "Waiting for vector"}
                       </span>
-                      <span>Created {formatMemoryDate(memory.createdAt)}</span>
+                      <span>Criado {formatMemoryDate(memory.createdAt)}</span>
                     </div>
                   </div>
                   <button
@@ -6313,7 +6327,7 @@ function ImpersonateSettingsContent({
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-1.5">
-            <span className="text-xs font-semibold">Prompt Template</span>
+            <span className="text-xs font-semibold">Modelo de prompt</span>
             <HelpTooltip text="Optional global instruction sent to the model when you /impersonate. Leave empty to use the chat-specific prompt, or the built-in default if that chat has none. Macros like {{user}}, {{persona_description}} and {{impersonate_direction}} are replaced before sending." />
           </div>
           <span className="shrink-0 rounded-full bg-[var(--secondary)]/55 px-2 py-0.5 text-[0.625rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
@@ -6339,10 +6353,11 @@ function ImpersonateSettingsContent({
             <button
               onClick={() => setPromptTemplate("")}
               className="flex items-center gap-1 rounded-md bg-[var(--secondary)] px-2 py-0.5 text-[0.625rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-              title="Reset to default"
+              title="Restaurar padrão"
             >
               <RotateCcw size="0.625rem" />
-              Reset
+              
+              Redefinir
             </button>
           )}
         </div>
@@ -6385,7 +6400,7 @@ function ImpersonateSettingsContent({
               className="w-full rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
             >
               <option value="">Use chat default</option>
-              <option value="random">Random</option>
+              <option value="random">Aleatório</option>
               {connections.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -6399,7 +6414,8 @@ function ImpersonateSettingsContent({
           <label className="flex min-w-0 items-center justify-between gap-3 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-[var(--accent)]/35">
             <span className="min-w-0">
               <span className="flex items-center gap-1.5 text-xs font-semibold">
-                Skip agents
+                
+                Pular agentes
                 <span onClick={(e) => e.preventDefault()}>
                   <HelpTooltip text="When enabled, the agent pipeline (trackers, lorebook routers, etc.) is suppressed during impersonate so generations stay fast and don't trigger world-state mutations." />
                 </span>
@@ -6784,7 +6800,7 @@ function SelfiePromptControls({
   return (
     <div className="mt-2 space-y-2">
       <label className="flex flex-col gap-1">
-        <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Selfie prompt</span>
+        <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Prompt de selfie</span>
         <textarea
           value={promptDraft}
           onChange={(e) => setPromptDraft(e.target.value)}
@@ -6794,7 +6810,7 @@ function SelfiePromptControls({
         />
       </label>
       <label className="flex flex-col gap-1">
-        <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Positive tags</span>
+        <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Tags positivas</span>
         <textarea
           value={positiveDraft}
           onChange={(e) => setPositiveDraft(e.target.value)}
@@ -6804,7 +6820,7 @@ function SelfiePromptControls({
         />
       </label>
       <label className="flex flex-col gap-1">
-        <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Negative prompt</span>
+        <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Prompt negativo</span>
         <textarea
           value={negativeDraft}
           onChange={(e) => setNegativeDraft(e.target.value)}
@@ -7017,7 +7033,7 @@ function ScheduleEditor({
                         value={editDraft.idleResponseDelayMinutes}
                         onChange={(e) => updateDraftSetting("idleResponseDelayMinutes", e.target.value)}
                         className="w-full rounded bg-[var(--secondary)] px-1.5 py-1 text-[0.625rem] outline-none ring-1 ring-transparent focus:ring-[var(--primary)]/40"
-                        placeholder="Default"
+                        placeholder="Padrão"
                       />
                       <span className="block text-[0.5rem] text-[var(--muted-foreground)]">
                         Blank keeps the built-in 1-3 minute range.
@@ -7035,7 +7051,7 @@ function ScheduleEditor({
                         value={editDraft.dndResponseDelayMinutes}
                         onChange={(e) => updateDraftSetting("dndResponseDelayMinutes", e.target.value)}
                         className="w-full rounded bg-[var(--secondary)] px-1.5 py-1 text-[0.625rem] outline-none ring-1 ring-transparent focus:ring-[var(--primary)]/40"
-                        placeholder="Default"
+                        placeholder="Padrão"
                       />
                       <span className="block text-[0.5rem] text-[var(--muted-foreground)]">
                         Blank keeps the built-in 2-5 minute range.
@@ -7149,13 +7165,15 @@ function ScheduleEditor({
                     }}
                     className="rounded-md px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
                   >
-                    Cancel
+                    
+                    Cancelar
                   </button>
                   <button
                     onClick={handleSave}
                     className="rounded-md bg-[var(--primary)] px-2.5 py-1 text-[0.625rem] font-medium text-white transition-colors hover:bg-[var(--primary)]/80"
                   >
-                    Save Changes
+                    
+                    Salvar alterações
                   </button>
                 </div>
               </div>

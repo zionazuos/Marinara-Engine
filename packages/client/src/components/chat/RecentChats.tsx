@@ -61,7 +61,8 @@ export function RecentChats() {
   return (
     <div className="flex w-full max-w-md flex-col items-center gap-1.5">
       <p className="text-[0.625rem] font-medium text-[var(--muted-foreground)]/50 tracking-wide uppercase">
-        Recent Chats
+        
+        Chats recentes
       </p>
       <div className="flex w-full items-center justify-center gap-1.5">
         {recentChats.map((chat) => (

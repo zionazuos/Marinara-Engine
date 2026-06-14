@@ -427,7 +427,7 @@ export function GameAssetsBrowserView() {
       const targetFolder = selectedPath;
       try {
         await copyAsset.mutateAsync({ path: node.path, targetFolder });
-        toast.success("Copied");
+        toast.success("Copiado");
       } catch (err) {
         toast.error(`Copy failed: ${err instanceof Error ? err.message : "Unknown error"}`);
       }
@@ -511,22 +511,22 @@ export function GameAssetsBrowserView() {
         const filename = modalValue.endsWith(ext) ? modalValue : `${modalValue}${ext}`;
         const filePath = selectedPath ? `${selectedPath}/${filename}` : filename;
         await saveFile.mutateAsync({ path: filePath, content: "" });
-        toast.success("File created");
+        toast.success("Arquivo criado");
         const newNode: TreeNode = { name: filename, path: filePath, type: "file", ext };
         setEditingFile({ node: newNode, mode: ext === ".md" ? "preview" : "edit" });
       } else if (modal.type === "rename") {
         await renameAsset.mutateAsync({ path: modal.node.path, newName: modalValue });
-        toast.success("Renamed");
+        toast.success("Renomeado");
       } else if (modal.type === "move") {
         await moveAsset.mutateAsync({ path: modal.node.path, targetFolder: modalValue });
-        toast.success("Moved");
+        toast.success("Movido");
       } else if (modal.type === "delete") {
         if (modal.node.type === "folder") {
           await deleteFolder.mutateAsync({ path: modal.node.path, recursive: deleteRecursive });
           toast.success("Folder deleted");
         } else {
           await deleteAsset.mutateAsync(modal.node.path);
-          toast.success("File deleted");
+          toast.success("Arquivo excluído");
         }
       } else if (modal.type === "bulk-move") {
         const paths = Array.from(selectedPaths);
@@ -690,7 +690,8 @@ export function GameAssetsBrowserView() {
               className="ml-auto flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
             >
               <RotateCcw size="0.75rem" />
-              Reset to all
+              
+              Redefinir para tudo
             </button>
           )}
         </div>
@@ -718,13 +719,15 @@ export function GameAssetsBrowserView() {
                 onClick={handleSaveDescription}
                 className="rounded-md bg-[var(--primary)] px-2 py-1 text-xs font-medium text-white transition-opacity hover:opacity-90"
               >
-                Save
+                
+                Salvar
               </button>
               <button
                 onClick={() => setEditingDescription(false)}
                 className="rounded-md border border-[var(--border)] bg-[var(--background)] px-2 py-1 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
               >
-                Cancel
+                
+                Cancelar
               </button>
             </div>
           ) : PROTECTED_PATHS.has(selectedPath) ? (
@@ -753,7 +756,7 @@ export function GameAssetsBrowserView() {
       {selectedPaths.size > 0 && (
         <div className="flex min-h-[36px] items-center gap-3 border-b border-[var(--border)]/40 bg-[var(--primary)]/5 px-4 py-1.5">
           <span className="text-xs font-medium text-[var(--primary)]">
-            {selectedPaths.size} file{selectedPaths.size !== 1 ? "s" : ""} selected
+            {selectedPaths.size} file{selectedPaths.size !== 1 ? "s" : ""}  selecionado(s)
           </span>
           <div className="ml-auto flex items-center gap-1.5">
             <button
@@ -771,7 +774,8 @@ export function GameAssetsBrowserView() {
               className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
             >
               <Move size="0.75rem" />
-              Move
+              
+              Mover
             </button>
             <button
               onClick={() => {
@@ -781,14 +785,16 @@ export function GameAssetsBrowserView() {
               className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
             >
               <Copy size="0.75rem" />
-              Copy
+              
+              Copiar
             </button>
             <button
               onClick={() => setModal({ type: "bulk-delete" })}
               className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[var(--destructive)] transition-colors hover:bg-[var(--destructive)]/10"
             >
               <Trash2 size="0.75rem" />
-              Delete
+              
+              Excluir
             </button>
             <div className="mx-1 h-3 w-px bg-[var(--border)]" />
             <button
@@ -807,7 +813,7 @@ export function GameAssetsBrowserView() {
         {/* Sidebar tree */}
         <div className="w-56 overflow-y-auto border-r border-[var(--border)]/40 bg-[var(--card)]/30 p-2 max-md:hidden">
           {isLoading ? (
-            <div className="p-4 text-sm text-[var(--muted-foreground)]">Loading...</div>
+            <div className="p-4 text-sm text-[var(--muted-foreground)]">Carregando...</div>
           ) : tree ? (
             <FolderTree
               node={tree}
@@ -1114,7 +1120,8 @@ export function GameAssetsBrowserView() {
                 }}
                 className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-4 py-2 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
               >
-                Cancel
+                
+                Cancelar
               </button>
               <button
                 onClick={handleModalConfirm}

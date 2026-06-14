@@ -203,7 +203,7 @@ export function GameInventory({
         <div className="flex items-center justify-between border-b border-white/8 bg-white/[0.02] px-4 py-3">
           <div className="flex items-center gap-2">
             <Package size={15} className="text-amber-400/80" />
-            <h2 className="text-sm font-semibold tracking-wide text-white/90">Inventory</h2>
+            <h2 className="text-sm font-semibold tracking-wide text-white/90">Inventário</h2>
             <span className="rounded bg-white/8 px-1.5 py-0.5 text-[0.6rem] tabular-nums text-white/40">
               {items.length} {items.length === 1 ? "item" : "items"}
             </span>
@@ -231,7 +231,8 @@ export function GameInventory({
                     <ChevronLeft size={12} />
                   </button>
                   <span className="tabular-nums">
-                    Page {pageIndex + 1} / {pageCount}
+                    
+                    Página {pageIndex + 1} / {pageCount}
                   </span>
                   <button
                     onClick={() => setPageIndex((page) => Math.min(pageCount - 1, page + 1))}
@@ -306,7 +307,8 @@ export function GameInventory({
                   className="flex shrink-0 items-center justify-center gap-1 rounded border border-amber-500/20 bg-amber-500/10 px-2 py-1.5 text-[0.7rem] font-semibold text-amber-300 transition-colors hover:bg-amber-500/15 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Check size={12} />
-                  Save
+                  
+                  Salvar
                 </button>
               </div>
             )}
@@ -318,7 +320,8 @@ export function GameInventory({
                   className="flex flex-1 items-center justify-center gap-1 rounded border border-white/8 bg-white/[0.03] py-1.5 text-[0.7rem] text-white/70 transition-colors hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Plus size={12} />
-                  Add
+                  
+                  Adicionar
                 </button>
               )}
               {selectedInventoryItem && (onRemoveItem || onIncrementItem) && (
@@ -365,7 +368,8 @@ export function GameInventory({
                   className="flex flex-1 items-center justify-center gap-1 rounded border border-amber-500/20 bg-amber-500/10 py-1.5 text-[0.7rem] font-semibold text-amber-400 transition-colors hover:bg-amber-500/15"
                 >
                   <Wand2 size={12} />
-                  Use
+                  
+                  Usar
                 </button>
               )}
             </div>

@@ -195,7 +195,7 @@ export function AgentsPanel() {
 
   return (
     <div className="flex flex-col gap-1 p-3">
-      {isLoading && <div className="py-4 text-center text-xs text-[var(--muted-foreground)]">Loading...</div>}
+      {isLoading && <div className="py-4 text-center text-xs text-[var(--muted-foreground)]">Carregando...</div>}
 
       <div className="mb-1 flex items-center gap-1 rounded-lg bg-[var(--secondary)] p-1 ring-1 ring-[var(--border)]">
         <button
@@ -224,7 +224,7 @@ export function AgentsPanel() {
 
       {/* ── Regex Scripts (moved to top) ── */}
       <PanelSection
-        title="Regex Scripts"
+        title="Scripts de regex"
         icon={<Regex size="0.8125rem" />}
         action={
           <div className="flex items-center gap-1">
@@ -361,7 +361,7 @@ export function AgentsPanel() {
                 </button>
                 <button
                   className="mt-0.5 shrink-0 text-[var(--muted-foreground)] transition-colors hover:text-[var(--destructive)]"
-                  title="Delete script"
+                  title="Excluir script"
                   onClick={async () => {
                     if (
                       await showConfirmDialog({
@@ -472,7 +472,7 @@ export function AgentsPanel() {
 
       {viewMode === "category" && (
         <PanelSection
-          title="Custom Agents"
+          title="Agentes personalizados"
           icon={<Sparkles size="0.8125rem" />}
           action={
             <button
@@ -536,7 +536,7 @@ export function AgentsPanel() {
                   </button>
                   <button
                     className="mt-0.5 shrink-0 text-[var(--muted-foreground)] transition-colors hover:text-[var(--destructive)]"
-                    title="Delete agent"
+                    title="Excluir agente"
                     onClick={async () => {
                       if (
                         await showConfirmDialog({
@@ -561,7 +561,7 @@ export function AgentsPanel() {
 
       {/* ── Custom Function Tools ── */}
       <PanelSection
-        title="Custom Tools"
+        title="Ferramentas personalizadas"
         icon={<Wrench size="0.8125rem" />}
         action={
           <button

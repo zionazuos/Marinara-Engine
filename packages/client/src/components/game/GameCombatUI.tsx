@@ -1733,7 +1733,8 @@ export function GameCombatUI({
                 onClick={() => onCombatEnd("victory", buildSummary("victory"))}
                 className="rounded-lg bg-amber-500/20 px-6 py-2.5 text-sm font-semibold text-amber-200 ring-1 ring-amber-400/30 transition-colors hover:bg-amber-500/30"
               >
-                Continue
+                
+                Continuar
               </button>
             </div>
           )}
@@ -1746,7 +1747,8 @@ export function GameCombatUI({
                 onClick={() => onCombatEnd("defeat", buildSummary("defeat"))}
                 className="rounded-lg bg-red-500/20 px-6 py-2.5 text-sm font-semibold text-red-200 ring-1 ring-red-400/30 transition-colors hover:bg-red-500/30"
               >
-                Continue
+                
+                Continuar
               </button>
             </div>
           )}
@@ -1808,7 +1810,8 @@ export function GameCombatUI({
                   : "border-white/10 bg-white/5 text-white/55 hover:bg-white/10",
               )}
             >
-              Party
+              
+              Grupo
             </button>
             {combatMechanics.length > 0 && (
               <button
@@ -1848,11 +1851,13 @@ export function GameCombatUI({
                   : "border-white/10 bg-white/5 text-white/55 hover:bg-white/10",
               )}
             >
-              Log
+              
+              Registro
             </button>
             {turnOrder.length > 0 && (
               <span className="ml-auto shrink-0 truncate rounded bg-white/5 px-2 py-1 text-[0.55rem] font-semibold uppercase tracking-wide text-white/45">
-                Next: {turnOrder[0]?.name ?? "—"}
+                
+                Próximo: {turnOrder[0]?.name ?? "—"}
               </span>
             )}
           </div>
@@ -1882,7 +1887,8 @@ export function GameCombatUI({
                 </div>
                 <div className="flex shrink-0 flex-col items-center gap-0.5 text-center">
                   <span className="min-w-[4.25rem] rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wide text-white/45">
-                    Round {round}
+                    
+                    Rodada {round}
                   </span>
                   <span className="min-w-[4.25rem] rounded bg-amber-500/20 px-1.5 py-0.5 text-[0.55rem] font-semibold uppercase tracking-wide text-amber-200">
                     Your turn
@@ -1968,7 +1974,8 @@ export function GameCombatUI({
                   }}
                   className="self-start rounded border border-white/15 px-2 py-0.5 text-[0.65rem] text-white/60 hover:bg-white/10 hover:text-white"
                 >
-                  Back
+                  
+                  Voltar
                 </button>
               </div>
             )}
@@ -2032,7 +2039,8 @@ export function GameCombatUI({
                   }}
                   className="self-start rounded border border-white/15 px-2 py-0.5 text-[0.65rem] text-white/60 hover:bg-white/10 hover:text-white"
                 >
-                  Back
+                  
+                  Voltar
                 </button>
               </div>
             )}
@@ -2081,7 +2089,8 @@ export function GameCombatUI({
                     }}
                     className="rounded border border-white/15 px-2 py-1 text-xs text-white/60 hover:bg-white/10 hover:text-white"
                   >
-                    Back
+                    
+                    Voltar
                   </button>
                 </div>
               </div>
@@ -2165,7 +2174,8 @@ export function GameCombatUI({
                   }}
                   className="self-start rounded border border-white/15 px-2 py-0.5 text-[0.65rem] text-white/60 hover:bg-white/10 hover:text-white"
                 >
-                  Back
+                  
+                  Voltar
                 </button>
               </div>
             )}
@@ -2194,7 +2204,7 @@ export function GameCombatUI({
                   type="button"
                   onClick={() => setOpenDrawer(null)}
                   className="rounded p-1 text-white/55 hover:bg-white/10 hover:text-white"
-                  aria-label="Close drawer"
+                  aria-label="Fechar gaveta"
                 >
                   <X size={14} />
                 </button>
@@ -2366,7 +2376,7 @@ export function GameCombatUI({
           <div className="flex min-w-0 flex-wrap items-center gap-2">{combatControlsSlot}</div>
           {phase !== "intro" && (
             <div className="shrink-0 rounded-lg border border-white/10 bg-black/65 px-2.5 py-1 text-center shadow-lg backdrop-blur-md">
-              <div className="text-[0.55rem] font-semibold uppercase tracking-widest text-white/40">Round</div>
+              <div className="text-[0.55rem] font-semibold uppercase tracking-widest text-white/40">Rodada</div>
               <div className="text-lg font-bold leading-none tabular-nums text-white">{round}</div>
             </div>
           )}
@@ -2377,7 +2387,8 @@ export function GameCombatUI({
         <div className="relative z-30 shrink-0 border-y border-white/10 bg-black/60 px-3 py-1.5 backdrop-blur-md sm:px-4">
           <div className="flex items-center gap-1 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <span className="mr-1 shrink-0 text-[0.6rem] font-semibold uppercase tracking-widest text-white/50">
-              Turn
+              
+              Turno
             </span>
             {turnOrder.map((entry, i) => {
               const isParty = party.some((p) => p.id === entry.id);
@@ -2436,7 +2447,7 @@ export function GameCombatUI({
               </div>
               <div>
                 <div className="text-xs font-semibold text-white">{activePlayer.name}</div>
-                <div className="text-[0.6rem] text-white/40">Choose action</div>
+                <div className="text-[0.6rem] text-white/40">Escolher ação</div>
               </div>
             </div>
 
@@ -2522,7 +2533,8 @@ export function GameCombatUI({
                 }}
                 className="rounded border border-white/15 px-2 py-1 text-xs text-white/60 hover:bg-white/10 hover:text-white"
               >
-                Back
+                
+                Voltar
               </button>
             </div>
           </div>
@@ -2593,7 +2605,8 @@ export function GameCombatUI({
                 }}
                 className="rounded border border-white/15 px-2 py-1 text-xs text-white/60 hover:bg-white/10 hover:text-white"
               >
-                Back
+                
+                Voltar
               </button>
             </div>
           </div>
@@ -2650,7 +2663,8 @@ export function GameCombatUI({
                 }}
                 className="rounded border border-white/15 px-2 py-1.5 text-xs text-white/60 hover:bg-white/10 hover:text-white"
               >
-                Back
+                
+                Voltar
               </button>
             </div>
           </div>
@@ -2735,7 +2749,8 @@ export function GameCombatUI({
               }}
               className="rounded border border-white/15 px-2 py-0.5 text-xs text-white/60 hover:bg-white/10 hover:text-white"
             >
-              Back
+              
+              Voltar
             </button>
           </div>
         )}
@@ -2749,7 +2764,8 @@ export function GameCombatUI({
               onClick={() => onCombatEnd("victory", buildSummary("victory"))}
               className="mt-2 rounded-lg bg-amber-500/20 px-6 py-2 text-sm font-semibold text-amber-200 ring-1 ring-amber-400/30 transition-colors hover:bg-amber-500/30"
             >
-              Continue
+              
+              Continuar
             </button>
           </div>
         )}
@@ -2764,7 +2780,8 @@ export function GameCombatUI({
               onClick={() => onCombatEnd("defeat", buildSummary("defeat"))}
               className="mt-2 rounded-lg bg-red-500/20 px-6 py-2 text-sm font-semibold text-red-200 ring-1 ring-red-400/30 transition-colors hover:bg-red-500/30"
             >
-              Continue
+              
+              Continuar
             </button>
           </div>
         )}

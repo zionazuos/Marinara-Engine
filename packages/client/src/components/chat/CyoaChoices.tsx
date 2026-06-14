@@ -281,7 +281,7 @@ export function CyoaChoices({ messages }: Props) {
               className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--muted)]/20 px-3 py-1.5 text-[0.625rem] text-[var(--foreground)]/70 transition-colors hover:bg-[var(--muted)]/40 hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:bg-black/35 dark:text-white/60"
             >
               <X size="0.75rem" />
-              <span>Cancel</span>
+              <span>Cancelar</span>
             </button>
             <button
               type="button"

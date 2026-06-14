@@ -104,7 +104,7 @@ function HiddenFromAIConversationSummary({ onExpand }: { onExpand: () => void })
     >
       <EyeOff size="0.8rem" className="shrink-0" />
       <span className="min-w-0 flex-1 truncate">Hidden from AI</span>
-      <span className="shrink-0 text-[0.625rem] opacity-70">Show</span>
+      <span className="shrink-0 text-[0.625rem] opacity-70">Mostrar</span>
     </button>
   );
 }
@@ -684,7 +684,7 @@ export const ConversationMessage = memo(function ConversationMessage({
                 "absolute -right-1 -top-1 rounded-md p-1 text-[var(--muted-foreground)]/30 opacity-0 transition-all hover:bg-red-500/20 hover:text-red-400 group-hover:opacity-100",
                 showActions && "opacity-100",
               )}
-              title="Delete"
+              title="Excluir"
             >
               <Trash2 size="0.75rem" />
             </button>
@@ -928,14 +928,14 @@ export const ConversationMessage = memo(function ConversationMessage({
             (showActions || forceShowActions) && "opacity-100",
           )}
         >
-          <MsgAction icon={copied ? "✓" : <Copy size="0.75rem" />} onClick={handleCopy} title="Copy" />
+          <MsgAction icon={copied ? "✓" : <Copy size="0.75rem" />} onClick={handleCopy} title="Copiar" />
           <MsgAction
             icon={<Languages size="0.75rem" />}
             onClick={() => translate(message.id, message.content, message.chatId)}
             title={translatedText ? "Hide translation" : "Translate"}
             className={translatedText ? "text-blue-400" : undefined}
           />
-          <MsgAction icon={<Pencil size="0.75rem" />} onClick={onEditClick ?? startEditing} title="Edit" />
+          <MsgAction icon={<Pencil size="0.75rem" />} onClick={onEditClick ?? startEditing} title="Editar" />
           <MsgAction
             icon={<RefreshCw size="0.75rem" />}
             onClick={() => onRegenerate?.(message.id)}
@@ -966,7 +966,7 @@ export const ConversationMessage = memo(function ConversationMessage({
           <MsgAction
             icon={<Trash2 size="0.75rem" />}
             onClick={() => onDelete?.(message.id)}
-            title="Delete"
+            title="Excluir"
             className="hover:text-[var(--destructive)]"
           />
         </div>
@@ -1162,7 +1162,7 @@ export const ConversationMessage = memo(function ConversationMessage({
         {(translatedText || isTranslating) && (
           <div className="mt-1.5 border-t border-[var(--border)] pt-1.5">
             {isTranslating ? (
-              <span className="text-[0.75rem] italic text-[var(--muted-foreground)]">Translating…</span>
+              <span className="text-[0.75rem] italic text-[var(--muted-foreground)]">Traduzindo…</span>
             ) : (
               <div className="whitespace-pre-wrap text-[0.8125rem] leading-relaxed text-[var(--muted-foreground)]">
                 {translatedText}
@@ -1228,14 +1228,14 @@ export const ConversationMessage = memo(function ConversationMessage({
             (showActions || forceShowActions) && "opacity-100",
           )}
         >
-          <MsgAction icon={copied ? "✓" : <Copy size="0.75rem" />} onClick={handleCopy} title="Copy" />
+          <MsgAction icon={copied ? "✓" : <Copy size="0.75rem" />} onClick={handleCopy} title="Copiar" />
           <MsgAction
             icon={<Languages size="0.75rem" />}
             onClick={() => translate(message.id, renderedContent, message.chatId)}
             title={translatedText ? "Hide translation" : "Translate"}
             className={translatedText ? "text-blue-400" : undefined}
           />
-          <MsgAction icon={<Pencil size="0.75rem" />} onClick={onEditClick ?? startEditing} title="Edit" />
+          <MsgAction icon={<Pencil size="0.75rem" />} onClick={onEditClick ?? startEditing} title="Editar" />
           {canRegenerate && (
             <MsgAction
               icon={<RefreshCw size="0.75rem" />}
@@ -1268,7 +1268,7 @@ export const ConversationMessage = memo(function ConversationMessage({
           <MsgAction
             icon={<Trash2 size="0.75rem" />}
             onClick={() => onDelete?.(message.id)}
-            title="Delete"
+            title="Excluir"
             className="hover:text-[var(--destructive)]"
           />
         </div>

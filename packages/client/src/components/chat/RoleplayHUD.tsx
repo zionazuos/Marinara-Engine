@@ -737,7 +737,8 @@ function CombinedPlayerWidget({
           <Swords size="0.875rem" className="text-orange-400/70 max-md:h-4 max-md:w-4" />
         </div>
         <span className="max-w-full truncate text-[0.5625rem] font-semibold leading-tight shrink-0 max-md:hidden">
-          Tracker
+          
+          Rastreador
         </span>
       </button>
 
@@ -984,7 +985,7 @@ function PersonaStatsWidget({
         ref={buttonRef}
         onClick={() => setOpen(!open)}
         className={cn(WIDGET, "text-violet-300")}
-        title="Persona Stats"
+        title="Atributos da persona"
       >
         {bars.length > 0 ? (
           <div className="flex w-6 max-md:w-8 flex-col justify-center gap-0.5 max-md:gap-px shrink-0">
@@ -1162,7 +1163,7 @@ function InventoryWidget({
 
   return (
     <div className="relative">
-      <button ref={buttonRef} onClick={() => setOpen(!open)} className={cn(WIDGET, "text-amber-300")} title="Inventory">
+      <button ref={buttonRef} onClick={() => setOpen(!open)} className={cn(WIDGET, "text-amber-300")} title="Inventário">
         {items.length > 0 && currentItem ? (
           <span
             key={animKey}
@@ -1220,7 +1221,7 @@ function QuestsWidget({
         ref={buttonRef}
         onClick={() => setOpen(!open)}
         className={cn(WIDGET, "text-emerald-300")}
-        title="Active Quests"
+        title="Missões ativas"
       >
         {currentObjective ? (
           <span className="widget-scroll-text w-full px-0.5 text-center text-[0.375rem] font-semibold leading-[1.15] max-md:text-[0.5rem]">
@@ -1329,7 +1330,7 @@ function CombinedWorldWidget({
           "flex items-center gap-1.5 md:gap-1 rounded-lg border border-[var(--border)] bg-[var(--card)]/80 backdrop-blur-md px-2 py-1.5 md:px-2 md:py-2 md:h-10 transition-all hover:bg-[var(--card)] dark:border-foreground/10 dark:bg-black/40 dark:hover:bg-black/60 cursor-pointer select-none",
           open && "bg-[var(--card)] border-[var(--border)] dark:bg-black/60 dark:border-foreground/20",
         )}
-        title="World State"
+        title="Estado do mundo"
       >
         {/* Location pin */}
         <MapPin size="0.9375rem" className={cn(pinColor, "drop-shadow-sm shrink-0")} />

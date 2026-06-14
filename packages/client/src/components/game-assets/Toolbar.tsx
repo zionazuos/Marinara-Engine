@@ -186,8 +186,8 @@ export function Toolbar({
             type="button"
             onClick={onClose}
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Close assets"
-            aria-label="Close assets"
+            title="Fechar assets"
+            aria-label="Fechar assets"
           >
             <X size="0.875rem" />
           </button>
@@ -234,7 +234,7 @@ export function Toolbar({
                 "rounded-lg border border-[var(--border)] bg-[var(--background)] px-2 py-1.5 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]",
                 colsOpen && "bg-[var(--accent)]",
               )}
-              title="Columns"
+              title="Colunas"
             >
               <List size="0.875rem" />
             </button>
@@ -249,7 +249,8 @@ export function Toolbar({
                     onChange={() => onToggleColumn("size")}
                     className="rounded border-[var(--border)]"
                   />
-                  Size
+                  
+                  Tamanho
                 </label>
                 <label className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-xs text-[var(--foreground)] hover:bg-[var(--accent)]">
                   <input
@@ -258,7 +259,8 @@ export function Toolbar({
                     onChange={() => onToggleColumn("modified")}
                     className="rounded border-[var(--border)]"
                   />
-                  Modified
+                  
+                  Modificado
                 </label>
               </>,
               colsDropdownRef,
@@ -295,7 +297,7 @@ export function Toolbar({
           className="flex items-center gap-1.5 rounded-lg bg-[var(--primary)] px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90"
         >
           <Upload size="0.875rem" />
-          <span className="max-sm:hidden">Upload</span>
+          <span className="max-sm:hidden">Enviar</span>
         </button>
 
         <button
@@ -307,7 +309,7 @@ export function Toolbar({
           )}
         >
           <Plus size="0.875rem" />
-          <span className="max-sm:hidden">New</span>
+          <span className="max-sm:hidden">Novo</span>
         </button>
         {dropdown(
           newOpen,
@@ -331,7 +333,8 @@ export function Toolbar({
               className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
             >
               <FileText size="0.875rem" />
-              New text file
+              
+              Novo arquivo de texto
             </button>
             <button
               onClick={() => {
@@ -350,7 +353,7 @@ export function Toolbar({
         <button
           onClick={onRescan}
           className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
-          title="Rescan"
+          title="Reescanear"
         >
           <RefreshCw size="0.875rem" />
         </button>

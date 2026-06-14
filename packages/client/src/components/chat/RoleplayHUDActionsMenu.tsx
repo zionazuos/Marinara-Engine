@@ -266,7 +266,8 @@ export function RoleplayHUDActionsMenu({
             <div className="space-y-1.5 px-3 py-2">
               <div className="flex items-center gap-1.5 text-[0.5625rem] font-semibold uppercase tracking-wide text-amber-300/90">
                 <AlertTriangle size="0.625rem" />
-                Failed agents
+                
+                Agentes com falha
               </div>
               <div className="space-y-1">
                 {displayedFailures.map((failure) => (
@@ -291,7 +292,8 @@ export function RoleplayHUDActionsMenu({
             >
               <MessageCircle size="0.75rem" className={echoChamberOpen ? "text-foreground/75" : "text-foreground/50"} />
               <span className={echoChamberOpen ? "font-medium text-foreground/75" : "text-foreground/55"}>
-                Echo Chamber {echoChamberOpen ? "On" : "Off"}
+                
+                Câmara de eco {echoChamberOpen ? "On" : "Off"}
               </span>
               {echoMessageCount > 0 && (
                 <span className="ml-auto flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-foreground/15 px-1 text-[0.5rem] font-bold text-foreground/80 ring-1 ring-foreground/10">

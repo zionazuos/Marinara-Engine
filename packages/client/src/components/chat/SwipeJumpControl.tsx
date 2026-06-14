@@ -64,7 +64,8 @@ export function SwipeJumpControl({
         <ChevronLeft size={iconSize} />
       </button>
       <label className="sr-only" htmlFor={inputId}>
-        Jump to swipe
+        
+        Ir para o swipe
       </label>
       <input
         id={inputId}

@@ -249,7 +249,7 @@ function NpcDefaultVoicePool({
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-2">
         <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">{label}</span>
-        <span className="text-[0.625rem] text-[var(--muted-foreground)]">{selected.length} selected</span>
+        <span className="text-[0.625rem] text-[var(--muted-foreground)]">{selected.length}  selecionado(s)</span>
       </div>
       {options.length > 0 ? (
         <div className="grid gap-1 sm:grid-cols-2">
@@ -717,7 +717,7 @@ export function TTSConfigCard() {
       {expanded && (
         <div className="mt-4 space-y-4">
           {/* Source */}
-          <FieldRow label="Source" help="Choose the provider used by the server-side TTS proxy.">
+          <FieldRow label="Fonte" help="Choose the provider used by the server-side TTS proxy.">
             <select
               value={source}
               onChange={(e) => handleSourceChange(e.target.value as TTSSource)}
@@ -733,7 +733,7 @@ export function TTSConfigCard() {
 
           {/* Base URL */}
           <FieldRow
-            label="Base URL"
+            label="URL base"
             help={
               source === "elevenlabs"
                 ? "The ElevenLabs API root. Use the default unless you proxy ElevenLabs through another server."
@@ -758,7 +758,7 @@ export function TTSConfigCard() {
 
           {/* API Key */}
           <FieldRow
-            label="API Key"
+            label="Chave de API"
             help="Your API key for the TTS provider. Encrypted at rest. Keep the masked value to preserve the current key, or clear the field to remove it."
           >
             <div className="relative">
@@ -781,7 +781,7 @@ export function TTSConfigCard() {
 
           {/* Model */}
           <FieldRow
-            label="Model"
+            label="Modelo"
             help={
               source === "elevenlabs"
                 ? "ElevenLabs model_id to use. Use eleven_v3 for Eleven v3 speech; eleven_ttv_v3 is a voice-design model and cannot generate TTS."
@@ -818,7 +818,7 @@ export function TTSConfigCard() {
 
           {/* Voice assignment mode */}
           <FieldRow
-            label="Voice Option"
+            label="Opção de voz"
             help="Use one voice for every character, or assign specific voices to characters from your Characters tab."
           >
             <select
@@ -924,7 +924,7 @@ export function TTSConfigCard() {
               <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-2">
                 <div className="grid gap-2 text-[0.625rem] font-semibold uppercase tracking-wide text-[var(--muted-foreground)] sm:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_auto]">
                   <span>Character</span>
-                  <span>Voice</span>
+                  <span>Voz</span>
                   <span className="hidden sm:block" />
                 </div>
                 {voiceAssignments.length === 0 && (
@@ -959,7 +959,7 @@ export function TTSConfigCard() {
                       disabled={fetchingVoices || voiceOptions.length === 0}
                       className={cn(INPUT_CLS, "cursor-pointer appearance-none py-2 text-xs")}
                     >
-                      {source === "elevenlabs" && <option value="">Select voice</option>}
+                      {source === "elevenlabs" && <option value="">Selecionar voz</option>}
                       {voiceOptions.map((option) => (
                         <option key={option.id} value={option.id}>
                           {option.name === option.id ? option.id : `${option.name} (${option.id})`}
@@ -1066,7 +1066,7 @@ export function TTSConfigCard() {
 
           {source !== "elevenlabs" && (
             <FieldRow
-              label="Audio Format"
+              label="Formato de áudio"
               help="Output audio format. WAV are useful for local/self-hosted TTS servers that do not support MP3."
             >
               <select
@@ -1148,7 +1148,7 @@ export function TTSConfigCard() {
 
           {source === "elevenlabs" && (
             <FieldRow
-              label="Language"
+              label="Idioma"
               help="Optional ElevenLabs language_code. Auto lets ElevenLabs detect the language; choose a language to force pronunciation and text normalization. The selected model must support that language."
             >
               <select
@@ -1167,7 +1167,8 @@ export function TTSConfigCard() {
               </select>
               {elevenLabsLanguageCode && (
                 <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-                  Forcing {selectedLanguage.label}; ElevenLabs may reject this if the selected model does not support
+                  
+                  Forçando {selectedLanguage.label}; ElevenLabs may reject this if the selected model does not support
                   it.
                 </p>
               )}
@@ -1193,9 +1194,9 @@ export function TTSConfigCard() {
                 className="w-full accent-rose-400"
               />
               <div className="flex justify-between text-[0.6rem] text-[var(--muted-foreground)]">
-                <span>Creative</span>
+                <span>Criativo</span>
                 <span>Natural</span>
-                <span>Robust</span>
+                <span>Robusto</span>
               </div>
             </FieldRow>
           )}
@@ -1268,16 +1269,18 @@ export function TTSConfigCard() {
             {saveStatus === "saving" && (
               <span className="flex items-center gap-1 text-[0.6875rem] text-[var(--muted-foreground)]">
                 <Loader2 size="0.625rem" className="animate-spin" />
-                Saving…
+                
+                Salvando…
               </span>
             )}
             {saveStatus === "saved" && (
               <span className="flex items-center gap-1 text-[0.6875rem] text-emerald-400">
                 <Check size="0.625rem" />
-                Saved
+                
+                Salvo
               </span>
             )}
-            {saveStatus === "error" && <span className="text-[0.6875rem] text-rose-400">Save failed</span>}
+            {saveStatus === "error" && <span className="text-[0.6875rem] text-rose-400">Falha ao salvar</span>}
           </div>
           {previewError && (
             <p className="rounded-lg border border-rose-400/20 bg-rose-500/10 px-2.5 py-2 text-[0.6875rem] leading-relaxed text-rose-300">

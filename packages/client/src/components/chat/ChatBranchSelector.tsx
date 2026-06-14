@@ -148,7 +148,8 @@ export function ChatBranchSelector({
           >
             <div className="border-b border-[var(--border)] px-3 py-2">
               <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                Chat Branches
+                
+                Ramificações do chat
               </div>
               <div className="mt-1 text-xs text-[var(--muted-foreground)]">
                 Switch branches without opening Manage Chat Files.
@@ -191,12 +192,13 @@ export function ChatBranchSelector({
 
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-medium">{branch.name}</div>
-                      <div className="text-[0.6875rem] text-[var(--muted-foreground)]">Updated {updatedAt}</div>
+                      <div className="text-[0.6875rem] text-[var(--muted-foreground)]">Atualizado {updatedAt}</div>
                     </div>
 
                     {isActive && (
                       <span className="shrink-0 rounded-full bg-sky-500/15 px-2 py-0.5 text-[0.625rem] font-medium text-sky-400">
-                        Active
+                        
+                        Ativo
                       </span>
                     )}
                   </button>

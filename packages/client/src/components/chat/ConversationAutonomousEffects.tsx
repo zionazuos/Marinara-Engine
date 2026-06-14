@@ -95,7 +95,7 @@ export function ConversationAutonomousEffects({
           key={notification.id}
           className="pointer-events-auto absolute right-4 top-14 z-20 flex animate-slide-in-right items-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-medium text-white shadow-lg"
         >
-          <span>{notification.name} messaged you!</span>
+          <span>{notification.name}  te enviou uma mensagem!</span>
           <button
             onClick={() => setNotification(null)}
             className="ml-1 rounded p-0.5 transition-colors hover:bg-foreground/20"

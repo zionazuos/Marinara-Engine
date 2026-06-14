@@ -168,7 +168,7 @@ export function GenerationReplayDetailsModal({
                 {storedText(replay?.impersonateConnectionId) && (
                   <MetadataRow label="Connection" value={storedText(replay?.impersonateConnectionId)!} />
                 )}
-                {replay?.impersonateBlockAgents === true && <MetadataRow label="Agents" value="Blocked" />}
+                {replay?.impersonateBlockAgents === true && <MetadataRow label="Agentes" value="Blocked" />}
               </dl>
             )}
           </section>

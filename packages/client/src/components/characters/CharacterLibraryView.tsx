@@ -192,7 +192,7 @@ function CharacterLibraryDetailCard({
                 </span>
                 {character.parsed.extensions?.fav && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-1 text-[0.6875rem] font-medium text-amber-300">
-                    <Star size="0.75rem" className="fill-current" /> Favorite
+                    <Star size="0.75rem" className="fill-current" />  Favorito
                   </span>
                 )}
               </div>
@@ -351,7 +351,7 @@ export function CharacterLibraryView() {
             <button
               onClick={closeCharacterLibrary}
               className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-[var(--border)]/60 bg-[var(--secondary)]/80 text-[var(--muted-foreground)] transition-all hover:border-[var(--primary)]/35 hover:text-[var(--primary)] md:h-10 md:w-10"
-              title="Close library"
+              title="Fechar biblioteca"
             >
               <ArrowLeft size="0.95rem" />
             </button>
@@ -375,21 +375,24 @@ export function CharacterLibraryView() {
               className="inline-flex min-w-[6.1rem] shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-[var(--secondary)] px-2.5 py-1.5 text-[0.8125rem] font-medium text-[var(--secondary-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] sm:min-w-[8rem] sm:px-3 sm:py-2 sm:text-sm"
             >
               <Plus size="0.8125rem" />
-              New
+              
+              Novo
             </button>
             <button
               onClick={() => openModal("import-character")}
               className="inline-flex min-w-[6.1rem] shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-[var(--secondary)] px-2.5 py-1.5 text-[0.8125rem] font-medium text-[var(--secondary-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] sm:min-w-[8rem] sm:px-3 sm:py-2 sm:text-sm"
             >
               <Download size="0.8125rem" />
-              Import
+              
+              Importar
             </button>
             <button
               onClick={() => openModal("character-maker")}
               className="inline-flex min-w-[6.35rem] shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-gradient-to-r from-pink-400 to-rose-500 px-2.5 py-1.5 text-[0.8125rem] font-medium text-white shadow-lg shadow-pink-500/15 transition-all hover:shadow-pink-500/25 sm:min-w-[8rem] sm:px-3 sm:py-2 sm:text-sm"
             >
               <Sparkles size="0.8125rem" />
-              AI Maker
+              
+              Criador por IA
             </button>
           </div>
         </div>
@@ -428,10 +431,10 @@ export function CharacterLibraryView() {
                 onChange={(event) => handleSortChange(event.target.value)}
                 className="w-full appearance-none rounded-2xl border border-[var(--border)]/60 bg-[var(--secondary)]/80 py-2 pl-3 pr-8 text-[0.8125rem] outline-none transition-colors focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20 md:py-2.5 md:pl-3.5 md:pr-9 md:text-sm"
               >
-                <option value="name-asc">Name A-Z</option>
-                <option value="name-desc">Name Z-A</option>
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
+                <option value="name-asc">Nome A-Z</option>
+                <option value="name-desc">Nome Z-A</option>
+                <option value="newest">Mais recentes</option>
+                <option value="oldest">Mais antigos</option>
                 <option value="favorites">Favorites first</option>
               </select>
               <ArrowUpDown
@@ -510,7 +513,7 @@ export function CharacterLibraryView() {
 
                         {isFavorite && (
                           <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 text-[0.5625rem] font-medium text-amber-200 backdrop-blur-sm sm:right-3 sm:top-3 sm:text-[0.625rem]">
-                            <Star size="0.625rem" className="fill-current sm:h-[0.6875rem] sm:w-[0.6875rem]" /> Favorite
+                            <Star size="0.625rem" className="fill-current sm:h-[0.6875rem] sm:w-[0.6875rem]" />  Favorito
                           </div>
                         )}
                       </div>
@@ -583,7 +586,7 @@ export function CharacterLibraryView() {
                   <User size="1.5rem" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-[var(--foreground)]">Select a card</h2>
+                  <h2 className="text-lg font-semibold text-[var(--foreground)]">Selecionar um card</h2>
                   <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                     Pick a character from the grid to see a larger overview before editing.
                   </p>

@@ -33,7 +33,8 @@ export function GameSessionBanner({
           className="flex items-center gap-1 rounded px-2 py-1 text-xs text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)] transition-colors"
         >
           <History size={14} />
-          History
+          
+          Histórico
         </button>
 
         {sessionStatus !== "concluded" ? (

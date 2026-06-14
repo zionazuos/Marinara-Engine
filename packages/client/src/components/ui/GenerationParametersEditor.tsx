@@ -133,7 +133,7 @@ export function GenerationParametersFields({
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-2">
         <ParamInput
-          label="Temperature"
+          label="Temperatura"
           help="Controls randomness. Lower values make output more focused and deterministic; higher values make it more creative and varied."
           value={value.temperature}
           onChange={(nextValue) => set("temperature", nextValue)}
@@ -142,7 +142,7 @@ export function GenerationParametersFields({
           step={0.05}
         />
         <ParamInput
-          label="Max Output Tokens"
+          label="Máximo de tokens de saída"
           help="The maximum number of tokens the model can generate in a single response. Higher values allow longer replies."
           value={value.maxTokens}
           onChange={(nextValue) => set("maxTokens", nextValue)}
@@ -180,7 +180,7 @@ export function GenerationParametersFields({
           step={0.05}
         />
         <ParamInput
-          label="Presence"
+          label="Presença"
           help="Penalizes tokens that have appeared at all, regardless of frequency. Positive values encourage the model to talk about new topics."
           value={value.presencePenalty}
           onChange={(nextValue) => set("presencePenalty", nextValue)}

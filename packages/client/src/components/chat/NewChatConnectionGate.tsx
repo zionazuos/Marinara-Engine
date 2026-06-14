@@ -90,7 +90,7 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
             <div className="flex items-center gap-2">
               <span className="text-[var(--primary)]">{MODE_META[mode].icon}</span>
               <div>
-                <h3 className="text-sm font-semibold">Set Up {MODE_META[mode].label}</h3>
+                <h3 className="text-sm font-semibold">Configurar {MODE_META[mode].label}</h3>
                 <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
                   Choose a connection before we create the chat.
                 </p>
@@ -149,7 +149,8 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
               onClick={onClose}
               className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
             >
-              Cancel
+              
+              Cancelar
             </button>
             <button
               onClick={handleCreate}

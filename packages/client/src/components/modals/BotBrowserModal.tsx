@@ -275,7 +275,7 @@ export function BotBrowserModal({ open, onClose }: Props) {
   }, [open]);
 
   return (
-    <Modal open={open} onClose={onClose} title="Browser" width="max-w-5xl">
+    <Modal open={open} onClose={onClose} title="Navegador" width="max-w-5xl">
       <div className="flex flex-col gap-4" style={{ minHeight: "60vh" }}>
         {selectedCard ? (
           <DetailView
@@ -378,17 +378,20 @@ export function BotBrowserModal({ open, onClose }: Props) {
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
                     >
-                      Previous
+                      
+                      Anterior
                     </button>
                     <span className="text-xs text-[var(--muted-foreground)]">
-                      Page {page} of {totalPages}
+                      
+                      Página {page} of {totalPages}
                     </span>
                     <button
                       disabled={page >= totalPages}
                       onClick={() => setPage((p) => p + 1)}
                       className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
                     >
-                      Next
+                      
+                      Próximo
                     </button>
                   </div>
                 )}
@@ -447,7 +450,7 @@ function CardTile({
 
         {/* Stats row */}
         <div className="mt-auto flex items-center gap-2 pt-1.5 text-[0.65rem] text-[var(--muted-foreground)]">
-          <span className="flex items-center gap-0.5" title="Stars">
+          <span className="flex items-center gap-0.5" title="Estrelas">
             <Star size="0.625rem" /> {card.starCount}
           </span>
           <span className="flex items-center gap-0.5" title="Chats">
@@ -499,7 +502,7 @@ function DetailView({
           onClick={onBack}
           className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
         >
-          <ChevronLeft size="0.875rem" /> Back
+          <ChevronLeft size="0.875rem" />  Voltar
         </button>
         <div className="flex-1" />
         <a
@@ -537,7 +540,7 @@ function DetailView({
 
             <div className="flex flex-col gap-2 max-md:flex-1">
               <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/60 p-2.5">
-                <p className="mb-2 text-[0.6875rem] font-semibold text-[var(--foreground)]">Imported tags</p>
+                <p className="mb-2 text-[0.6875rem] font-semibold text-[var(--foreground)]">Tags importadas</p>
                 <div className="flex flex-col gap-1.5">
                   {TAG_IMPORT_OPTIONS.map((option) => (
                     <label
@@ -617,10 +620,10 @@ function DetailView({
             {/* Definition sections */}
             {def && (
               <div className="flex flex-col gap-3">
-                {def.description && <DefinitionSection title="Description" content={def.description} />}
-                {def.personality && <DefinitionSection title="Personality" content={def.personality} />}
-                {def.scenario && <DefinitionSection title="Scenario" content={def.scenario} />}
-                {def.first_message && <DefinitionSection title="First Message" content={def.first_message} />}
+                {def.description && <DefinitionSection title="Descrição" content={def.description} />}
+                {def.personality && <DefinitionSection title="Personalidade" content={def.personality} />}
+                {def.scenario && <DefinitionSection title="Cenário" content={def.scenario} />}
+                {def.first_message && <DefinitionSection title="Primeira mensagem" content={def.first_message} />}
                 {def.alternate_greetings?.length > 0 && (
                   <div>
                     <h4 className="mb-1 text-xs font-semibold text-[var(--foreground)]">

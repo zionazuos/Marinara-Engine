@@ -203,7 +203,8 @@ export function CombinedPlayerPanel({
             <PersonaStatusField value={personaStatus} onSave={onUpdatePersonaStatus} />
             <div className="flex items-center justify-between px-1 pb-1">
               <span className="text-[0.625rem] font-semibold text-violet-300/70 uppercase tracking-wider">
-                Persona Stats
+                
+                Atributos da persona
               </span>
               <TrackerSectionRefresh
                 agentType="persona-stats"
@@ -244,7 +245,7 @@ export function CombinedPlayerPanel({
                   onClick={addCharacter}
                   className="flex items-center gap-0.5 text-[0.625rem] text-purple-400 hover:text-purple-300 transition-colors"
                 >
-                  <Plus size="0.625rem" /> Add
+                  <Plus size="0.625rem" />  Adicionar
                 </button>
               </span>
             </div>
@@ -262,7 +263,7 @@ export function CombinedPlayerPanel({
                       value={char.name}
                       onSave={(value) => updateCharacter(idx, { ...char, name: value })}
                       className="flex-1 !font-medium"
-                      placeholder="Name"
+                      placeholder="Nome"
                     />
                     <button
                       onClick={() => removeCharacter(idx)}
@@ -274,22 +275,22 @@ export function CombinedPlayerPanel({
                   </div>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 pl-1">
                     <LabeledEdit
-                      label="Mood"
+                      label="Humor"
                       value={char.mood}
                       onSave={(value) => updateCharacter(idx, { ...char, mood: value })}
                     />
                     <LabeledEdit
-                      label="Look"
+                      label="Aparência"
                       value={char.appearance ?? ""}
                       onSave={(value) => updateCharacter(idx, { ...char, appearance: value || null })}
                     />
                     <LabeledEdit
-                      label="Outfit"
+                      label="Roupa"
                       value={char.outfit ?? ""}
                       onSave={(value) => updateCharacter(idx, { ...char, outfit: value || null })}
                     />
                     <LabeledEdit
-                      label="Thinks"
+                      label="Pensa"
                       value={char.thoughts ?? ""}
                       onSave={(value) => updateCharacter(idx, { ...char, thoughts: value || null })}
                     />
@@ -330,7 +331,7 @@ export function CombinedPlayerPanel({
                 onClick={addItem}
                 className="flex items-center gap-0.5 text-[0.625rem] text-amber-400 hover:text-amber-300 transition-colors"
               >
-                <Plus size="0.625rem" /> Add
+                <Plus size="0.625rem" />  Adicionar
               </button>
             </div>
             <div className="space-y-1">
@@ -349,7 +350,7 @@ export function CombinedPlayerPanel({
                     value={item.quantity}
                     onChange={(e) => updateItem(idx, { ...item, quantity: Math.max(0, Number(e.target.value)) })}
                     className="w-8 bg-transparent text-center text-[0.5625rem] text-[var(--foreground)]/60 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    title="Quantity"
+                    title="Quantidade"
                   />
                   <button
                     onClick={() => removeItem(idx)}
@@ -381,7 +382,7 @@ export function CombinedPlayerPanel({
                   onClick={addQuest}
                   className="flex items-center gap-0.5 text-[0.625rem] text-emerald-400 hover:text-emerald-300 transition-colors"
                 >
-                  <Plus size="0.625rem" /> Add
+                  <Plus size="0.625rem" />  Adicionar
                 </button>
               </span>
             </div>
@@ -416,7 +417,7 @@ export function CombinedPlayerPanel({
                   onClick={addCustomField}
                   className="flex items-center gap-0.5 text-[0.625rem] text-cyan-400 hover:text-cyan-300 transition-colors"
                 >
-                  <Plus size="0.625rem" /> Add
+                  <Plus size="0.625rem" />  Adicionar
                 </button>
               </span>
             </div>
@@ -436,12 +437,12 @@ export function CombinedPlayerPanel({
                     value={field.value}
                     onSave={(value) => updateCustomField(idx, { ...field, value })}
                     className="flex-1 min-w-0"
-                    placeholder="Value"
+                    placeholder="Valor"
                   />
                   <button
                     onClick={() => removeCustomField(idx)}
                     className="text-[var(--muted-foreground)]/40 hover:text-red-500 transition-colors shrink-0"
-                    title="Remove field"
+                    title="Remover campo"
                   >
                     <X size="0.5625rem" />
                   </button>
@@ -488,7 +489,8 @@ export function PersonaStatsPanel({
       </div>
       <div className="flex items-center justify-between border-b border-[var(--border)] px-3 py-1.5">
         <span className="text-[0.625rem] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">
-          Persona Stats
+          
+          Atributos da persona
         </span>
         <TrackerSectionRefresh
           agentType="persona-stats"
@@ -631,14 +633,14 @@ export function CharactersPanel({
               title={autoGenEnabled ? "Auto-generate avatars: ON" : "Auto-generate avatars: OFF"}
             >
               <Sparkles size="0.5625rem" />
-              <span className="hidden sm:inline">Auto</span>
+              <span className="hidden sm:inline">Automático</span>
             </button>
           )}
           <button
             onClick={addCharacter}
             className="flex items-center gap-0.5 text-[0.625rem] text-purple-400 hover:text-purple-300 transition-colors"
           >
-            <Plus size="0.625rem" /> Add
+            <Plus size="0.625rem" />  Adicionar
           </button>
         </div>
       </div>
@@ -655,7 +657,7 @@ export function CharactersPanel({
                     fileInputRef.current?.click();
                   }}
                   className="shrink-0 rounded-full overflow-hidden ring-1 ring-purple-400/40 hover:ring-purple-400/80 transition-all"
-                  title="Change avatar"
+                  title="Alterar avatar"
                 >
                   <img src={char.avatarPath} alt={char.name} className="w-8 h-8 object-cover" />
                 </button>
@@ -675,7 +677,7 @@ export function CharactersPanel({
                 value={char.name}
                 onSave={(value) => updateCharacter(idx, { ...char, name: value })}
                 className="flex-1 !font-medium"
-                placeholder="Name"
+                placeholder="Nome"
               />
               <button
                 onClick={() => removeCharacter(idx)}
@@ -687,22 +689,22 @@ export function CharactersPanel({
             </div>
             <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 pl-1">
               <LabeledEdit
-                label="Mood"
+                label="Humor"
                 value={char.mood}
                 onSave={(value) => updateCharacter(idx, { ...char, mood: value })}
               />
               <LabeledEdit
-                label="Look"
+                label="Aparência"
                 value={char.appearance ?? ""}
                 onSave={(value) => updateCharacter(idx, { ...char, appearance: value || null })}
               />
               <LabeledEdit
-                label="Outfit"
+                label="Roupa"
                 value={char.outfit ?? ""}
                 onSave={(value) => updateCharacter(idx, { ...char, outfit: value || null })}
               />
               <LabeledEdit
-                label="Thinks"
+                label="Pensa"
                 value={char.thoughts ?? ""}
                 onSave={(value) => updateCharacter(idx, { ...char, thoughts: value || null })}
               />
@@ -776,7 +778,7 @@ export function InventoryPanel({ items, onUpdate }: InventoryPanelProps) {
           onClick={addItem}
           className="flex items-center gap-0.5 text-[0.625rem] text-amber-400 hover:text-amber-300 transition-colors"
         >
-          <Plus size="0.625rem" /> Add
+          <Plus size="0.625rem" />  Adicionar
         </button>
       </div>
       <div className="p-2 space-y-1">
@@ -795,7 +797,7 @@ export function InventoryPanel({ items, onUpdate }: InventoryPanelProps) {
               value={item.quantity}
               onChange={(e) => updateItem(idx, { ...item, quantity: Math.max(0, Number(e.target.value)) })}
               className="w-8 bg-transparent text-center text-[0.5625rem] text-[var(--foreground)]/60 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              title="Quantity"
+              title="Quantidade"
             />
             <button
               onClick={() => removeItem(idx)}
@@ -859,7 +861,7 @@ export function QuestsPanel({ quests, onUpdate, onRerunSingleTracker, isTrackerR
             onClick={addQuest}
             className="flex items-center gap-0.5 text-[0.625rem] text-emerald-400 hover:text-emerald-300 transition-colors"
           >
-            <Plus size="0.625rem" /> Add
+            <Plus size="0.625rem" />  Adicionar
           </button>
         </span>
       </div>
@@ -922,7 +924,7 @@ export function CustomTrackerPanel({
             onClick={addField}
             className="flex items-center gap-0.5 text-[0.625rem] text-cyan-400 hover:text-cyan-300 transition-colors"
           >
-            <Plus size="0.625rem" /> Add
+            <Plus size="0.625rem" />  Adicionar
           </button>
         </span>
       </div>
@@ -942,12 +944,12 @@ export function CustomTrackerPanel({
               value={field.value}
               onSave={(value) => updateField(idx, { ...field, value })}
               className="flex-1 min-w-0"
-              placeholder="Value"
+              placeholder="Valor"
             />
             <button
               onClick={() => removeField(idx)}
               className="text-[var(--muted-foreground)]/40 hover:text-red-500 transition-colors shrink-0"
-              title="Remove field"
+              title="Remover campo"
             >
               <X size="0.5625rem" />
             </button>
@@ -999,7 +1001,7 @@ export function CombinedWorldPanel({
     <>
       <div className="flex items-center justify-between border-b border-[var(--border)] px-3 py-1.5">
         <span className="text-[0.625rem] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider flex items-center gap-1">
-          <CloudSun size="0.625rem" /> World State
+          <CloudSun size="0.625rem" />  Estado do mundo
         </span>
         <span className="flex items-center gap-1">
           <TrackerSectionRefresh
@@ -1019,35 +1021,35 @@ export function CombinedWorldPanel({
       <div className="divide-y divide-[var(--border)]">
         <WorldFieldRow
           icon={<MapPin size="0.8125rem" className={pinColor} />}
-          label="Location"
+          label="Local"
           value={location}
           onSave={onSaveLocation}
           accent="text-emerald-300"
         />
         <WorldFieldRow
           icon={<CalendarDays size="0.8125rem" className="text-violet-400" />}
-          label="Date"
+          label="Data"
           value={date}
           onSave={onSaveDate}
           accent="text-violet-300"
         />
         <WorldFieldRow
           icon={<Clock size="0.8125rem" className="text-amber-400" />}
-          label="Time"
+          label="Hora"
           value={time}
           onSave={onSaveTime}
           accent="text-amber-300"
         />
         <WorldFieldRow
           icon={<span className="text-sm leading-none">{weatherEmoji}</span>}
-          label="Weather"
+          label="Clima"
           value={weather}
           onSave={onSaveWeather}
           accent="text-sky-300"
         />
         <WorldFieldRow
           icon={<Thermometer size="0.8125rem" className={tempColor} />}
-          label="Temperature"
+          label="Temperatura"
           value={temperature}
           onSave={onSaveTemperature}
           accent="text-rose-300"
@@ -1351,7 +1353,7 @@ function StatBarEditable({
         <button
           type="button"
           onClick={onRemove}
-          title="Remove stat"
+          title="Remover atributo"
           aria-label={`Remove ${stat.name || "stat"}`}
           className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded bg-[var(--popover)]/90 text-[var(--muted-foreground)]/45 opacity-0 shadow-sm ring-1 ring-[var(--border)]/70 transition-all hover:text-[var(--destructive)] hover:opacity-100 focus-visible:opacity-100 group-hover/stat:opacity-80 max-md:opacity-80"
         >
@@ -1430,7 +1432,7 @@ function QuestCardEditable({
         <button
           onClick={onRemove}
           className="text-[var(--muted-foreground)]/40 hover:text-red-500 transition-colors shrink-0"
-          title="Remove quest"
+          title="Remover missão"
         >
           <X size="0.5625rem" />
         </button>

@@ -27,7 +27,8 @@ function WorldInfoEntryRow({
       </div>
       {entry.keys.length > 0 && (
         <p className="mt-0.5 truncate text-[0.625rem] text-[var(--muted-foreground)]">
-          Keys: {entry.keys.slice(0, 5).join(", ")}
+          
+          Chaves: {entry.keys.slice(0, 5).join(", ")}
           {entry.keys.length > 5 && ` +${entry.keys.length - 5}`}
         </p>
       )}
@@ -100,7 +101,7 @@ function BudgetSkippedEntriesNotice({ entries }: { entries: BudgetSkippedLoreboo
         <AlertTriangle size="0.875rem" className="mt-0.5 shrink-0 text-amber-300" />
         <span className="min-w-0 flex-1">
           <span className="block font-medium text-amber-100">
-            {entries.length} matching lore {entries.length === 1 ? "entry was" : "entries were"} skipped by token budget
+            {entries.length}  lore correspondente {entries.length === 1 ? "entry was" : "entries were"} skipped by token budget
           </span>
           <span className="mt-0.5 block text-[0.625rem] leading-relaxed text-amber-50/65">
             Expand for budget details. Knowledge Retrieval or Knowledge Router may fit large lorebooks better than

@@ -943,8 +943,8 @@ export function SpriteWandCleanupEditor({
               onClick={zoomIn}
               disabled={loading || applying}
               className={navigationButtonClass()}
-              aria-label="Zoom in"
-              title="Zoom in"
+              aria-label="Aproximar"
+              title="Aproximar"
             >
               <ZoomIn size="0.875rem" />
             </button>
@@ -963,7 +963,8 @@ export function SpriteWandCleanupEditor({
                   title="Reset wand controls to their defaults"
                 >
                   <RotateCcw size="0.875rem" />
-                  Defaults
+                  
+                  Padrões
                 </button>
                 <RangeControl
                   label="Tolerance"
@@ -975,7 +976,7 @@ export function SpriteWandCleanupEditor({
                   className="min-w-[12rem] flex-[1_1_12rem]"
                 />
                 <ToggleControl
-                  label="Strong"
+                  label="Forte"
                   checked={wandStrong}
                   onChange={setWandStrong}
                   disabled={loading || applying}
@@ -992,7 +993,7 @@ export function SpriteWandCleanupEditor({
                   className="min-w-[14rem] flex-[1_1_14rem]"
                 />
                 <RangeControl
-                  label="Feather"
+                  label="Suavizar"
                   min={0}
                   max={100}
                   value={wandFeather}
@@ -1007,7 +1008,7 @@ export function SpriteWandCleanupEditor({
             {activeBrushMode && (
               <>
                 <RangeControl
-                  label="Brush"
+                  label="Pincel"
                   min={2}
                   max={96}
                   value={brushSize}
@@ -1033,7 +1034,8 @@ export function SpriteWandCleanupEditor({
                       title="Paint with the selected color"
                     >
                       <Brush size="0.75rem" />
-                      Color
+                      
+                      Cor
                     </button>
                     <button
                       type="button"
@@ -1049,7 +1051,8 @@ export function SpriteWandCleanupEditor({
                       title="Paint original pixels back in"
                     >
                       <Undo2 size="0.75rem" />
-                      Restore
+                      
+                      Restaurar
                     </button>
                   </div>
                 )}
@@ -1076,7 +1079,7 @@ export function SpriteWandCleanupEditor({
                       className="min-w-[16rem] flex-[1_1_16rem]"
                     />
                     <RangeControl
-                      label="Feather"
+                      label="Suavizar"
                       min={0}
                       max={100}
                       value={cleanFeather}
@@ -1092,7 +1095,7 @@ export function SpriteWandCleanupEditor({
                     className="flex min-w-fit items-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs"
                     title="Brush color"
                   >
-                    <span className="shrink-0 whitespace-nowrap font-medium text-[var(--foreground)]">Color</span>
+                    <span className="shrink-0 whitespace-nowrap font-medium text-[var(--foreground)]">Cor</span>
                     <input
                       type="color"
                       value={brushColor}
@@ -1121,14 +1124,15 @@ export function SpriteWandCleanupEditor({
                       title="Pick brush color from the sprite"
                     >
                       <Pipette size="0.75rem" />
-                      Pick
+                      
+                      Escolher
                     </button>
                   </div>
                 )}
                 {usesOpacityHardnessControls(tool) && (
                   <>
                     <RangeControl
-                      label="Opacity"
+                      label="Opacidade"
                       min={0}
                       max={100}
                       value={brushOpacity}
@@ -1138,7 +1142,7 @@ export function SpriteWandCleanupEditor({
                       className="min-w-48 flex-1"
                     />
                     <RangeControl
-                      label="Hardness"
+                      label="Dureza"
                       min={0}
                       max={100}
                       value={brushHardness}
@@ -1240,7 +1244,8 @@ export function SpriteWandCleanupEditor({
             className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:text-[var(--foreground)] disabled:opacity-45"
           >
             <Undo2 size="0.875rem" />
-            Undo
+            
+            Desfazer
           </button>
           <button
             type="button"
@@ -1249,7 +1254,8 @@ export function SpriteWandCleanupEditor({
             className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:text-[var(--foreground)] disabled:opacity-45"
           >
             <RotateCcw size="0.875rem" />
-            Reset
+            
+            Redefinir
           </button>
           <button
             type="button"
@@ -1257,7 +1263,8 @@ export function SpriteWandCleanupEditor({
             disabled={applying}
             className="rounded-lg px-3 py-2 text-sm font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-50"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             type="button"
@@ -1266,7 +1273,8 @@ export function SpriteWandCleanupEditor({
             className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-medium text-[var(--primary-foreground)] transition-colors hover:opacity-90 disabled:opacity-50"
           >
             {applying ? <Loader2 size="0.875rem" className="animate-spin" /> : <Eraser size="0.875rem" />}
-            Apply Cleanup
+            
+            Aplicar limpeza
           </button>
         </div>
       </div>

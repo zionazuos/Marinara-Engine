@@ -24,7 +24,7 @@ export function WorldForecastTile({
   const temperatureDisplay = getTemperatureGaugeDisplay(temperature, trackerTemperatureUnit);
   const useHorizontalTempRail = trackerPanelSizeProfile !== "compact";
   return (
-    <WorldTileShell label="Forecast" className="min-h-[3.125rem]">
+    <WorldTileShell label="Previsão" className="min-h-[3.125rem]">
       <div className="@container relative h-full min-w-0 overflow-hidden">
         <div
           aria-hidden="true"
@@ -40,10 +40,10 @@ export function WorldForecastTile({
         <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(90deg,color-mix(in_srgb,var(--background)_28%,transparent)_0%,transparent_48%),radial-gradient(ellipse_at_82%_45%,color-mix(in_srgb,var(--primary)_10%,transparent)_0%,transparent_58%)]" />
         <div className="pointer-events-none absolute inset-1 z-[1] rounded-[3px] opacity-[0.14] [background-image:repeating-linear-gradient(135deg,color-mix(in_srgb,var(--foreground)_24%,transparent)_0_1px,transparent_1px_7px)]" />
         <WorldRenderedEdit
-          label="Weather"
+          label="Clima"
           value={weather}
           onSave={onSaveWeather}
-          placeholder="Set weather"
+          placeholder="Definir clima"
           className={cn(
             "relative z-[2] flex h-full min-w-0 flex-col justify-center overflow-hidden px-1.5 py-1 text-left @min-[10rem]:px-2",
             useHorizontalTempRail

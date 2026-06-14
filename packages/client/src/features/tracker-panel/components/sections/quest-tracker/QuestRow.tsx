@@ -102,7 +102,7 @@ export function QuestRow({
           <InlineEdit
             value={quest.name}
             onSave={(name) => onUpdate({ ...quest, name: name || "Quest" })}
-            placeholder="Quest"
+            placeholder="Missão"
             title={`Quest: ${questTitle}`}
             showEditHint={false}
             fitPreview={!wrapsText}
@@ -131,7 +131,7 @@ export function QuestRow({
             type="button"
             onClick={onRemove}
             className={QUEST_REMOVE_BUTTON_CLASS}
-            title="Remove quest"
+            title="Remover missão"
             aria-label={`Remove ${visibleText(quest.name, "quest")}`}
           >
             <X size="0.625rem" />
@@ -168,8 +168,8 @@ export function QuestRow({
               type="button"
               onClick={addObjective}
               className={ADD_OBJECTIVE_BUTTON_CLASS}
-              title="Add objective"
-              aria-label="Add objective"
+              title="Adicionar objetivo"
+              aria-label="Adicionar objetivo"
             >
               <Plus size="0.625rem" className="justify-self-center" />
               <span className="truncate font-medium">Objective</span>

@@ -817,7 +817,7 @@ export function CharacterEditor() {
             type="button"
             onClick={handleClose}
             className="rounded-xl p-2 transition-all hover:bg-[var(--accent)] active:scale-95 max-md:rounded-lg max-md:p-1.5"
-            title="Back"
+            title="Voltar"
           >
             <ArrowLeft size="1.125rem" />
           </button>
@@ -909,7 +909,8 @@ export function CharacterEditor() {
             onClick={() => setShowUnsavedWarning(false)}
             className="rounded-lg px-3 py-1 text-xs font-medium text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)]"
           >
-            Keep editing
+            
+            Continuar editando
           </button>
           <button
             type="button"
@@ -929,7 +930,8 @@ export function CharacterEditor() {
             disabled={saving || avatarUploading}
             className="rounded-lg bg-gradient-to-r from-pink-400 to-purple-500 px-3 py-1 text-xs font-medium text-white shadow-sm transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Save & close
+            
+            Salvar e fechar
           </button>
         </div>
       )}
@@ -988,7 +990,7 @@ export function CharacterEditor() {
             )}
             {activeTab === "personality" && (
               <TextareaTab
-                title="Personality"
+                title="Personalidade"
                 subtitle="A concise summary of the character's personality traits, temperament, and behavioral patterns."
                 value={formData.personality}
                 onChange={(v) => updateField("personality", v)}
@@ -1008,7 +1010,7 @@ export function CharacterEditor() {
             )}
             {activeTab === "appearance" && (
               <TextareaTab
-                title="Appearance"
+                title="Aparência"
                 subtitle="Detailed physical description — height, build, hair, eyes, clothing, distinguishing features."
                 value={(formData.extensions.appearance as string) ?? ""}
                 onChange={(v) => updateExtension("appearance", v)}
@@ -1018,7 +1020,7 @@ export function CharacterEditor() {
             )}
             {activeTab === "scenario" && (
               <TextareaTab
-                title="Scenario"
+                title="Cenário"
                 subtitle="The default setting or situation where interactions take place."
                 value={formData.scenario}
                 onChange={(v) => updateField("scenario", v)}
@@ -1102,14 +1104,14 @@ function CharacterDescriptionTab({
       <div>
         <div className="flex items-start justify-between gap-2 mb-4">
           <SectionHeader
-            title="Description"
+            title="Descrição"
             subtitle="The character's general description. This is sent in every prompt as part of the character's identity."
           />
           <button
             type="button"
             onClick={() => setExpandedField("description")}
             className="mt-0.5 shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Expand editor"
+            title="Expandir editor"
           >
             <Maximize2 size="0.875rem" />
           </button>
@@ -1141,7 +1143,8 @@ function CharacterDescriptionTab({
             className="flex shrink-0 items-center gap-1 rounded-lg bg-[var(--primary)]/15 px-2.5 py-1 text-[0.6875rem] font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/25"
           >
             <Plus size="0.75rem" />
-            Add
+            
+            Adicionar
           </button>
         </div>
 
@@ -1196,7 +1199,7 @@ function CharacterDescriptionTab({
                     type="button"
                     onClick={() => setExpandedField(desc.id)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                    title="Expand editor"
+                    title="Expandir editor"
                   >
                     <Maximize2 size="0.75rem" />
                   </button>
@@ -1220,7 +1223,7 @@ function CharacterDescriptionTab({
       <ExpandedTextarea
         open={expandedField === "description"}
         onClose={() => setExpandedField(null)}
-        title="Description"
+        title="Descrição"
         value={formData.description}
         onChange={(value) => updateField("description", value)}
         placeholder="Describe who this character is, their role, and their key traits…"
@@ -1264,7 +1267,7 @@ function TextareaTab({
           type="button"
           onClick={() => setExpanded(true)}
           className="mt-0.5 shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-          title="Expand editor"
+          title="Expandir editor"
         >
           <Maximize2 size="0.875rem" />
         </button>
@@ -1324,7 +1327,7 @@ function MetadataTab({
 
   return (
     <div className="space-y-5">
-      <SectionHeader title="Metadata" subtitle="Basic character info — name, creator, version, tags." />
+      <SectionHeader title="Metadados" subtitle="Basic character info — name, creator, version, tags." />
 
       {/* Avatar Crop */}
       {avatarPreview && (
@@ -1341,7 +1344,8 @@ function MetadataTab({
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="space-y-1.5">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-            Name{" "}
+            
+            Nome{" "}
             <HelpTooltip text="The character's display name. This is what appears in chat and is used as {{char}} in prompts." />
           </span>
           <input
@@ -1352,7 +1356,8 @@ function MetadataTab({
         </label>
         <label className="space-y-1.5">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-            Creator{" "}
+            
+            Criador{" "}
             <HelpTooltip text="The person who made this character. Useful for giving credit when sharing characters." />
           </span>
           <input
@@ -1364,7 +1369,8 @@ function MetadataTab({
         </label>
         <div className="space-y-1.5">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-            Version <HelpTooltip text="Version number for tracking changes to this character definition over time." />
+            
+            Versão <HelpTooltip text="Version number for tracking changes to this character definition over time." />
           </span>
           <input
             value={formData.character_version}
@@ -1444,7 +1450,7 @@ function MetadataTab({
                 addTag();
               }
             }}
-            placeholder="Add tag…"
+            placeholder="Adicionar tag…"
             className="flex-1 rounded-xl border border-[var(--border)] bg-[var(--secondary)] px-3 py-1.5 text-xs outline-none focus:border-[var(--primary)]/40"
           />
           <button
@@ -1452,7 +1458,8 @@ function MetadataTab({
             onClick={addTag}
             className="rounded-xl bg-[var(--primary)]/15 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/25"
           >
-            Add
+            
+            Adicionar
           </button>
         </div>
       </div>
@@ -1460,7 +1467,8 @@ function MetadataTab({
       {/* Creator Notes */}
       <label className="block space-y-1.5">
         <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-          Creator Notes{" "}
+          
+          Notas do criador{" "}
           <HelpTooltip text="Private notes about this character — tips for use, known quirks, recommended settings. Not sent to the AI." />
         </span>
         <textarea
@@ -1645,7 +1653,7 @@ function CharacterVersionHistoryPanel({
           <div className="flex max-h-[75vh] flex-col gap-4 overflow-y-auto">
             <div className="grid gap-3 rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-3 text-xs md:grid-cols-2">
               <div>
-                <p className="font-semibold text-[var(--foreground)]">Current card</p>
+                <p className="font-semibold text-[var(--foreground)]">Card atual</p>
                 <p className="mt-1 text-[var(--muted-foreground)]">
                   v{currentData.character_version || "1.0"}
                   {currentComment ? ` · ${currentComment}` : ""}
@@ -1680,10 +1688,10 @@ function CharacterVersionHistoryPanel({
                     </div>
                     <div className="grid gap-2 md:grid-cols-2">
                       <div className="min-h-20 whitespace-pre-wrap rounded-lg bg-[var(--secondary)] p-2 text-xs leading-relaxed text-[var(--foreground)]">
-                        {currentValue || <span className="text-[var(--muted-foreground)]">Empty</span>}
+                        {currentValue || <span className="text-[var(--muted-foreground)]">Vazio</span>}
                       </div>
                       <div className="min-h-20 whitespace-pre-wrap rounded-lg bg-[var(--secondary)] p-2 text-xs leading-relaxed text-[var(--foreground)]">
-                        {savedValue || <span className="text-[var(--muted-foreground)]">Empty</span>}
+                        {savedValue || <span className="text-[var(--muted-foreground)]">Vazio</span>}
                       </div>
                     </div>
                   </div>
@@ -1750,14 +1758,15 @@ function DialogueTab({
       <label className="block space-y-1.5">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-            First Message{" "}
+            
+            Primeira mensagem{" "}
             <HelpTooltip text="The character's opening message when a new chat starts. Good first messages set the scene and establish the character's voice." />
           </span>
           <button
             type="button"
             onClick={() => setExpandedField("first_mes")}
             className="shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Expand editor"
+            title="Expandir editor"
           >
             <Maximize2 size="0.875rem" />
           </button>
@@ -1783,7 +1792,8 @@ function DialogueTab({
             onClick={addGreeting}
             className="rounded-xl bg-[var(--primary)]/15 px-3 py-1 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/25"
           >
-            + Add
+            
+            + Adicionar
           </button>
         </div>
         {formData.alternate_greetings.map((g, i) => (
@@ -1800,7 +1810,7 @@ function DialogueTab({
                 type="button"
                 onClick={() => setExpandedField(i)}
                 className="rounded-lg p-1 text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)]"
-                title="Expand editor"
+                title="Expandir editor"
               >
                 <Maximize2 size="0.75rem" />
               </button>
@@ -1827,7 +1837,7 @@ function DialogueTab({
             type="button"
             onClick={() => setExpandedField("mes_example")}
             className="shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Expand editor"
+            title="Expandir editor"
           >
             <Maximize2 size="0.875rem" />
           </button>
@@ -1847,7 +1857,7 @@ function DialogueTab({
       <ExpandedTextarea
         open={expandedField === "first_mes"}
         onClose={() => setExpandedField(null)}
-        title="First Message"
+        title="Primeira mensagem"
         value={formData.first_mes}
         onChange={(value) => updateField("first_mes", value)}
         placeholder="What does the character say when they first meet someone? Use *asterisks* for actions…"
@@ -1890,7 +1900,7 @@ function AdvancedTab({
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Advanced"
+        title="Avançado"
         subtitle="System prompt, post-history instructions, and depth prompt injection."
       />
 
@@ -1904,7 +1914,7 @@ function AdvancedTab({
             type="button"
             onClick={() => setExpandedField("system_prompt")}
             className="shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Expand editor"
+            title="Expandir editor"
           >
             <Maximize2 size="0.875rem" />
           </button>
@@ -1928,7 +1938,7 @@ function AdvancedTab({
             type="button"
             onClick={() => setExpandedField("post_history")}
             className="shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Expand editor"
+            title="Expandir editor"
           >
             <Maximize2 size="0.875rem" />
           </button>
@@ -1946,14 +1956,15 @@ function AdvancedTab({
       <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1 text-xs font-semibold">
-            Depth Prompt{" "}
+            
+            Prompt de profundidade{" "}
             <HelpTooltip text="Injects text at a specific position in the chat history. Depth 0 = at the end, depth 4 = 4 messages back. Useful for persistent reminders." />
           </span>
           <button
             type="button"
             onClick={() => setExpandedField("depth_prompt")}
             className="shrink-0 rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Expand editor"
+            title="Expandir editor"
           >
             <Maximize2 size="0.875rem" />
           </button>
@@ -1967,7 +1978,7 @@ function AdvancedTab({
         />
         <div className="flex gap-4">
           <label className="flex items-center gap-2 text-xs">
-            <span className="text-[var(--muted-foreground)]">Depth</span>
+            <span className="text-[var(--muted-foreground)]">Profundidade</span>
             <input
               type="number"
               min={0}
@@ -1980,14 +1991,14 @@ function AdvancedTab({
             />
           </label>
           <label className="flex items-center gap-2 text-xs">
-            <span className="text-[var(--muted-foreground)]">Role</span>
+            <span className="text-[var(--muted-foreground)]">Papel</span>
             <select
               value={depthPrompt.role}
               onChange={(e) => updateExtension("depth_prompt", { ...depthPrompt, role: e.target.value })}
               className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-2 py-1 text-xs outline-none"
             >
-              <option value="system">System</option>
-              <option value="user">User</option>
+              <option value="system">Sistema</option>
+              <option value="user">Usuário</option>
               <option value="assistant">Assistant</option>
             </select>
           </label>
@@ -2013,7 +2024,7 @@ function AdvancedTab({
       <ExpandedTextarea
         open={expandedField === "depth_prompt"}
         onClose={() => setExpandedField(null)}
-        title="Depth Prompt"
+        title="Prompt de profundidade"
         value={depthPrompt.prompt}
         onChange={(value) => updateExtension("depth_prompt", { ...depthPrompt, prompt: value })}
         placeholder="Prompt injected at a specific depth in the chat history…"
@@ -2106,7 +2117,7 @@ function CharacterGalleryTab({ characterId, characterName }: { characterId: stri
                     href={image.url}
                     download
                     className="rounded-lg bg-white/15 p-1.5 text-white transition-colors hover:bg-white/25"
-                    title="Download"
+                    title="Baixar"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Download size="0.75rem" />
@@ -2115,7 +2126,7 @@ function CharacterGalleryTab({ characterId, characterName }: { characterId: stri
                     type="button"
                     onClick={() => void handleDelete(image)}
                     className="rounded-lg bg-red-500/35 p-1.5 text-white transition-colors hover:bg-red-500/55"
-                    title="Delete"
+                    title="Excluir"
                   >
                     <Trash2 size="0.75rem" />
                   </button>
@@ -2658,7 +2669,7 @@ function SpritesTab({
 
         <div className="flex flex-wrap items-center gap-2 rounded-lg bg-[var(--secondary)]/60 px-3 py-2">
           <span className="text-[0.6875rem] font-medium text-[var(--foreground)]">Cleanup strength</span>
-          <span className="text-[0.625rem] text-[var(--muted-foreground)]">Soft</span>
+          <span className="text-[0.625rem] text-[var(--muted-foreground)]">Suave</span>
           <input
             type="range"
             min={0}
@@ -2698,7 +2709,8 @@ function SpritesTab({
               className="flex items-center gap-1.5 rounded-md bg-[var(--card)] px-2.5 py-1 text-[0.6875rem] font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
             >
               {restoringCleanup ? <Loader2 size="0.75rem" className="animate-spin" /> : <RotateCcw size="0.75rem" />}
-              Undo Cleanup
+              
+              Desfazer limpeza
             </button>
           </div>
         )}
@@ -2740,7 +2752,8 @@ function SpritesTab({
             className="flex items-center gap-1.5 rounded-xl bg-[var(--primary)] px-4 py-2 text-xs font-medium text-[var(--primary-foreground)] shadow-sm transition-all hover:shadow-md disabled:opacity-40"
           >
             <Plus size="0.8125rem" />
-            Upload
+            
+            Enviar
           </button>
         </div>
 
@@ -2821,7 +2834,7 @@ function SpritesTab({
                     type="button"
                     onClick={() => setFramingSprite(sprite)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                    title="Frame"
+                    title="Quadro"
                   >
                     <Crop size="0.6875rem" />
                   </button>
@@ -2829,7 +2842,7 @@ function SpritesTab({
                     type="button"
                     onClick={() => void downloadSpriteFile(sprite)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                    title="Download"
+                    title="Baixar"
                   >
                     <ImageDown size="0.6875rem" />
                   </button>
@@ -2837,7 +2850,7 @@ function SpritesTab({
                     type="button"
                     onClick={() => startUpload(sprite.expression)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                    title="Replace"
+                    title="Substituir"
                   >
                     <Upload size="0.6875rem" />
                   </button>
@@ -2845,7 +2858,7 @@ function SpritesTab({
                     type="button"
                     onClick={() => setDeleteSpriteRequest(sprite)}
                     className="rounded-lg p-1 text-[var(--muted-foreground)] hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                    title="Delete"
+                    title="Excluir"
                   >
                     <Trash2 size="0.6875rem" />
                   </button>
@@ -2895,7 +2908,7 @@ function SpritesTab({
           onClose={() => {
             if (!deletingSprites) setDeleteSpriteRequest(null);
           }}
-          title="Delete Sprite"
+          title="Excluir sprite"
           width="max-w-sm"
         >
           <div className="space-y-4">
@@ -2925,7 +2938,8 @@ function SpritesTab({
                   disabled={!!deletingSprites}
                   className="rounded-lg px-2.5 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-50 sm:px-3 sm:text-sm"
                 >
-                  Cancel
+                  
+                  Cancelar
                 </button>
                 <button
                   type="button"
@@ -2934,7 +2948,8 @@ function SpritesTab({
                   className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--destructive)] px-2.5 py-2 text-xs font-medium text-white transition-colors hover:bg-[var(--destructive)]/85 disabled:opacity-50 sm:px-3 sm:text-sm"
                 >
                   {deletingSprites === "single" && <Loader2 size="0.875rem" className="animate-spin" />}
-                  Delete
+                  
+                  Excluir
                 </button>
               </div>
             </div>
@@ -3054,7 +3069,8 @@ function StatsTab({
                 className="flex items-center gap-1 rounded-lg bg-purple-500/15 px-2.5 py-1 text-[0.6875rem] font-medium text-purple-400 transition-colors hover:bg-purple-500/25"
               >
                 <Plus size="0.75rem" />
-                Add
+                
+                Adicionar
               </button>
             </div>
 
@@ -3068,7 +3084,7 @@ function StatsTab({
                     value={attr.name}
                     onChange={(e) => updateAttribute(i, "name", e.target.value)}
                     className="w-20 rounded-lg border border-[var(--border)] bg-[var(--input)] px-2 py-1 text-xs font-medium"
-                    placeholder="Name"
+                    placeholder="Nome"
                   />
                   <input
                     type="number"
@@ -3169,7 +3185,7 @@ function ColorsTab({
 
       {/* Preview card */}
       <div className="rounded-xl border border-[var(--border)] bg-black/30 p-4 space-y-3">
-        <p className="text-[0.625rem] font-medium uppercase tracking-widest text-[var(--muted-foreground)]">Preview</p>
+        <p className="text-[0.625rem] font-medium uppercase tracking-widest text-[var(--muted-foreground)]">Pré-visualização</p>
         <div className="flex gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-600 ring-2 ring-purple-400/20">
             <User size="1rem" className="text-white" />
@@ -3372,7 +3388,8 @@ function LorebookTab({ characterId, formData }: { characterId: string | null; fo
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium">{entry.name || `Entry #${i + 1}`}</p>
                   <p className="mt-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
-                    Keys: {entry.keys.join(", ")}{" "}
+                    
+                    Chaves: {entry.keys.join(", ")}{" "}
                     {entry.secondary_keys.length > 0 && `· Secondary: ${entry.secondary_keys.join(", ")}`}
                   </p>
                 </div>

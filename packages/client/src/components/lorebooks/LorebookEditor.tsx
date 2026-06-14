@@ -1064,7 +1064,8 @@ export function LorebookEditor() {
             onClick={() => setShowUnsavedWarning(false)}
             className="rounded-lg px-3 py-1 text-[0.6875rem] font-medium text-amber-300 ring-1 ring-amber-400/30 transition-colors hover:bg-amber-400/10"
           >
-            Keep editing
+            
+            Continuar editando
           </button>
           <button
             onClick={() => {
@@ -1084,7 +1085,8 @@ export function LorebookEditor() {
             }}
             className="rounded-lg bg-amber-500 px-3 py-1 text-[0.6875rem] font-medium text-white transition-colors hover:bg-amber-600"
           >
-            Save & close
+            
+            Salvar e fechar
           </button>
         </div>
       )}
@@ -1172,7 +1174,7 @@ export function LorebookEditor() {
               <div className="space-y-6">
                 {/* Name */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium">Name</label>
+                  <label className="mb-1.5 block text-xs font-medium">Nome</label>
                   <input
                     value={formName}
                     onChange={(e) => {
@@ -1185,7 +1187,7 @@ export function LorebookEditor() {
 
                 {/* Description */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium">Description</label>
+                  <label className="mb-1.5 block text-xs font-medium">Descrição</label>
                   <ExpandableTextarea
                     value={formDescription}
                     onChange={(value) => {
@@ -1231,7 +1233,7 @@ export function LorebookEditor() {
                           handleAddTags();
                         }
                       }}
-                      placeholder="Add tag…"
+                      placeholder="Adicionar tag…"
                       className="flex-1 rounded-xl bg-[var(--secondary)] px-3 py-2 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                     />
                     <button
@@ -1245,7 +1247,7 @@ export function LorebookEditor() {
 
                 {/* Category */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium">Category</label>
+                  <label className="mb-1.5 block text-xs font-medium">Categoria</label>
                   <div className="flex gap-2">
                     {CATEGORY_OPTIONS.map((opt) => {
                       const Icon = opt.icon;
@@ -1341,7 +1343,7 @@ export function LorebookEditor() {
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <div className="flex min-h-[4.75rem] items-center justify-between rounded-xl bg-[var(--secondary)] px-4 py-3 ring-1 ring-[var(--border)]">
                     <div>
-                      <p className="text-xs font-medium">Enabled</p>
+                      <p className="text-xs font-medium">Ativado</p>
                       <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
                         When off, entries in this lorebook won't activate
                       </p>
@@ -1424,7 +1426,8 @@ export function LorebookEditor() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   <div>
                     <label className="mb-1.5 flex items-center gap-1 text-xs font-medium">
-                      Scan Depth{" "}
+                      
+                      Profundidade de varredura{" "}
                       <HelpTooltip text="How many recent messages to scan for keyword matches. Higher = searches further back in chat history, but uses more processing." />
                     </label>
                     <input
@@ -1440,7 +1443,8 @@ export function LorebookEditor() {
                   </div>
                   <div>
                     <label className="mb-1.5 flex items-center gap-1 text-xs font-medium">
-                      Token Budget{" "}
+                      
+                      Orçamento de tokens{" "}
                       <HelpTooltip text="Maximum number of tokens this lorebook can inject per generation. Prevents a lorebook from consuming too much of the context window." />
                     </label>
                     <input
@@ -1535,7 +1539,7 @@ export function LorebookEditor() {
                     aria-expanded={keywordPreviewOpen}
                   >
                     <FlaskConical size="0.8125rem" className="shrink-0 text-amber-400" />
-                    <span className="flex-1">Keyword test</span>
+                    <span className="flex-1">Teste de palavra-chave</span>
                     {previewActive && (
                       <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[0.625rem] font-medium text-emerald-300 ring-1 ring-emerald-400/25">
                         {previewMatchCount} match{previewMatchCount === 1 ? "" : "es"}
@@ -1639,7 +1643,8 @@ export function LorebookEditor() {
                     title="Select entries to copy or move"
                   >
                     <CheckSquare2 size="0.8125rem" />
-                    Select
+                    
+                    Selecionar
                   </button>
                   <button
                     onClick={handleAddFolder}
@@ -1661,7 +1666,7 @@ export function LorebookEditor() {
                 {entrySelectionMode && (
                   <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--secondary)]/60 px-3 py-2">
                     <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                      {selectedEntryIds.size} selected
+                      {selectedEntryIds.size}  selecionado(s)
                     </span>
                     <button
                       onClick={() => setSelectedEntryIds(new Set(visibleEntryIds))}
@@ -1675,7 +1680,8 @@ export function LorebookEditor() {
                       disabled={selectedEntryIds.size === 0}
                       className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-40"
                     >
-                      Clear
+                      
+                      Limpar
                     </button>
                     <select
                       value={entryTransferTargetId}
@@ -1703,7 +1709,8 @@ export function LorebookEditor() {
                       ) : (
                         <Copy size="0.6875rem" />
                       )}
-                      Copy
+                      
+                      Copiar
                     </button>
                     <button
                       onClick={() => void handleTransferEntries("move")}
@@ -1715,13 +1722,15 @@ export function LorebookEditor() {
                       ) : (
                         <MoveRight size="0.6875rem" />
                       )}
-                      Move
+                      
+                      Mover
                     </button>
                     <button
                       onClick={exitEntrySelectionMode}
                       className="rounded-lg px-2.5 py-1.5 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
                     >
-                      Done
+                      
+                      Concluído
                     </button>
                   </div>
                 )}

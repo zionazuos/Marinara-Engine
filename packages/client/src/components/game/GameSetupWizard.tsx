@@ -671,7 +671,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
 
             {/* Setting */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Setting</label>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Configuração</label>
               <input
                 type="text"
                 value={setting}
@@ -818,12 +818,12 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
 
             {/* Language */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Language</label>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Idioma</label>
               <input
                 type="text"
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                placeholder="English"
+                placeholder="Inglês"
                 className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40"
               />
               <div className="mt-1.5 flex flex-wrap gap-1">
@@ -876,7 +876,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                       : "bg-[var(--secondary)] ring-[var(--border)] hover:ring-[var(--primary)]/20",
                   )}
                 >
-                  <div className="font-medium text-[var(--foreground)]">Character GM</div>
+                  <div className="font-medium text-[var(--foreground)]">GM do personagem</div>
                   <div className="mt-1 text-[var(--muted-foreground)]">Use an existing character as GM</div>
                 </button>
               </div>
@@ -885,7 +885,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             {/* GM Character selector */}
             {gmMode === "character" && (
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">GM Character</label>
+                <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Personagem GM</label>
                 {/* Selected GM */}
                 {gmCharacterId &&
                   (() => {
@@ -898,7 +898,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                         <button
                           onClick={() => setGmCharacterId(null)}
                           className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                          title="Remove"
+                          title="Remover"
                         >
                           <X size="0.6875rem" />
                         </button>
@@ -936,7 +936,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                           )}
                         </div>
                         {c.id === gmCharacterId && (
-                          <span className="text-[0.625rem] text-[var(--primary)]">Selected</span>
+                          <span className="text-[0.625rem] text-[var(--primary)]">Selecionado</span>
                         )}
                       </button>
                     ))}
@@ -978,7 +978,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                         <button
                           onClick={() => togglePartyMember(cid)}
                           className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                          title="Remove"
+                          title="Remover"
                         >
                           <X size="0.6875rem" />
                         </button>
@@ -1020,7 +1020,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                           )}
                         </div>
                         {isSelected ? (
-                          <span className="text-[0.625rem] text-[var(--primary)]">Added</span>
+                          <span className="text-[0.625rem] text-[var(--primary)]">Adicionado</span>
                         ) : (
                           <Plus size="0.75rem" className="text-[var(--muted-foreground)]" />
                         )}
@@ -1044,7 +1044,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">
                 <User size={12} className="mr-1 inline" />
-                Your Persona
+                
+                Sua persona
               </label>
               {/* Selected persona */}
               {personaId &&
@@ -1070,7 +1071,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                       <button
                         onClick={() => setPersonaId(null)}
                         className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                        title="Remove"
+                        title="Remover"
                       >
                         <X size="0.6875rem" />
                       </button>
@@ -1114,7 +1115,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                             </span>
                           )}
                         </div>
-                        {p.id === personaId && <span className="text-[0.625rem] text-[var(--primary)]">Selected</span>}
+                        {p.id === personaId && <span className="text-[0.625rem] text-[var(--primary)]">Selecionado</span>}
                       </button>
                     );
                   })}
@@ -1233,7 +1234,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
 
             {/* Game Features */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Game Features</label>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Recursos do game</label>
               <div className="space-y-2">
                 <div>
                   <button
@@ -1276,7 +1277,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   {enableSpotifyDj && (
                     <div className="mt-2 space-y-2 rounded-lg bg-[var(--background)]/55 p-3 ring-1 ring-[var(--border)]">
                       <label className="flex flex-col gap-1">
-                        <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Music source</span>
+                        <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Fonte de música</span>
                         <select
                           value={gameSpotifySourceType}
                           onChange={(event) => {
@@ -1358,7 +1359,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
 
                       {gameSpotifySourceType === "artist" && (
                         <label className="flex flex-col gap-1">
-                          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Artist</span>
+                          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Artista</span>
                           <input
                             value={gameSpotifyArtist}
                             onChange={(event) => setGameSpotifyArtist(event.target.value)}
@@ -1517,7 +1518,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
           <>
             {/* Player Goals */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Player Goals</label>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Objetivos do jogador</label>
               <textarea
                 value={playerGoals}
                 onChange={(e) => setPlayerGoals(e.target.value)}
@@ -1604,7 +1605,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                         <button
                           onClick={() => toggleLorebook(lb.id)}
                           className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                          title="Remove"
+                          title="Remover"
                         >
                           <X size={11} />
                         </button>
@@ -1661,7 +1662,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                     <Volume2 size={14} className="text-[var(--primary)]" />
                   )}
                   <div>
-                    <p className="text-xs font-medium text-[var(--foreground)]">Start Muted</p>
+                    <p className="text-xs font-medium text-[var(--foreground)]">Iniciar sem som</p>
                     <p className="text-[0.55rem] text-[var(--muted-foreground)]">Begin the game with all audio muted</p>
                   </div>
                 </div>
@@ -1706,7 +1707,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             onClick={() => setStep(step + 1)}
             className="flex items-center gap-1 rounded-lg bg-[var(--primary)]/15 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/25"
           >
-            Next
+            
+            Próximo
             <ArrowRight size={14} />
           </button>
         ) : (

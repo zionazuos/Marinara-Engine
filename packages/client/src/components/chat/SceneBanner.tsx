@@ -35,7 +35,8 @@ export function SceneBanner({ variant, sceneChatId, sceneChatName, originChatId,
           style={{ color: "var(--muted-foreground)" }}
         >
           <Film size={14} />
-          Scene
+          
+          Cena
         </div>
         {description && (
           <p className="mb-3 text-sm leading-relaxed italic" style={{ color: "var(--card-foreground)" }}>
@@ -198,7 +199,8 @@ export function EndSceneBar({
               border: "1px solid var(--border)",
             }}
           >
-            No
+            
+            Não
           </button>
         </div>
       )}
@@ -216,7 +218,8 @@ export function EndSceneBar({
           title="Discard the scene without saving"
         >
           <Trash2 size={13} />
-          Discard
+          
+          Descartar
         </button>
       )}
       {onFork && !confirmDiscard && (
@@ -230,7 +233,8 @@ export function EndSceneBar({
           title="Detach this scene into a standalone roleplay"
         >
           <ArrowRightLeft size={13} />
-          Convert
+          
+          Converter
         </button>
       )}
       {onAbandon && confirmDiscard && (
@@ -241,7 +245,8 @@ export function EndSceneBar({
             className="rounded-lg px-2 py-0.5 text-[0.6875rem] font-medium transition-all hover:opacity-80"
             style={{ background: "var(--destructive)", color: "var(--destructive-foreground)" }}
           >
-            Yes
+            
+            Sim
           </button>
           <button
             onClick={() => setConfirmDiscard(false)}
@@ -252,7 +257,8 @@ export function EndSceneBar({
               border: "1px solid var(--border)",
             }}
           >
-            No
+            
+            Não
           </button>
         </div>
       )}

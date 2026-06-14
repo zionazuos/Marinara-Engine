@@ -183,7 +183,8 @@ export function ColorPicker({
               className="flex items-center gap-1 rounded-lg px-1.5 py-0.5 text-[0.625rem] text-[var(--muted-foreground)] transition-all hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
             >
               <X size="0.625rem" />
-              Clear
+              
+              Limpar
             </button>
           )}
         </div>
@@ -239,7 +240,8 @@ export function ColorPicker({
                 )}
               >
                 <Pipette size="0.6875rem" className="mr-1 inline" />
-                Solid
+                
+                Sólido
               </button>
               <button
                 type="button"
@@ -255,7 +257,8 @@ export function ColorPicker({
                 )}
               >
                 <Sparkles size="0.6875rem" className="mr-1 inline" />
-                Gradient
+                
+                Gradiente
               </button>
             </div>
           )}
@@ -336,7 +339,7 @@ export function ColorPicker({
                     onClick={addStop}
                     className="flex items-center gap-0.5 rounded-md bg-[var(--secondary)] px-2 py-0.5 text-[0.625rem] text-[var(--muted-foreground)] transition-all hover:text-[var(--foreground)]"
                   >
-                    <Plus size="0.625rem" /> Add
+                    <Plus size="0.625rem" />  Adicionar
                   </button>
                 </div>
                 {gradientStops.map((stop, i) => (
@@ -371,7 +374,7 @@ export function ColorPicker({
               {/* Angle */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[0.625rem] text-[var(--muted-foreground)]">Angle</span>
+                  <span className="text-[0.625rem] text-[var(--muted-foreground)]">Ângulo</span>
                   <span className="min-w-[2.75rem] text-right font-mono text-[0.625rem] tabular-nums text-[var(--muted-foreground)]">
                     {gradientAngle}°
                   </span>

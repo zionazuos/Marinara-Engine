@@ -191,9 +191,9 @@ export function AssetGrid({
         className={`grid ${gridColsClass} items-center gap-3 border-b border-[var(--border)]/40 px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)]`}
       >
         <span></span>
-        <span className="col-span-2">Name</span>
-        {listColumns.size && <span className="text-right">Size</span>}
-        {listColumns.modified && <span className="text-right">Modified</span>}
+        <span className="col-span-2">Nome</span>
+        {listColumns.size && <span className="text-right">Tamanho</span>}
+        {listColumns.modified && <span className="text-right">Modificado</span>}
         <span></span>
       </div>
       {nodes.map((node) => {

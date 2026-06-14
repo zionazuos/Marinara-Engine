@@ -390,23 +390,23 @@ export function LorebooksPanel() {
         <button
           onClick={() => openModal("create-lorebook")}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-2.5 text-xs font-medium text-white shadow-md shadow-amber-400/15 transition-all hover:shadow-lg hover:shadow-amber-400/25 active:scale-[0.98]"
-          title="New"
+          title="Novo"
         >
-          <Plus size="0.8125rem" /> <span className="md:hidden">New</span>
+          <Plus size="0.8125rem" /> <span className="md:hidden">Novo</span>
         </button>
         <button
           onClick={() => openModal("import-lorebook")}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-xs font-medium text-[var(--secondary-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] active:scale-[0.98]"
-          title="Import"
+          title="Importar"
         >
-          <Download size="0.8125rem" /> <span className="md:hidden">Import</span>
+          <Download size="0.8125rem" /> <span className="md:hidden">Importar</span>
         </button>
         <button
           onClick={() => openModal("lorebook-maker")}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-xs font-medium text-[var(--secondary-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] active:scale-[0.98]"
-          title="AI Maker"
+          title="Criador por IA"
         >
-          <Sparkles size="0.8125rem" /> <span className="md:hidden">Maker</span>
+          <Sparkles size="0.8125rem" /> <span className="md:hidden">Criador</span>
         </button>
         <button
           onClick={() => {
@@ -419,16 +419,16 @@ export function LorebooksPanel() {
               ? "bg-amber-400/15 text-amber-400 ring-1 ring-amber-400/30"
               : "bg-[var(--secondary)] text-[var(--secondary-foreground)] ring-1 ring-[var(--border)] hover:bg-[var(--accent)]",
           )}
-          title="Select"
+          title="Selecionar"
         >
-          <Check size="0.8125rem" /> <span className="md:hidden">Select</span>
+          <Check size="0.8125rem" /> <span className="md:hidden">Selecionar</span>
         </button>
       </div>
 
       {selectionMode && (
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--secondary)]/60 px-3 py-2">
           <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-            {selectedLorebookIds.size} selected
+            {selectedLorebookIds.size}  selecionado(s)
           </span>
           <button
             onClick={() => setSelectedLorebookIds(new Set(sorted.map((lb) => lb.id)))}
@@ -442,7 +442,8 @@ export function LorebooksPanel() {
             disabled={selectedLorebookIds.size === 0}
             className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-40"
           >
-            Clear
+            
+            Limpar
           </button>
           <button
             onClick={handleDeleteSelected}
@@ -450,7 +451,8 @@ export function LorebooksPanel() {
             className="inline-flex items-center gap-1 rounded-lg bg-[var(--destructive)]/12 px-2.5 py-1 text-[0.625rem] font-medium text-[var(--destructive)] transition-all hover:bg-[var(--destructive)]/20 disabled:opacity-40"
           >
             <Trash2 size="0.6875rem" />
-            Delete
+            
+            Excluir
           </button>
           <button
             onClick={() => setExportDialogOpen(true)}
@@ -464,7 +466,8 @@ export function LorebooksPanel() {
             onClick={exitSelectionMode}
             className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
           >
-            Done
+            
+            Concluído
           </button>
         </div>
       )}
@@ -501,9 +504,9 @@ export function LorebooksPanel() {
           >
             <option value="name-asc">A-Z</option>
             <option value="name-desc">Z-A</option>
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="tokens">Token Budget</option>
+            <option value="newest">Mais recentes</option>
+            <option value="oldest">Mais antigos</option>
+            <option value="tokens">Orçamento de tokens</option>
           </select>
           <ArrowUpDown
             size="0.625rem"
@@ -784,7 +787,8 @@ function LorebookRow({
           <span className="truncate text-sm font-medium">{lorebook.name}</span>
           {!lorebook.enabled && (
             <span className="rounded bg-[var(--muted)]/50 px-1 py-0.5 text-[0.5625rem] text-[var(--muted-foreground)]">
-              OFF
+              
+              DESL
             </span>
           )}
         </div>
@@ -808,7 +812,7 @@ function LorebookRow({
               onDelete();
             }}
             className="rounded-lg p-1.5 transition-all hover:bg-[var(--destructive)]/15 active:scale-90"
-            title="Delete"
+            title="Excluir"
           >
             <Trash2 size="0.75rem" className="text-[var(--destructive)]" />
           </button>

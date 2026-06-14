@@ -309,7 +309,7 @@ export function TrackerPortraitStage({
           >
             <RotateCcw size="0.6875rem" />
           </button>
-          <span className="sr-only">Portrait zoom {zoomPercent}%</span>
+          <span className="sr-only">Zoom do retrato {zoomPercent}%</span>
         </div>
       )}
       <div className={cn(PORTRAIT_TOP_GLEAM_BASE_CLASS, PORTRAIT_TOP_GLEAM_CLASS_BY_SIDE[outsideSide])} />

@@ -243,7 +243,7 @@ export function LorebookFolderRow({
         {/* Delete (hover-revealed on desktop, always visible on mobile per the row-action convention) */}
         <button
           type="button"
-          aria-label="Delete folder"
+          aria-label="Excluir pasta"
           onClick={handleDelete}
           className="shrink-0 rounded p-1 opacity-0 transition-all hover:bg-[var(--destructive)]/15 group-hover:opacity-100 max-md:opacity-100"
         >

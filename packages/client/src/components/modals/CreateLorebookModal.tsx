@@ -40,7 +40,7 @@ export function CreateLorebookModal({ open, onClose }: Props) {
         </div>
 
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-[var(--muted-foreground)]">Name *</span>
+          <span className="text-xs font-medium text-[var(--muted-foreground)]">Nome *</span>
           <input
             value={form.name}
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -51,7 +51,7 @@ export function CreateLorebookModal({ open, onClose }: Props) {
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-[var(--muted-foreground)]">Description</span>
+          <span className="text-xs font-medium text-[var(--muted-foreground)]">Descrição</span>
           <textarea
             value={form.description}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
@@ -74,7 +74,8 @@ export function CreateLorebookModal({ open, onClose }: Props) {
             onClick={onClose}
             className="rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             type="button"

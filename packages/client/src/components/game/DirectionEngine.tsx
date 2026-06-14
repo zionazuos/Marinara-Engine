@@ -198,7 +198,8 @@ export function DirectionEngine({
           onClick={clearAll}
           className="absolute bottom-4 right-4 z-50 rounded-full bg-black/50 px-3 py-1 text-xs text-white/60 backdrop-blur-sm transition-opacity hover:text-white/80"
         >
-          Skip effects
+          
+          Pular efeitos
         </button>
       )}
     </div>

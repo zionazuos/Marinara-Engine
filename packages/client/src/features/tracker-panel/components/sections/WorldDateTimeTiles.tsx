@@ -15,12 +15,12 @@ export function WorldDateTile({
   const isFreeformDate = display.kind === "freeform";
 
   return (
-    <WorldTileShell label="Date">
+    <WorldTileShell label="Data">
       <WorldRenderedEdit
-        label="Date"
+        label="Data"
         value={display.raw || value}
         onSave={onSave}
-        placeholder="Set date"
+        placeholder="Definir data"
         className={cn(
           "overflow-hidden text-center",
           isFreeformDate
@@ -33,7 +33,8 @@ export function WorldDateTile({
         {isFreeformDate ? (
           <>
             <span className="mb-0.5 max-w-full truncate text-[0.4375rem] font-bold uppercase leading-none text-[var(--primary)]/82">
-              Date
+              
+              Data
             </span>
             <span className="line-clamp-2 max-w-full break-words text-[0.5625rem] font-black leading-[0.625rem] text-[var(--foreground)] [overflow-wrap:anywhere]">
               {display.main}
@@ -99,9 +100,9 @@ export function WorldTimeTile({
 }) {
   const display = getWorldTimeDisplay(value);
   return (
-    <WorldTileShell label="Time">
+    <WorldTileShell label="Hora">
       <WorldRenderedEdit
-        label="Time"
+        label="Hora"
         value={display.raw || value}
         onSave={onSave}
         placeholder="Set time"

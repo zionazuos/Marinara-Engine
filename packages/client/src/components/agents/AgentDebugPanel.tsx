@@ -111,7 +111,7 @@ export function AgentDebugPanel() {
               {/* Results from debug log */}
               {resultEntries.map((entry, i) => (
                 <div key={`result-${i}`} className="rounded-md bg-[var(--muted)]/30 p-2">
-                  <div className="font-semibold text-blue-400 mb-1">Results</div>
+                  <div className="font-semibold text-blue-400 mb-1">Resultados</div>
                   <div className="flex flex-col gap-0.5">
                     {entry.results!.map((r) => (
                       <div key={r.agentType} className="flex items-center gap-1.5">

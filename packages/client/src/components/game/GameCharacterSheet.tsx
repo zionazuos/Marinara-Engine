@@ -401,7 +401,8 @@ export function GameCharacterSheet({
                   disabled={isSaving}
                   className="inline-flex h-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)]/90 px-2.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)] disabled:opacity-60 sm:h-auto sm:px-3 sm:py-1.5"
                 >
-                  Cancel
+                  
+                  Cancelar
                 </button>
                 <button
                   onClick={() => void handleSave()}
@@ -521,12 +522,12 @@ export function GameCharacterSheet({
                 />
                 <div className="space-y-3">
                   <label className="block space-y-1.5">
-                    <span className={FIELD_LABEL_CLASS}>Class</span>
+                    <span className={FIELD_LABEL_CLASS}>Classe</span>
                     <input
                       type="text"
                       value={draft.class}
                       onChange={(e) => setDraft((prev) => ({ ...prev, class: e.target.value }))}
-                      placeholder="Class or role"
+                      placeholder="Classe ou papel"
                       className={TEXT_INPUT_CLASS}
                     />
                   </label>
@@ -557,7 +558,8 @@ export function GameCharacterSheet({
                       onChange={(e) => setDraft((prev) => ({ ...prev, rpgStatsEnabled: e.target.checked }))}
                       className="h-4 w-4 rounded accent-[var(--primary)]"
                     />
-                    Enable
+                    
+                    Ativar
                   </label>
                 </div>
                 {draft.rpgStatsEnabled ? (
@@ -575,7 +577,7 @@ export function GameCharacterSheet({
                         />
                       </label>
                       <label className="block space-y-1.5">
-                        <span className={FIELD_LABEL_CLASS}>Max HP</span>
+                        <span className={FIELD_LABEL_CLASS}>HP máx</span>
                         <input
                           type="number"
                           value={draft.hpMax}
@@ -617,7 +619,8 @@ export function GameCharacterSheet({
                         className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
                       >
                         <Plus size={13} />
-                        Add Attribute
+                        
+                        Adicionar atributo
                       </button>
                     </div>
                   </div>
@@ -640,7 +643,8 @@ export function GameCharacterSheet({
                     className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
                   >
                     <Plus size={13} />
-                    Add
+                    
+                    Adicionar
                   </button>
                 </div>
                 <div className="space-y-2">
@@ -679,7 +683,8 @@ export function GameCharacterSheet({
                         className="inline-flex items-center gap-1 rounded-lg border border-dashed border-[var(--border)] px-2 py-1 text-[0.6875rem] text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
                       >
                         <Plus size={12} />
-                        Add
+                        
+                        Adicionar
                       </button>
                     </div>
                     <div className="space-y-2">
@@ -715,7 +720,8 @@ export function GameCharacterSheet({
                         className="inline-flex items-center gap-1 rounded-lg border border-dashed border-[var(--border)] px-2 py-1 text-[0.6875rem] text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
                       >
                         <Plus size={12} />
-                        Add
+                        
+                        Adicionar
                       </button>
                     </div>
                     <div className="space-y-2">
@@ -746,7 +752,7 @@ export function GameCharacterSheet({
                 <div className="mb-2.5 flex items-center justify-between gap-3">
                   <SectionHeader
                     icon={<Info size={12} />}
-                    title="Details"
+                    title="Detalhes"
                     className="mb-0 text-[var(--muted-foreground)]"
                   />
                   <button
@@ -770,7 +776,7 @@ export function GameCharacterSheet({
                         type="text"
                         value={entry.key}
                         onChange={(e) => updateExtraEntry(index, "key", e.target.value)}
-                        placeholder="Skills"
+                        placeholder="Habilidades"
                         className={TEXT_INPUT_CLASS}
                       />
                       <input
@@ -783,7 +789,7 @@ export function GameCharacterSheet({
                       <button
                         onClick={() => removeExtraEntry(index)}
                         className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] px-2 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-red-400 max-sm:h-10"
-                        title="Remove detail"
+                        title="Remover detalhe"
                       >
                         <Trash2 size={13} />
                       </button>
@@ -848,7 +854,7 @@ export function GameCharacterSheet({
 
           {card.stats && card.stats.length > 0 && (
             <div className="border-b border-[var(--border)] px-5 py-4">
-              <SectionHeader icon={<Shield size={12} />} title="Stats" className="text-[var(--muted-foreground)]" />
+              <SectionHeader icon={<Shield size={12} />} title="Atributos" className="text-[var(--muted-foreground)]" />
               <div className="space-y-2">
                 {card.stats.map((stat) => {
                   const max = Math.max(1, stat.max ?? 100);
@@ -933,7 +939,7 @@ export function GameCharacterSheet({
 
           {!isEditing && previewGameCard && Object.keys(previewGameCard.extra).length > 0 && (
             <div className="border-b border-[var(--border)] px-5 py-4">
-              <SectionHeader icon={<Info size={12} />} title="Details" className="text-[var(--muted-foreground)]" />
+              <SectionHeader icon={<Info size={12} />} title="Detalhes" className="text-[var(--muted-foreground)]" />
               <div className="space-y-1.5 text-xs">
                 {Object.entries(previewGameCard.extra).map(([key, value]) => (
                   <div key={key} className="flex items-start justify-between gap-3">
@@ -949,7 +955,7 @@ export function GameCharacterSheet({
 
           {card.inventory && card.inventory.length > 0 && (
             <div className="border-b border-[var(--border)] px-5 py-4">
-              <SectionHeader icon={<Swords size={12} />} title="Inventory" className="text-[var(--muted-foreground)]" />
+              <SectionHeader icon={<Swords size={12} />} title="Inventário" className="text-[var(--muted-foreground)]" />
               <div className="space-y-1">
                 {card.inventory.map((item) => (
                   <div
@@ -977,7 +983,7 @@ export function GameCharacterSheet({
 
           {card.customFields && Object.keys(card.customFields).length > 0 && (
             <div className="border-b border-[var(--border)] px-5 py-4">
-              <SectionHeader icon={<Sparkles size={12} />} title="Traits" className="text-[var(--muted-foreground)]" />
+              <SectionHeader icon={<Sparkles size={12} />} title="Traços" className="text-[var(--muted-foreground)]" />
               <div className="space-y-1.5 text-xs">
                 {Object.entries(card.customFields).map(([key, value]) => (
                   <div key={key} className="flex items-start justify-between gap-3">

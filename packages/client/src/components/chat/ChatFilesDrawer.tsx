@@ -154,7 +154,8 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-xs font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] active:scale-[0.98] disabled:opacity-50"
               >
                 <FileText size="0.8125rem" />
-                Text
+                
+                Texto
               </button>
             </div>
           </div>
@@ -228,11 +229,12 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
               className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-xs font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] active:scale-[0.98] disabled:opacity-50"
             >
               <FileText size="0.8125rem" />
-              Text
+              
+              Texto
             </button>
           </div>
           <p className="mt-2 text-center text-[0.625rem] text-[var(--muted-foreground)]/60">
-            {chatFiles.length} chat file{chatFiles.length !== 1 ? "s" : ""} in this group
+            {chatFiles.length} chat file{chatFiles.length !== 1 ? "s" : ""}  neste grupo
           </p>
         </div>
 
@@ -292,7 +294,8 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
                   </div>
                   {isActive && (
                     <span className="shrink-0 rounded-full bg-sky-400/15 px-2 py-0.5 text-[0.5625rem] font-medium text-sky-400">
-                      Active
+                      
+                      Ativo
                     </span>
                   )}
                   {!isActive && (
@@ -303,7 +306,7 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
                           void handleRename(cf);
                         }}
                         className="rounded-lg p-1.5 transition-all hover:bg-[var(--accent)]/80 active:scale-[0.95] ring-1 ring-transparent hover:ring-[var(--border)]"
-                        title="Rename branch"
+                        title="Renomear ramificação"
                       >
                         <Pencil size="0.75rem" className="text-[var(--muted-foreground)]" />
                       </button>
@@ -314,7 +317,7 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
                         }}
                         disabled={deleteChat.isPending}
                         className="rounded-lg p-1.5 transition-all hover:bg-[var(--destructive)]/15"
-                        title="Delete branch"
+                        title="Excluir ramificação"
                       >
                         <Trash2 size="0.75rem" className="text-[var(--destructive)]" />
                       </button>

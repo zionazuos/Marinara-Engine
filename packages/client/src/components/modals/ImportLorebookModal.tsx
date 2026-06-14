@@ -127,7 +127,7 @@ export function ImportLorebookModal({ open, onClose }: Props) {
 
         {status === "loading" && (
           <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] p-3 text-xs">
-            <Loader2 size="0.875rem" className="animate-spin text-[var(--primary)]" /> Importing...
+            <Loader2 size="0.875rem" className="animate-spin text-[var(--primary)]" />  Importando...
           </div>
         )}
         {status === "done" && results.length > 0 && (
@@ -172,7 +172,8 @@ export function ImportLorebookModal({ open, onClose }: Props) {
             }}
             className="rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Close
+            
+            Fechar
           </button>
         </div>
       </div>

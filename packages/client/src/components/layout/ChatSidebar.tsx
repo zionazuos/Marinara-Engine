@@ -878,7 +878,7 @@ export function ChatSidebar() {
           <button
             onClick={() => setSidebarOpen(false)}
             className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-[var(--sidebar-accent)] hover:text-[var(--primary)] active:scale-90 md:hidden"
-            title="Close"
+            title="Fechar"
           >
             <X size="1rem" />
           </button>
@@ -940,8 +940,8 @@ export function ChatSidebar() {
               className="w-full appearance-none rounded-lg bg-[var(--secondary)] py-2 pl-2.5 pr-7 text-[0.6875rem] text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all focus:ring-[var(--primary)]/40"
               title="Sort chats"
             >
-              <option value="newest">Sort: Newest</option>
-              <option value="oldest">Sort: Oldest</option>
+              <option value="newest">Ordenar: Mais recentes</option>
+              <option value="oldest">Ordenar: Mais antigos</option>
               <option value="name-asc">Sort: A-Z</option>
               <option value="name-desc">Sort: Z-A</option>
             </select>
@@ -978,7 +978,8 @@ export function ChatSidebar() {
                   onClick={() => setActiveTag(null)}
                   className="rounded-lg px-2 py-1 text-[0.625rem] text-[var(--destructive)] transition-colors hover:bg-[var(--destructive)]/10"
                 >
-                  Clear
+                  
+                  Limpar
                 </button>
               )}
               {(tagsExpanded ? allTags : allTags.slice(0, 4)).map((tag) => (
@@ -1057,7 +1058,8 @@ export function ChatSidebar() {
               onClick={handleNewChatFromTab}
               className="mt-1 rounded-lg bg-[var(--primary)]/15 px-3 py-1.5 text-[0.6875rem] font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/25"
             >
-              + New {activeTab === "conversation" ? "Conversation" : activeTab === "game" ? "Game" : "Roleplay"}
+              
+              + Novo {activeTab === "conversation" ? "Conversation" : activeTab === "game" ? "Game" : "Roleplay"}
             </button>
           </div>
         )}
@@ -1152,7 +1154,7 @@ export function ChatSidebar() {
       {multiSelectMode && (
         <div className="mari-sidebar-footer border-t border-[var(--border)]/30 bg-[var(--card)]/95 px-3 py-2.5 backdrop-blur-sm">
           <div className="mb-2 text-center text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-            {selectedChatIds.size} selected
+            {selectedChatIds.size}  selecionado(s)
           </div>
           <div className="flex gap-2">
             {modeFolders.length > 0 && (
@@ -1162,7 +1164,8 @@ export function ChatSidebar() {
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs font-medium transition-all hover:bg-[var(--accent)] disabled:opacity-40"
               >
                 <FolderOpen size="0.75rem" />
-                Move
+                
+                Mover
               </button>
             )}
             <button
@@ -1171,7 +1174,8 @@ export function ChatSidebar() {
               className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs font-medium transition-all hover:bg-[var(--accent)] disabled:opacity-40"
             >
               <Download size="0.75rem" />
-              Export
+              
+              Exportar
             </button>
             <button
               onClick={handleBatchDelete}
@@ -1179,7 +1183,8 @@ export function ChatSidebar() {
               className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--destructive)]/10 px-3 py-2 text-xs font-medium text-[var(--destructive)] transition-all hover:bg-[var(--destructive)]/20 disabled:opacity-40"
             >
               <Trash2 size="0.75rem" />
-              Delete
+              
+              Excluir
             </button>
           </div>
         </div>
@@ -1225,7 +1230,7 @@ export function ChatSidebar() {
                 className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[var(--destructive)]/10 px-3 py-2.5 text-xs font-medium text-[var(--destructive)] ring-1 ring-[var(--destructive)]/20 transition-all hover:bg-[var(--destructive)]/20 active:scale-[0.98]"
               >
                 <Trash2 size="0.8125rem" />
-                Delete All {deleteTarget.branchCount} Branches
+                Delete All {deleteTarget.branchCount}  Ramificações
               </button>
             </div>
           </div>
@@ -1244,7 +1249,8 @@ export function ChatSidebar() {
               )}
             >
               <MessageSquare size="0.75rem" className="text-[var(--muted-foreground)]" />
-              Unfiled
+              
+              Sem pasta
             </button>
             {modeFolders.map((f) => (
               <button
@@ -1276,7 +1282,8 @@ export function ChatSidebar() {
             className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-xs transition-all hover:bg-[var(--accent)]"
           >
             <MessageSquare size="0.75rem" className="text-[var(--muted-foreground)]" />
-            Unfiled
+            
+            Sem pasta
           </button>
           {modeFolders.map((f) => (
             <button
@@ -1321,7 +1328,8 @@ export function ChatSidebar() {
             Text zip
           </button>
           <p className="px-1 pt-2 text-[0.625rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]/60">
-            Full library
+            
+            Biblioteca completa
           </p>
           <button
             type="button"
@@ -1450,7 +1458,7 @@ function FolderRow({
             setRenaming(true);
           }}
           className="shrink-0 rounded-md p-1 opacity-0 transition-all hover:bg-[var(--accent)] group-hover:opacity-100 max-md:opacity-100"
-          title="Rename folder"
+          title="Renomear pasta"
         >
           <Pencil size="0.75rem" className="text-[var(--muted-foreground)]" />
         </button>

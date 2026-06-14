@@ -381,7 +381,8 @@ export function GameSessionHistory({
           <div className="rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/5">
             <div className="flex flex-wrap items-center gap-3 px-4 py-3">
               <span className="text-sm font-semibold text-[var(--foreground)]">
-                Session {currentSessionNumber} (Current)
+                
+                Sessão {currentSessionNumber} (Current)
               </span>
               <span className="text-xs text-[var(--muted-foreground)]">{currentSessionDateStr}</span>
               <button
@@ -510,7 +511,8 @@ export function GameSessionHistory({
                         disabled={savingCurrentSecrets}
                         className="rounded-md bg-[var(--secondary)] px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-50"
                       >
-                        Cancel
+                        
+                        Cancelar
                       </button>
                       <button
                         type="button"
@@ -531,7 +533,8 @@ export function GameSessionHistory({
                           onClick={handleStartEditingSecrets}
                           className="rounded-md bg-[var(--secondary)] px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
                         >
-                          Edit Spoilers
+                          
+                          Editar spoilers
                         </button>
                       )}
                     </div>
@@ -539,7 +542,7 @@ export function GameSessionHistory({
                     <SpoilerTextSection label="Story Arc" value={currentSecrets.storyArc} />
                     <SpoilerListSection label="Plot Twists" values={currentSecrets.plotTwists} />
                     <SpoilerJsonSection label="Party Arcs" value={currentSecrets.partyArcs} />
-                    <SpoilerJsonSection label="Maps" value={currentSecrets.maps} />
+                    <SpoilerJsonSection label="Mapas" value={currentSecrets.maps} />
                     <SpoilerJsonSection label="NPCs" value={currentSecrets.npcs} />
                     <SpoilerJsonSection label="Character Cards" value={currentSecrets.characterCards} />
                   </div>
@@ -586,7 +589,8 @@ export function GameSessionHistory({
                       <ChevronRight size={14} className="text-[var(--muted-foreground)]" />
                     )}
                     <span className="text-sm font-medium text-[var(--foreground)]">
-                      Session {session.sessionNumber}
+                      
+                      Sessão {session.sessionNumber}
                     </span>
                     <span className="text-xs text-[var(--muted-foreground)]">{dateStr}</span>
                     <span className="ml-auto text-xs text-[var(--muted-foreground)]">
@@ -600,7 +604,8 @@ export function GameSessionHistory({
                         <div className="mb-1 flex items-center justify-between gap-3">
                           <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)]">
                             <ScrollText size={12} />
-                            Summary
+                            
+                            Resumo
                           </div>
                           {!isEditing && (
                             <div className="flex flex-wrap items-center justify-end gap-2">
@@ -665,7 +670,8 @@ export function GameSessionHistory({
                                   disabled={isRegenerating}
                                   className="rounded-md bg-[var(--secondary)] px-2 py-1 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                  Edit Details
+                                  
+                                  Editar detalhes
                                 </button>
                               )}
                             </div>
@@ -675,7 +681,8 @@ export function GameSessionHistory({
                           <div className="flex flex-col gap-2">
                             <label className="flex flex-col gap-1">
                               <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                Summary
+                                
+                                Resumo
                               </span>
                               <textarea
                                 value={draft?.summary ?? ""}
@@ -689,7 +696,8 @@ export function GameSessionHistory({
                             </label>
                             <label className="flex flex-col gap-1">
                               <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                Resume Point
+                                
+                                Ponto de retomada
                               </span>
                               <textarea
                                 value={draft?.resumePoint ?? ""}
@@ -810,7 +818,8 @@ export function GameSessionHistory({
                                 disabled={isSaving}
                                 className="rounded-md bg-[var(--secondary)] px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
                               >
-                                Cancel
+                                
+                                Cancelar
                               </button>
                               <button
                                 onClick={() => void handleSaveSession(session)}
@@ -830,7 +839,8 @@ export function GameSessionHistory({
                             {session.resumePoint && (
                               <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2">
                                 <div className="mb-1 text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                  Resume Point
+                                  
+                                  Ponto de retomada
                                 </div>
                                 <AnimatedText
                                   html={session.resumePoint}
@@ -933,7 +943,7 @@ export function GameSessionHistory({
 
                       {session.partyState && (
                         <div className="mt-3 rounded bg-[var(--card)] p-2 text-xs text-[var(--muted-foreground)]">
-                          <span className="font-medium">Party Status:</span> <AnimatedText html={session.partyState} />
+                          <span className="font-medium">Status do grupo:</span> <AnimatedText html={session.partyState} />
                         </div>
                       )}
                     </div>

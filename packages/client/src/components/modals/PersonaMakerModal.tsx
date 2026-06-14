@@ -223,10 +223,10 @@ export function PersonaMakerModal({ open, onClose }: Props) {
 
             {/* Preview sections */}
             <div className="grid gap-2 text-xs">
-              {generated.personality && <PreviewSection label="Personality" text={generated.personality} />}
+              {generated.personality && <PreviewSection label="Personalidade" text={generated.personality} />}
               {generated.backstory && <PreviewSection label="Backstory" text={generated.backstory} />}
-              {generated.appearance && <PreviewSection label="Appearance" text={generated.appearance} />}
-              {generated.scenario && <PreviewSection label="Scenario" text={generated.scenario} />}
+              {generated.appearance && <PreviewSection label="Aparência" text={generated.appearance} />}
+              {generated.scenario && <PreviewSection label="Cenário" text={generated.scenario} />}
             </div>
 
             {/* Save button */}
@@ -238,7 +238,8 @@ export function PersonaMakerModal({ open, onClose }: Props) {
               {saving ? (
                 <>
                   <Loader2 size="0.9375rem" className="animate-spin" />
-                  Saving…
+                  
+                  Salvando…
                 </>
               ) : (
                 <>

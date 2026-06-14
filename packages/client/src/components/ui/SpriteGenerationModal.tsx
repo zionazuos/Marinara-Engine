@@ -1415,7 +1415,7 @@ export function SpriteGenerationModal({
                       className="flex h-20 w-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-[var(--border)] text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)]/40 hover:text-[var(--primary)]"
                     >
                       <ImagePlus size={18} />
-                      <span className="text-[0.5625rem]">Upload</span>
+                      <span className="text-[0.5625rem]">Enviar</span>
                     </button>
                   )}
                 </div>
@@ -1552,7 +1552,8 @@ export function SpriteGenerationModal({
                       </span>
                       {existingPortraitExpressions.length > matchedFullBodyExpressions.length && (
                         <span className="text-[0.625rem] text-[var(--muted-foreground)]">
-                          First {MATCHED_FULL_BODY_EXPRESSION_LIMIT} used
+                          
+                          Primeiro {MATCHED_FULL_BODY_EXPRESSION_LIMIT} used
                         </span>
                       )}
                     </div>
@@ -1632,7 +1633,8 @@ export function SpriteGenerationModal({
                 onClick={onClose}
                 className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)] hover:bg-[var(--secondary)]"
               >
-                Cancel
+                
+                Cancelar
               </button>
               <button
                 onClick={handleGenerate}
@@ -1703,7 +1705,8 @@ export function SpriteGenerationModal({
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium text-[var(--foreground)]">
-                      Batch {failedMatchedBatch.batchIndex + 1} of {failedMatchedBatch.totalBatches} paused
+                      
+                      Lote {failedMatchedBatch.batchIndex + 1} of {failedMatchedBatch.totalBatches} paused
                     </p>
                     <p className="mt-1 text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
                       {failedMatchedBatch.expressions.map((expr) => expr.replace(/_/g, " ")).join(", ")}
@@ -1720,7 +1723,8 @@ export function SpriteGenerationModal({
                     className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--primary)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
                   >
                     <RotateCcw size={13} />
-                    Retry Batch
+                    
+                    Repetir lote
                   </button>
                 </div>
               </div>
@@ -1756,7 +1760,7 @@ export function SpriteGenerationModal({
             {canAdjustSlices && !singleImageMode && (
               <div className="rounded-lg bg-[var(--secondary)]/60 p-2.5 ring-1 ring-[var(--border)]/60">
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                  <label className="text-xs font-medium text-[var(--foreground)]">Adjust Slice</label>
+                  <label className="text-xs font-medium text-[var(--foreground)]">Ajustar fatia</label>
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -1764,7 +1768,8 @@ export function SpriteGenerationModal({
                       disabled={sliceApplying}
                       className="rounded-lg px-2.5 py-1 text-[0.6875rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:text-[var(--foreground)] disabled:opacity-50"
                     >
-                      Reset
+                      
+                      Redefinir
                     </button>
                     <button
                       type="button"
@@ -1885,7 +1890,7 @@ export function SpriteGenerationModal({
                   {noBackground && (
                     <>
                       <div className="flex min-w-52 flex-1 items-center gap-2">
-                        <span className="text-[0.6875rem] text-[var(--muted-foreground)]">Soft</span>
+                        <span className="text-[0.6875rem] text-[var(--muted-foreground)]">Suave</span>
                         <input
                           type="range"
                           min={0}
@@ -1912,7 +1917,8 @@ export function SpriteGenerationModal({
                           disabled={cleanupApplying}
                           className="rounded-lg px-2.5 py-1 text-[0.6875rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:text-[var(--foreground)]"
                         >
-                          Use Original
+                          
+                          Usar original
                         </button>
                       )}
                     </>
@@ -1939,14 +1945,14 @@ export function SpriteGenerationModal({
                       <div className="flex items-center justify-between gap-2">
                         <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-[var(--foreground)]">
                           <Crop size={14} className="shrink-0 text-[var(--primary)]" />
-                          <span className="truncate capitalize">Frame {activeFrameCell.expression}</span>
+                          <span className="truncate capitalize">Quadro {activeFrameCell.expression}</span>
                         </span>
                         <button
                           type="button"
                           onClick={handleCloseCellFrame}
                           className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
                           aria-label="Close frame editor"
-                          title="Close"
+                          title="Fechar"
                         >
                           <X size={14} />
                         </button>
@@ -1977,7 +1983,8 @@ export function SpriteGenerationModal({
                           className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[0.6875rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:text-[var(--foreground)]"
                         >
                           <RotateCcw size={12} />
-                          Reset
+                          
+                          Redefinir
                         </button>
                         <button
                           type="button"
@@ -2049,7 +2056,7 @@ export function SpriteGenerationModal({
                               "bg-[var(--primary)] text-white ring-[var(--primary)] hover:bg-[var(--primary)] hover:text-white",
                           )}
                           aria-label={`Frame ${cell.expression}`}
-                          title="Frame sprite"
+                          title="Sprite do quadro"
                         >
                           <Crop size={13} />
                         </button>
@@ -2077,12 +2084,14 @@ export function SpriteGenerationModal({
                 {saving ? (
                   <>
                     <Loader2 size={14} className="animate-spin" />
-                    Saving…
+                    
+                    Salvando…
                   </>
                 ) : (
                   <>
                     <Check size={14} />
-                    Save {selectedCount} Sprites
+                    
+                    Salvar {selectedCount} Sprites
                   </>
                 )}
               </button>

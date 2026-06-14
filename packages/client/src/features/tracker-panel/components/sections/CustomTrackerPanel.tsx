@@ -88,7 +88,7 @@ function CustomFieldList({
                   <InlineEdit
                     value={field.name}
                     onSave={(name) => updateField(index, { ...field, name: name || "Field" })}
-                    placeholder="Field"
+                    placeholder="Campo"
                     className={cn("min-w-0 px-0.5 py-0 font-medium", allowWrap && "min-h-5")}
                     editHintMode={allowWrap ? "overlay" : "inline"}
                     previewLineCount={allowWrap ? 2 : undefined}
@@ -109,7 +109,7 @@ function CustomFieldList({
                   <InlineEdit
                     value={field.value}
                     onSave={(value) => updateField(index, { ...field, value })}
-                    placeholder="Value"
+                    placeholder="Valor"
                     className={cn(
                       "min-w-0 px-0.5 py-0",
                       valueAlignment,
@@ -137,7 +137,7 @@ function CustomFieldList({
                     type="button"
                     onClick={() => removeField(index)}
                     className="absolute right-1 top-1/2 flex h-4 w-4 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--background)]/85 text-[var(--destructive)] shadow-sm ring-1 ring-[var(--border)]/70 backdrop-blur-sm transition-all hover:bg-[var(--accent)] focus-visible:outline-none focus-visible:ring-[var(--primary)] active:scale-90"
-                    title="Remove field"
+                    title="Remover campo"
                     aria-label={`Remove ${visibleText(field.name, "field")}`}
                   >
                     <X size="0.5625rem" />
@@ -177,7 +177,7 @@ export function CustomTrackerPanel({
       <div className="relative z-10">
         <SectionHeader
           icon={<SlidersHorizontal size="0.6875rem" />}
-          title="Custom Stats"
+          title="Atributos personalizados"
           action={action}
           addAction={
             addMode ? (

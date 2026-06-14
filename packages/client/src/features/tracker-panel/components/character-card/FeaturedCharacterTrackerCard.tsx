@@ -327,7 +327,7 @@ export function FeaturedCharacterTrackerCard({
                 <InlineEdit
                   value={name}
                   onSave={(nextName) => updateCustomField(name, nextName, value)}
-                  placeholder="Field"
+                  placeholder="Campo"
                   className="min-w-0 px-0.5 py-0 font-medium"
                   scrollOnHover
                 />
@@ -338,7 +338,7 @@ export function FeaturedCharacterTrackerCard({
                 <InlineEdit
                   value={value}
                   onSave={(nextValue) => updateCustomField(name, name, nextValue)}
-                  placeholder="Value"
+                  placeholder="Valor"
                   className="min-w-0 px-0.5 py-0"
                   scrollOnHover
                 />

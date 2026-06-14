@@ -408,7 +408,8 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
           )}
         >
           {saveOverride.isPending ? <Loader2 size="0.8125rem" className="animate-spin" /> : <Save size="0.8125rem" />}
-          Save
+          
+          Salvar
         </button>
         <button
           type="button"
@@ -430,7 +431,8 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
       {detail?.override && !isDirty && (
         <div className="flex items-center gap-1.5 text-[0.625rem] text-[var(--muted-foreground)]">
           <Check size="0.6875rem" className="text-green-500" />
-          Saved {new Date(detail.override.updatedAt).toLocaleString()}
+          
+          Salvo {new Date(detail.override.updatedAt).toLocaleString()}
         </div>
       )}
     </div>

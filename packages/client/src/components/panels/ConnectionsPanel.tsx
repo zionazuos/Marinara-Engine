@@ -407,7 +407,7 @@ function ConnectionRow({
             });
           }}
           className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-sky-400/10 hover:text-sky-400 active:scale-90"
-          title="Duplicate"
+          title="Duplicar"
         >
           <Copy size="0.75rem" />
         </button>
@@ -427,7 +427,7 @@ function ConnectionRow({
             deleteConnection.mutate(conn.id);
           }}
           className="rounded-lg p-1.5 transition-all hover:bg-[var(--destructive)]/15 active:scale-90"
-          title="Delete"
+          title="Excluir"
         >
           <Trash2 size="0.75rem" className="text-[var(--destructive)]" />
         </button>
@@ -514,7 +514,7 @@ function ConnectionFolderRow({
             setRenaming(true);
           }}
           className="shrink-0 rounded-md p-1 opacity-0 transition-all hover:bg-[var(--accent)] group-hover:opacity-100 max-md:opacity-100"
-          title="Rename folder"
+          title="Renomear pasta"
         >
           <Pencil size="0.75rem" className="text-[var(--muted-foreground)]" />
         </button>
@@ -524,7 +524,7 @@ function ConnectionFolderRow({
             onDelete(folder);
           }}
           className="shrink-0 rounded-md p-1 opacity-0 transition-all hover:bg-[var(--destructive)]/20 group-hover:opacity-100 max-md:opacity-100"
-          title="Delete folder"
+          title="Excluir pasta"
         >
           <Trash2 size="0.75rem" className="text-[var(--destructive)]" />
         </button>
@@ -820,7 +820,8 @@ export function ConnectionsPanel() {
               )}
             >
               <Link size="0.75rem" className="text-[var(--muted-foreground)]" />
-              Unfiled
+              
+              Sem pasta
             </button>
             {sortedFolders.map((f) => (
               <button

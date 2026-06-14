@@ -52,7 +52,7 @@ export function CreatePersonaModal({ open, onClose }: Props) {
         </div>
 
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-[var(--muted-foreground)]">Name *</span>
+          <span className="text-xs font-medium text-[var(--muted-foreground)]">Nome *</span>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -73,7 +73,8 @@ export function CreatePersonaModal({ open, onClose }: Props) {
             }}
             className="rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             onClick={handleCreate}
@@ -81,7 +82,8 @@ export function CreatePersonaModal({ open, onClose }: Props) {
             className="flex items-center gap-1.5 rounded-lg bg-[var(--primary)] px-4 py-2 text-xs font-medium text-[var(--primary-foreground)] transition-all hover:opacity-90 disabled:opacity-50"
           >
             {createPersona.isPending ? <Loader2 size="0.75rem" className="animate-spin" /> : <User size="0.75rem" />}
-            Create
+            
+            Criar
           </button>
         </div>
       </div>

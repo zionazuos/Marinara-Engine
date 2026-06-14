@@ -33,7 +33,7 @@ function showChibiProfessorMariToast() {
         <button
           type="button"
           aria-label="Dismiss Professor Mari toast"
-          title="Dismiss"
+          title="Dispensar"
           onClick={() => toast.dismiss(toastId)}
           className="absolute right-2 top-2 rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
         >

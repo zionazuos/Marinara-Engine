@@ -345,7 +345,7 @@ export function PresetEditor() {
             markDirty();
           }}
           className="h-10 min-w-0 flex-1 self-stretch bg-transparent text-lg font-semibold outline-none placeholder:text-[var(--muted-foreground)] max-md:text-base"
-          placeholder="Preset name…"
+          placeholder="Nome do preset…"
         />
         <div className="flex items-center gap-1.5">
           <button
@@ -353,12 +353,12 @@ export function PresetEditor() {
             disabled={updatePreset.isPending}
             className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-400 to-violet-500 px-4 py-2 text-xs font-medium text-white shadow-md transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
           >
-            <Save size="0.8125rem" /> Save
+            <Save size="0.8125rem" />  Salvar
           </button>
           <button
             onClick={() => api.download(`/prompts/${presetDetailId}/export`)}
             className="rounded-xl p-2 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Export preset"
+            title="Exportar preset"
           >
             <svg
               width="0.9375rem"
@@ -389,26 +389,29 @@ export function PresetEditor() {
       {/* Saved toast */}
       {showSaved && (
         <div className="absolute left-1/2 top-14 z-50 -translate-x-1/2 animate-fade-in-up rounded-lg border border-emerald-500/30 bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-400 shadow-lg backdrop-blur-sm">
-          Changes saved
+          
+          Alterações salvas
         </div>
       )}
 
       {/* Unsaved warning */}
       {showUnsavedWarning && (
         <div className="flex items-center justify-between bg-amber-500/10 px-4 py-2 text-xs text-amber-400">
-          <span>You have unsaved changes.</span>
+          <span>Você tem alterações não salvas.</span>
           <div className="flex gap-2">
             <button
               onClick={() => setShowUnsavedWarning(false)}
               className="rounded-lg px-3 py-1 hover:bg-[var(--accent)]"
             >
-              Keep editing
+              
+              Continuar editando
             </button>
             <button
               onClick={() => closePresetDetail()}
               className="rounded-lg px-3 py-1 text-[var(--destructive)] hover:bg-[var(--destructive)]/15"
             >
-              Discard
+              
+              Descartar
             </button>
             <button
               onClick={() => {
@@ -417,7 +420,8 @@ export function PresetEditor() {
               }}
               className="rounded-lg bg-amber-500/20 px-3 py-1 hover:bg-amber-500/30"
             >
-              Save & close
+              
+              Salvar e fechar
             </button>
           </div>
         </div>
@@ -540,17 +544,17 @@ function OverviewTab({
 }) {
   return (
     <>
-      <FieldGroup label="Name" help="The display name for this preset. Used in the Presets panel and chat settings.">
+      <FieldGroup label="Nome" help="The display name for this preset. Used in the Presets panel and chat settings.">
         <input
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
-          placeholder="Preset name…"
+          placeholder="Nome do preset…"
           className="w-full rounded-xl bg-[var(--secondary)] p-3 text-sm text-[var(--foreground)] ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
         />
       </FieldGroup>
 
       <FieldGroup
-        label="Description"
+        label="Descrição"
         help="A short summary of what this preset is designed for. Helps you remember its purpose when choosing between presets."
       >
         <textarea
@@ -563,7 +567,7 @@ function OverviewTab({
       </FieldGroup>
 
       <FieldGroup
-        label="Wrap Format"
+        label="Formato de quebra"
         help="Controls how prompt sections are formatted when sent to the AI. XML uses <tags>, Markdown uses ## headings, None sends raw content."
       >
         <div className="flex gap-2">
@@ -598,7 +602,7 @@ function OverviewTab({
         </p>
       </FieldGroup>
 
-      <FieldGroup label="Author" help="Optional creator name, useful if you share presets with others.">
+      <FieldGroup label="Autor" help="Optional creator name, useful if you share presets with others.">
         <input
           value={author}
           onFocus={(e) => e.target.select()}
@@ -609,8 +613,8 @@ function OverviewTab({
       </FieldGroup>
 
       <div className="flex gap-4">
-        <StatCard label="Sections" value={sectionCount} />
-        <StatCard label="Groups" value={groupCount} />
+        <StatCard label="Seções" value={sectionCount} />
+        <StatCard label="Grupos" value={groupCount} />
       </div>
     </>
   );
@@ -881,10 +885,10 @@ function SectionsTab({
                   onClick={() => handleAddSection()}
                   className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-[var(--foreground)] hover:bg-[var(--accent)]"
                 >
-                  <MessageSquare size="0.8125rem" /> Prompt Block
+                  <MessageSquare size="0.8125rem" />  Bloco de prompt
                 </button>
                 <div className="my-1 border-t border-[var(--border)]" />
-                <p className="px-3 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">Markers</p>
+                <p className="px-3 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">Marcadores</p>
                 {(Object.keys(MARKER_LABELS) as MarkerType[])
                   .filter((t) => t !== "agent_data")
                   .map((type) => (
@@ -949,7 +953,7 @@ function SectionsTab({
       {showGroupsPanel && (
         <div className="rounded-xl border border-sky-400/20 bg-sky-400/5 p-3 space-y-2">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-semibold text-sky-400">Groups</h4>
+            <h4 className="text-xs font-semibold text-sky-400">Grupos</h4>
             <button
               onClick={handleAddGroup}
               className="flex items-center gap-1 rounded-lg bg-sky-400/15 px-2 py-1 text-[0.625rem] font-medium text-sky-400 hover:bg-sky-400/25 active:scale-95"
@@ -1088,7 +1092,7 @@ function SectionsTab({
                         onClick={() => moveSectionByOffset(idx, -1)}
                         disabled={idx === 0 || onReorderSections.isPending}
                         className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30"
-                        title="Move up"
+                        title="Mover para cima"
                         aria-label={`Move ${section.name} up`}
                       >
                         <ArrowUp size="0.75rem" />
@@ -1142,7 +1146,7 @@ function SectionsTab({
                         onClick={() => void duplicateSection(section, idx)}
                         disabled={onCreateSection.isPending || onReorderSections.isPending}
                         className="rounded-lg p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30"
-                        title="Duplicate"
+                        title="Duplicar"
                         aria-label={`Duplicate ${section.name}`}
                       >
                         <Copy size="0.75rem" />
@@ -1167,7 +1171,7 @@ function SectionsTab({
                       <button
                         onClick={() => onDeleteSection.mutate({ presetId, sectionId: section.id })}
                         className="rounded-lg p-1 hover:bg-[var(--destructive)]/15"
-                        title="Delete"
+                        title="Excluir"
                       >
                         <Trash2 size="0.75rem" className="text-[var(--destructive)]" />
                       </button>
@@ -1200,8 +1204,8 @@ function SectionsTab({
                           }
                           className="rounded-lg bg-[var(--secondary)] px-2 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none"
                         >
-                          <option value="system">System</option>
-                          <option value="user">User</option>
+                          <option value="system">Sistema</option>
+                          <option value="user">Usuário</option>
                           <option value="assistant">Assistant</option>
                         </select>
                       </div>
@@ -1235,7 +1239,8 @@ function SectionsTab({
                               <div className="rounded-lg bg-[var(--primary)]/5 p-3 text-xs text-[var(--primary)]">
                                 Agent section: <strong>{section.name}</strong>
                                 <p className="mt-1 text-[var(--muted-foreground)]">
-                                  The{" "}
+                                  
+                                  O{" "}
                                   <code className="rounded bg-black/20 px-1 py-0.5 text-[0.625rem] font-mono text-pink-300">
                                     {"{{agent::" + (mc.agentType ?? "agent") + "}}"}
                                   </code>{" "}
@@ -1257,7 +1262,8 @@ function SectionsTab({
                             </div>
                           ) : (
                             <div className="rounded-lg bg-violet-400/5 p-3 text-xs text-violet-300">
-                              Marker type: <strong>{MARKER_LABELS[mc.type as MarkerType] ?? "Unknown"}</strong>
+                              
+                              Tipo de marcador: <strong>{MARKER_LABELS[mc.type as MarkerType] ?? "Unknown"}</strong>
                               <p className="mt-1 text-[var(--muted-foreground)]">
                                 Content is auto-generated at assembly time from your characters, lorebooks, etc.
                               </p>
@@ -1289,7 +1295,7 @@ function SectionsTab({
                         </select>
                         {section.injectionPosition === "depth" && (
                           <>
-                            <label className="text-[var(--muted-foreground)]">Depth:</label>
+                            <label className="text-[var(--muted-foreground)]">Profundidade:</label>
                             <DraftNumberInput
                               value={section.injectionDepth ?? 0}
                               min={0}
@@ -1310,7 +1316,7 @@ function SectionsTab({
 
                       {/* Group assignment */}
                       <div className="flex items-center gap-3 text-xs">
-                        <label className="text-[var(--muted-foreground)]">Group:</label>
+                        <label className="text-[var(--muted-foreground)]">Grupo:</label>
                         <select
                           value={section.groupId ?? ""}
                           onChange={(e) =>
@@ -1322,7 +1328,7 @@ function SectionsTab({
                           }
                           className="rounded-lg bg-[var(--secondary)] px-2 py-1 text-xs ring-1 ring-[var(--border)]"
                         >
-                          <option value="">No group</option>
+                          <option value="">Sem grupo</option>
                           {[...groupMap.values()].map((g: any) => (
                             <option key={g.id} value={g.id}>
                               {g.name}
@@ -1461,7 +1467,7 @@ function PresetVariablesEditor({
           }
           className="flex items-center gap-1.5 rounded-lg bg-amber-400/10 px-2.5 py-1.5 text-[0.6875rem] font-medium text-amber-400 hover:bg-amber-400/20 active:scale-[0.98]"
         >
-          <Plus size="0.6875rem" /> Add Variable
+          <Plus size="0.6875rem" />  Adicionar variável
         </button>
       </div>
 
@@ -1608,7 +1614,7 @@ function VariableCard({
             onClick={onMoveUp}
             disabled={!canMoveUp || isReordering}
             className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30"
-            title="Move up"
+            title="Mover para cima"
             aria-label={`Move ${varName || "variable"} up`}
           >
             <ArrowUp size="0.75rem" />
@@ -1677,7 +1683,8 @@ function VariableCard({
             <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Variable Name</label>
             <VariableNameInput value={varName} onCommit={(v) => update({ variableName: v })} />
             <p className="text-[0.5625rem] text-[var(--muted-foreground)]">
-              Use <code className="text-amber-400">{`{{${varName}}}`}</code> in any prompt section to insert the
+              
+              Usar <code className="text-amber-400">{`{{${varName}}}`}</code> in any prompt section to insert the
               selected value. Must be alphanumeric/underscores only.
             </p>
           </div>
@@ -1707,7 +1714,7 @@ function VariableCard({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <ListChecks size="0.75rem" className="text-purple-400" />
-                  <span className="text-[0.625rem] font-medium text-[var(--foreground)]">Multi-Select</span>
+                  <span className="text-[0.625rem] font-medium text-[var(--foreground)]">Seleção múltipla</span>
                 </div>
                 <button
                   onClick={() => update({ multiSelect: !isMultiSelect })}
@@ -1782,7 +1789,7 @@ function VariableCard({
 
           {/* Options */}
           <div className="space-y-1.5">
-            <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Options</label>
+            <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Opções</label>
             {opts.map((opt, oi) => {
               const valueBlank = !opt.value || !opt.value.trim();
               return (
@@ -1834,7 +1841,7 @@ function VariableCard({
                         updateOpts(opts.filter((_, i) => i !== oi));
                       }}
                       className="shrink-0 rounded p-0.5 hover:bg-[var(--destructive)]/15"
-                      title="Remove option"
+                      title="Remover opção"
                     >
                       <X size="0.625rem" className="text-[var(--destructive)]" />
                     </button>
@@ -2076,7 +2083,7 @@ function SectionContentTextarea({
           <button
             onClick={() => setExpanded(true)}
             className="rounded p-1 text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-            title="Expand editor"
+            title="Expandir editor"
           >
             <Maximize2 size="0.75rem" />
           </button>
@@ -2231,7 +2238,8 @@ function ExpandedEditorModal({
               onClick={handleClose}
               className="rounded-xl bg-gradient-to-r from-purple-400 to-violet-500 px-4 py-1.5 text-xs font-medium text-white shadow-md hover:shadow-lg active:scale-[0.98]"
             >
-              Done
+              
+              Concluído
             </button>
           </div>
         </div>
@@ -2289,7 +2297,8 @@ function MacrosReferenceModal({ onClose }: { onClose: () => void }) {
               <div>
                 <h4 className="text-[0.6875rem] font-semibold text-purple-400">Conditional blocks</h4>
                 <p className="mt-1 text-[0.6875rem] text-[var(--muted-foreground)]">
-                  Use <code>{"{{#if ...}}"}</code>, optional <code>{"{{else}}"}</code>, and <code>{"{{/if}}"}</code> to
+                  
+                  Usar <code>{"{{#if ...}}"}</code>, optional <code>{"{{else}}"}</code>, and <code>{"{{/if}}"}</code> to
                   switch prompt text by the active speaker, user, or a preset variable.
                 </p>
               </div>
@@ -2331,7 +2340,8 @@ Write this for anyone else.
               onClick={onClose}
               className="rounded-xl px-4 py-1.5 text-xs font-medium text-[var(--muted-foreground)] hover:bg-[var(--accent)]"
             >
-              Close
+              
+              Fechar
             </button>
           </div>
         </div>
@@ -2368,7 +2378,7 @@ function SectionNameInput({ value, onCommit }: { value: string; onCommit: (v: st
         }
       }}
       className="flex-1 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-      placeholder="Section name"
+      placeholder="Nome da seção"
     />
   );
 }

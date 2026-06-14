@@ -101,7 +101,7 @@ export function ImagePromptReviewModal({
             <span className="text-[0.625rem] text-[var(--destructive)]">Every image request needs a prompt.</span>
           ) : (
             <span className="text-[0.625rem] text-[var(--muted-foreground)]">
-              {items.length} request{items.length === 1 ? "" : "s"} ready.
+              {items.length} request{items.length === 1 ? "" : "s"}  pronto.
             </span>
           )}
           <div className="flex items-center justify-end gap-2">
@@ -111,7 +111,8 @@ export function ImagePromptReviewModal({
               className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <X size="0.875rem" />
-              Cancel
+              
+              Cancelar
             </button>
             <button
               onClick={handleConfirm}
@@ -124,7 +125,8 @@ export function ImagePromptReviewModal({
               )}
             >
               {isSubmitting ? <Loader2 size="0.875rem" className="animate-spin" /> : <Send size="0.875rem" />}
-              Generate
+              
+              Gerar
             </button>
           </div>
         </div>

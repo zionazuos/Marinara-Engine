@@ -293,7 +293,7 @@ export function CharacterTrackerCard({
               icon={<HeartPulse size="0.6875rem" />}
               accessibleLabel="Mood"
               value={character.mood}
-              placeholder="Mood"
+              placeholder="Humor"
               onSave={onUpdate ? (mood) => onUpdate({ ...character, mood }) : undefined}
               tone="mood"
               readable={readableDetailRows}
@@ -305,7 +305,7 @@ export function CharacterTrackerCard({
               icon={<Eye size="0.6875rem" />}
               accessibleLabel="Look"
               value={character.appearance}
-              placeholder="Appearance"
+              placeholder="Aparência"
               onSave={onUpdate ? (appearance) => onUpdate({ ...character, appearance: appearance || null }) : undefined}
               tone="appearance"
               readable={readableDetailRows}
@@ -316,7 +316,7 @@ export function CharacterTrackerCard({
               icon={<Shirt size="0.6875rem" />}
               accessibleLabel="Outfit"
               value={character.outfit}
-              placeholder="Outfit"
+              placeholder="Roupa"
               onSave={onUpdate ? (outfit) => onUpdate({ ...character, outfit: outfit || null }) : undefined}
               tone="outfit"
               readable={readableDetailRows}
@@ -346,7 +346,7 @@ export function CharacterTrackerCard({
                 <InlineEdit
                   value={name}
                   onSave={(nextName) => updateCustomField(name, nextName, value)}
-                  placeholder="Field"
+                  placeholder="Campo"
                   className="min-w-0 px-0.5 py-0 font-medium"
                   scrollOnHover
                 />
@@ -357,7 +357,7 @@ export function CharacterTrackerCard({
                 <InlineEdit
                   value={value}
                   onSave={(nextValue) => updateCustomField(name, name, nextValue)}
-                  placeholder="Value"
+                  placeholder="Valor"
                   className="min-w-0 px-0.5 py-0"
                   scrollOnHover={!readableCustomFields}
                   twoLinePreview={readableCustomFields}

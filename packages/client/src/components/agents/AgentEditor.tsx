@@ -646,7 +646,8 @@ export function AgentEditor() {
   if (!agentDetailId || (!builtIn && !dbConfig && agentDetailId !== "__new__")) {
     return (
       <div className="flex flex-1 items-center justify-center text-sm text-[var(--muted-foreground)]">
-        Agent not found.
+        
+        Agente não encontrado.
       </div>
     );
   }
@@ -676,7 +677,7 @@ export function AgentEditor() {
         <button
           type="button"
           onClick={handleClose}
-          aria-label="Back to agents"
+          aria-label="Voltar para os agentes"
           className="rounded-xl p-2 transition-all hover:bg-[var(--accent)] active:scale-95"
         >
           <ArrowLeft size="1.125rem" />
@@ -696,21 +697,21 @@ export function AgentEditor() {
         <div className="flex items-center gap-1.5 max-md:w-full max-md:justify-end max-md:border-t max-md:border-[var(--border)]/30 max-md:pt-2">
           {saveError && (
             <span className="mr-2 flex items-center gap-1 text-[0.625rem] font-medium text-red-400">
-              <AlertCircle size="0.6875rem" /> Save failed
+              <AlertCircle size="0.6875rem" />  Falha ao salvar
             </span>
           )}
           {savedFlash && !dirty && (
             <span className="mr-2 flex items-center gap-1 text-[0.625rem] font-medium text-emerald-400">
-              <Check size="0.6875rem" /> Saved
+              <Check size="0.6875rem" />  Salvo
             </span>
           )}
-          {dirty && !saveError && <span className="mr-2 text-[0.625rem] font-medium text-amber-400">Unsaved</span>}
+          {dirty && !saveError && <span className="mr-2 text-[0.625rem] font-medium text-amber-400">Não salvo</span>}
           {isCustomAgent && dbConfig && (
             <button
               onClick={handleDelete}
               className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium text-[var(--destructive)] transition-all hover:bg-[var(--destructive)]/15 active:scale-[0.98]"
             >
-              <Trash2 size="0.8125rem" /> <span className="max-md:hidden">Delete</span>
+              <Trash2 size="0.8125rem" /> <span className="max-md:hidden">Excluir</span>
             </button>
           )}
           <button
@@ -718,7 +719,7 @@ export function AgentEditor() {
             disabled={isPending}
             className="flex items-center gap-1.5 rounded-xl bg-[var(--primary)] px-4 py-2 text-xs font-medium text-[var(--primary-foreground)] shadow-md transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
           >
-            <Save size="0.8125rem" /> <span className="max-md:hidden">Save</span>
+            <Save size="0.8125rem" /> <span className="max-md:hidden">Salvar</span>
           </button>
         </div>
       </div>
@@ -726,19 +727,21 @@ export function AgentEditor() {
       {/* Unsaved warning */}
       {showUnsavedWarning && (
         <div className="flex items-center justify-between bg-amber-500/10 px-4 py-2 text-xs text-amber-400">
-          <span>You have unsaved changes.</span>
+          <span>Você tem alterações não salvas.</span>
           <div className="flex gap-2">
             <button
               onClick={() => setShowUnsavedWarning(false)}
               className="rounded-lg px-3 py-1 hover:bg-[var(--accent)]"
             >
-              Keep editing
+              
+              Continuar editando
             </button>
             <button
               onClick={() => closeAgentDetail()}
               className="rounded-lg px-3 py-1 text-[var(--destructive)] hover:bg-[var(--destructive)]/15"
             >
-              Discard
+              
+              Descartar
             </button>
             <button
               onClick={async () => {
@@ -747,7 +750,8 @@ export function AgentEditor() {
               }}
               className="rounded-lg bg-amber-500/20 px-3 py-1 hover:bg-amber-500/30"
             >
-              Save & close
+              
+              Salvar e fechar
             </button>
           </div>
         </div>
@@ -783,7 +787,7 @@ export function AgentEditor() {
         <div className="mx-auto max-w-3xl space-y-6">
           {/* ── Description ── */}
           <FieldGroup
-            label="Description"
+            label="Descrição"
             icon={<Info size="0.875rem" className="text-[var(--primary)]" />}
             help="A short summary of what this agent does. Shown in the agents panel to help you identify each agent."
           >
@@ -800,7 +804,7 @@ export function AgentEditor() {
 
           {/* Agent Status */}
           <FieldGroup
-            label="Agent Status"
+            label="Status do agente"
             icon={<Activity size="0.875rem" className="text-[var(--primary)]" />}
             help="Controls whether this agent can run. Add as Prompt Section only controls whether saved output appears in prompt presets."
           >
@@ -868,7 +872,7 @@ export function AgentEditor() {
 
           {(isCustomAgent || isNewCustomAgent) && (
             <FieldGroup
-              label="Result Type"
+              label="Tipo de resultado"
               icon={<FileText size="0.875rem" className="text-[var(--primary)]" />}
               help="Controls how Marinara interprets this custom agent's output. Use Text Rewrite for post-processing agents that edit the generated reply."
             >
@@ -972,7 +976,7 @@ export function AgentEditor() {
 
           {/* ── Connection Override ── */}
           <FieldGroup
-            label="Connection Override"
+            label="Substituição de conexão"
             icon={<Link2 size="0.875rem" className="text-[var(--primary)]" />}
             help="Use a different AI connection for this agent. For example, use a faster/cheaper model for background processing tasks."
           >
@@ -1050,7 +1054,7 @@ export function AgentEditor() {
                   />
                 </label>
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Negative prompt</span>
+                  <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Prompt negativo</span>
                   <textarea
                     value={localImageNegativePrompt}
                     onChange={(e) => {
@@ -1203,7 +1207,7 @@ export function AgentEditor() {
           )}
 
           <FieldGroup
-            label="Agent Budget"
+            label="Orçamento do agente"
             icon={<Clock size="0.875rem" className="text-[var(--primary)]" />}
             help="Controls how much recent chat context the agent reads and how much output room it reserves. If max output is too high for the model context, prompt context can be trimmed."
           >
@@ -1211,7 +1215,8 @@ export function AgentEditor() {
               {!isChatSummaryAgent ? (
                 <div>
                   <label className="mb-1 block text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                    Context Size
+                    
+                    Tamanho do contexto
                   </label>
                   <div className="flex items-center gap-3">
                     <input
@@ -1237,7 +1242,8 @@ export function AgentEditor() {
               )}
               <div>
                 <label className="mb-1 block text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                  Max Output Tokens
+                  
+                  Máximo de tokens de saída
                 </label>
                 <div className="flex items-center gap-3">
                   <input
@@ -1338,14 +1344,15 @@ export function AgentEditor() {
 
           {(isCustomAgent || isNewCustomAgent) && (
             <FieldGroup
-              label="Activation Keywords"
+              label="Palavras-chave de ativação"
               icon={<Activity size="0.875rem" className="text-[var(--primary)]" />}
               help="When keywords are set, this custom agent is skipped unless at least one keyword appears in the recent chat messages it scans."
             >
               <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
                 <div>
                   <label className="mb-1 block text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                    Keywords
+                    
+                    Palavras-chave
                   </label>
                   <textarea
                     value={localActivationKeywordsText}
@@ -1360,7 +1367,8 @@ export function AgentEditor() {
                 </div>
                 <div>
                   <label className="mb-1 block text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-                    Scan Depth
+                    
+                    Profundidade de varredura
                   </label>
                   <div className="flex items-center gap-3">
                     <input
@@ -1422,7 +1430,7 @@ export function AgentEditor() {
           {/* ── Run Interval (Lorebook Keeper) ── */}
           {isLorebookKeeperAgent && (
             <FieldGroup
-              label="Run Interval"
+              label="Intervalo de execução"
               icon={<Clock size="0.875rem" className="text-[var(--primary)]" />}
               help="How many assistant messages between each Lorebook Keeper run. Higher values reduce duplicates and save tokens. Set to 1 to run every message."
             >
@@ -1451,7 +1459,7 @@ export function AgentEditor() {
           {/* ── Run Interval (Narrative Director / Illustrator) ── */}
           {(isDirectorAgent || isIllustratorAgent) && (
             <FieldGroup
-              label="Run Interval"
+              label="Intervalo de execução"
               icon={<Clock size="0.875rem" className="text-[var(--primary)]" />}
               help={
                 isIllustratorAgent
@@ -1580,7 +1588,8 @@ export function AgentEditor() {
                       }}
                       className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/50 transition-colors hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20"
                     >
-                      Disconnect
+                      
+                      Desconectar
                     </button>
                   </div>
                 ) : (
@@ -1772,7 +1781,7 @@ export function AgentEditor() {
 
                 {/* Setup instructions */}
                 <div className="rounded-lg border border-green-500/10 bg-green-500/5 p-3 text-[0.6875rem] text-white/50 space-y-2">
-                  <p className="font-medium text-green-400/80">Setup:</p>
+                  <p className="font-medium text-green-400/80">Configuração:</p>
                   <ol className="list-decimal list-inside space-y-1 text-white/40">
                     <li>
                       Go to the{" "}
@@ -1796,7 +1805,7 @@ export function AgentEditor() {
                       Copy the <strong>Client ID</strong> and paste it above
                     </li>
                     <li>
-                      Save the agent, then click <strong>Connect Spotify Account</strong>
+                      Save the agent, then click <strong>Conectar conta do Spotify</strong>
                     </li>
                   </ol>
                   <p className="text-[0.625rem] text-white/30 mt-1">
@@ -1817,7 +1826,7 @@ export function AgentEditor() {
           {/* ── Knowledge Source Lorebooks (Knowledge Retrieval + Knowledge Router) ── */}
           {(isKnowledgeRetrievalAgent || isKnowledgeRouterAgent) && (
             <FieldGroup
-              label="Knowledge Sources"
+              label="Fontes de conhecimento"
               icon={<BookOpen size="0.875rem" className="text-amber-400" />}
               help={
                 isKnowledgeRouterAgent
@@ -1873,7 +1882,7 @@ export function AgentEditor() {
                       (descriptionCoverage.total === 0 ? (
                         <div className="flex items-center gap-1.5 text-[0.625rem]">
                           <div className="h-1.5 w-1.5 rounded-full bg-[var(--muted-foreground)] opacity-50" />
-                          <span className="text-[var(--muted-foreground)]">No entries yet</span>
+                          <span className="text-[var(--muted-foreground)]">Nenhuma entrada ainda</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5 text-[0.625rem]">
@@ -1941,7 +1950,7 @@ export function AgentEditor() {
                       })}
                     </div>
                   ) : (
-                    <p className="text-[0.625rem] text-[var(--muted-foreground)]">No lorebooks available.</p>
+                    <p className="text-[0.625rem] text-[var(--muted-foreground)]">Nenhum lorebook disponível.</p>
                   )}
                   {localSourceLorebookIds.length > 0 && (
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
@@ -1963,7 +1972,7 @@ export function AgentEditor() {
                 {/* ── Uploaded Files (Knowledge Retrieval only) ── */}
                 {isKnowledgeRetrievalAgent && (
                   <div className="space-y-1.5">
-                    <p className="text-[0.6875rem] font-medium text-white/60">Files</p>
+                    <p className="text-[0.6875rem] font-medium text-white/60">Arquivos</p>
                     {/* File list */}
                     {allKnowledgeSources && allKnowledgeSources.length > 0 && (
                       <div className="max-h-48 overflow-y-auto space-y-1 rounded-lg border border-white/10 bg-white/[0.02] p-2">
@@ -2012,7 +2021,7 @@ export function AgentEditor() {
                                   });
                                 }}
                                 className="shrink-0 p-1 rounded text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                                title="Delete file"
+                                title="Excluir arquivo"
                               >
                                 <Trash2 size="0.75rem" />
                               </button>
@@ -2056,12 +2065,14 @@ export function AgentEditor() {
                       {uploadSource.isPending ? (
                         <>
                           <Loader2 size="0.875rem" className="animate-spin" />
-                          Uploading...
+                          
+                          Enviando...
                         </>
                       ) : (
                         <>
                           <Upload size="0.875rem" />
-                          Upload File
+                          
+                          Enviar arquivo
                         </>
                       )}
                     </button>
@@ -2081,7 +2092,8 @@ export function AgentEditor() {
                     ]
                       .filter(Boolean)
                       .join(", ")}{" "}
-                    selected
+                    
+                    selecionado(s)
                   </p>
                 )}
               </div>
@@ -2090,7 +2102,7 @@ export function AgentEditor() {
 
           {/* ── Prompt Template ── */}
           <FieldGroup
-            label="Prompt Template"
+            label="Modelo de prompt"
             icon={<FileText size="0.875rem" className="text-[var(--primary)]" />}
             help="The system instructions this agent receives. Built-in agents have sensible defaults. You can override to customize behavior."
           >
@@ -2099,11 +2111,11 @@ export function AgentEditor() {
               <div className="flex items-center gap-2 mb-2">
                 {isUsingDefaultPrompt ? (
                   <span className="flex items-center gap-1 rounded-lg bg-emerald-400/10 px-2.5 py-1 text-[0.625rem] font-medium text-emerald-400">
-                    <Check size="0.625rem" /> Using built-in default
+                    <Check size="0.625rem" />  Usando padrão embutido
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 rounded-lg bg-amber-400/10 px-2.5 py-1 text-[0.625rem] font-medium text-amber-400">
-                    <FileText size="0.625rem" /> Custom override
+                    <FileText size="0.625rem" />  Substituição personalizada
                   </span>
                 )}
                 <div className="flex-1" />
@@ -2112,7 +2124,7 @@ export function AgentEditor() {
                     onClick={handleResetPrompt}
                     className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
                   >
-                    <RotateCcw size="0.625rem" /> Reset to default
+                    <RotateCcw size="0.625rem" />  Restaurar padrão
                   </button>
                 )}
                 {isUsingDefaultPrompt && defaultPrompt && (
@@ -2120,7 +2132,7 @@ export function AgentEditor() {
                     onClick={handleLoadDefault}
                     className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
                   >
-                    <FileText size="0.625rem" /> Copy default to edit
+                    <FileText size="0.625rem" />  Copiar padrão para editar
                   </button>
                 )}
               </div>
@@ -2216,11 +2228,11 @@ export function AgentEditor() {
                 <strong className="text-[var(--foreground)]">Type:</strong> {isCustomAgent ? "Custom" : agentDetailId}
               </p>
               <p>
-                <strong className="text-[var(--foreground)]">Phase:</strong> {phaseMeta.label} — {phaseMeta.description}
+                <strong className="text-[var(--foreground)]">Fase:</strong> {phaseMeta.label} — {phaseMeta.description}
               </p>
               {(isCustomAgent || isNewCustomAgent) && (
                 <p>
-                  <strong className="text-[var(--foreground)]">Result Type:</strong>{" "}
+                  <strong className="text-[var(--foreground)]">Tipo de resultado:</strong>{" "}
                   {CUSTOM_AGENT_RESULT_TYPE_OPTIONS.find((option) => option.id === localResultType)?.label ??
                     localResultType}
                 </p>

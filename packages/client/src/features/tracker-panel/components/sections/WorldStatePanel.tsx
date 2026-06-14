@@ -48,7 +48,7 @@ export function WorldStatePanel({
 
       <SectionHeader
         icon={<MapPin size="0.6875rem" />}
-        title="World"
+        title="Mundo"
         action={action}
         collapsed={collapsed}
         onToggle={onToggleCollapsed}

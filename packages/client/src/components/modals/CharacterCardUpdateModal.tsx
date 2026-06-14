@@ -197,7 +197,8 @@ export function CharacterCardUpdateModal({ open, onClose }: Props) {
                 {u.reason && <p className="text-xs italic text-[var(--muted-foreground)]">{u.reason}</p>}
                 <div className="flex flex-col gap-1">
                   <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                    Before
+                    
+                    Antes
                   </span>
                   <p className="whitespace-pre-wrap rounded-md bg-[var(--destructive)]/5 p-2 text-xs leading-relaxed text-[var(--foreground)]">
                     {u.oldText}
@@ -205,7 +206,8 @@ export function CharacterCardUpdateModal({ open, onClose }: Props) {
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                    After
+                    
+                    Depois
                   </span>
                   <p className="whitespace-pre-wrap rounded-md bg-emerald-500/5 p-2 text-xs leading-relaxed text-[var(--foreground)]">
                     {u.newText}
@@ -231,7 +233,8 @@ export function CharacterCardUpdateModal({ open, onClose }: Props) {
             className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-50"
           >
             <X size="0.75rem" />
-            Reject
+            
+            Rejeitar
           </button>
           <button
             type="button"
@@ -240,7 +243,8 @@ export function CharacterCardUpdateModal({ open, onClose }: Props) {
             className="flex items-center gap-1.5 rounded-lg bg-[var(--primary)] px-4 py-2 text-xs font-medium text-[var(--primary-foreground)] transition-all hover:opacity-90 disabled:opacity-50"
           >
             {updateCharacter.isPending ? <Loader2 size="0.75rem" className="animate-spin" /> : <Check size="0.75rem" />}
-            Approve {applicableUpdates.length > 0 ? `(${applicableUpdates.length})` : ""}
+            
+            Aprovar {applicableUpdates.length > 0 ? `(${applicableUpdates.length})` : ""}
           </button>
         </div>
       </div>

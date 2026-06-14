@@ -105,7 +105,7 @@ export function CreateCharacterModal({ open, onClose }: Props) {
 
         {/* Name */}
         <div className="w-full">
-          <label className="mb-1 block text-xs font-medium text-[var(--muted-foreground)]">Name *</label>
+          <label className="mb-1 block text-xs font-medium text-[var(--muted-foreground)]">Nome *</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -127,7 +127,8 @@ export function CreateCharacterModal({ open, onClose }: Props) {
             }}
             className="rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             onClick={handleCreate}
@@ -139,7 +140,8 @@ export function CreateCharacterModal({ open, onClose }: Props) {
             ) : (
               <Sparkles size="0.75rem" />
             )}
-            Create
+            
+            Criar
           </button>
         </div>
       </div>

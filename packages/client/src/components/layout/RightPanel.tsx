@@ -53,7 +53,7 @@ const mountedPanels = new Set<string>();
 
 function PanelFallback() {
   return (
-    <div className="flex h-full items-center justify-center text-sm text-[var(--muted-foreground)]">Loading...</div>
+    <div className="flex h-full items-center justify-center text-sm text-[var(--muted-foreground)]">Carregando...</div>
   );
 }
 

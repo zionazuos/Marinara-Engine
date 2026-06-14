@@ -183,7 +183,8 @@ function TargetSelection({ attackType, enemies, party, onSelect, onCancel }: Tar
       >
         <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-[var(--foreground)]">
           <Crosshair size="1rem" className="text-red-400" />
-          Select Target
+          
+          Selecionar alvo
         </h3>
 
         <div className="flex flex-col gap-2">
@@ -254,7 +255,8 @@ function TargetSelection({ attackType, enemies, party, onSelect, onCancel }: Tar
           onClick={onCancel}
           className="mt-3 w-full rounded-xl border border-[var(--border)] py-2 text-xs text-[var(--muted-foreground)] hover:bg-[var(--accent)]"
         >
-          Cancel
+          
+          Cancelar
         </button>
       </motion.div>
     </motion.div>
@@ -283,7 +285,7 @@ function NarrativeSelect({
           onChange={(e) => onChange({ ...value, tense: e.target.value as any })}
           className="rounded-lg border border-[var(--border)] bg-[var(--muted)]/30 px-2 py-1.5 text-xs text-[var(--foreground)]"
         >
-          <option value="present">Present Tense</option>
+          <option value="present">Tempo presente</option>
           <option value="past">Past Tense</option>
         </select>
         <select
@@ -291,9 +293,9 @@ function NarrativeSelect({
           onChange={(e) => onChange({ ...value, person: e.target.value as any })}
           className="rounded-lg border border-[var(--border)] bg-[var(--muted)]/30 px-2 py-1.5 text-xs text-[var(--foreground)]"
         >
-          <option value="first">First Person</option>
-          <option value="second">Second Person</option>
-          <option value="third">Third Person</option>
+          <option value="first">Primeira pessoa</option>
+          <option value="second">Segunda pessoa</option>
+          <option value="third">Terceira pessoa</option>
         </select>
         <select
           value={value.narration}
@@ -301,7 +303,7 @@ function NarrativeSelect({
           className="rounded-lg border border-[var(--border)] bg-[var(--muted)]/30 px-2 py-1.5 text-xs text-[var(--foreground)]"
         >
           <option value="omniscient">Omniscient</option>
-          <option value="limited">Limited</option>
+          <option value="limited">Limitado</option>
         </select>
         <input
           value={value.pov}
@@ -372,7 +374,7 @@ function EncounterConfig() {
               onChange={(e) => setSpellbookId(e.target.value || null)}
               className="w-full rounded-lg border border-[var(--border)] bg-[var(--muted)]/30 px-2 py-1.5 text-xs text-[var(--foreground)]"
             >
-              <option value="">None</option>
+              <option value="">Nenhum</option>
               {spellbooks.map((lb) => (
                 <option key={lb.id} value={lb.id}>
                   {lb.name}
@@ -387,14 +389,16 @@ function EncounterConfig() {
             onClick={closeConfigModal}
             className="flex-1 rounded-xl border border-[var(--border)] py-2.5 text-xs font-medium text-[var(--muted-foreground)] hover:bg-[var(--accent)]"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             onClick={() => initEncounter(settings)}
             className="flex-1 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 py-2.5 text-xs font-bold text-foreground shadow-lg shadow-red-500/20 transition-all hover:shadow-xl hover:shadow-red-500/30 active:scale-95"
           >
             <Swords size="0.875rem" className="mr-1.5 inline" />
-            Begin Combat
+            
+            Iniciar combate
           </button>
         </div>
       </motion.div>
@@ -544,14 +548,16 @@ function PlayerControls({ onAction }: { onAction: (text: string) => void }) {
       <div className="space-y-3 rounded-xl border border-foreground/5 bg-foreground/5 p-4">
         <h3 className="flex items-center gap-2 text-xs font-bold text-foreground/70">
           <Zap size="0.875rem" className="text-yellow-400" />
-          Your Actions
+          
+          Suas ações
         </h3>
 
         {/* Attacks */}
         {attacks.length > 0 && (
           <div>
             <div className="mb-1.5 text-[0.625rem] font-semibold uppercase tracking-wider text-foreground/30">
-              Attacks
+              
+              Ataques
             </div>
             <div className="flex flex-wrap gap-1.5">
               {attacks.map((atk, i) => (
@@ -574,7 +580,8 @@ function PlayerControls({ onAction }: { onAction: (text: string) => void }) {
         {items.length > 0 && (
           <div>
             <div className="mb-1.5 text-[0.625rem] font-semibold uppercase tracking-wider text-foreground/30">
-              Items
+              
+              Itens
             </div>
             <div className="flex flex-wrap gap-1.5">
               {items.map((item, i) => (
@@ -595,7 +602,8 @@ function PlayerControls({ onAction }: { onAction: (text: string) => void }) {
         {/* Custom action */}
         <div>
           <div className="mb-1.5 text-[0.625rem] font-semibold uppercase tracking-wider text-foreground/30">
-            Custom Action
+            
+            Ação personalizada
           </div>
           <div className="flex gap-2">
             <input
@@ -687,7 +695,8 @@ function CombatEndScreen() {
             onClick={closeEncounter}
             className="mt-6 rounded-xl bg-foreground/10 px-6 py-3 text-sm font-bold text-foreground/80 transition-all hover:bg-foreground/20"
           >
-            Close Anyway
+            
+            Fechar mesmo assim
           </button>
         </>
       )}
@@ -800,7 +809,8 @@ function EncounterModalInner() {
                     className="flex items-center gap-1.5 rounded-lg border border-foreground/10 px-3 py-1.5 text-[0.6875rem] text-foreground/50 transition-all hover:bg-foreground/10"
                   >
                     <Flag size="0.75rem" />
-                    Conclude
+                    
+                    Concluir
                   </button>
                 )}
                 <button
@@ -844,13 +854,15 @@ function EncounterModalInner() {
                       className="flex items-center gap-1.5 rounded-xl bg-red-600 px-4 py-2 text-xs font-medium text-foreground"
                     >
                       <RefreshCw size="0.75rem" />
-                      Retry
+                      
+                      Tentar de novo
                     </button>
                     <button
                       onClick={closeEncounter}
                       className="rounded-xl border border-foreground/10 px-4 py-2 text-xs text-foreground/50 hover:bg-foreground/5"
                     >
-                      Close
+                      
+                      Fechar
                     </button>
                   </div>
                 </div>
@@ -871,7 +883,8 @@ function EncounterModalInner() {
                   <div>
                     <h3 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-red-400">
                       <Skull size="0.875rem" />
-                      Enemies
+                      
+                      Inimigos
                     </h3>
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                       {Array.isArray(enemies) &&
@@ -883,7 +896,8 @@ function EncounterModalInner() {
                   <div>
                     <h3 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-blue-400">
                       <Shield size="0.875rem" />
-                      Party
+                      
+                      Grupo
                     </h3>
                     <div className="space-y-2">
                       {Array.isArray(party) && party.map((member, i) => <PartyCard key={i} member={member} />)}
@@ -941,7 +955,7 @@ class EncounterErrorBoundary extends Component<{ children: ReactNode; onReset: (
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
           <div className="relative flex max-w-md flex-col items-center gap-4 rounded-2xl border border-red-500/20 bg-gray-950 p-8 shadow-2xl">
             <AlertTriangle size="2.5rem" className="text-red-400" />
-            <h3 className="text-sm font-bold text-foreground/90">Combat Error</h3>
+            <h3 className="text-sm font-bold text-foreground/90">Erro de combate</h3>
             <p className="text-center text-xs text-foreground/50">
               Something went wrong during combat. This is usually caused by the AI returning unexpected data.
             </p>

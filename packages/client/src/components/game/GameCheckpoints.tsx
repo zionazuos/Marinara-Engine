@@ -128,7 +128,8 @@ export function GameCheckpoints({ chatId, onClose, onLoaded }: GameCheckpointsPr
           className="flex items-center gap-1 rounded bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
           <Save className="h-3 w-3" />
-          Save
+          
+          Salvar
         </button>
       </div>
 
@@ -170,13 +171,15 @@ export function GameCheckpoints({ chatId, onClose, onLoaded }: GameCheckpointsPr
                           disabled={loadCheckpoint.isPending}
                           className="rounded bg-primary px-2 py-1 text-[10px] font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                         >
-                          Confirm
+                          
+                          Confirmar
                         </button>
                         <button
                           onClick={() => setConfirmLoadId(null)}
                           className="rounded px-2 py-1 text-[10px] hover:bg-muted"
                         >
-                          Cancel
+                          
+                          Cancelar
                         </button>
                       </>
                     ) : (

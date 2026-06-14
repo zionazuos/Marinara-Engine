@@ -268,7 +268,8 @@ export function QuickSwitcherMobile() {
               )}
             >
               <Link size="0.75rem" />
-              Connections
+              
+              Conexões
             </button>
             <button
               onClick={() => setTab("personas")}
@@ -361,7 +362,7 @@ export function QuickSwitcherMobile() {
                     ?
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className={cn("text-xs font-semibold", !activePersonaId && "text-foreground")}>None</span>
+                    <span className={cn("text-xs font-semibold", !activePersonaId && "text-foreground")}>Nenhum</span>
                     <span className="text-[0.625rem] text-[var(--muted-foreground)]">No persona selected</span>
                   </div>
                   {!activePersonaId && <span className="ml-auto text-[0.6875rem]">✓</span>}

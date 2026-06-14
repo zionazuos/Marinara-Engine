@@ -239,7 +239,7 @@ export function GamePartySidebar({
                   <div className="border-b border-amber-500/10 px-2.5 py-1.5">
                     <div className="mb-1 flex items-center gap-1 text-[0.5625rem] font-semibold uppercase tracking-wider text-amber-500/50">
                       <Swords size={9} />
-                      <span>Inventory</span>
+                      <span>Inventário</span>
                     </div>
                     <div className="space-y-0.5">
                       {selectedCard.inventory.slice(0, 5).map((item) => (
@@ -264,7 +264,7 @@ export function GamePartySidebar({
                   <div className="border-t border-amber-500/10 px-2.5 py-1.5">
                     <div className="mb-1 flex items-center gap-1 text-[0.5625rem] font-semibold uppercase tracking-wider text-amber-500/50">
                       <Sparkles size={9} />
-                      <span>Traits</span>
+                      <span>Traços</span>
                     </div>
                     <div className="space-y-0.5 text-[0.5625rem]">
                       {Object.entries(selectedCard.customFields)
@@ -355,7 +355,7 @@ export function GamePartySidebar({
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Say to party…"
+                placeholder="Dizer ao grupo…"
                 className="flex-1 rounded-lg bg-[var(--secondary)] px-2 py-2 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted-foreground)]"
               />
               <button

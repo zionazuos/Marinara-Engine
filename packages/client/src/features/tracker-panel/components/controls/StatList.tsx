@@ -185,7 +185,7 @@ function StatBar({
           <InlineEdit
             value={stat.name}
             onSave={onUpdateName}
-            placeholder="Stat"
+            placeholder="Atributo"
             title={visibleText(stat.name, "Stat")}
             className={cn(
               nameInlineEditClass,
@@ -221,11 +221,11 @@ function StatBar({
         )}
         {onUpdateValue && onUpdateMax ? (
           <div className={valueGroupClass}>
-            <InlineNumber value={stat.value} onChange={onUpdateValue} title="Value" className={valueInputClass} />
+            <InlineNumber value={stat.value} onChange={onUpdateValue} title="Valor" className={valueInputClass} />
             <span className="px-px text-[color:color-mix(in_srgb,var(--tracker-profile-number-text)_58%,transparent)]">
               /
             </span>
-            <InlineNumber value={stat.max} onChange={onUpdateMax} min={0} title="Max" className={valueInputClass} />
+            <InlineNumber value={stat.max} onChange={onUpdateMax} min={0} title="Máx" className={valueInputClass} />
           </div>
         ) : (
           <div className={valueGroupClass} title={`${stat.value} / ${stat.max}`}>
@@ -292,7 +292,7 @@ export function StatList({
 }) {
   if (stats.length === 0) {
     return onAdd && addMode ? (
-      <InlineAddRow onClick={onAdd} title="Add stat" className="border-t-0" />
+      <InlineAddRow onClick={onAdd} title="Adicionar atributo" className="border-t-0" />
     ) : (
       <EmptySection>No stats tracked.</EmptySection>
     );
@@ -367,7 +367,7 @@ export function StatList({
       {onAdd && addMode && (
         <InlineAddRow
           onClick={onAdd}
-          title="Add stat"
+          title="Adicionar atributo"
           className={cn(
             fillAvailable && "shrink-0",
             density === "tight"

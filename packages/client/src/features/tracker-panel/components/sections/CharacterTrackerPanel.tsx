@@ -155,14 +155,14 @@ export function CharacterTrackerPanel({
   return (
     <section
       className="group/characters relative z-10 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_5%,transparent)] shadow-[inset_0_1px_0_color-mix(in_srgb,var(--foreground)_5%,transparent)]"
-      aria-label="Characters"
+      aria-label="Personagens"
     >
       <SectionHeader
         icon={<Users size="0.6875rem" />}
         title="Present Characters"
         action={action}
         addAction={
-          addMode ? <AddRowButton title="Add character" onClick={onAddCharacter} className="rounded-sm" /> : undefined
+          addMode ? <AddRowButton title="Adicionar personagem" onClick={onAddCharacter} className="rounded-sm" /> : undefined
         }
         collapsed={collapsed}
         onToggle={onToggleCollapsed}

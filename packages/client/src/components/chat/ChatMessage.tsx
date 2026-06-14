@@ -131,7 +131,7 @@ function HiddenFromAIMessageSummary({ roleplay, onExpand }: { roleplay?: boolean
     >
       <EyeOff size="0.8rem" className="shrink-0" />
       <span className="min-w-0 flex-1 truncate">Hidden from AI</span>
-      <span className="shrink-0 text-[0.625rem] opacity-70">Show</span>
+      <span className="shrink-0 text-[0.625rem] opacity-70">Mostrar</span>
     </button>
   );
 }
@@ -1276,7 +1276,7 @@ export const ChatMessage = memo(function ChatMessage({
     isMergedGroup && mergedNameColors.length > 0 ? (
       <span ref={mergedNameRef} className="relative inline-block">
         {/* Invisible sizer so the parent reserves the right width */}
-        <span className="invisible">Narrator</span>
+        <span className="invisible">Narrador</span>
         {mergedNameColors.map((c, i) => (
           <span
             key={i}
@@ -1288,7 +1288,7 @@ export const ChatMessage = memo(function ChatMessage({
               transition: "opacity 1s ease",
             }}
           >
-            <NameColorText color={c}>Narrator</NameColorText>
+            <NameColorText color={c}>Narrador</NameColorText>
           </span>
         ))}
       </span>
@@ -1442,7 +1442,7 @@ export const ChatMessage = memo(function ChatMessage({
       {(translatedText || isTranslating) && (
         <div className="mt-2 border-t border-white/10 pt-2">
           {isTranslating ? (
-            <span className="text-[0.75rem] italic text-white/40">Translating…</span>
+            <span className="text-[0.75rem] italic text-white/40">Traduzindo…</span>
           ) : (
             <div className="whitespace-pre-wrap text-[0.8125rem] leading-relaxed text-blue-200/70">
               {translatedText}
@@ -1477,7 +1477,7 @@ export const ChatMessage = memo(function ChatMessage({
                 "absolute -right-1 -top-1 rounded-md p-1 text-white/20 opacity-0 transition-all hover:bg-red-500/20 hover:text-red-400 group-hover:opacity-100",
                 showActions && "opacity-100",
               )}
-              title="Delete"
+              title="Excluir"
             >
               <Trash2 size="0.75rem" />
             </button>
@@ -1536,7 +1536,7 @@ export const ChatMessage = memo(function ChatMessage({
                     "absolute right-2 top-2 rounded-md p-1 text-white/20 opacity-0 transition-all hover:bg-red-500/20 hover:text-red-400 group-hover:opacity-100",
                     showActions && "opacity-100",
                   )}
-                  title="Delete"
+                  title="Excluir"
                 >
                   <Trash2 size="0.75rem" />
                 </button>
@@ -1544,7 +1544,8 @@ export const ChatMessage = memo(function ChatMessage({
               <div className="mb-1 flex items-center gap-2 text-[0.625rem] font-semibold uppercase tracking-widest text-amber-400/70">
                 <span className="h-px flex-1 bg-amber-400/20" />
                 {hiddenFromAIHeader}
-                Narrator
+                
+                Narrador
                 <span className="h-px flex-1 bg-amber-400/20" />
               </div>
               {isHiddenCollapsed ? (
@@ -1620,7 +1621,7 @@ export const ChatMessage = memo(function ChatMessage({
                         mergedAvatarRefs.current[i] = el;
                       }}
                       src={avatar.url}
-                      alt="Group"
+                      alt="Grupo"
                       loading="lazy"
                       decoding="async"
                       className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
@@ -1774,7 +1775,7 @@ export const ChatMessage = memo(function ChatMessage({
                                 mergedAvatarRefs.current[i] = el;
                               }}
                               src={avatar.url}
-                              alt="Group"
+                              alt="Grupo"
                               loading="lazy"
                               decoding="async"
                               className="absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-700"
@@ -1905,7 +1906,7 @@ export const ChatMessage = memo(function ChatMessage({
               <ActionBtn
                 icon={copied ? "\u2713" : <Copy size={MESSAGE_ACTION_ICON_SIZE} />}
                 onClick={handleCopy}
-                title="Copy"
+                title="Copiar"
                 dark
               />
               <ActionBtn
@@ -1915,7 +1916,7 @@ export const ChatMessage = memo(function ChatMessage({
                 className={translatedText ? "text-blue-400/80 hover:text-blue-300" : undefined}
                 dark
               />
-              <ActionBtn icon={<Pencil size={MESSAGE_ACTION_ICON_SIZE} />} onClick={startEditing} title="Edit" dark />
+              <ActionBtn icon={<Pencil size={MESSAGE_ACTION_ICON_SIZE} />} onClick={startEditing} title="Editar" dark />
               <ActionBtn
                 icon={<RefreshCw size={MESSAGE_ACTION_ICON_SIZE} />}
                 onClick={() => onRegenerate?.(message.id)}
@@ -1989,7 +1990,7 @@ export const ChatMessage = memo(function ChatMessage({
               <ActionBtn
                 icon={<Trash2 size={MESSAGE_ACTION_ICON_SIZE} />}
                 onClick={() => onDelete?.(message.id)}
-                title="Delete"
+                title="Excluir"
                 className="hover:text-red-400"
                 dark
               />
@@ -2139,7 +2140,7 @@ export const ChatMessage = memo(function ChatMessage({
                       mergedAvatarRefs.current[i] = el;
                     }}
                     src={avatar.url}
-                    alt="Group"
+                    alt="Grupo"
                     loading="lazy"
                     decoding="async"
                     className="absolute inset-0 h-8 w-8 object-cover transition-opacity duration-700"
@@ -2259,7 +2260,7 @@ export const ChatMessage = memo(function ChatMessage({
                 {(translatedText || isTranslating) && (
                   <div className="mt-2 border-t border-[var(--border)] pt-2">
                     {isTranslating ? (
-                      <span className="text-[0.75rem] italic text-[var(--muted-foreground)]">Translating…</span>
+                      <span className="text-[0.75rem] italic text-[var(--muted-foreground)]">Traduzindo…</span>
                     ) : (
                       <div className="whitespace-pre-wrap text-[0.8125rem] leading-relaxed text-[var(--muted-foreground)]">
                         {translatedText}
@@ -2348,7 +2349,7 @@ export const ChatMessage = memo(function ChatMessage({
             <ActionBtn
               icon={copied ? "✓" : <Copy size={MESSAGE_ACTION_ICON_SIZE} />}
               onClick={handleCopy}
-              title="Copy"
+              title="Copiar"
             />
             <ActionBtn
               icon={<Languages size={MESSAGE_ACTION_ICON_SIZE} />}
@@ -2356,7 +2357,7 @@ export const ChatMessage = memo(function ChatMessage({
               title={translatedText ? "Hide translation" : "Translate"}
               className={translatedText ? "text-blue-500" : undefined}
             />
-            <ActionBtn icon={<Pencil size={MESSAGE_ACTION_ICON_SIZE} />} onClick={startEditing} title="Edit" />
+            <ActionBtn icon={<Pencil size={MESSAGE_ACTION_ICON_SIZE} />} onClick={startEditing} title="Editar" />
             <ActionBtn
               icon={<RefreshCw size={MESSAGE_ACTION_ICON_SIZE} />}
               onClick={() => onRegenerate?.(message.id)}
@@ -2419,7 +2420,7 @@ export const ChatMessage = memo(function ChatMessage({
             <ActionBtn
               icon={<Trash2 size={MESSAGE_ACTION_ICON_SIZE} />}
               onClick={() => onDelete?.(message.id)}
-              title="Delete"
+              title="Excluir"
               className="hover:text-[var(--destructive)]"
             />
             {ttsEnabled && (

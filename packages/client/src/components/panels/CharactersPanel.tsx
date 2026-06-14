@@ -638,8 +638,8 @@ export function CharactersPanel() {
           >
             <option value="name-asc">A-Z</option>
             <option value="name-desc">Z-A</option>
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
+            <option value="newest">Mais recentes</option>
+            <option value="oldest">Mais antigos</option>
             <option value="favorites">Favorites</option>
           </select>
           <ArrowUpDown
@@ -702,7 +702,7 @@ export function CharactersPanel() {
                   onClick={clearTagFilters}
                   className="flex items-center gap-1 rounded-full bg-[var(--destructive)]/10 px-2 py-0.5 text-[0.625rem] font-medium text-[var(--destructive)] transition-all hover:bg-[var(--destructive)]/20"
                 >
-                  <X size="0.5rem" /> Clear
+                  <X size="0.5rem" />  Limpar
                 </button>
               )}
               {allTags.map((tag) => {
@@ -771,23 +771,23 @@ export function CharactersPanel() {
         <button
           onClick={() => openModal("create-character")}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-pink-400 to-purple-500 px-3 py-2.5 text-xs font-medium text-white shadow-md shadow-pink-500/15 transition-all hover:shadow-lg hover:shadow-pink-500/25 active:scale-[0.98]"
-          title="New"
+          title="Novo"
         >
-          <Plus size="0.8125rem" /> <span className="md:hidden">New</span>
+          <Plus size="0.8125rem" /> <span className="md:hidden">Novo</span>
         </button>
         <button
           onClick={() => openModal("import-character")}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-xs font-medium text-[var(--secondary-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] active:scale-[0.98]"
-          title="Import"
+          title="Importar"
         >
-          <Download size="0.8125rem" /> <span className="md:hidden">Import</span>
+          <Download size="0.8125rem" /> <span className="md:hidden">Importar</span>
         </button>
         <button
           onClick={() => openModal("character-maker")}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-xs font-medium text-[var(--secondary-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] active:scale-[0.98]"
-          title="AI Maker"
+          title="Criador por IA"
         >
-          <Sparkles size="0.8125rem" /> <span className="md:hidden">Maker</span>
+          <Sparkles size="0.8125rem" /> <span className="md:hidden">Criador</span>
         </button>
         <button
           onClick={() => {
@@ -804,17 +804,17 @@ export function CharactersPanel() {
               ? "bg-[var(--primary)]/15 text-[var(--primary)] ring-1 ring-[var(--primary)]/30"
               : "bg-[var(--secondary)] text-[var(--secondary-foreground)] ring-1 ring-[var(--border)] hover:bg-[var(--accent)]",
           )}
-          title="Select"
+          title="Selecionar"
         >
           <Check size="0.8125rem" />
-          <span className="md:hidden">Select</span>
+          <span className="md:hidden">Selecionar</span>
         </button>
       </div>
 
       {selectionMode && (
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--secondary)]/60 px-3 py-2">
           <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
-            {selectedCharacterIds.size} selected
+            {selectedCharacterIds.size}  selecionado(s)
           </span>
           <button
             onClick={selectAllVisible}
@@ -828,7 +828,8 @@ export function CharactersPanel() {
             disabled={selectedCharacterIds.size === 0}
             className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-40"
           >
-            Clear
+            
+            Limpar
           </button>
           <button
             onClick={handleDeleteSelected}
@@ -836,7 +837,8 @@ export function CharactersPanel() {
             className="inline-flex items-center gap-1 rounded-lg bg-[var(--destructive)]/12 px-2.5 py-1 text-[0.625rem] font-medium text-[var(--destructive)] transition-all hover:bg-[var(--destructive)]/20 disabled:opacity-40"
           >
             <Trash2 size="0.6875rem" />
-            Delete
+            
+            Excluir
           </button>
           <button
             onClick={() => setExportDialogOpen(true)}
@@ -850,7 +852,8 @@ export function CharactersPanel() {
             onClick={exitSelectionMode}
             className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
           >
-            Done
+            
+            Concluído
           </button>
         </div>
       )}
@@ -881,7 +884,7 @@ export function CharactersPanel() {
               setGroupsExpanded(true);
             }}
             className="rounded-lg p-1 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)] hover:text-[var(--primary)]"
-            title="Create group"
+            title="Criar grupo"
           >
             <FolderPlus size="0.8125rem" />
           </button>
@@ -1003,7 +1006,7 @@ export function CharactersPanel() {
                                 setEditGroupName(group.name);
                               }}
                               className="rounded-lg p-1 transition-all hover:bg-[var(--accent)]"
-                              title="Rename group"
+                              title="Renomear grupo"
                             >
                               <Pencil size="0.6875rem" />
                             </button>
@@ -1013,7 +1016,7 @@ export function CharactersPanel() {
                                 deleteGroup.mutate(group.id);
                               }}
                               className="rounded-lg p-1 transition-all hover:bg-[var(--destructive)]/15"
-                              title="Delete group"
+                              title="Excluir grupo"
                             >
                               <Trash2 size="0.6875rem" className="text-[var(--destructive)]" />
                             </button>
@@ -1141,7 +1144,7 @@ export function CharactersPanel() {
         <User size="0.6875rem" />
         Characters ({filteredCharacters.length})
         {selectionMode && (
-          <span className="text-[0.625rem] font-normal normal-case">· {selectedCharacterIds.size} selected</span>
+          <span className="text-[0.625rem] font-normal normal-case">· {selectedCharacterIds.size}  selecionado(s)</span>
         )}
       </div>
 
@@ -1351,7 +1354,7 @@ export function CharactersPanel() {
                       });
                     }}
                     className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-sky-400/10 hover:text-sky-400 active:scale-90"
-                    title="Duplicate"
+                    title="Duplicar"
                   >
                     <Copy size="0.75rem" />
                   </button>
@@ -1371,7 +1374,7 @@ export function CharactersPanel() {
                       deleteCharacter.mutate(char.id);
                     }}
                     className="rounded-lg p-1.5 transition-all hover:bg-[var(--destructive)]/15 active:scale-90"
-                    title="Delete"
+                    title="Excluir"
                   >
                     <Trash2 size="0.75rem" className="text-[var(--destructive)]" />
                   </button>
@@ -1428,11 +1431,12 @@ export function CharactersPanel() {
           >
             <div className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3">
               <MessageCircle size="0.875rem" className="text-[var(--muted-foreground)]" />
-              <span className="text-sm font-semibold text-[var(--foreground)]">First Message</span>
+              <span className="text-sm font-semibold text-[var(--foreground)]">Primeira mensagem</span>
             </div>
             <div className="px-4 py-3">
               <p className="text-sm text-[var(--foreground)]">
-                Add <strong>{firstMesConfirm.charName}</strong>'s first message to the chat?
+                
+                Adicionar <strong>{firstMesConfirm.charName}</strong>'s first message to the chat?
               </p>
               <p className="mt-2 max-h-32 overflow-y-auto rounded-lg bg-[var(--accent)]/50 px-3 py-2 text-xs leading-relaxed text-[var(--muted-foreground)]">
                 {firstMesConfirm.message.length > 300
@@ -1445,7 +1449,8 @@ export function CharactersPanel() {
                 onClick={() => setFirstMesConfirm(null)}
                 className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
               >
-                Skip
+                
+                Pular
               </button>
               <button
                 onClick={async () => {

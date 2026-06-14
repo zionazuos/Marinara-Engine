@@ -57,14 +57,16 @@ export function AudioPlayerModal({ path, name, onClose }: { path: string; name: 
             download={name}
             className="rounded-lg border border-(--border) bg-(--background) px-4 py-2 text-xs font-medium text-(--foreground) transition-colors hover:bg-(--accent)"
           >
-            Download
+            
+            Baixar
           </a>
           <button
             type="button"
             onClick={onClose}
             className="rounded-lg border border-(--border) bg-(--background) px-4 py-2 text-xs font-medium text-(--foreground) transition-colors hover:bg-(--accent)"
           >
-            Close
+            
+            Fechar
           </button>
         </div>
       </div>

@@ -195,7 +195,7 @@ export function AvatarGenerationModal({
               </label>
 
               <label className="space-y-1.5">
-                <span className="block text-xs font-medium text-[var(--foreground)]">Avatar Prompt</span>
+                <span className="block text-xs font-medium text-[var(--foreground)]">Prompt do avatar</span>
                 <textarea
                   value={appearance}
                   onChange={(event) => setAppearance(event.target.value)}
@@ -256,7 +256,8 @@ export function AvatarGenerationModal({
                 className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <X size="0.875rem" />
-                Cancel
+                
+                Cancelar
               </button>
               <button
                 type="button"

@@ -345,7 +345,7 @@ function ToolbarMenu({ children }: { children: ReactNode }) {
             "border-foreground/10",
             open && "bg-[var(--accent)] border-foreground/20 text-foreground",
           )}
-          title="More options"
+          title="Mais opções"
         >
           <MoreHorizontal size="0.9375rem" />
         </button>
@@ -538,7 +538,7 @@ function SummaryButton({
               ? "bg-foreground/10 border-foreground/25 text-foreground/80 hover:bg-foreground/15 hover:text-foreground"
               : "bg-foreground/5 border-foreground/10 text-foreground/60 hover:bg-foreground/10 hover:text-foreground",
         )}
-        title="Chat Summary"
+        title="Resumo do chat"
       >
         <ScrollText size="0.875rem" />
       </button>
@@ -1032,7 +1032,7 @@ export function ChatRoleplaySurface({
                         onClick={onToggleSpritePosition}
                       />
                     )}
-                    <RpToolbarButton icon={<Image size="0.875rem" />} title="Gallery" onClick={onOpenGallery} />
+                    <RpToolbarButton icon={<Image size="0.875rem" />} title="Galeria" onClick={onOpenGallery} />
                     {chat?.connectedChatId && (
                       <RpToolbarButton
                         icon={<ArrowRightLeft size="0.875rem" />}
@@ -1042,7 +1042,7 @@ export function ChatRoleplaySurface({
                     )}
                     <RpToolbarButton
                       icon={<Settings2 size="0.875rem" />}
-                      title="Chat Settings"
+                      title="Configurações do chat"
                       onClick={onOpenSettings}
                     />
                   </ToolbarMenu>
@@ -1137,7 +1137,7 @@ export function ChatRoleplaySurface({
                             onClick={onToggleSpritePosition}
                           />
                         )}
-                        <RpToolbarButton icon={<Image size="0.875rem" />} title="Gallery" onClick={onOpenGallery} />
+                        <RpToolbarButton icon={<Image size="0.875rem" />} title="Galeria" onClick={onOpenGallery} />
                         {chat?.connectedChatId && (
                           <RpToolbarButton
                             icon={<ArrowRightLeft size="0.875rem" />}
@@ -1147,7 +1147,7 @@ export function ChatRoleplaySurface({
                         )}
                         <RpToolbarButton
                           icon={<Settings2 size="0.875rem" />}
-                          title="Chat Settings"
+                          title="Configurações do chat"
                           onClick={onOpenSettings}
                         />
                       </ToolbarMenu>
@@ -1194,7 +1194,7 @@ export function ChatRoleplaySurface({
                         title="Manage Chat Files"
                         onClick={onOpenFiles}
                       />
-                      <RpToolbarButton icon={<Image size="0.875rem" />} title="Gallery" onClick={onOpenGallery} />
+                      <RpToolbarButton icon={<Image size="0.875rem" />} title="Galeria" onClick={onOpenGallery} />
                       {chat?.connectedChatId && (
                         <RpToolbarButton
                           icon={<ArrowRightLeft size="0.875rem" />}
@@ -1204,7 +1204,7 @@ export function ChatRoleplaySurface({
                       )}
                       <RpToolbarButton
                         icon={<Settings2 size="0.875rem" />}
-                        title="Chat Settings"
+                        title="Configurações do chat"
                         onClick={onOpenSettings}
                       />
                     </ToolbarMenu>

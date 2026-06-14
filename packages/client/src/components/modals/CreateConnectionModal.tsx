@@ -62,7 +62,7 @@ export function CreateConnectionModal({ open, onClose }: Props) {
         </div>
 
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-[var(--muted-foreground)]">Name *</span>
+          <span className="text-xs font-medium text-[var(--muted-foreground)]">Nome *</span>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -76,7 +76,7 @@ export function CreateConnectionModal({ open, onClose }: Props) {
         </label>
 
         <div className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-[var(--muted-foreground)]">Provider</span>
+          <span className="text-xs font-medium text-[var(--muted-foreground)]">Provedor</span>
           <div className="grid grid-cols-2 gap-1.5">
             {(Object.entries(PROVIDERS) as [APIProvider, (typeof PROVIDERS)[APIProvider]][]).map(([key, info]) => (
               <button
@@ -109,7 +109,8 @@ export function CreateConnectionModal({ open, onClose }: Props) {
             }}
             className="rounded-lg px-4 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             onClick={handleCreate}
@@ -117,7 +118,8 @@ export function CreateConnectionModal({ open, onClose }: Props) {
             className="flex items-center gap-1.5 rounded-lg bg-[var(--primary)] px-4 py-2 text-xs font-medium text-[var(--primary-foreground)] transition-all hover:opacity-90 disabled:opacity-50"
           >
             {createConnection.isPending ? <Loader2 size="0.75rem" className="animate-spin" /> : <Link size="0.75rem" />}
-            Create
+            
+            Criar
           </button>
         </div>
       </div>

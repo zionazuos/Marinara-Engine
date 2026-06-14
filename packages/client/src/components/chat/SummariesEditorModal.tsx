@@ -390,7 +390,7 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
                   <div className="space-y-2 border-t border-[var(--border)] px-3 py-2">
                     {/* Summary textarea */}
                     <div className="space-y-1">
-                      <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Summary</label>
+                      <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Resumo</label>
                       <AutoSizingTextarea
                         value={current.summary}
                         onChange={(next) => updateEntry(entry.kind, entry.key, { ...current, summary: next })}
@@ -457,7 +457,8 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
               disabled={updateSummaries.isPending}
               className="rounded-lg px-3 py-1.5 text-[0.75rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:opacity-50"
             >
-              Cancel
+              
+              Cancelar
             </button>
             <button
               onClick={handleSave}

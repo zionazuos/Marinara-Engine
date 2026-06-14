@@ -145,7 +145,8 @@ export function GameJsonRepairModal({ request, onClose, onApplied }: GameJsonRep
             disabled={isApplying}
             className="rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Cancel
+            
+            Cancelar
           </button>
           <button
             type="button"
@@ -154,7 +155,8 @@ export function GameJsonRepairModal({ request, onClose, onApplied }: GameJsonRep
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Wand2 size="0.95rem" />
-            Format
+            
+            Formato
           </button>
           <button
             type="button"

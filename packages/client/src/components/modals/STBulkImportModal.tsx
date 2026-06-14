@@ -404,7 +404,8 @@ export function STBulkImportModal({ open, onClose }: Props) {
                   title="Browse for folder"
                 >
                   {picking ? <Loader2 size="0.875rem" className="animate-spin" /> : <FolderOpen size="0.875rem" />}
-                  Browse
+                  
+                  Navegar
                 </button>
               </div>
             </div>
@@ -421,7 +422,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
                     }}
                     disabled={browserLoading || browserPath === "/"}
                     className="rounded p-1 transition-colors hover:bg-[var(--accent)] disabled:opacity-30"
-                    title="Go up"
+                    title="Subir"
                   >
                     <ArrowLeft size="0.75rem" />
                   </button>
@@ -444,7 +445,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
                       <Loader2 size="0.875rem" className="animate-spin text-[var(--muted-foreground)]" />
                     </div>
                   ) : browserFolders.length === 0 ? (
-                    <p className="py-3 text-center text-[0.625rem] text-[var(--muted-foreground)]">No subfolders</p>
+                    <p className="py-3 text-center text-[0.625rem] text-[var(--muted-foreground)]">Sem subpastas</p>
                   ) : (
                     browserFolders.map((name) => (
                       <button
@@ -491,7 +492,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
             )}
 
             <div className="rounded-lg bg-[var(--secondary)]/50 p-2.5 text-[0.625rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-              <strong>Tip:</strong> This is the main SillyTavern folder, usually the one containing{" "}
+              <strong>Dica:</strong> This is the main SillyTavern folder, usually the one containing{" "}
               <code className="rounded bg-[var(--secondary)] px-1">data/</code> or{" "}
               <code className="rounded bg-[var(--secondary)] px-1">public/</code>.
             </div>
@@ -522,13 +523,13 @@ export function STBulkImportModal({ open, onClose }: Props) {
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-medium">Choose exactly what to import</span>
                 <span className="text-[0.6875rem] text-[var(--muted-foreground)]">
-                  {Object.values(selection).reduce((sum, ids) => sum + ids.length, 0)} selected
+                  {Object.values(selection).reduce((sum, ids) => sum + ids.length, 0)}  selecionado(s)
                 </span>
               </div>
 
               <SelectableImportCategory
                 icon={<Users size="0.875rem" />}
-                label="Characters"
+                label="Personagens"
                 items={scanResult.characters}
                 selectedIds={selection.characters}
                 onToggleItem={(itemId, checked) => toggleCategoryItem("characters", itemId, checked)}
@@ -602,7 +603,8 @@ export function STBulkImportModal({ open, onClose }: Props) {
                   const modified = formatModifiedAt(item.modifiedAt);
                   return (
                     <span>
-                      Folder: {item.folderName} · fileName: {item.name} · characterName: {item.characterName}
+                      
+                      Pasta: {item.folderName} · fileName: {item.name} · characterName: {item.characterName}
                       {modified ? ` · modified ${modified}` : ""}
                     </span>
                   );
@@ -659,7 +661,8 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 renderBadge={(item) =>
                   item.isBuiltin ? (
                     <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[0.5625rem] font-medium text-amber-400">
-                      Built-in
+                      
+                      Embutido
                     </span>
                   ) : null
                 }
@@ -680,7 +683,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 onSelectNone={() => updateCategorySelection("lorebooks", [])}
                 renderDetails={(item) => {
                   const modified = formatModifiedAt(item.modifiedAt);
-                  return modified ? <span>Modified {modified}</span> : null;
+                  return modified ? <span>Modificado {modified}</span> : null;
                 }}
               />
 
@@ -699,7 +702,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 onSelectNone={() => updateCategorySelection("backgrounds", [])}
                 renderDetails={(item) => {
                   const modified = formatModifiedAt(item.modifiedAt);
-                  return modified ? <span>Modified {modified}</span> : null;
+                  return modified ? <span>Modificado {modified}</span> : null;
                 }}
               />
 
@@ -741,7 +744,8 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 onClick={reset}
                 className="flex-1 rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-medium transition-all hover:bg-[var(--secondary)] active:scale-95"
               >
-                Back
+                
+                Voltar
               </button>
               <button
                 onClick={handleImport}
@@ -791,7 +795,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-[var(--muted-foreground)]">Preparing...</p>
+              <p className="text-xs text-[var(--muted-foreground)]">Preparando...</p>
             )}
           </div>
         )}
@@ -816,7 +820,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
               <div className="grid grid-cols-2 gap-2">
                 <StatCard
                   icon={<Users size="0.875rem" />}
-                  label="Characters"
+                  label="Personagens"
                   count={importResult.imported.characters}
                 />
                 <StatCard icon={<MessageSquare size="0.875rem" />} label="Chats" count={importResult.imported.chats} />
@@ -864,7 +868,8 @@ export function STBulkImportModal({ open, onClose }: Props) {
               onClick={handleClose}
               className="rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-medium text-[var(--primary-foreground)] transition-all hover:opacity-90 active:scale-95"
             >
-              Done
+              
+              Concluído
             </button>
           </>
         )}
@@ -922,14 +927,16 @@ function SelectableImportCategory<T extends ScanItemBase>({
               onClick={onSelectAll}
               className="rounded-md px-2 py-1 text-[0.625rem] font-medium text-[var(--primary)] transition-colors hover:bg-[var(--accent)]"
             >
-              All
+              
+              Todos
             </button>
             <button
               type="button"
               onClick={onSelectNone}
               className="rounded-md px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
             >
-              None
+              
+              Nenhum
             </button>
             <button
               type="button"
@@ -970,7 +977,8 @@ function SelectableImportCategory<T extends ScanItemBase>({
                       <span className="shrink-0 rounded-full bg-[var(--primary)]/15 px-1.5 py-0.5 text-[0.5625rem] font-medium text-[var(--primary)]">
                         <span className="inline-flex items-center gap-1">
                           <Check size="0.5625rem" />
-                          Selected
+                          
+                          Selecionado
                         </span>
                       </span>
                     )}

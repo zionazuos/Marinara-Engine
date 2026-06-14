@@ -196,7 +196,7 @@ function PersonaPicker({
       >
         <PersonaAvatar persona={null} />
         <div className="min-w-0 flex-1">
-          <span className="block truncate text-xs font-medium">None</span>
+          <span className="block truncate text-xs font-medium">Nenhum</span>
           <span className="block truncate text-[0.625rem] text-[var(--muted-foreground)]">Stay anonymous</span>
         </div>
         {!selectedId && <Check size="0.75rem" className="shrink-0 text-[var(--primary)]" />}
@@ -526,7 +526,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
             {/* Conversation name */}
             <div className="space-y-1.5">
               <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
-                Name
+                
+                Nome
               </label>
               <input
                 type="text"
@@ -554,7 +555,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                 onChange={(e) => setConnection(e.target.value || null)}
                 className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-[var(--border)] transition-shadow focus:ring-[var(--primary)]/40"
               >
-                <option value="">None</option>
+                <option value="">Nenhum</option>
                 <option value="random">🎲 Random</option>
                 {connectionOptions.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -586,7 +587,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
             {/* Persona picker (compact) */}
             <div className="space-y-1.5">
               <label className="text-[0.6875rem] font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
-                Your Persona
+                
+                Sua persona
               </label>
               <PersonaPicker personas={personas} value={chat.personaId ?? null} onChange={setPersona} />
             </div>
@@ -786,7 +788,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                   onClick={onFinish}
                   className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
                 >
-                  Skip
+                  
+                  Pular
                 </button>
                 <button
                   onClick={handleStartChatting}
@@ -1124,7 +1127,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
           onChange={(e) => setConnection(e.target.value || null)}
           className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2.5 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
         >
-          <option value="">None</option>
+          <option value="">Nenhum</option>
           <option value="random">🎲 Random</option>
           {connectionOptions.map((c) => (
             <option key={c.id} value={c.id}>
@@ -1162,7 +1165,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
         onChange={(e) => setPreset(e.target.value || null)}
         className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2.5 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
       >
-        <option value="">None</option>
+        <option value="">Nenhum</option>
         {((presets ?? []) as Array<{ id: string; name: string; isDefault?: boolean | string }>).map((p) => (
           <option key={p.id} value={p.id}>
             {p.name}
@@ -1222,7 +1225,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                   <button
                     onClick={() => toggleCharacter(cid)}
                     className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                    title="Remove"
+                    title="Remover"
                   >
                     <Trash2 size="0.6875rem" />
                   </button>
@@ -1313,7 +1316,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                   <button
                     onClick={() => toggleLorebook(lb.id)}
                     className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                    title="Remove"
+                    title="Remover"
                   >
                     <Trash2 size="0.6875rem" />
                   </button>
@@ -1408,7 +1411,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                 <button
                   onClick={() => setShortcutMode(false)}
                   className="flex items-center gap-1.5 rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
-                  aria-label="Back"
+                  aria-label="Voltar"
                 >
                   <ArrowLeft size="0.875rem" />
                 </button>
@@ -1419,7 +1422,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                 <button
                   onClick={onFinish}
                   className="rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
-                  aria-label="Close"
+                  aria-label="Fechar"
                 >
                   <X size="0.875rem" />
                 </button>
@@ -1440,7 +1443,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                     onChange={(e) => setShortcutPresetId(e.target.value)}
                     className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-[var(--border)] transition-shadow focus:ring-[var(--primary)]/40"
                   >
-                    {chatPresetList.length === 0 && <option value="">Loading…</option>}
+                    {chatPresetList.length === 0 && <option value="">Carregando…</option>}
                     {chatPresetList.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.isDefault ? "Default" : p.name}
@@ -1581,7 +1584,8 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                   onClick={() => setShortcutMode(false)}
                   className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
                 >
-                  Back
+                  
+                  Voltar
                 </button>
                 <button
                   onClick={handleShortcutApply}
@@ -1659,7 +1663,8 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                     onClick={onFinish}
                     className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
                   >
-                    Skip
+                    
+                    Pular
                   </button>
                   <button
                     onClick={() => setShortcutMode(true)}

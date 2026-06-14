@@ -89,7 +89,7 @@ const TOP_BAR_SELECTOR = '[data-component="TopBar"]';
 
 function MainPaneFallback() {
   return (
-    <div className="flex flex-1 items-center justify-center text-sm text-[var(--muted-foreground)]">Loading...</div>
+    <div className="flex flex-1 items-center justify-center text-sm text-[var(--muted-foreground)]">Carregando...</div>
   );
 }
 /** Mounts children once `open` becomes true, then keeps them mounted so state persists.
@@ -132,7 +132,7 @@ function MountOnceWhenOpened({
 
 function SidePanelFallback() {
   return (
-    <div className="flex h-full items-center justify-center text-sm text-[var(--muted-foreground)]">Loading...</div>
+    <div className="flex h-full items-center justify-center text-sm text-[var(--muted-foreground)]">Carregando...</div>
   );
 }
 
@@ -741,7 +741,7 @@ export function AppShell() {
         ref={mainRef}
         data-tour="chat-area"
         data-component="CenterContent"
-        aria-label="Main content"
+        aria-label="Conteúdo principal"
         className="@container mari-main relative flex min-w-0 flex-1 flex-col overflow-hidden"
       >
         <TopBar />

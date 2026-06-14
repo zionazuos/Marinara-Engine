@@ -425,7 +425,7 @@ export function GameInput({
         <div className={cn("flex items-center", inline ? "px-0 pb-1" : "border-b border-[var(--border)] px-4 py-2")}>
           <div className="flex min-w-0 items-center gap-1.5 rounded-lg border border-sky-400/20 bg-sky-500/10 px-2.5 py-1 text-[0.6875rem] text-sky-100/90">
             <span className="shrink-0">📍</span>
-            <span className="min-w-0 truncate">Destination: {pendingMoveLabel}</span>
+            <span className="min-w-0 truncate">Destino: {pendingMoveLabel}</span>
             {onClearPendingMove && (
               <button
                 onClick={onClearPendingMove}
@@ -460,7 +460,7 @@ export function GameInput({
                 >
                   <Users size={14} className="shrink-0" />
                   <span className="flex-1">Talk to Party</span>
-                  {addressMode === "party" && <span className="text-[0.625rem] uppercase tracking-wide">On</span>}
+                  {addressMode === "party" && <span className="text-[0.625rem] uppercase tracking-wide">Ligado</span>}
                 </button>
               )}
               <button
@@ -474,7 +474,7 @@ export function GameInput({
               >
                 <MessageCircle size={14} className="shrink-0" />
                 <span className="flex-1">Talk to GM</span>
-                {addressMode === "gm" && <span className="text-[0.625rem] uppercase tracking-wide">On</span>}
+                {addressMode === "gm" && <span className="text-[0.625rem] uppercase tracking-wide">Ligado</span>}
               </button>
             </div>
           )}
@@ -519,7 +519,7 @@ export function GameInput({
               ? "text-blue-400 hover:bg-foreground/10"
               : "text-foreground/40 hover:bg-foreground/10 hover:text-foreground/70",
           )}
-          title="Attach files"
+          title="Anexar arquivos"
         >
           <Paperclip size={18} />
         </button>

@@ -17,12 +17,12 @@ export function WorldLocationPlate({
   const compactLocationText = locationText.length > 34;
 
   return (
-    <WorldTileShell label="Location" className={cn("min-h-[2.375rem]", className)}>
+    <WorldTileShell label="Local" className={cn("min-h-[2.375rem]", className)}>
       <WorldRenderedEdit
-        label="Location"
+        label="Local"
         value={value}
         onSave={onSave}
-        placeholder="Set location"
+        placeholder="Definir local"
         className="relative z-[1] grid grid-cols-[1.7rem_minmax(0,1fr)] items-center gap-1 px-1 py-1 text-left @min-[380px]:grid-cols-[1.9rem_minmax(0,1fr)] @min-[380px]:px-1.5"
         inputClassName="text-center text-[0.75rem]"
         editHintClassName="right-1 top-1"

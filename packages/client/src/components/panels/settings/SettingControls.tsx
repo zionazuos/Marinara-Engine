@@ -25,7 +25,7 @@ export function ConversationSoundSetting() {
         }}
       />
       <ToggleSetting
-        label="Roleplay mode"
+        label="Modo roleplay"
         checked={rpNotificationSound}
         onChange={(v) => {
           setRpNotificationSound(v);
