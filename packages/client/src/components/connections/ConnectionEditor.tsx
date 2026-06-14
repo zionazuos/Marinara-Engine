@@ -845,7 +845,8 @@ export function ConnectionEditor() {
               <p className="flex items-start gap-1.5 text-[0.6875rem] text-sky-300">
                 <AlertCircle size="0.75rem" className="mt-px shrink-0" />
                 <span>
-                  Routes chat through your local <strong>Claude Code</strong> install so it bills against your Anthropic{" "}
+                  
+                  Roteia o chat pelo seu modelo local <strong>Claude Code</strong> install so it bills against your Anthropic{" "}
                   <strong>Pro / Max</strong> subscription instead of an API key. Prerequisites on the Marinara host:
                 </span>
               </p>
@@ -873,7 +874,8 @@ export function ConnectionEditor() {
               <p className="flex items-start gap-1.5 text-[0.6875rem] text-sky-300">
                 <AlertCircle size="0.75rem" className="mt-px shrink-0" />
                 <span>
-                  Routes chat through your local <strong>Codex ChatGPT</strong> login so it uses your ChatGPT account
+                  
+                  Roteia o chat pelo seu modelo local <strong>Codex ChatGPT</strong> login so it uses your ChatGPT account
                   instead of an OpenAI API key. Prerequisites on the Marinara host:
                 </span>
               </p>
@@ -1618,7 +1620,7 @@ export function ConnectionEditor() {
                   <div className="h-5 w-9 rounded-full bg-[var(--border)] transition-colors peer-checked:bg-purple-400/70" />
                   <div className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
                 </div>
-                <span className="text-sm">Use custom defaults for this connection</span>
+                <span className="text-sm">Usar padrões personalizados para esta conexão</span>
               </label>
 
               {localDefaultParametersEnabled ? (
@@ -1677,7 +1679,8 @@ export function ConnectionEditor() {
                   <div className="min-w-0">
                     <span className="block text-sm font-medium">Profundidade do cache</span>
                     <span className="block text-[0.625rem] text-[var(--muted-foreground)]">
-                      Messages back from the newest turn.
+                      
+                      Mensagens atrás a partir do turno mais recente.
                     </span>
                   </div>
                   <DraftNumberInput
@@ -1763,7 +1766,7 @@ export function ConnectionEditor() {
                   className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-amber-400"
                 />
                 <div className="min-w-0 flex-1 text-[0.6875rem] leading-relaxed">
-                  <div className="font-medium text-[var(--foreground)]">Use Claude Code fast-mode routing</div>
+                  <div className="font-medium text-[var(--foreground)]">Usar roteamento fast-mode do Claude Code</div>
                   <p className="mt-0.5 text-[var(--muted-foreground)]">
                     <strong className="text-amber-400">99% of users should leave this off.</strong> Fast mode is
                     effectively a dead feature today — Claude/Anthropic removed support for downgrading current models,

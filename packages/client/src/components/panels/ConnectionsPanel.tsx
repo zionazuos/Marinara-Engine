@@ -218,7 +218,7 @@ function SidecarCard() {
                 className="flex items-center justify-between gap-3 rounded-lg border border-purple-400/15 bg-purple-400/8 px-3 py-2 text-left transition-all hover:bg-purple-400/12 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="text-xs font-medium text-purple-200">Use local model for all tracker agents</div>
+                  <div className="text-xs font-medium text-purple-200">Usar modelo local para todos os agentes de rastreador</div>
                   <div className="mt-0.5 text-[0.625rem] text-[var(--muted-foreground)]">
                     Assigns the built-in local model as the connection override for every built-in tracker agent.
                   </div>

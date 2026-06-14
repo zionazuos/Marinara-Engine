@@ -126,8 +126,8 @@ function HiddenFromAIMessageSummary({ roleplay, onExpand }: { roleplay?: boolean
         "flex w-full items-center gap-2 rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-left text-[0.75rem] text-amber-600/90 transition-colors hover:bg-amber-500/15 dark:text-amber-200/75",
         roleplay && "border-amber-200/15 bg-white/5 text-amber-100/70 hover:bg-white/10",
       )}
-      title="Expand hidden from AI message"
-      aria-label="Expand hidden from AI message"
+      title="Expandir mensagem oculta da IA"
+      aria-label="Expandir mensagem oculta da IA"
     >
       <EyeOff size="0.8rem" className="shrink-0" />
       <span className="min-w-0 flex-1 truncate">Oculto da IA</span>

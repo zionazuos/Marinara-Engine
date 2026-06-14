@@ -1112,7 +1112,7 @@ function PersonaSpritesTab({
                 onClick={() => setExportMenuOpen((open) => !open)}
                 disabled={exporting || allSprites.length === 0}
                 className="flex w-full min-w-0 items-center justify-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-1.5 text-center text-[0.6875rem] font-medium leading-tight text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-40 max-md:px-2.5"
-                title="Choose which saved sprites to export"
+                title="Escolha quais sprites salvos exportar"
               >
                 <ImageDown size="0.8125rem" />
                 {exporting ? "Exporting..." : "Export"}
@@ -1184,7 +1184,7 @@ function PersonaSpritesTab({
         )}
         {lastCleanupBackupId && (
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--muted-foreground)]">
-            <span>Last cleanup has a restore point.</span>
+            <span>A última limpeza tem um ponto de restauração.</span>
             <button
               type="button"
               onClick={() => void handleRestoreLastCleanup()}
@@ -2132,7 +2132,7 @@ function DescriptionTab({
                 <textarea
                   value={desc.content}
                   onChange={(e) => updateAltDescField(desc.id, "content", e.target.value)}
-                  placeholder="Additional description content…"
+                  placeholder="Conteúdo de descrição adicional…"
                   rows={4}
                   className="w-full resize-y rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-3 text-sm leading-relaxed outline-none transition-colors placeholder:text-[var(--muted-foreground)]/40 focus:border-emerald-400/40 focus:ring-1 focus:ring-emerald-400/20"
                 />
@@ -2161,7 +2161,7 @@ function DescriptionTab({
           title={desc.label || "Description Extension"}
           value={desc.content}
           onChange={(value) => updateAltDescField(desc.id, "content", value)}
-          placeholder="Additional description content…"
+          placeholder="Conteúdo de descrição adicional…"
         />
       ))}
     </div>

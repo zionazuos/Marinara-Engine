@@ -99,7 +99,7 @@ export function ImagePromptReviewModal({
 
         <div className="flex flex-col gap-2 border-t border-[var(--border)]/50 pt-3 sm:flex-row sm:items-center sm:justify-between">
           {hasEmptyPrompt ? (
-            <span className="text-[0.625rem] text-[var(--destructive)]">Every image request needs a prompt.</span>
+            <span className="text-[0.625rem] text-[var(--destructive)]">Toda solicitação de imagem precisa de um prompt.</span>
           ) : (
             <span className="text-[0.625rem] text-[var(--muted-foreground)]">
               {items.length} request{items.length === 1 ? "" : "s"}  pronto.

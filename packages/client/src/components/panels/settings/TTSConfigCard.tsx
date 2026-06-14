@@ -270,7 +270,8 @@ function NpcDefaultVoicePool({
         </div>
       ) : (
         <p className="rounded-lg border border-dashed border-[var(--border)] px-2.5 py-2 text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
-          No ElevenLabs voices loaded yet.
+          
+          Nenhuma voz do ElevenLabs carregada ainda.
         </p>
       )}
       {note && <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">{note}</p>}
@@ -771,7 +772,7 @@ export function TTSConfigCard() {
                 }}
                 type="password"
                 className={cn(INPUT_CLS, "pl-8")}
-                placeholder="Enter API key or clear to remove"
+                placeholder="Insira a chave de API ou limpe para remover"
               />
             </div>
             <p className="text-[0.625rem] text-[var(--muted-foreground)]">
@@ -1092,7 +1093,7 @@ export function TTSConfigCard() {
             >
               <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-2">
                 <ToggleRow
-                  label="Use default voices for random NPCs"
+                  label="Usar vozes padrão para NPCs aleatórios"
                   checked={npcDefaultVoicesEnabled}
                   onChange={toggleNpcDefaultVoices}
                 />

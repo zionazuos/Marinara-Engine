@@ -1380,7 +1380,7 @@ export function SpriteGenerationModal({
                     alt="Referência do avatar atual"
                     className="h-12 w-12 rounded-lg object-cover ring-1 ring-[var(--border)]"
                   />
-                  <span className="flex-1">Use current avatar as a reference image</span>
+                  <span className="flex-1">Usar o avatar atual como imagem de referência</span>
                 </label>
               )}
               <div className="flex items-start gap-3">
@@ -1535,7 +1535,7 @@ export function SpriteGenerationModal({
                       className="mt-0.5 accent-[var(--primary)]"
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block font-medium">Match existing expression sprites</span>
+                      <span className="block font-medium">Casar com sprites de expressão existentes</span>
                       <span className="mt-0.5 block text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
                         Generates idle full-body sprites named after the portrait expressions, saved as full_neutral,
                         full_happy, and so on.

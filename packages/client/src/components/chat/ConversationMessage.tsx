@@ -99,8 +99,8 @@ function HiddenFromAIConversationSummary({ onExpand }: { onExpand: () => void })
         onExpand();
       }}
       className="flex w-full items-center gap-2 rounded-md border border-amber-400/20 bg-amber-500/10 px-2.5 py-1.5 text-left text-[0.75rem] text-amber-600/90 transition-colors hover:bg-amber-500/15 dark:text-amber-200/75"
-      title="Expand hidden from AI message"
-      aria-label="Expand hidden from AI message"
+      title="Expandir mensagem oculta da IA"
+      aria-label="Expandir mensagem oculta da IA"
     >
       <EyeOff size="0.8rem" className="shrink-0" />
       <span className="min-w-0 flex-1 truncate">Oculto da IA</span>

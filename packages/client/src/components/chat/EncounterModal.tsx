@@ -681,7 +681,7 @@ function CombatEndScreen() {
 
       {summaryStatus === "done" && (
         <>
-          <p className="mt-2 text-sm text-foreground/50">Combat summary has been added to the chat.</p>
+          <p className="mt-2 text-sm text-foreground/50">O resumo do combate foi adicionado ao chat.</p>
           <button
             onClick={closeEncounter}
             className="mt-6 rounded-xl bg-foreground/10 px-6 py-3 text-sm font-bold text-foreground/80 transition-all hover:bg-foreground/20"
@@ -844,7 +844,7 @@ function EncounterModalInner() {
               {isLoading && !initialized && (
                 <div className="flex flex-col items-center justify-center gap-3 py-20">
                   <Loader2 size="2rem" className="animate-spin text-red-400" />
-                  <p className="text-sm text-foreground/50">Initializing combat encounter...</p>
+                  <p className="text-sm text-foreground/50">Inicializando encontro de combate...</p>
                 </div>
               )}
 

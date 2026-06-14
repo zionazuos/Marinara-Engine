@@ -888,8 +888,8 @@ export function SpotifyMiniPlayer({ mobile = false }: { mobile?: boolean }) {
             onClick={() => createDjMariPlaylist.mutate()}
             disabled={createDjMariPlaylist.isPending}
             className="inline-flex h-7 min-w-7 items-center justify-center rounded-full px-1.5 text-[0.625rem] font-black leading-none text-[oklch(0.70_0.012_145)] transition-colors hover:text-[oklch(0.96_0.006_145)] disabled:cursor-wait disabled:opacity-80"
-            title="DJ Mari composes a playlist for you!"
-            aria-label="DJ Mari composes a playlist for you!"
+            title="A DJ Mari compõe uma playlist para você!"
+            aria-label="A DJ Mari compõe uma playlist para você!"
           >
             {createDjMariPlaylist.isPending ? <Loader2 size="0.8125rem" className="animate-spin" /> : "DJ"}
           </button>

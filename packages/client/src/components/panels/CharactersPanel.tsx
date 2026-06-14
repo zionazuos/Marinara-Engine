@@ -277,7 +277,7 @@ export function CharactersPanel() {
           return next;
         });
       } catch {
-        toast.error("Failed to remove tag from some characters");
+        toast.error("Falha ao remover a tag de alguns personagens");
       }
     },
     [parsedCharacters, updateCharacter, includedTags],

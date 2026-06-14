@@ -158,7 +158,7 @@ export function WorldInfoPanel({
       ) : entries.length === 0 ? (
         <>
           <BudgetSkippedEntriesNotice entries={skippedEntries} />
-          <p className="py-3 text-center text-xs text-[var(--muted-foreground)]">No active entries for this chat</p>
+          <p className="py-3 text-center text-xs text-[var(--muted-foreground)]">Nenhuma entrada ativa para este chat</p>
         </>
       ) : (
         <>

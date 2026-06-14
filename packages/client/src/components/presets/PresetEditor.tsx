@@ -1037,7 +1037,7 @@ function SectionsTab({
         {sections.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-10 text-center">
             <Layers size="1.5rem" className="text-[var(--muted-foreground)]" />
-            <p className="text-xs text-[var(--muted-foreground)]">No sections yet. Add one to get started.</p>
+            <p className="text-xs text-[var(--muted-foreground)]">Nenhuma seção ainda. Adicione uma para começar.</p>
           </div>
         ) : (
           sections.map((section: any, idx: number) => {
@@ -1994,7 +1994,7 @@ function VariableQuestionInput({ value, onCommit }: { value: string; onCommit: (
         }
       }}
       className="w-full rounded bg-[var(--background)] px-2 py-1 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-1 focus:ring-amber-400/50"
-      placeholder="What should the user choose?"
+      placeholder="O que o usuário deve escolher?"
     />
   );
 }
@@ -2236,7 +2236,7 @@ function ExpandedEditorModal({
           </div>
           {/* Footer */}
           <div className="flex items-center justify-between border-t border-[var(--border)] px-4 py-2.5">
-            <p className="text-[0.625rem] text-[var(--muted-foreground)]">Changes auto-save. Press Escape to close.</p>
+            <p className="text-[0.625rem] text-[var(--muted-foreground)]">As alterações são salvas automaticamente. Pressione Esc para fechar.</p>
             <button
               onClick={handleClose}
               className="rounded-xl bg-gradient-to-r from-purple-400 to-violet-500 px-4 py-1.5 text-xs font-medium text-white shadow-md hover:shadow-lg active:scale-[0.98]"

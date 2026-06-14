@@ -43,7 +43,7 @@ export function ProfessorMariWorkingWindow({ visible, className }: ProfessorMari
         {!imageFailed && (
           <img
             src={DOTTOR_SUPPORT_GIF}
-            alt="Dottore providing moral support"
+            alt="Dottore dando apoio moral"
             className="h-28 w-28 object-contain [image-rendering:pixelated]"
             onError={() => setImageFailed(true)}
           />

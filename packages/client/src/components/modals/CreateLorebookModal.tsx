@@ -55,7 +55,7 @@ export function CreateLorebookModal({ open, onClose }: Props) {
           <textarea
             value={form.description}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            placeholder="Brief description of this lorebook..."
+            placeholder="Breve descrição deste lorebook..."
             rows={3}
             className="resize-none rounded-lg bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]"
           />

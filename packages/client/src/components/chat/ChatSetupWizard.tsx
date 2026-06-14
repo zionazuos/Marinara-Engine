@@ -819,7 +819,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
             ) : (
               <div className="flex items-center justify-center gap-2 py-1">
                 <Check size="0.875rem" className="text-emerald-400" />
-                <span className="text-xs text-emerald-400">Ready! Say hi to start the conversation.</span>
+                <span className="text-xs text-emerald-400">Pronto! Mande um oi para começar a conversa.</span>
               </div>
             )}
           </div>

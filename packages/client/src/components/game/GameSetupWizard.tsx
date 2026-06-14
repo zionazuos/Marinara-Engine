@@ -865,7 +865,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   )}
                 >
                   <div className="font-medium text-[var(--foreground)]">GM independente</div>
-                  <div className="mt-1 text-[var(--muted-foreground)]">A snarky narrator running the show</div>
+                  <div className="mt-1 text-[var(--muted-foreground)]">Um narrador sarcástico comandando tudo</div>
                 </button>
                 <button
                   onClick={() => setGmMode("character")}
@@ -877,7 +877,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   )}
                 >
                   <div className="font-medium text-[var(--foreground)]">GM do personagem</div>
-                  <div className="mt-1 text-[var(--muted-foreground)]">Use an existing character as GM</div>
+                  <div className="mt-1 text-[var(--muted-foreground)]">Usar um personagem existente como GM</div>
                 </button>
               </div>
             </div>
@@ -1524,7 +1524,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
               <textarea
                 value={playerGoals}
                 onChange={(e) => setPlayerGoals(e.target.value)}
-                placeholder="What do you want to achieve?"
+                placeholder="O que você quer alcançar?"
                 rows={3}
                 className="w-full resize-none rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40"
               />
@@ -1558,7 +1558,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
               <textarea
                 value={preferences}
                 onChange={(e) => setPreferences(e.target.value)}
-                placeholder="Any extra details for the GM?"
+                placeholder="Algum detalhe extra para o GM?"
                 rows={3}
                 className="w-full resize-none rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-all placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40"
               />
@@ -1666,7 +1666,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   )}
                   <div>
                     <p className="text-xs font-medium text-[var(--foreground)]">Iniciar sem som</p>
-                    <p className="text-[0.55rem] text-[var(--muted-foreground)]">Begin the game with all audio muted</p>
+                    <p className="text-[0.55rem] text-[var(--muted-foreground)]">Começar o game com todo o áudio mudo</p>
                   </div>
                 </div>
                 <div

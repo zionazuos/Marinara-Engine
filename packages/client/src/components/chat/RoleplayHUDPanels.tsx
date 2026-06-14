@@ -239,7 +239,7 @@ export function CombinedPlayerPanel({
                   agentType="character-tracker"
                   onRerunSingleTracker={onRerunSingleTracker}
                   busy={isTrackerRetryBusy}
-                  title="Re-run character tracker only"
+                  title="Reexecutar apenas o rastreador de personagens"
                 />
                 <button
                   onClick={addCharacter}
@@ -619,7 +619,7 @@ export function CharactersPanel({
             agentType="character-tracker"
             onRerunSingleTracker={onRerunSingleTracker}
             busy={isTrackerRetryBusy}
-            title="Re-run character tracker only"
+            title="Reexecutar apenas o rastreador de personagens"
           />
           {trackerConfig && (
             <button
@@ -1008,7 +1008,7 @@ export function CombinedWorldPanel({
             agentType="world-state"
             onRerunSingleTracker={onRerunSingleTracker}
             busy={isTrackerRetryBusy}
-            title="Re-run world state tracker only"
+            title="Reexecutar apenas o rastreador de estado do mundo"
           />
           <button
             onClick={onClose}

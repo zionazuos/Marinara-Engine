@@ -1411,7 +1411,7 @@ export function ConversationInput({
       ...savedStatusOptions.filter((option) => option.toLowerCase() !== normalizedUserActivity.toLowerCase()),
     ];
     await persistSavedStatusOptions(nextOptions);
-    toast.success("Saved status for this persona");
+    toast.success("Status salvo para esta persona");
   }, [activePersona, normalizedUserActivity, persistSavedStatusOptions, savedStatusOptions]);
 
   const handleApplySavedStatus = useCallback(

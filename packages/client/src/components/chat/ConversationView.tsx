@@ -924,7 +924,8 @@ export function ConversationView({
         {!isLoading && !hasNextPage && messages && messages.length === 0 && (
           <div className="px-4 pt-2">
             <p className="text-xs text-[var(--muted-foreground)]">
-              This is the start of your conversation with{" "}
+              
+              Este é o começo da sua conversa com{" "}
               <span className="font-medium text-[var(--foreground)]">
                 {(() => {
                   const names = chatCharIds.map((id) => characterMap.get(id)?.name).filter(Boolean) as string[];

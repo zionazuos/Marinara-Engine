@@ -805,12 +805,12 @@ function GeneralSettings() {
   const handleGameAssetUpload = async () => {
     if (assetUploading) return;
     if (assetFiles.length === 0) {
-      toast.error("Choose at least one asset file first.");
+      toast.error("Escolha pelo menos um arquivo de asset primeiro.");
       return;
     }
     const folder = assetSubcategory.trim().replace(/^\/+|\/+$/g, "") || assetCategoryMeta.defaultFolder;
     if (folder.includes("..") || folder.includes("\\") || folder.startsWith("/")) {
-      toast.error("Folder names cannot contain path traversal.");
+      toast.error("Nomes de pasta não podem conter path traversal.");
       return;
     }
 
@@ -854,7 +854,7 @@ function GeneralSettings() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="text-xs text-[var(--muted-foreground)]">General application settings.</div>
+      <div className="text-xs text-[var(--muted-foreground)]">Configurações gerais do aplicativo.</div>
 
       <label className="flex flex-col gap-1">
         <span className="inline-flex items-center gap-1 text-xs font-medium">
@@ -935,7 +935,7 @@ function GeneralSettings() {
       />
 
       <ToggleSetting
-        label="Mouse-wheel + click navigation"
+        label="Navegação com roda do mouse + clique"
         checked={gameMiddleMouseNav}
         onChange={setGameMiddleMouseNav}
         help="In Game mode, scroll the mouse wheel up to step back through past assistant turns and down to step forward. Clicking the scene background acts like the Next button. While reviewing the past, Next becomes Return — clicking the background or pressing Return jumps you back to where you were reading."
@@ -1093,7 +1093,7 @@ function GeneralSettings() {
       </div>
 
       <ToggleSetting
-        label="Trim incomplete model endings"
+        label="Aparar finais incompletos do modelo"
         checked={trimIncompleteModelOutput}
         onChange={setTrimIncompleteModelOutput}
         help="When on, Marinara trims a trailing unfinished sentence from AI responses before saving the message. It leaves complete responses and command-only endings alone."
@@ -1139,7 +1139,7 @@ function GeneralSettings() {
 
         <div className="flex flex-col gap-2.5">
           <ToggleSetting
-            label="Expose image prompts before sending"
+            label="Expor os prompts de imagem antes de enviar"
             checked={reviewImagePromptsBeforeSend}
             onChange={setReviewImagePromptsBeforeSend}
             help="Shows generated image prompts for review before sending Game assets, character or persona avatars, and sprite generations to the image provider."
@@ -1185,7 +1185,7 @@ function GeneralSettings() {
             onClick={() => {
               rescanGameAssets()
                 .then(() => toast.success("Assets do game reescaneados."))
-                .catch(() => toast.error("Failed to rescan game assets."));
+                .catch(() => toast.error("Falha ao reescanear os assets do game."));
             }}
             className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
           >
@@ -1609,7 +1609,7 @@ function AppearanceSettings() {
 
         {/* Roleplay Messages Background Opacity */}
         <label className="flex flex-col gap-1">
-          <span className="text-[0.6875rem] font-medium">Roleplay Messages Background Opacity</span>
+          <span className="text-[0.6875rem] font-medium">Opacidade do fundo das mensagens de roleplay</span>
           <div className="flex items-center gap-3">
             <input
               type="range"
@@ -2699,7 +2699,7 @@ function ThemesSettings() {
             setActiveTheme.mutate(null, {
               onError: (err) => {
                 console.error("[ThemesSettings] Failed to reset active theme:", err);
-                toast.error("Failed to reset the active theme.");
+                toast.error("Falha ao redefinir o tema ativo.");
               },
             })
           }
@@ -3275,7 +3275,7 @@ function ImportSettings() {
             elapsedSeconds: Math.floor((Date.now() - startedAt) / 1000),
             error: "Not a valid profile export file.",
           });
-          toast.error("Not a valid profile export file.");
+          toast.error("Arquivo de exportação de perfil inválido.");
           e.target.value = "";
           return;
         }
@@ -3520,7 +3520,8 @@ function ImportSettings() {
           <polyline points="7 10 12 15 17 10" />
           <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
-        Import from SillyTavern Folder
+        
+        Importar da pasta do SillyTavern
       </button>
 
       <div className="flex flex-col gap-2">
@@ -3734,7 +3735,7 @@ function AdvancedSettings() {
     setRefreshingSpa(true);
 
     try {
-      toast.info("Clearing caches and refreshing app…");
+      toast.info("Limpando caches e atualizando o app…");
       await forceRefreshSpa();
     } catch (err) {
       setRefreshingSpa(false);
@@ -3851,7 +3852,7 @@ function AdvancedSettings() {
     const trimmed = adminSecret.trim();
     if (trimmed) {
       localStorage.setItem(ADMIN_SECRET_STORAGE_KEY, trimmed);
-      toast.success("Admin secret saved for this browser");
+      toast.success("Segredo de admin salvo para este navegador");
     } else {
       localStorage.removeItem(ADMIN_SECRET_STORAGE_KEY);
       toast.info("Segredo de admin limpo");
@@ -3958,7 +3959,7 @@ function AdvancedSettings() {
 
     expungeData.mutate(selectedScopes, {
       onSuccess: () => toast.success("Selected data was cleared. Runtime caches were reset immediately."),
-      onError: () => toast.error("Failed to clear selected data."),
+      onError: () => toast.error("Falha ao limpar os dados selecionados."),
       onSettled: () => setConfirmAction(null),
     });
   };
@@ -3975,7 +3976,7 @@ function AdvancedSettings() {
         onSelect={handleExportProfileChoice}
       />
 
-      <div className="text-xs text-[var(--muted-foreground)]">Advanced settings for power users.</div>
+      <div className="text-xs text-[var(--muted-foreground)]">Configurações avançadas para usuários avançados.</div>
 
       <div className="flex flex-col gap-2 rounded-lg bg-[var(--secondary)]/40 p-2.5 ring-1 ring-[var(--border)]">
         <div className="flex items-center gap-1.5">
@@ -4269,7 +4270,7 @@ function AdvancedSettings() {
             id="quick-replies-actions-drawer"
             className="grid gap-1 border-t border-[var(--border)]/60 bg-[var(--background)]/25 p-1"
             role="group"
-            aria-label="Quick replies actions to include"
+            aria-label="Ações de respostas rápidas a incluir"
           >
             {[
               {

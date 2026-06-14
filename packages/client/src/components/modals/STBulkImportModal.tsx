@@ -523,7 +523,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
 
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-medium">Choose exactly what to import</span>
+                <span className="text-xs font-medium">Escolha exatamente o que importar</span>
                 <span className="text-[0.6875rem] text-[var(--muted-foreground)]">
                   {Object.values(selection).reduce((sum, ids) => sum + ids.length, 0)}  selecionado(s)
                 </span>

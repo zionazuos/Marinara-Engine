@@ -223,7 +223,7 @@ export function SecretPlotPanel({
           currentSavedFingerprint !== null &&
           draftFingerprint(currentDraft) !== currentSavedFingerprint;
         if (currentIsDirty) {
-          toast("Local edits will be preserved", {
+          toast("As edições locais serão preservadas", {
             description: "This reroll only updates the backend Secret Plot state for the turn.",
           });
         }
@@ -467,7 +467,7 @@ export function SecretPlotPanel({
                     disabled={isGenerationBusy || !!rerollingMode || !target}
                     onClick={() => handleReroll("full")}
                     title={target ? "Re-run full secret plot state" : "No assistant message yet"}
-                    aria-label="Re-run full secret plot state"
+                    aria-label="Reexecutar todo o estado do enredo secreto"
                     className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]/55 hover:text-[var(--accent-foreground)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:opacity-40 max-md:h-7 max-md:w-7"
                   >
                     <RefreshCw size="0.625rem" className={cn(fullRerollBusy && "animate-spin")} />
@@ -486,7 +486,7 @@ export function SecretPlotPanel({
                         <label
                           className="inline-flex shrink-0 items-center gap-1 rounded border border-[var(--border)]/70 bg-[var(--secondary)]/30 px-1.5 py-0.5 text-[0.5rem] font-medium transition-colors hover:bg-[var(--accent)]/45 hover:text-[var(--accent-foreground)]"
                           title="Mark this long-term arc as complete without deleting the arc notes."
-                          aria-label="Mark this long-term arc as complete"
+                          aria-label="Marcar este arco de longo prazo como concluído"
                         >
                           <input
                             type="checkbox"

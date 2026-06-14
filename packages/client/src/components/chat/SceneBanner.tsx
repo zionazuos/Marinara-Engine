@@ -176,7 +176,7 @@ export function EndSceneBar({
             color: "var(--card-foreground)",
             border: "1px solid var(--border)",
           }}
-          title="End the scene and generate a summary"
+          title="Encerrar a cena e gerar um resumo"
         >
           <Film size={14} />
           
@@ -220,7 +220,7 @@ export function EndSceneBar({
           style={{
             color: "var(--muted-foreground)",
           }}
-          title="Discard the scene without saving"
+          title="Descartar a cena sem salvar"
         >
           <Trash2 size={13} />
           
@@ -235,7 +235,7 @@ export function EndSceneBar({
           style={{
             color: "var(--muted-foreground)",
           }}
-          title="Detach this scene into a standalone roleplay"
+          title="Destacar esta cena em um roleplay independente"
         >
           <ArrowRightLeft size={13} />
           

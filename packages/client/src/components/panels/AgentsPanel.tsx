@@ -239,7 +239,7 @@ export function AgentsPanel() {
             </button>
             <label
               className="inline-flex items-center justify-center rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--primary)] cursor-pointer"
-              title="Import regex scripts from JSON"
+              title="Importar scripts de regex de um JSON"
             >
               <input type="file" accept="application/json" className="hidden" onChange={handleImportRegex} />
               <svg

@@ -1582,7 +1582,8 @@ export function ChatSettingsDrawer({
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-[0.6875rem] font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
         >
           <Brain size="0.75rem" />
-          Access memories for this chat
+          
+          Acessar memórias deste chat
         </button>
       </div>
     );
@@ -1637,7 +1638,7 @@ export function ChatSettingsDrawer({
                 <select
                   value={selectedChatPreset?.id ?? ""}
                   onChange={(e) => handleSelectPreset(e.target.value)}
-                  title="Apply a chat-settings preset to this chat"
+                  title="Aplicar um preset de configurações a este chat"
                   className="flex-1 min-w-0 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                 >
                   {presetList.length === 0 && <option value="">Carregando…</option>}
@@ -1707,7 +1708,7 @@ export function ChatSettingsDrawer({
               <button
                 onClick={handleSaveAsPreset}
                 disabled={!selectedChatPreset}
-                title="Save current chat settings as a new preset"
+                title="Salvar as configurações atuais do chat como novo preset"
                 className="flex-1 flex items-center justify-center rounded-md p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <FilePlus2 size="0.875rem" />
@@ -2395,7 +2396,7 @@ export function ChatSettingsDrawer({
             >
               {/* Active characters */}
               {chatCharIds.length === 0 ? (
-                <p className="text-[0.6875rem] text-[var(--muted-foreground)]">No characters added to this chat.</p>
+                <p className="text-[0.6875rem] text-[var(--muted-foreground)]">Nenhum personagem adicionado a este chat.</p>
               ) : (
                 <div
                   className="flex flex-col gap-1"
@@ -3209,7 +3210,8 @@ export function ChatSettingsDrawer({
                 <label className="flex flex-col gap-1.5">
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium">
                     <Sparkles size="0.75rem" className="text-[var(--primary)]" />
-                    Schedule generation preferences
+                    
+                    Preferências de geração de agenda
                     <HelpTooltip text="Free-form guidance that steers how character schedules are generated. Both directives ('no characters past midnight') and factual constraints ('I work 9-5') work. This setting is global, it applies to every conversation chat." />
                   </span>
                   <textarea
@@ -3233,7 +3235,8 @@ export function ChatSettingsDrawer({
                     <Sparkles size="0.875rem" className="mt-0.5 shrink-0 text-[var(--primary)]" />
                     <div className="min-w-0 flex-1">
                       <span className="block text-[0.6875rem] font-medium leading-snug text-[var(--foreground)]">
-                        Schedule generation preference active
+                        
+                        Preferência de geração de agenda ativa
                       </span>
                       <p className="mt-0.5 truncate text-[0.625rem] italic text-[var(--muted-foreground)]">
                         "{scheduleGenerationPreferences.trim()}"
@@ -3338,7 +3341,7 @@ export function ChatSettingsDrawer({
                   search={connectionSearch}
                   onSearchChange={setConnectionSearch}
                   onClose={() => setShowConnectionPicker(false)}
-                  placeholder="Search roleplay or game chats…"
+                  placeholder="Buscar chats de roleplay ou game…"
                 >
                   {((allChats ?? []) as Chat[])
                     .filter(
@@ -3559,7 +3562,7 @@ export function ChatSettingsDrawer({
 
             {/* Active lorebooks */}
             {activeLorebooks.length === 0 ? (
-              <p className="text-[0.6875rem] text-[var(--muted-foreground)]">No lorebooks active in this chat.</p>
+              <p className="text-[0.6875rem] text-[var(--muted-foreground)]">Nenhum lorebook ativo neste chat.</p>
             ) : (
               <div className="flex flex-col gap-1">
                 {activeLorebooks.map((lb) => {
@@ -3973,7 +3976,7 @@ export function ChatSettingsDrawer({
                           }
                           className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-2.5 py-2 text-xs text-[var(--foreground)]"
                         >
-                          <option value="">Auto-select first writable lorebook</option>
+                          <option value="">Selecionar automaticamente o primeiro lorebook gravável</option>
                           {((lorebooks ?? []) as Array<{ id: string; name: string }>).map((lorebook) => (
                             <option key={lorebook.id} value={lorebook.id}>
                               {lorebook.name}
@@ -4607,7 +4610,7 @@ export function ChatSettingsDrawer({
                               <AlertTriangle size="0.75rem" className="shrink-0" />
                             )}
                             <span className="truncate">
-                              ~{agentLoadCost.cost.instructionTokens.toLocaleString()} tokens of agent instructions
+                              ~{agentLoadCost.cost.instructionTokens.toLocaleString()}  tokens de instruções do agente
                               {" · "}~{agentLoadCost.cost.extraCalls} extra call
                               {agentLoadCost.cost.extraCalls === 1 ? "" : "s"}/turn
                             </span>
@@ -4838,7 +4841,8 @@ export function ChatSettingsDrawer({
                                 </div>
                               ) : (
                                 <p className="text-[0.625rem] text-[var(--muted-foreground)] px-1">
-                                  All agents in this category are active.
+                                  
+                                  Todos os agentes desta categoria estão ativos.
                                 </p>
                               )}
                             </AgentCategorySection>
@@ -5474,7 +5478,8 @@ export function ChatSettingsDrawer({
                 <div>
                   <span className="text-xs font-medium">Limitar mensagens de contexto</span>
                   <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Only send the last N messages to the model
+                    
+                    Enviar apenas as últimas N mensagens ao modelo
                   </p>
                 </div>
                 <div
@@ -5922,7 +5927,7 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
 
   const handleExport = async () => {
     if (memories.length === 0) {
-      toast.error("There are no recall memories to export yet.");
+      toast.error("Ainda não há memórias de recuperação para exportar.");
       return;
     }
 
@@ -5946,7 +5951,7 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
     try {
       const parsed = JSON.parse(await file.text()) as unknown;
       if (!isMemoryRecallExportEnvelope(parsed)) {
-        toast.error("Choose a Memory Recall export file.");
+        toast.error("Escolha um arquivo de exportação de Recuperação de Memória.");
         return;
       }
 
@@ -5954,7 +5959,7 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
       if (result.imported > 0) {
         toast.success(`Imported ${formatMemoryChunkCount(result.imported)}.`);
       } else {
-        toast.info("No new recall memories were imported.");
+        toast.info("Nenhuma nova memória de recuperação foi importada.");
       }
     } catch (err) {
       toast.error(err instanceof Error ? `Import failed: ${err.message}` : "Import failed.");
@@ -6031,7 +6036,7 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
               onClick={() => refreshMemories.mutate()}
               disabled={memoriesQuery.isFetching || refreshMemories.isPending || importMemories.isPending}
               className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-50"
-              title="Rebuild memories from current chat messages"
+              title="Reconstruir memórias a partir das mensagens atuais do chat"
             >
               <RefreshCw
                 size="0.8125rem"
@@ -6304,7 +6309,7 @@ function ConversationPromptSection({
         title="Editar prompt de sistema"
         value={promptDraft}
         onChange={setPromptDraft}
-        placeholder="Enter your custom system prompt..."
+        placeholder="Insira seu prompt de sistema personalizado..."
       />
     </>
   );
@@ -6454,7 +6459,8 @@ function ImpersonateSettingsContent({
                 </span>
               </span>
               <span className="mt-0.5 block text-[0.65rem] leading-tight text-[var(--muted-foreground)]">
-                Treat choices as impersonate guidance.
+                
+                Tratar as escolhas como orientação de personificação.
               </span>
             </span>
             <input
@@ -7032,7 +7038,8 @@ function ScheduleEditor({
                         placeholder="120"
                       />
                       <span className="block text-[0.5rem] text-[var(--muted-foreground)]">
-                        Minutes before they follow up.
+                        
+                        Minutos antes de eles darem retorno.
                       </span>
                     </label>
                     <label className="space-y-1">

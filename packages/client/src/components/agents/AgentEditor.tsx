@@ -1010,7 +1010,7 @@ export function AgentEditor() {
           {/* ── Image Generation Connection (Illustrator only) ── */}
           {(agentDetailId === "illustrator" || dbConfig?.type === "illustrator") && (
             <FieldGroup
-              label="Image Generation Connection Override"
+              label="Substituição de conexão de geração de imagem"
               icon={<ImageIcon size="0.875rem" className="text-[var(--primary)]" />}
               help="The connection used to generate images. This should point to an image generation API (e.g. DALL-E, NovelAI, Stable Diffusion). The Connection Override above is used for the LLM that decides when and what to illustrate. Leave this empty to use the default Illustrator image connection from Settings → Connections."
             >
@@ -1107,7 +1107,7 @@ export function AgentEditor() {
                   }}
                   className="rounded border-[var(--border)] bg-[var(--secondary)] text-[var(--primary)] focus:ring-[var(--ring)]"
                 />
-                <span className="text-sm">Generate avatar portraits for new NPCs</span>
+                <span className="text-sm">Gerar retratos de avatar para novos NPCs</span>
               </label>
               {localAutoGenerateAvatars && (
                 <div className="mt-2">
@@ -1540,7 +1540,7 @@ export function AgentEditor() {
                       setLocalSpotifyClientId(e.target.value);
                       setDirty(true);
                     }}
-                    placeholder="Paste your Spotify app Client ID..."
+                    placeholder="Cole o Client ID do seu app do Spotify..."
                     className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white placeholder-white/30 outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/20 font-mono"
                   />
                 </div>
@@ -2160,7 +2160,7 @@ export function AgentEditor() {
                   markDirty();
                 }}
                 rows={16}
-                placeholder="Write the system prompt for this agent…"
+                placeholder="Escreva o prompt de sistema para este agente…"
                 className="w-full resize-y rounded-xl bg-[var(--secondary)] px-4 py-3 font-mono text-xs leading-relaxed ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] max-h-[60vh] overflow-y-auto"
               />
             )}
@@ -2246,7 +2246,7 @@ export function AgentEditor() {
                 <strong className="text-[var(--foreground)]">DB Status:</strong>{" "}
                 {dbConfig ? `Persisted (ID: ${dbConfig.id})` : "Not yet saved — click Save to persist"}
               </p>
-              <p className="text-[var(--muted-foreground)]">Add this agent to a Roleplay chat to use it.</p>
+              <p className="text-[var(--muted-foreground)]">Adicione este agente a um chat de roleplay para usá-lo.</p>
             </div>
           </div>
         </div>

@@ -1520,7 +1520,7 @@ export function BotBrowserView() {
       const d = await provider.fetchDetail(card);
       setDetail(d);
     } catch {
-      toast.error("Failed to load character details");
+      toast.error("Falha ao carregar os detalhes do personagem");
       setSelectedCard(null);
     } finally {
       setDetailLoading(false);
@@ -1781,7 +1781,7 @@ export function BotBrowserView() {
     setCtLoggedIn(false);
     setNsfw(false);
     setPage(1);
-    toast.info("Logged out of CharacterTavern.");
+    toast.info("Desconectado do CharacterTavern.");
   };
 
   return (
@@ -2142,7 +2142,7 @@ export function BotBrowserView() {
                   ((sourceId === "pygmalion" && pygLoggedIn) || (sourceId === "chartavern" && ctLoggedIn) ? (
                     <div className="flex items-center gap-1.5">
                       <span className="flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-[0.65rem] text-emerald-400">
-                        <CheckCircle size="0.625rem" /> NSFW depends on your account settings
+                        <CheckCircle size="0.625rem" />  NSFW depende das configurações da sua conta
                       </span>
                       <button
                         onClick={() => {
@@ -2495,7 +2495,7 @@ function LoginModal({
                   value={pygTokenInput}
                   onChange={(e) => setPygTokenInput(e.target.value)}
                   disabled={isLoggedIn || loginLoading}
-                  placeholder="Paste your Pygmalion auth token here"
+                  placeholder="Cole aqui o seu token de autenticação do Pygmalion"
                   rows={3}
                   className="w-full resize-y rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs outline-none transition-colors focus:border-[var(--primary)] disabled:opacity-50"
                 />
@@ -2570,7 +2570,7 @@ function LoginModal({
                   value={cookie}
                   onChange={(e) => setCookie(e.target.value)}
                   disabled={isLoggedIn || loginLoading}
-                  placeholder="Paste your session cookie value here"
+                  placeholder="Cole aqui o valor do cookie da sua sessão"
                   rows={3}
                   className="w-full resize-y rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm outline-none transition-colors focus:border-[var(--primary)] disabled:opacity-50"
                 />

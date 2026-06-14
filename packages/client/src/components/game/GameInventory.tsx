@@ -266,7 +266,7 @@ export function GameInventory({
             <div className="flex min-h-40 flex-col items-center justify-center rounded border border-dashed border-white/10 bg-white/[0.02] px-4 text-center">
               <Package size={18} className="mb-2 text-white/25" />
               <div className="text-[0.75rem] font-medium text-white/55">Inventário vazio</div>
-              <div className="mt-1 text-[0.65rem] text-white/35">Add an item to start tracking supplies.</div>
+              <div className="mt-1 text-[0.65rem] text-white/35">Adicione um item para começar a rastrear suprimentos.</div>
             </div>
           )}
         </div>
@@ -279,7 +279,7 @@ export function GameInventory({
                 {selectedItem}
               </div>
             ) : (
-              <div className="mb-2 text-[0.7rem] font-medium text-white/45">Add a new item, then rename it.</div>
+              <div className="mb-2 text-[0.7rem] font-medium text-white/45">Adicione um novo item e então renomeie.</div>
             )}
             {onRenameItem && selectedInventoryItem && (
               <div className="mb-2.5 flex gap-1.5">

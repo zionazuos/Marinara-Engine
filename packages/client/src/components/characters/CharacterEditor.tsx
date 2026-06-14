@@ -1208,7 +1208,7 @@ function CharacterDescriptionTab({
                 <textarea
                   value={desc.content}
                   onChange={(event) => updateAltDescField(desc.id, "content", event.target.value)}
-                  placeholder="Additional description content…"
+                  placeholder="Conteúdo de descrição adicional…"
                   rows={4}
                   className="w-full resize-y rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-3 text-sm leading-relaxed outline-none transition-colors placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
                 />
@@ -1237,7 +1237,7 @@ function CharacterDescriptionTab({
           title={desc.label || "Description Extension"}
           value={desc.content}
           onChange={(value) => updateAltDescField(desc.id, "content", value)}
-          placeholder="Additional description content…"
+          placeholder="Conteúdo de descrição adicional…"
         />
       ))}
     </div>
@@ -2156,7 +2156,7 @@ function CharacterGalleryTab({ characterId, characterName }: { characterId: stri
       )}
 
       <div className="rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
-        <h4 className="mb-1.5 text-xs font-semibold">How this differs from chat gallery</h4>
+        <h4 className="mb-1.5 text-xs font-semibold">Como isto difere da galeria do chat</h4>
         <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
           <li>• These images belong to the character, so deleting a chat does not remove them.</li>
           <li>• Use this for reference sheets, outfit variants, or imported ST-style character image packs.</li>
@@ -2427,7 +2427,7 @@ function SpritesTab({
               : `Exported ${successCount} ${category === "full-body" ? "full-body" : "expression"} sprite${successCount === 1 ? "" : "s"}.`,
           );
         } else {
-          toast.error("No sprites were exported. Please try again.");
+          toast.error("Nenhum sprite foi exportado. Tente novamente.");
         }
       } finally {
         setExporting(false);
@@ -2643,7 +2643,7 @@ function SpritesTab({
                 onClick={() => setExportMenuOpen((open) => !open)}
                 disabled={exporting || allSprites.length === 0}
                 className="flex w-full min-w-0 items-center justify-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-1.5 text-center text-[0.6875rem] font-medium leading-tight text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-40 max-md:px-2.5"
-                title="Choose which saved sprites to export"
+                title="Escolha quais sprites salvos exportar"
               >
                 <ImageDown size="0.8125rem" />
                 {exporting ? "Exporting..." : "Export"}
@@ -2716,7 +2716,7 @@ function SpritesTab({
         )}
         {lastCleanupBackupId && (
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--muted-foreground)]">
-            <span>Last cleanup has a restore point.</span>
+            <span>A última limpeza tem um ponto de restauração.</span>
             <button
               type="button"
               onClick={() => void handleRestoreLastCleanup()}

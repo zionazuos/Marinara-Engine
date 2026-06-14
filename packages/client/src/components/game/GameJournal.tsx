@@ -441,7 +441,7 @@ function NpcsView({
                     type="button"
                     onClick={() => handleNpcPortraitAvatarClick(entry.npc.name)}
                     className="rounded-full transition-transform hover:scale-[1.05] focus:outline-none focus:ring-2 focus:ring-white/20"
-                    title="Upload or replace NPC portrait"
+                    title="Enviar ou substituir retrato do NPC"
                   >
                     {entry.npc.avatarUrl ? (
                       <img
@@ -495,7 +495,7 @@ function NpcsView({
                   type="button"
                   onClick={() => onNpcRemove(entry.originalName)}
                   disabled={isRemoving}
-                  title="Remove this NPC from the journal"
+                  title="Remover este NPC do diário"
                   className="rounded p-1 text-white/35 transition-colors hover:bg-red-500/15 hover:text-red-300 disabled:opacity-40"
                 >
                   <Trash2 size={11} />

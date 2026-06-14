@@ -944,7 +944,8 @@ export function GameAssetsBrowserView() {
                         onClick={() => handleExcludeSubfolders(subfolders)}
                         className="flex w-full items-center justify-between px-3 py-1.5 text-left text-xs font-medium text-[var(--destructive)] transition-colors hover:bg-[var(--accent)]"
                       >
-                        Remove all subfolders from game
+                        
+                        Remover todas as subpastas do game
                       </button>
                       <button
                         type="button"
@@ -1039,7 +1040,8 @@ export function GameAssetsBrowserView() {
             {modal.type === "delete" ? (
               <div className="mb-4 text-sm text-[var(--muted-foreground)]">
                 <p>
-                  Are you sure you want to delete{" "}
+                  
+                  Tem certeza de que deseja excluir{" "}
                   <strong className="text-[var(--foreground)]">{modal.node.name}</strong>?
                 </p>
                 {modal.node.type === "folder" && (
@@ -1096,13 +1098,14 @@ export function GameAssetsBrowserView() {
             ) : modal.type === "bulk-delete" ? (
               <div className="mb-4 text-sm text-[var(--muted-foreground)]">
                 <p>
-                  Are you sure you want to delete{" "}
+                  
+                  Tem certeza de que deseja excluir{" "}
                   <strong className="text-[var(--foreground)]">
                     {selectedPaths.size} file{selectedPaths.size !== 1 ? "s" : ""}
                   </strong>
                   ?
                 </p>
-                <p className="mt-1 text-xs text-[var(--destructive)]">This action cannot be undone.</p>
+                <p className="mt-1 text-xs text-[var(--destructive)]">Esta ação não pode ser desfeita.</p>
               </div>
             ) : (
               <input

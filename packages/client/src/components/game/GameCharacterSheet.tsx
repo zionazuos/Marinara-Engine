@@ -654,7 +654,7 @@ export function GameCharacterSheet({
                         type="text"
                         value={ability}
                         onChange={(e) => updateListItem("abilities", index, e.target.value)}
-                        placeholder="Dual-wielding, Arcane shield, etc."
+                        placeholder="Empunhadura dupla, Escudo arcano, etc."
                         className={TEXT_INPUT_CLASS}
                       />
                       <button
@@ -694,7 +694,7 @@ export function GameCharacterSheet({
                             type="text"
                             value={strength}
                             onChange={(e) => updateListItem("strengths", index, e.target.value)}
-                            placeholder="Reliable, quick thinker, etc."
+                            placeholder="Confiável, raciocínio rápido, etc."
                             className={TEXT_INPUT_CLASS}
                           />
                           <button
@@ -731,7 +731,7 @@ export function GameCharacterSheet({
                             type="text"
                             value={weakness}
                             onChange={(e) => updateListItem("weaknesses", index, e.target.value)}
-                            placeholder="Impulsive, poor swimmer, etc."
+                            placeholder="Impulsivo, mau nadador, etc."
                             className={TEXT_INPUT_CLASS}
                           />
                           <button

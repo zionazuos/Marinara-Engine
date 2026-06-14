@@ -1567,7 +1567,7 @@ export function LorebookEditor() {
                         <textarea
                           value={keywordPreviewText}
                           onChange={(e) => setKeywordPreviewText(e.target.value)}
-                          placeholder="Paste a paragraph or sample messages here…"
+                          placeholder="Cole um parágrafo ou mensagens de exemplo aqui…"
                           rows={4}
                           className="w-full resize-y rounded-xl bg-[var(--background)] px-3 py-2 pr-8 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                         />
@@ -1642,7 +1642,7 @@ export function LorebookEditor() {
                         ? "bg-amber-400/15 text-amber-400 ring-amber-400/30"
                         : "bg-[var(--secondary)] ring-[var(--border)] hover:bg-[var(--accent)]",
                     )}
-                    title="Select entries to copy or move"
+                    title="Selecione entradas para copiar ou mover"
                   >
                     <CheckSquare2 size="0.8125rem" />
                     
@@ -1651,7 +1651,7 @@ export function LorebookEditor() {
                   <button
                     onClick={handleAddFolder}
                     className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-xs font-medium ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)]"
-                    title="Create a new folder to group entries"
+                    title="Crie uma nova pasta para agrupar entradas"
                   >
                     <FolderPlus size="0.8125rem" />
                     
@@ -1695,7 +1695,7 @@ export function LorebookEditor() {
                       className="min-h-8 min-w-[12rem] flex-1 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:opacity-50"
                     >
                       {transferTargetLorebooks.length === 0 ? (
-                        <option value="">Create another lorebook first</option>
+                        <option value="">Crie outro lorebook primeiro</option>
                       ) : (
                         transferTargetLorebooks.map((book) => (
                           <option key={book.id} value={book.id}>
@@ -2171,7 +2171,7 @@ function VectorizeSection({
           {vectorizedCount}/{vectorizableEntryCount}  entradas vetorizadas
         </span>
         {missingCount > 0 && <span>{missingCount}  ainda precisam de embeddings.</span>}
-        {excludeFromVectorization ? <span>This lorebook excludes every entry.</span> : null}
+        {excludeFromVectorization ? <span>Este lorebook exclui todas as entradas.</span> : null}
         {!excludeFromVectorization && excludedCount > 0 && <span>{excludedCount}  excluído.</span>}
       </div>
       {excludeFromVectorization ? (

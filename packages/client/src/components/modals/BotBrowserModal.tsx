@@ -181,7 +181,7 @@ export function BotBrowserModal({ open, onClose }: Props) {
       if (!node) throw new Error("Invalid character data");
       setDetail(node);
     } catch {
-      toast.error("Failed to load character details");
+      toast.error("Falha ao carregar os detalhes do personagem");
       setSelectedCard(null);
     } finally {
       setDetailLoading(false);

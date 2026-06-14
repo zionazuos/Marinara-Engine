@@ -231,7 +231,7 @@ export function AvatarCropWidget({ src, alt, crop, onChange, onRemove, removing 
             type="button"
             onClick={reset}
             className="inline-flex items-center gap-1 rounded-lg bg-[var(--accent)] px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)]"
-            title="Reset to centered max-square crop"
+            title="Redefinir para recorte quadrado centralizado"
           >
             <RotateCcw size="0.625rem" />  Redefinir
           </button>

@@ -271,7 +271,7 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
       await resetOverride.mutateAsync(selectedKey);
       setDraft(defaultTemplate);
       setEnabled(true);
-      toast.success("Prompt override reset to default.");
+      toast.success("Substituição de prompt restaurada ao padrão.");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to reset prompt override.";
       setLastError(message);
@@ -283,7 +283,8 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
     return (
       <div className="flex items-start gap-2 text-xs text-[var(--destructive)]">
         <AlertTriangle size="0.875rem" className="mt-0.5 shrink-0" />
-        Could not load registered prompt overrides.
+        
+        Não foi possível carregar as substituições de prompt registradas.
       </div>
     );
   }

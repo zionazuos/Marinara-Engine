@@ -1987,7 +1987,7 @@ export function GameCombatUI({
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Backpack size={13} className="text-green-400" />
-                    <span className="text-[0.65rem] text-white/60">Pick an item to use this turn.</span>
+                    <span className="text-[0.65rem] text-white/60">Escolha um item para usar neste turno.</span>
                   </div>
                   {onOpenInventory && (
                     <button
@@ -2030,7 +2030,8 @@ export function GameCombatUI({
                   </div>
                 ) : (
                   <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/45">
-                    No items are available in your inventory.
+                    
+                    Nenhum item disponível no seu inventário.
                   </div>
                 )}
                 <button
@@ -2250,7 +2251,8 @@ export function GameCombatUI({
                 <div className="space-y-1 pr-1">
                   {combatLogEntries.length === 0 ? (
                     <div className="rounded border border-white/10 bg-white/5 px-2 py-1.5 text-[0.65rem] text-white/45">
-                      No combat events recorded yet.
+                      
+                      Nenhum evento de combate registrado ainda.
                     </div>
                   ) : (
                     combatLogEntries.map((entry) => (
@@ -2489,7 +2491,7 @@ export function GameCombatUI({
               <Sparkles size={14} className="text-blue-400" />
               <div>
                 <div className="text-xs font-semibold text-white">{activePlayer.name}'s Skills</div>
-                <div className="text-[0.65rem] text-white/45">Choose a combat ability, then pick a target.</div>
+                <div className="text-[0.65rem] text-white/45">Escolha uma habilidade de combate e então um alvo.</div>
               </div>
             </div>
 
@@ -2551,7 +2553,7 @@ export function GameCombatUI({
                 <Backpack size={14} className="text-green-400" />
                 <div>
                   <div className="text-xs font-semibold text-white">{activePlayer.name}'s Items</div>
-                  <div className="text-[0.65rem] text-white/45">Choose an item to use this turn.</div>
+                  <div className="text-[0.65rem] text-white/45">Escolha um item para usar neste turno.</div>
                 </div>
               </div>
               {onOpenInventory && (
@@ -2596,7 +2598,8 @@ export function GameCombatUI({
               </div>
             ) : (
               <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-3 text-xs text-white/45">
-                No items are available in your inventory.
+                
+                Nenhum item disponível no seu inventário.
               </div>
             )}
 

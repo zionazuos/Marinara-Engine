@@ -180,7 +180,7 @@ export function LorebooksPanel() {
         }
         if (activeTag === tag) setActiveTag(null);
       } catch {
-        toast.error("Failed to remove tag from some lorebooks");
+        toast.error("Falha ao remover a tag de alguns lorebooks");
       }
     },
     [lorebooks, updateLorebook, activeTag],

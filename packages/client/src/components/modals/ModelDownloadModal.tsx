@@ -776,7 +776,7 @@ export function ModelDownloadModal({ open, onClose }: Props) {
 
               {status === "server_error" && (
                 <div className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-4">
-                  <div className="text-sm font-medium text-amber-200">Local runtime failed to start</div>
+                  <div className="text-sm font-medium text-amber-200">O runtime local falhou ao iniciar</div>
                   <div className="mt-1 text-xs text-[var(--muted-foreground)]/85">
                     Marinara will keep working without the local model until you retry or change these settings.
                   </div>
@@ -1158,10 +1158,11 @@ export function ModelDownloadModal({ open, onClose }: Props) {
         {!hasModel && !isBlockingSetup && (
           <div className="rounded-xl border border-[var(--border)] bg-[var(--card)]/50 p-3">
             <span className="text-xs font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-              What the local model handles
+              
+              O que o modelo local cuida
             </span>
             <ul className="mt-2 flex flex-col gap-1 text-xs text-[var(--muted-foreground)]/80">
-              <li>Tracker agents in roleplay mode</li>
+              <li>Agentes de rastreador no modo roleplay</li>
               <li>Scene effects in game mode (backgrounds, music, SFX, ambient)</li>
               <li>Widget updates, weather, and time-of-day changes</li>
               <li>NPC reputation tracking and expression selection</li>

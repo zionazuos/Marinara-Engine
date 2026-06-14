@@ -104,7 +104,7 @@ export function TrackerDataSidebar({ fillHeight = false }: { fillHeight?: boolea
         ) : null}
 
         {!activeChatId ? (
-          <EmptySection>Select a chat to view tracker data.</EmptySection>
+          <EmptySection>Selecione um chat para ver os dados do rastreador.</EmptySection>
         ) : isLoadingGameState ? (
           <TrackerSkeleton />
         ) : !currentGameState ? (

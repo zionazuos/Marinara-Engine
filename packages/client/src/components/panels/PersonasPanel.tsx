@@ -177,7 +177,7 @@ export function PersonasPanel() {
         }
         if (activeTag === tag) setActiveTag(null);
       } catch {
-        toast.error("Failed to remove tag from some personas");
+        toast.error("Falha ao remover a tag de algumas personas");
       }
     },
     [rawList, updatePersona, activeTag],

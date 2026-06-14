@@ -175,7 +175,8 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
               {isImporting ? "Importing…" : "JSONL"}
             </button>
             <p className="mt-2 text-center text-[0.625rem] text-[var(--muted-foreground)]/60">
-              Adds the file as a new branch in this chat
+              
+              Adiciona o arquivo como uma nova ramificação neste chat
             </p>
             <input ref={importInputRef} type="file" accept=".jsonl" onChange={handleImportChat} className="hidden" />
           </div>
@@ -257,7 +258,8 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
             {isImporting ? "Importing…" : "JSONL"}
           </button>
           <p className="mt-2 text-center text-[0.625rem] text-[var(--muted-foreground)]/60">
-            Adds the file as a new branch in this chat
+            
+            Adiciona o arquivo como uma nova ramificação neste chat
           </p>
           <input ref={importInputRef} type="file" accept=".jsonl" onChange={handleImportChat} className="hidden" />
         </div>

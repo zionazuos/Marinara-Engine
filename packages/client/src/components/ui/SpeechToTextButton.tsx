@@ -131,7 +131,7 @@ export function SpeechToTextButton({ disabled, onTranscript, className, iconSize
     } catch {
       recognitionRef.current = null;
       setListening(false);
-      toast.error("Could not start speech recognition.");
+      toast.error("Não foi possível iniciar o reconhecimento de fala.");
     }
   }, [disabled, listening, onTranscript, stopListening]);
 

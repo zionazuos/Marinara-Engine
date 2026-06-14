@@ -499,7 +499,8 @@ export function HomeFaq() {
                   Perguntas frequentes
                 </p>
                 <p className="text-[0.625rem] text-[var(--muted-foreground)]/50">
-                  Tap a question to reveal the answer.
+                  
+                  Toque em uma pergunta para revelar a resposta.
                 </p>
               </div>
 

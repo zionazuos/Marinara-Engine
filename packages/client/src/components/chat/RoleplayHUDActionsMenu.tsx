@@ -240,7 +240,7 @@ export function RoleplayHUDActionsMenu({
               runs={injectableCustomRuns}
               loading={customAgentRunsLoading}
               title="Seções de prompt personalizadas"
-              emptyText="No saved prompt-section output yet."
+              emptyText="Nenhuma saída de seção de prompt salva ainda."
               countMode="latest"
               collapsible
             />

@@ -67,7 +67,7 @@ export function KeysEditor({ keys, onChange }: { keys: string[]; onChange: (keys
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addKey())}
           className="flex-1 rounded-lg bg-[var(--secondary)] px-2 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-          placeholder="Type a keyword and press Enter…"
+          placeholder="Digite uma palavra-chave e pressione Enter…"
         />
         <button
           onClick={addKey}

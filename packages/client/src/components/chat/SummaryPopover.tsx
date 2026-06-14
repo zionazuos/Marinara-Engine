@@ -466,7 +466,7 @@ export function SummaryPopover({
       setEditingEntryId(null);
       setDraftEntry(null);
     } catch {
-      toast.error("Could not save summary entry.");
+      toast.error("Não foi possível salvar a entrada do resumo.");
     }
   }, [chatId, displayEntries, draftEntry, updateSummaryEntry]);
 
@@ -475,7 +475,7 @@ export function SummaryPopover({
       try {
         await toggleSummaryEntry.mutateAsync({ chatId, entryId: entry.id, enabled });
       } catch {
-        toast.error("Could not update summary entry.");
+        toast.error("Não foi possível atualizar a entrada do resumo.");
       }
     },
     [chatId, toggleSummaryEntry],
@@ -492,7 +492,7 @@ export function SummaryPopover({
       }
       if (nextEnabled) setShowInactiveSummaries(false);
     } catch {
-      toast.error("Could not update summary entries.");
+      toast.error("Não foi possível atualizar as entradas do resumo.");
     }
   }, [chatId, displayEntries, enabledEntryCount, toggleSummaryEntry]);
 
@@ -515,7 +515,7 @@ export function SummaryPopover({
           return next;
         });
       } catch {
-        toast.error("Could not delete summary entry.");
+        toast.error("Não foi possível excluir a entrada do resumo.");
       }
     },
     [chatId, deleteSummaryEntry, editingEntryId, handleCancelEditEntry],
@@ -796,8 +796,8 @@ export function SummaryPopover({
                       type="button"
                       onClick={() => handleDuplicatePromptTemplate(activePromptTemplate ?? null)}
                       className="rounded-md p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                      title="Copy current prompt to a new template"
-                      aria-label="Copy current prompt to a new template"
+                      title="Copiar o prompt atual para um novo modelo"
+                      aria-label="Copiar o prompt atual para um novo modelo"
                     >
                       <Copy size="0.75rem" />
                     </button>
@@ -1322,7 +1322,7 @@ function SummaryEntryEditor({
         value={entry.content}
         onChange={(event) => onChange({ ...entry, content: event.target.value })}
         rows={7}
-        placeholder="Write or paste a summary of this chat..."
+        placeholder="Escreva ou cole um resumo deste chat..."
         className="max-h-64 min-h-36 w-full resize-y rounded-md bg-[var(--card)] p-2.5 text-xs leading-relaxed text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
       />
       <div className="flex flex-wrap items-center justify-between gap-2">

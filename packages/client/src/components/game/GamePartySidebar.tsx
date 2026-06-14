@@ -306,7 +306,7 @@ export function GamePartySidebar({
           {/* Messages */}
           <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-2 py-2">
             {messages.length === 0 ? (
-              <p className="py-4 text-center text-xs text-[var(--muted-foreground)]">Party members will chat here...</p>
+              <p className="py-4 text-center text-xs text-[var(--muted-foreground)]">Os membros do grupo vão conversar aqui...</p>
             ) : (
               messages.map((msg) => {
                 const msgMember = msg.characterName ? partyMembersByName.get(msg.characterName.toLowerCase()) : null;

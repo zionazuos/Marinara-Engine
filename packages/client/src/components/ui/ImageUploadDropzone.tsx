@@ -55,7 +55,7 @@ export function ImageUploadDropzone({
       return;
     }
     if (files && imageFiles.length < files.length) {
-      toast.warning("Only image files can be uploaded here.");
+      toast.warning("Só arquivos de imagem podem ser enviados aqui.");
     }
     onFilesSelected(imageFiles);
   };

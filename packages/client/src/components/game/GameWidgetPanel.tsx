@@ -250,7 +250,7 @@ function useWidgetEditor(widgets: HudWidget[], chatId: string) {
         setEditingWidgetId(null);
       } catch {
         setHudWidgets(previousWidgets);
-        toast.error("Failed to save widget changes.");
+        toast.error("Falha ao salvar as alterações do widget.");
       }
     },
     [chatId, editingWidget, setHudWidgets, updateGameWidgets, widgets],

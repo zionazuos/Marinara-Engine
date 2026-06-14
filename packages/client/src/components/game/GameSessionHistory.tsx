@@ -402,7 +402,7 @@ export function GameSessionHistory({
             {spoilersVisible && (
               <div className="border-t border-[var(--border)] px-4 py-3">
                 {!currentSecrets ? (
-                  <p className="text-xs text-[var(--muted-foreground)]">No GM spoiler state has been generated yet.</p>
+                  <p className="text-xs text-[var(--muted-foreground)]">Nenhum estado de spoiler do GM foi gerado ainda.</p>
                 ) : editingSecrets ? (
                   <div className="flex flex-col gap-3">
                     <label className="flex flex-col gap-1">
@@ -650,7 +650,7 @@ export function GameSessionHistory({
                                 <button
                                   onClick={() => void onUpdatePlotArcs(session.sessionNumber)}
                                   disabled={isUpdatingPlotArcs || isRegenerating}
-                                  title="Update game plot arcs from this session"
+                                  title="Atualizar arcos do enredo do game a partir desta sessão"
                                   className="inline-flex items-center gap-1 rounded-md bg-[var(--secondary)] px-2 py-1 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                   <GitBranch size={11} className={isUpdatingPlotArcs ? "animate-pulse" : undefined} />
@@ -661,7 +661,7 @@ export function GameSessionHistory({
                                 <button
                                   onClick={() => void onRegenerateSession(session.sessionNumber)}
                                   disabled={isRegenerating}
-                                  title="Regenerate this session conclusion"
+                                  title="Regenerar a conclusão desta sessão"
                                   className="inline-flex items-center gap-1 rounded-md bg-[var(--secondary)] px-2 py-1 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                   <RefreshCw size={11} className={isRegenerating ? "animate-spin" : undefined} />
@@ -710,7 +710,7 @@ export function GameSessionHistory({
                                 }
                                 disabled={isSaving}
                                 rows={4}
-                                placeholder="How the next session should resume"
+                                placeholder="Como a próxima sessão deve continuar"
                                 className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
                               />
                             </label>

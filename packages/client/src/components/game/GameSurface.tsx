@@ -4712,10 +4712,10 @@ export function GameSurface({
       }
 
       await playSpotifySceneTrack(selectedTrack);
-      toast.success("Spotify scene music refreshed.", { duration: 1800 });
+      toast.success("Música de cena do Spotify atualizada.", { duration: 1800 });
     } catch (error) {
       console.warn("[spotify/game] Retry failed:", error);
-      toast.error("Spotify scene music retry failed.");
+      toast.error("Falha ao repetir a música de cena do Spotify.");
     } finally {
       setSpotifyRetryPending(false);
     }
@@ -6179,7 +6179,7 @@ export function GameSurface({
       return;
     }
     if (combatGenerationPending) {
-      toast("Combat is already being prepared.");
+      toast("O combate já está sendo preparado.");
       return;
     }
     const messageId = latestAssistantMsg?.id;
@@ -6881,7 +6881,7 @@ export function GameSurface({
         });
         useGameModeStore.getState().setNpcs(nextSecrets.npcs);
         useGameModeStore.getState().setMaps(nextSecrets.maps, nextActiveMapId);
-        toast.success("Current session spoilers updated.");
+        toast.success("Spoilers da sessão atual atualizados.");
       } catch (error) {
         const message = error instanceof Error ? error.message : "Failed to update current session spoilers.";
         toast.error(message);
@@ -8138,7 +8138,7 @@ export function GameSurface({
                             ) : (
                               <Volume2 size={13} />
                             )}
-                            <span>Retry Spotify DJ Music Generation</span>
+                            <span>Repetir geração de música do DJ Mari do Spotify</span>
                           </button>
                         )}
                         <button
@@ -8150,7 +8150,7 @@ export function GameSurface({
                           className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-white/85 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
                         >
                           <Image size={13} />
-                          <span>Retry Assets Image Generation</span>
+                          <span>Repetir geração de imagem dos assets</span>
                         </button>
                       </div>
                     )}
@@ -8352,7 +8352,7 @@ export function GameSurface({
                                   ) : (
                                     <Volume2 size={13} />
                                   )}
-                                  <span>Retry Spotify DJ Music Generation</span>
+                                  <span>Repetir geração de música do DJ Mari do Spotify</span>
                                 </button>
                               )}
                               <button
@@ -8365,7 +8365,7 @@ export function GameSurface({
                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-white/85 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
                               >
                                 <Image size={13} />
-                                <span>Retry Assets Image Generation</span>
+                                <span>Repetir geração de imagem dos assets</span>
                               </button>
                             </div>
                           )}
@@ -8476,7 +8476,7 @@ export function GameSurface({
                       <div className="flex items-start gap-3">
                         <AlertTriangle size={14} className="mt-0.5 shrink-0 text-amber-400" />
                         <div className="min-w-0 flex-1">
-                          <div className="text-xs font-medium text-amber-200">Local scene helper failed to start</div>
+                          <div className="text-xs font-medium text-amber-200">O auxiliar de cena local falhou ao iniciar</div>
                           <div className="mt-1 text-[0.6875rem] leading-relaxed text-white/70">
                             Marinara will keep the game running without the local sidecar for now.
                             {sidecarFailedRuntimeVariant &&
@@ -9184,7 +9184,7 @@ export function GameSurface({
                 onChange={(event) => setNextSessionRequest(event.target.value)}
                 rows={4}
                 maxLength={5000}
-                placeholder="Leave empty to let the GM steer naturally."
+                placeholder="Deixe vazio para o GM conduzir naturalmente."
                 className="resize-none rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none placeholder:text-[var(--muted-foreground)]/70 focus:border-[var(--primary)]"
               />
             </label>

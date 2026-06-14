@@ -423,7 +423,7 @@ export function ToolEditor() {
                         setLocalParams(next);
                         markDirty();
                       }}
-                      placeholder="Description of this parameter…"
+                      placeholder="Descrição deste parâmetro…"
                       className="w-full rounded-lg bg-[var(--secondary)] px-2 py-1.5 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-[var(--ring)]"
                     />
                   </div>
@@ -486,7 +486,7 @@ export function ToolEditor() {
               <div className="mt-3 flex gap-2 rounded-xl border border-amber-500/25 bg-amber-500/10 p-3 text-xs text-amber-200">
                 <AlertCircle size="0.875rem" className="mt-0.5 shrink-0" />
                 <div>
-                  <div className="font-medium">Script tools are disabled on this server.</div>
+                  <div className="font-medium">As ferramentas de script estão desativadas neste servidor.</div>
                   <div className="mt-1 text-amber-100/80">
                     
                     Definir <code className="rounded bg-black/20 px-1">CUSTOM_TOOL_SCRIPT_ENABLED=true</code> in{" "}
@@ -531,7 +531,8 @@ export function ToolEditor() {
                 className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 font-mono text-sm ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
               />
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                A POST request will be sent with{" "}
+                
+                Uma requisição POST será enviada com{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">{"{ tool, arguments }"}</code> as JSON body.
                 Response is returned to the AI.
               </p>
@@ -553,7 +554,8 @@ export function ToolEditor() {
                 className="w-full resize-y rounded-xl bg-[var(--secondary)] px-4 py-3 font-mono text-xs leading-relaxed ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
               />
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Write JavaScript. Has access to <code className="rounded bg-[var(--secondary)] px-1">args</code>,{" "}
+                
+                Escreva JavaScript. Tem acesso a <code className="rounded bg-[var(--secondary)] px-1">args</code>,{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">JSON</code>,{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">Math</code>,{" "}
                 <code className="rounded bg-[var(--secondary)] px-1">Data</code>. Must{" "}

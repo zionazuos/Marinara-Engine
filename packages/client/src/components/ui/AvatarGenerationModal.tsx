@@ -176,7 +176,8 @@ export function AvatarGenerationModal({
                 <span className="block text-xs font-medium text-[var(--foreground)]">Conexão de geração de imagem</span>
                 {imageConnections.length === 0 ? (
                   <p className="rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--destructive)]">
-                    No image generation connections found.
+                    
+                    Nenhuma conexão de geração de imagem encontrada.
                   </p>
                 ) : (
                   <select
@@ -218,7 +219,7 @@ export function AvatarGenerationModal({
                     alt="Referência do avatar atual"
                     className="h-10 w-10 rounded-lg object-cover ring-1 ring-[var(--border)]"
                   />
-                  <span className="min-w-0 flex-1">Use current avatar as a reference</span>
+                  <span className="min-w-0 flex-1">Usar o avatar atual como referência</span>
                 </label>
               )}
             </div>

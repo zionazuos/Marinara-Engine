@@ -175,7 +175,7 @@ export function GenerationReplayDetailsModal({
         )}
 
         {!generationGuide && !hasImpersonate && (
-          <p className="text-sm text-[var(--muted-foreground)]">No stored guidance on this swipe.</p>
+          <p className="text-sm text-[var(--muted-foreground)]">Nenhuma orientação armazenada neste swipe.</p>
         )}
       </div>
     </Modal>

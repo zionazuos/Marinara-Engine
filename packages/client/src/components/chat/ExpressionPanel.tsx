@@ -253,7 +253,8 @@ function ExpressionSprite({
           <p
             className={cn("mt-0.5 text-[0.625rem]", isRoleplay ? "text-white/30" : "text-[var(--muted-foreground)]/50")}
           >
-            No expression sprites uploaded
+            
+            Nenhum sprite de expressão enviado
           </p>
         </div>
       </div>

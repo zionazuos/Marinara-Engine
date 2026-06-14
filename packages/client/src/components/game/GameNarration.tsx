@@ -3816,7 +3816,7 @@ export function GameNarration({
           )}
 
           {!scenePreparing && !active && !isStreaming && !sceneAnalysisFailed && (
-            <p className="text-sm text-[var(--muted-foreground)]">Send an action to begin the scene.</p>
+            <p className="text-sm text-[var(--muted-foreground)]">Envie uma ação para começar a cena.</p>
           )}
 
           {!scenePreparing && active && active.type === "dialogue" && (
@@ -3836,7 +3836,7 @@ export function GameNarration({
                             type="button"
                             onClick={(event) => handleNpcPortraitAvatarClick(event, active.speaker)}
                             className="rounded-xl transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/30"
-                            title="Upload or replace NPC portrait"
+                            title="Enviar ou substituir retrato do NPC"
                           >
                             {activeAvatar ? (
                               <CroppedAvatar
@@ -4749,7 +4749,7 @@ export function GameNarration({
                                   type="button"
                                   onClick={(event) => handleNpcPortraitAvatarClick(event, seg.speaker)}
                                   className="rounded-lg transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-white/20"
-                                  title="Upload or replace NPC portrait"
+                                  title="Enviar ou substituir retrato do NPC"
                                 >
                                   {logAvatar ? (
                                     <CroppedAvatar

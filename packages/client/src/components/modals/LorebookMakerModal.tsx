@@ -418,7 +418,8 @@ export function LorebookMakerModal({ open, onClose }: Props) {
                 ) : (
                   <>
                     <Plus size="0.875rem" />
-                    Create Lorebook & Save Entries
+                    
+                    Criar lorebook e salvar entradas
                   </>
                 )}
               </button>

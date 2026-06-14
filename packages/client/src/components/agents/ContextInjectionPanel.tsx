@@ -268,7 +268,8 @@ export function ContextInjectionPanel({
           )}
           {!target && (
             <p className="py-2 text-center text-[0.625rem] text-[var(--muted-foreground)]">
-              No assistant message loaded yet.
+              
+              Nenhuma mensagem do assistente carregada ainda.
             </p>
           )}
           {target && injections.length === 0 && (
@@ -451,8 +452,8 @@ function DirectorCadenceCard({
             onClick={() => onStep(-1)}
             disabled={!canEdit || saving || interval <= 1}
             className="inline-flex h-6 w-6 items-center justify-center rounded-l-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]/55 hover:text-[var(--accent-foreground)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:opacity-40 max-md:h-7 max-md:w-7"
-            title="Decrease Narrative Director interval"
-            aria-label="Decrease Narrative Director interval"
+            title="Diminuir intervalo do Diretor Narrativo"
+            aria-label="Diminuir intervalo do Diretor Narrativo"
           >
             <Minus size="0.625rem" />
           </button>
@@ -464,8 +465,8 @@ function DirectorCadenceCard({
             onClick={() => onStep(1)}
             disabled={!canEdit || saving || interval >= maxInterval}
             className="inline-flex h-6 w-6 items-center justify-center rounded-r-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]/55 hover:text-[var(--accent-foreground)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:opacity-40 max-md:h-7 max-md:w-7"
-            title="Increase Narrative Director interval"
-            aria-label="Increase Narrative Director interval"
+            title="Aumentar intervalo do Diretor Narrativo"
+            aria-label="Aumentar intervalo do Diretor Narrativo"
           >
             <Plus size="0.625rem" />
           </button>

@@ -1228,7 +1228,8 @@ function ExpandedDrawer({
 
       <details className="rounded-lg border border-[var(--border)] bg-[var(--card)]/40 px-3 py-2">
         <summary className="cursor-pointer text-xs font-medium text-[var(--foreground)]">
-          Context filters & matching sources
+          
+          Filtros de contexto e fontes de correspondência
         </summary>
         <div className="mt-3 space-y-3">
           <div className="grid gap-3 lg:grid-cols-3">
