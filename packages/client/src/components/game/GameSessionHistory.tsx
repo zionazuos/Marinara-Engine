@@ -363,7 +363,7 @@ export function GameSessionHistory({
       <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
         <div className="flex items-center gap-2">
           <History size={16} className="text-[var(--muted-foreground)]" />
-          <span className="text-sm font-semibold text-[var(--foreground)]">Session History</span>
+          <span className="text-sm font-semibold text-[var(--foreground)]">Histórico de sessões</span>
           <span className="text-xs text-[var(--muted-foreground)]">
             ({sorted.length} past session{sorted.length !== 1 ? "s" : ""})
           </span>
@@ -407,7 +407,8 @@ export function GameSessionHistory({
                   <div className="flex flex-col gap-3">
                     <label className="flex flex-col gap-1">
                       <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                        World Overview
+                        
+                        Visão geral do mundo
                       </span>
                       <textarea
                         value={secretDraft?.worldOverview ?? ""}
@@ -541,13 +542,13 @@ export function GameSessionHistory({
                         </button>
                       )}
                     </div>
-                    <SpoilerTextSection label="World Overview" value={currentSecrets.worldOverview} />
+                    <SpoilerTextSection label="Visão geral do mundo" value={currentSecrets.worldOverview} />
                     <SpoilerTextSection label="Arco da história" value={currentSecrets.storyArc} />
                     <SpoilerListSection label="Reviravoltas" values={currentSecrets.plotTwists} />
                     <SpoilerJsonSection label="Arcos do grupo" value={currentSecrets.partyArcs} />
                     <SpoilerJsonSection label="Mapas" value={currentSecrets.maps} />
                     <SpoilerJsonSection label="NPCs" value={currentSecrets.npcs} />
-                    <SpoilerJsonSection label="Character Cards" value={currentSecrets.characterCards} />
+                    <SpoilerJsonSection label="Cards de personagem" value={currentSecrets.characterCards} />
                   </div>
                 )}
               </div>
@@ -715,7 +716,8 @@ export function GameSessionHistory({
                             </label>
                             <label className="flex flex-col gap-1">
                               <span className="text-[0.6875rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                                Party Dynamics
+                                
+                                Dinâmica do grupo
                               </span>
                               <textarea
                                 value={draft?.partyDynamics ?? ""}
@@ -863,7 +865,8 @@ export function GameSessionHistory({
                         <div className="mb-3">
                           <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)]">
                             <Users size={12} />
-                            Party Dynamics
+                            
+                            Dinâmica do grupo
                           </div>
                           <AnimatedText html={session.partyDynamics} className="text-sm text-[var(--foreground)]" />
                         </div>
@@ -943,7 +946,7 @@ export function GameSessionHistory({
 
                       {Object.keys(session.statsSnapshot).length > 0 && (
                         <div className="mb-3">
-                          <div className="mb-1 text-xs font-medium text-[var(--muted-foreground)]">Stats Snapshot</div>
+                          <div className="mb-1 text-xs font-medium text-[var(--muted-foreground)]">Snapshot dos atributos</div>
                           <pre className="overflow-x-auto rounded-lg bg-[var(--secondary)] p-3 font-mono text-[0.6875rem] leading-relaxed text-[var(--foreground)] whitespace-pre-wrap break-words">
                             {JSON.stringify(session.statsSnapshot, null, 2)}
                           </pre>

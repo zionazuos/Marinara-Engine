@@ -294,7 +294,7 @@ export function StatList({
     return onAdd && addMode ? (
       <InlineAddRow onClick={onAdd} title="Adicionar atributo" className="border-t-0" />
     ) : (
-      <EmptySection>No stats tracked.</EmptySection>
+      <EmptySection>Nenhum atributo rastreado.</EmptySection>
     );
   }
   const updateStat = (index: number, updated: CharacterStat) => {

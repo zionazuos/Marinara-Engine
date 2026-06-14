@@ -94,7 +94,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
       )}
 
       <ImageUploadDropzone
-        label="Upload Images"
+        label="Enviar imagens"
         pending={upload.isPending}
         pendingLabel="Uploading…"
         dragLabel="Drop images to upload"
@@ -146,7 +146,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
                     <button
                       type="button"
                       onClick={() => pinImage(img)}
-                      aria-label="Pin image to chat"
+                      aria-label="Fixar imagem no chat"
                       className="rounded-md bg-white/20 p-1.5 text-white transition-colors hover:bg-white/30"
                       title="Fixar no chat"
                     >
@@ -172,7 +172,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
       {confirmDeleteId && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm max-md:pt-[env(safe-area-inset-top)]">
           <div className="mx-4 rounded-xl bg-[var(--background)] p-5 shadow-2xl ring-1 ring-[var(--border)]">
-            <p className="mb-4 text-sm font-medium">Delete this image?</p>
+            <p className="mb-4 text-sm font-medium">Excluir esta imagem?</p>
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirmDeleteId(null)}
@@ -222,7 +222,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
                     pinImage(lightbox);
                     setLightbox(null);
                   }}
-                  aria-label="Pin image to chat"
+                  aria-label="Fixar imagem no chat"
                   className="rounded-lg bg-black/60 p-2 text-white transition-colors hover:bg-black/80"
                   title="Fixar no chat"
                 >
@@ -231,7 +231,7 @@ export function ChatGallery({ chatId, onIllustrate }: ChatGalleryProps) {
                 <a
                   href={lightbox.url}
                   download
-                  aria-label="Download image"
+                  aria-label="Baixar imagem"
                   className="rounded-lg bg-black/60 p-2 text-white transition-colors hover:bg-black/80"
                 >
                   <Download size="0.875rem" />

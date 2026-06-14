@@ -316,7 +316,8 @@ export function QuickPersonaSwitcher({ className }: { className?: string }) {
 
             {personas.length === 0 && (
               <div className="px-3 py-4 text-center text-[0.6875rem] italic text-[var(--muted-foreground)]">
-                No personas found.
+                
+                Nenhuma persona encontrada.
               </div>
             )}
           </div>

@@ -825,7 +825,7 @@ export function ChatSidebar() {
               setMovingChatId(chat.id);
             }}
             className="shrink-0 rounded-md p-1 opacity-0 transition-all hover:bg-[var(--accent)] group-hover:opacity-100 max-md:opacity-100"
-            title="Move to folder"
+            title="Mover para pasta"
           >
             <FolderOpen size="0.75rem" className="text-[var(--muted-foreground)]" />
           </button>
@@ -862,7 +862,7 @@ export function ChatSidebar() {
   };
 
   return (
-    <nav data-component="ChatSidebar" aria-label="Chat navigation" className="mari-chat-sidebar flex h-full flex-col">
+    <nav data-component="ChatSidebar" aria-label="Navegação do chat" className="mari-chat-sidebar flex h-full flex-col">
       {/* Header */}
       <div className="mari-sidebar-header relative flex h-12 items-center justify-between bg-[var(--card)]/80 px-4 backdrop-blur-sm">
         <div className="absolute inset-x-0 bottom-0 h-px bg-[var(--border)]/30" />
@@ -1071,7 +1071,7 @@ export function ChatSidebar() {
               <FolderPlus size="0.75rem" className="text-[var(--muted-foreground)]" />
               <input
                 autoFocus
-                placeholder="Folder name..."
+                placeholder="Nome da pasta..."
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
                 onKeyDown={(e) => {
@@ -1241,7 +1241,7 @@ export function ChatSidebar() {
       </Modal>
 
       {/* ── Move to Folder Modal ── */}
-      <Modal open={movingChatId !== null} onClose={() => setMovingChatId(null)} title="Move to Folder" width="max-w-xs">
+      <Modal open={movingChatId !== null} onClose={() => setMovingChatId(null)} title="Mover para pasta" width="max-w-xs">
         {movingChatId && (
           <div className="flex flex-col gap-1">
             <button
@@ -1310,7 +1310,8 @@ export function ChatSidebar() {
       >
         <div className="space-y-2">
           <p className="px-1 text-[0.625rem] font-medium uppercase tracking-wide text-[var(--muted-foreground)]/60">
-            Selected chats
+            
+            Chats selecionados
           </p>
           <button
             type="button"
@@ -1581,7 +1582,7 @@ function UserStatusFooter() {
           onChange={(event) => setUserActivity(event.target.value)}
           maxLength={120}
           placeholder="What are you doing?"
-          aria-label="Custom activity"
+          aria-label="Atividade personalizada"
           className="min-w-0 flex-1 rounded-lg border border-[var(--border)]/40 bg-[var(--sidebar-accent)]/35 px-2 py-1.5 text-xs text-[var(--sidebar-foreground)] outline-none transition-colors placeholder:text-[var(--muted-foreground)]/70 focus:border-[var(--primary)]/40 focus:bg-[var(--sidebar-accent)]/60"
         />
       </div>

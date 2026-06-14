@@ -380,7 +380,7 @@ export function ColorPicker({
                   </span>
                 </div>
                 <input
-                  aria-label="Gradient angle"
+                  aria-label="Ângulo do gradiente"
                   type="range"
                   min={0}
                   max={360}

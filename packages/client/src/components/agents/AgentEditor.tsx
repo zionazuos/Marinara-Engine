@@ -839,7 +839,7 @@ export function AgentEditor() {
 
           {/* Agent Pipeline Phase */}
           <FieldGroup
-            label="Pipeline Phase"
+            label="Fase do pipeline"
             icon={<Zap size="0.875rem" className="text-[var(--primary)]" />}
             help="When this agent runs during generation. Pre-Generation runs before the AI replies, Parallel runs alongside, Post-Processing runs after the reply is complete."
           >
@@ -1400,7 +1400,7 @@ export function AgentEditor() {
 
           {isChatSummaryAgent && (
             <FieldGroup
-              label="Triggers After"
+              label="Dispara após"
               icon={<Clock size="0.875rem" className="text-[var(--primary)]" />}
               help="How many user messages must be sent since the last automatic summary before the agent triggers again. The context size for each summary generation is set in the Chat Summary panel in the chat itself."
             >
@@ -1418,7 +1418,7 @@ export function AgentEditor() {
                   placeholder="5"
                   className="w-28 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm tabular-nums ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                 />
-                <span className="text-[0.6875rem] text-[var(--muted-foreground)]">user messages</span>
+                <span className="text-[0.6875rem] text-[var(--muted-foreground)]">mensagens do usuário</span>
               </div>
               <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
                 The automatic summary will trigger after this many user messages have been sent since the last summary
@@ -1523,7 +1523,7 @@ export function AgentEditor() {
           {/* ── Spotify Settings (only shown for Spotify agent) ── */}
           {(agentDetailId === "spotify" || dbConfig?.type === "spotify") && (
             <FieldGroup
-              label="Spotify Connection"
+              label="Conexão do Spotify"
               icon={<Music size="0.875rem" className="text-green-400" />}
               help="Connect your Spotify account to let this agent control playback."
             >
@@ -1802,7 +1802,7 @@ export function AgentEditor() {
                       </code>
                     </li>
                     <li>
-                      Copy the <strong>Client ID</strong> and paste it above
+                      Copy the <strong>Client ID</strong>  e cole acima
                     </li>
                     <li>
                       Save the agent, then click <strong>Conectar conta do Spotify</strong>
@@ -1816,7 +1816,7 @@ export function AgentEditor() {
                     <code className="text-white/40">http://127.0.0.1</code>). If you&apos;re running Marinara on another
                     machine over plain HTTP, register the loopback URI anyway and use the paste-back fallback that
                     appears under the Connect button — or set{" "}
-                    <code className="text-white/40">SPOTIFY_REDIRECT_URI</code> to your HTTPS URL.
+                    <code className="text-white/40">SPOTIFY_REDIRECT_URI</code>  para a sua URL HTTPS.
                   </p>
                 </div>
               </div>

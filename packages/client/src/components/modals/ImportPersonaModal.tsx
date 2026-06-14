@@ -148,7 +148,7 @@ export function ImportPersonaModal({ open, onClose }: Props) {
         reset();
         onClose();
       }}
-      title="Import Persona"
+      title="Importar persona"
     >
       <div className="flex flex-col gap-4">
         {/* Drop zone */}

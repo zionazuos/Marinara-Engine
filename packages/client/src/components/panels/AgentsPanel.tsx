@@ -310,7 +310,7 @@ export function AgentsPanel() {
               >
                 <button
                   className="mt-0.5 shrink-0 cursor-grab rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] active:cursor-grabbing"
-                  title="Drag to reorder"
+                  title="Arraste para reordenar"
                   onClick={(event) => event.stopPropagation()}
                   onMouseDown={(event) => {
                     event.stopPropagation();
@@ -438,12 +438,12 @@ export function AgentsPanel() {
         </>
       ) : (
         <>
-          <PanelSection title="Enabled Agents" icon={<Sparkles size="0.8125rem" />}>
+          <PanelSection title="Agentes ativados" icon={<Sparkles size="0.8125rem" />}>
             <div className="mb-1.5 text-[0.625rem] text-[var(--muted-foreground)]">
               Built-ins default to active unless explicitly disabled in their config.
             </div>
             {!activeAgents.length ? (
-              <p className="px-1 py-2 text-[0.625rem] text-[var(--muted-foreground)]">No active agents.</p>
+              <p className="px-1 py-2 text-[0.625rem] text-[var(--muted-foreground)]">Nenhum agente ativo.</p>
             ) : (
               activeAgents.map((agent) =>
                 renderAgentCard({
@@ -455,7 +455,7 @@ export function AgentsPanel() {
               )
             )}
           </PanelSection>
-          <PanelSection title="Disabled Agents" icon={<Sparkles size="0.8125rem" />}>
+          <PanelSection title="Agentes desativados" icon={<Sparkles size="0.8125rem" />}>
             {!inactiveAgents.length ? (
               <p className="px-1 py-2 text-[0.625rem] text-[var(--muted-foreground)]">No inactive agents.</p>
             ) : (
@@ -569,7 +569,7 @@ export function AgentsPanel() {
           <button
             onClick={handleCreateTool}
             className="rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--primary)]"
-            title="Create custom tool"
+            title="Criar ferramenta personalizada"
           >
             <Plus size="0.8125rem" />
           </button>

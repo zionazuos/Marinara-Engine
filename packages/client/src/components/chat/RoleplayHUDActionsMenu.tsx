@@ -168,7 +168,7 @@ export function RoleplayHUDActionsMenu({
           {isAgentProcessing && (
             <div className="flex items-center gap-2 border-b border-white/5 px-3 py-2">
               <Sparkles size="0.75rem" className="animate-pulse text-foreground/65" />
-              <span className="text-[0.625rem] text-foreground/65">Agents thinking...</span>
+              <span className="text-[0.625rem] text-foreground/65">Agentes pensando...</span>
             </div>
           )}
           {!hasAnyActivity && (
@@ -218,7 +218,7 @@ export function RoleplayHUDActionsMenu({
             <CustomAgentRunsSection
               runs={customAgentRuns}
               loading={customAgentRunsLoading}
-              title="Custom outputs"
+              title="Saídas personalizadas"
               countMode="all"
             />
           )}
@@ -312,7 +312,7 @@ export function RoleplayHUDActionsMenu({
               className="flex w-full items-center gap-2 px-3 py-2 text-[0.625rem] text-white/60 transition-colors hover:bg-red-500/10 hover:text-red-300"
             >
               <Trash2 size="0.75rem" className="text-current" />
-              <span>Clear Trackers</span>
+              <span>Limpar rastreadores</span>
             </button>
           )}
           {showTrackerActions && onRetriggerTrackers && (

@@ -279,8 +279,8 @@ export function TrackerPortraitStage({
               event.stopPropagation();
               updateZoom(-TRACKER_PORTRAIT_ZOOM_STEP);
             }}
-            title="Zoom portrait out"
-            aria-label="Zoom portrait out"
+            title="Afastar retrato"
+            aria-label="Afastar retrato"
             className={PORTRAIT_VIEW_BUTTON_CLASS}
           >
             <ZoomOut size="0.75rem" />

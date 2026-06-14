@@ -119,7 +119,7 @@ export function GameQteOverlay({ actions, timerSeconds, onSelect, onTimeout, onD
           >
             {timeLeft.toFixed(1)}s
           </span>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-white/60">React quickly!</p>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-white/60">Reaja rápido!</p>
         </div>
 
         {/* Action buttons */}

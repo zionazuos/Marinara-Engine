@@ -134,7 +134,8 @@ function MultiSelectBar({
           className="flex items-center gap-1.5 rounded-lg bg-[var(--destructive)] px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-[var(--destructive)]/80 disabled:opacity-40"
         >
           <Trash2 size="0.75rem" />
-          Delete selected
+          
+          Excluir selecionados
         </button>
         <button
           onClick={onCancel}

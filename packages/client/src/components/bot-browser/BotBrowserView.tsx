@@ -1834,7 +1834,7 @@ export function BotBrowserView() {
         )}
         {sourceId === "chartavern" && ctLoggedIn && (
           <span className="ml-auto flex items-center gap-1 text-[0.65rem] text-emerald-400">
-            <CheckCircle size="0.625rem" /> Session active
+            <CheckCircle size="0.625rem" />  Sessão ativa
           </span>
         )}
       </div>
@@ -1876,7 +1876,7 @@ export function BotBrowserView() {
                     addCustomTag();
                   }
                 }}
-                placeholder="Search tags..."
+                placeholder="Buscar tags..."
                 className="w-full rounded-md border border-[var(--border)] bg-[var(--secondary)] px-2.5 py-1.5 text-xs outline-none transition-colors focus:border-[var(--primary)]"
               />
             </div>
@@ -2222,7 +2222,7 @@ export function BotBrowserView() {
                       </span>
                       {provider.hasSortDirection && (
                         <div className="flex items-center gap-2">
-                          <label className="w-24 text-xs text-[var(--muted-foreground)]">Sort Direction</label>
+                          <label className="w-24 text-xs text-[var(--muted-foreground)]">Direção da ordenação</label>
                           <select
                             value={sortAsc ? "asc" : "desc"}
                             onChange={(e) => {
@@ -2537,7 +2537,8 @@ function LoginModal({
                     className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-emerald-500 disabled:opacity-50"
                   >
                     {loginLoading ? <Loader2 size="0.75rem" className="animate-spin" /> : <KeyRound size="0.75rem" />}{" "}
-                    Save & Connect
+                    
+                    Salvar e conectar
                   </button>
                 ) : (
                   <button
@@ -2592,7 +2593,7 @@ function LoginModal({
                     3. Find the <code className="rounded bg-[var(--accent)] px-1">session</code> cookie
                   </p>
                   <p>
-                    4. Copy its <strong>Valor</strong> and paste it above
+                    4. Copy its <strong>Valor</strong>  e cole acima
                   </p>
                 </div>
               </details>
@@ -2609,7 +2610,8 @@ function LoginModal({
                     className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
                   >
                     {loginLoading ? <Loader2 size="0.75rem" className="animate-spin" /> : <Cookie size="0.75rem" />}{" "}
-                    Save & Connect
+                    
+                    Salvar e conectar
                   </button>
                 ) : (
                   <button
@@ -2782,7 +2784,7 @@ function DetailView({
           onClick={onBack}
           className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
         >
-          <ChevronLeft size="0.875rem" /> Back to results
+          <ChevronLeft size="0.875rem" />  Voltar aos resultados
         </button>
         <div className="flex-1" />
         <a
@@ -2913,7 +2915,7 @@ function DetailView({
             {displayDetail ? (
               <div className="flex flex-col gap-3">
                 {displayDetail.creatorNotes && (
-                  <DefSection title="Creator's Notes" content={displayDetail.creatorNotes} />
+                  <DefSection title="Notas do criador" content={displayDetail.creatorNotes} />
                 )}
                 {displayDetail.description && (
                   <DefSection title="Description / Personality" content={displayDetail.description} />

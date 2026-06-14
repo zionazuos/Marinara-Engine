@@ -64,7 +64,7 @@ function HiddenFromAIConversationButton({
     return (
       <span
         className="inline-flex items-center gap-1 align-middle text-[0.625rem] font-medium text-amber-500/80"
-        title="Hidden from AI"
+        title="Oculto da IA"
       >
         <EyeOff size="0.7rem" className="shrink-0" />
       </span>
@@ -103,7 +103,7 @@ function HiddenFromAIConversationSummary({ onExpand }: { onExpand: () => void })
       aria-label="Expand hidden from AI message"
     >
       <EyeOff size="0.8rem" className="shrink-0" />
-      <span className="min-w-0 flex-1 truncate">Hidden from AI</span>
+      <span className="min-w-0 flex-1 truncate">Oculto da IA</span>
       <span className="shrink-0 text-[0.625rem] opacity-70">Mostrar</span>
     </button>
   );
@@ -744,7 +744,7 @@ export const ConversationMessage = memo(function ConversationMessage({
         {hiddenFromAIHeader && !isHiddenCollapsed && (
           <div className="mb-1 flex items-center gap-1 pl-14 text-[0.6875rem] text-amber-500/80">
             {hiddenFromAIHeader}
-            <span>Hidden from AI</span>
+            <span>Oculto da IA</span>
           </div>
         )}
         {isHiddenCollapsed ? (
@@ -961,7 +961,7 @@ export const ConversationMessage = memo(function ConversationMessage({
             />
           )}
           {thinking && (
-            <MsgAction icon={<Brain size="0.75rem" />} onClick={() => setShowThinking(true)} title="View thoughts" />
+            <MsgAction icon={<Brain size="0.75rem" />} onClick={() => setShowThinking(true)} title="Ver pensamentos" />
           )}
           <MsgAction
             icon={<Trash2 size="0.75rem" />}
@@ -986,7 +986,8 @@ export const ConversationMessage = memo(function ConversationMessage({
                 <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
                   <div className="flex items-center gap-2 text-sm font-semibold">
                     <Brain size="0.875rem" className="text-[var(--muted-foreground)]" />
-                    Model Thoughts
+                    
+                    Pensamentos do modelo
                   </div>
                   <button
                     onClick={() => setShowThinking(false)}
@@ -1263,7 +1264,7 @@ export const ConversationMessage = memo(function ConversationMessage({
             />
           )}
           {thinking && !isUser && (
-            <MsgAction icon={<Brain size="0.75rem" />} onClick={() => setShowThinking(true)} title="View thoughts" />
+            <MsgAction icon={<Brain size="0.75rem" />} onClick={() => setShowThinking(true)} title="Ver pensamentos" />
           )}
           <MsgAction
             icon={<Trash2 size="0.75rem" />}
@@ -1289,7 +1290,8 @@ export const ConversationMessage = memo(function ConversationMessage({
               <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <Brain size="0.875rem" className="text-[var(--muted-foreground)]" />
-                  Model Thoughts
+                  
+                  Pensamentos do modelo
                 </div>
                 <button
                   onClick={() => setShowThinking(false)}
@@ -1327,7 +1329,7 @@ export const ConversationMessage = memo(function ConversationMessage({
             >
               <img
                 src={imageLightbox.url}
-                alt="Expanded image"
+                alt="Imagem expandida"
                 className={
                   imageLightbox.prompt?.trim()
                     ? "max-h-[calc(90vh-9rem)] max-w-full rounded-lg object-contain shadow-2xl"

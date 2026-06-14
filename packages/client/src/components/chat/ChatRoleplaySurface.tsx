@@ -448,8 +448,8 @@ function ActiveContextLinksButton({
             ? "bg-foreground/15 border-foreground/20 text-foreground/90"
             : "bg-foreground/5 border-foreground/10 text-foreground/60 hover:bg-foreground/10 hover:text-foreground",
         )}
-        title="Active Context"
-        aria-label="Active Context"
+        title="Contexto ativo"
+        aria-label="Contexto ativo"
         aria-haspopup="menu"
         aria-expanded={open}
       >
@@ -460,7 +460,7 @@ function ActiveContextLinksButton({
           role="menu"
           className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-[var(--border)] bg-[var(--card)] p-2 shadow-2xl shadow-black/40 animate-message-in"
         >
-          <div className="px-2 pb-1 text-[0.625rem] font-semibold uppercase text-foreground/45">Active Context</div>
+          <div className="px-2 pb-1 text-[0.625rem] font-semibold uppercase text-foreground/45">Contexto ativo</div>
           <div className="space-y-1">
             {characterIds.map((id, index) => (
               <button
@@ -601,7 +601,7 @@ function AuthorNotesButton({ chatId, chatMeta }: { chatId: string | null; chatMe
               ? "bg-foreground/10 border-foreground/25 text-foreground/80 hover:bg-foreground/15 hover:text-foreground"
               : "bg-foreground/5 border-foreground/10 text-foreground/60 hover:bg-foreground/10 hover:text-foreground",
         )}
-        title="Author's Notes"
+        title="Notas do autor"
       >
         <PenLine size="0.875rem" />
       </button>
@@ -1011,7 +1011,7 @@ export function ChatRoleplaySurface({
                     <AuthorNotesButton chatId={chat?.id ?? null} chatMeta={chatMeta} />
                     <RpToolbarButton
                       icon={<FolderOpen size="0.875rem" />}
-                      title="Manage Chat Files"
+                      title="Gerenciar arquivos do chat"
                       onClick={onOpenFiles}
                     />
                     {showSpriteOverlay && (
@@ -1116,7 +1116,7 @@ export function ChatRoleplaySurface({
                         <AuthorNotesButton chatId={chat?.id ?? null} chatMeta={chatMeta} />
                         <RpToolbarButton
                           icon={<FolderOpen size="0.875rem" />}
-                          title="Manage Chat Files"
+                          title="Gerenciar arquivos do chat"
                           onClick={onOpenFiles}
                         />
                         {showSpriteOverlay && (
@@ -1191,7 +1191,7 @@ export function ChatRoleplaySurface({
                       <AuthorNotesButton chatId={chat?.id ?? null} chatMeta={chatMeta} />
                       <RpToolbarButton
                         icon={<FolderOpen size="0.875rem" />}
-                        title="Manage Chat Files"
+                        title="Gerenciar arquivos do chat"
                         onClick={onOpenFiles}
                       />
                       <RpToolbarButton icon={<Image size="0.875rem" />} title="Galeria" onClick={onOpenGallery} />

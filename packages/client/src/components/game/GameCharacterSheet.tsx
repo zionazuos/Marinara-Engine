@@ -532,7 +532,7 @@ export function GameCharacterSheet({
                     />
                   </label>
                   <label className="block space-y-1.5">
-                    <span className={FIELD_LABEL_CLASS}>Short Description</span>
+                    <span className={FIELD_LABEL_CLASS}>Descrição curta</span>
                     <textarea
                       value={draft.shortDescription}
                       onChange={(e) => setDraft((prev) => ({ ...prev, shortDescription: e.target.value }))}
@@ -548,7 +548,7 @@ export function GameCharacterSheet({
                 <div className="mb-2.5 flex items-center justify-between gap-3">
                   <SectionHeader
                     icon={<Shield size={12} />}
-                    title="RPG Attributes"
+                    title="Atributos de RPG"
                     className="mb-0 text-[var(--muted-foreground)]"
                   />
                   <label className="flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
@@ -660,7 +660,7 @@ export function GameCharacterSheet({
                       <button
                         onClick={() => removeListItem("abilities", index)}
                         className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] px-2 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-red-400"
-                        title="Remove ability"
+                        title="Remover habilidade"
                       >
                         <Trash2 size={13} />
                       </button>

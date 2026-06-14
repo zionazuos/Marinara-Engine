@@ -220,7 +220,7 @@ export function CyoaChoices({ messages }: Props) {
       <div className="flex items-center gap-2 text-[0.625rem] text-[var(--muted-foreground)]/60">
         <div className="flex items-center gap-1.5">
           <Sparkles size="0.625rem" />
-          <span>What will you do?</span>
+          <span>O que você vai fazer?</span>
         </div>
         {impersonateCyoaChoices && (
           <span className="rounded-full border border-purple-400/20 bg-purple-500/10 px-1.5 py-0.5 text-[0.5625rem] font-semibold text-purple-700 dark:text-purple-200">

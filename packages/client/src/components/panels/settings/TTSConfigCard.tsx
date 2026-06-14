@@ -676,7 +676,7 @@ export function TTSConfigCard() {
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium">Text to Speech</div>
+          <div className="text-sm font-medium">Texto para fala</div>
           <div className="truncate text-[0.6875rem] text-[var(--muted-foreground)]">
             {enabled
               ? `${selectedSource.label} · ${model || selectedSource.model} · ${selectedVoiceLabel}${narratorVoiceEnabled ? ` · Narrator: ${narratorVoiceLabel}` : ""}${voicesFromProvider || source !== "openai" ? "" : " (built-in voices)"}`
@@ -995,7 +995,7 @@ export function TTSConfigCard() {
           )}
 
           <FieldRow
-            label="Narrator Voice"
+            label="Voz do narrador"
             help="Use a separate voice for narrator messages, game narration, and roleplay narration outside speaker-tagged dialogue."
           >
             <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-2">
@@ -1086,7 +1086,7 @@ export function TTSConfigCard() {
 
           {source === "elevenlabs" && (
             <FieldRow
-              label="Random NPC Voices"
+              label="Vozes aleatórias de NPC"
               help="When enabled, tracked game NPCs without a character-specific voice use a stable random ElevenLabs default voice matched to inferred male/female presentation."
             >
               <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-2">
@@ -1205,7 +1205,7 @@ export function TTSConfigCard() {
           <div className="space-y-1">
             <span className="text-xs font-medium">Reprodução automática</span>
             <ToggleRow
-              label="Roleplay messages"
+              label="Mensagens de roleplay"
               checked={autoplayRP}
               onChange={(v) => {
                 setAutoplayRP(v);
@@ -1221,7 +1221,7 @@ export function TTSConfigCard() {
               }}
             />
             <ToggleRow
-              label="Game narration"
+              label="Narração do game"
               checked={autoplayGame}
               onChange={(v) => {
                 setAutoplayGame(v);

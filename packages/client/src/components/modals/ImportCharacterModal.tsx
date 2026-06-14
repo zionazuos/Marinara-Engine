@@ -293,7 +293,7 @@ export function ImportCharacterModal({ open, onClose }: Props) {
         <div className="rounded-xl border border-[var(--border)] bg-[var(--secondary)]/40 p-3">
           <div className="mb-2 flex items-center justify-between gap-2">
             <div>
-              <p className="text-xs font-semibold text-[var(--foreground)]">Imported card tags</p>
+              <p className="text-xs font-semibold text-[var(--foreground)]">Tags de card importadas</p>
               <p className="mt-0.5 text-[0.6875rem] text-[var(--muted-foreground)]">
                 Choose how source-site tags are applied to character cards.
               </p>
@@ -383,7 +383,8 @@ export function ImportCharacterModal({ open, onClose }: Props) {
         {status === "loading" && (
           <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] p-3 text-xs">
             <Loader2 size="0.875rem" className="animate-spin text-[var(--primary)]" />
-            Importing files...
+            
+            Importando arquivos...
           </div>
         )}
         {status === "done" && results.length > 0 && (

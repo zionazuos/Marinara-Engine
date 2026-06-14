@@ -454,11 +454,11 @@ function TrackerPanelToggleButton({ onToggle }: { onToggle: () => void }) {
       data-tracker-panel-toggle="roleplay-hud"
       onClick={onToggle}
       className={cn(WIDGET, "text-foreground/50 hover:border-foreground/20 hover:text-foreground/75")}
-      title="Show Tracker Panel"
-      aria-label="Show Tracker Panel"
+      title="Mostrar painel de rastreadores"
+      aria-label="Mostrar painel de rastreadores"
     >
       <TrackerPanelIcon size="1.05rem" strokeWidth={1.95} className="shrink-0" />
-      <span className="sr-only">Tracker Panel</span>
+      <span className="sr-only">Painel de rastreadores</span>
     </button>
   );
 }
@@ -913,7 +913,7 @@ function CharactersWidget({
         ref={buttonRef}
         onClick={() => setOpen(!open)}
         className={cn(WIDGET, "text-foreground/60 hover:text-foreground/75")}
-        title="Present Characters"
+        title="Personagens presentes"
       >
         {characters.length > 0 ? (
           <div className="flex items-center -space-x-0.5">
@@ -1083,7 +1083,7 @@ function CustomTrackerWidget({
         ref={buttonRef}
         onClick={() => setOpen(!open)}
         className={cn(WIDGET, "text-cyan-300")}
-        title="Custom Tracker"
+        title="Rastreador personalizado"
       >
         {fields.length > 0 && currentField ? (
           <span
@@ -1184,7 +1184,7 @@ function InventoryWidget({
         placement={layout === "left" ? "right" : layout === "right" ? "left" : "bottom"}
         className="w-64 max-h-80 overflow-y-auto"
       >
-        <Suspense fallback={<DeferredHUDPanelFallback label="Loading inventory…" />}>
+        <Suspense fallback={<DeferredHUDPanelFallback label="Carregando inventário…" />}>
           <InventoryPanel items={items} onUpdate={onUpdate} />
         </Suspense>
       </WidgetPopover>

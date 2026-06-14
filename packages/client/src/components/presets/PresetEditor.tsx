@@ -904,7 +904,8 @@ function SectionsTab({
                   <>
                     <div className="my-1 border-t border-[var(--border)]" />
                     <p className="px-3 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
-                      Agent Sections
+                      
+                      Seções do agente
                     </p>
                     {injectableAgents.map((agent) => (
                       <button
@@ -940,8 +941,8 @@ function SectionsTab({
               type="button"
               onClick={dismissLorebookWarning}
               className="ml-0.5 rounded-md p-0.5 text-amber-200/75 transition-colors hover:bg-amber-400/15 hover:text-amber-100"
-              title="Dismiss warning"
-              aria-label="Dismiss warning"
+              title="Dispensar aviso"
+              aria-label="Dispensar aviso"
             >
               <X size="0.6875rem" />
             </button>
@@ -999,7 +1000,7 @@ function SectionsTab({
                         setEditingGroupId(g.id);
                         setEditingGroupName(g.name);
                       }}
-                      title="Click to rename"
+                      title="Clique para renomear"
                     >
                       {g.name}
                     </span>
@@ -1081,7 +1082,7 @@ function SectionsTab({
                     <div className="flex shrink-0 items-center gap-0.5">
                       <div
                         className="cursor-grab rounded p-0.5 hover:bg-[var(--accent)] active:cursor-grabbing"
-                        title="Drag to reorder"
+                        title="Arraste para reordenar"
                         onMouseDown={() => setDragReady(idx)}
                         onMouseUp={() => setDragReady(null)}
                       >
@@ -1237,7 +1238,8 @@ function SectionsTab({
                           return isAgentMarker ? (
                             <div className="space-y-2">
                               <div className="rounded-lg bg-[var(--primary)]/5 p-3 text-xs text-[var(--primary)]">
-                                Agent section: <strong>{section.name}</strong>
+                                
+                                Seção do agente: <strong>{section.name}</strong>
                                 <p className="mt-1 text-[var(--muted-foreground)]">
                                   
                                   O{" "}
@@ -1603,7 +1605,7 @@ function VariableCard({
         <div className="flex shrink-0 items-center gap-0.5">
           <div
             className="cursor-grab rounded p-0.5 hover:bg-[var(--accent)] active:cursor-grabbing"
-            title="Drag to reorder"
+            title="Arraste para reordenar"
             onMouseDown={onGripDown}
             onMouseUp={onGripUp}
           >
@@ -1669,7 +1671,7 @@ function VariableCard({
             }
           }}
           className="shrink-0 rounded-lg p-1 hover:bg-[var(--destructive)]/15"
-          title="Delete variable"
+          title="Excluir variável"
         >
           <Trash2 size="0.75rem" className="text-[var(--destructive)]" />
         </button>
@@ -1680,7 +1682,7 @@ function VariableCard({
         <div className="space-y-3 border-t border-amber-400/20 px-3 py-3">
           {/* Variable Name */}
           <div className="space-y-1">
-            <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Variable Name</label>
+            <label className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Nome da variável</label>
             <VariableNameInput value={varName} onCommit={(v) => update({ variableName: v })} />
             <p className="text-[0.5625rem] text-[var(--muted-foreground)]">
               
@@ -1702,7 +1704,7 @@ function VariableCard({
             <div className="space-y-1.5 rounded-lg bg-[var(--secondary)] p-2.5 ring-1 ring-[var(--border)]">
               <div className="flex items-center gap-1.5">
                 <ToggleLeft size="0.75rem" className="text-purple-400" />
-                <span className="text-[0.625rem] font-medium text-purple-400">Boolean Toggle</span>
+                <span className="text-[0.625rem] font-medium text-purple-400">Alternância booleana</span>
               </div>
               <p className="text-[0.5625rem] text-[var(--muted-foreground)]">
                 This variable has only one option, so it behaves as a Boolean toggle. Users can switch it on or off in
@@ -2296,7 +2298,7 @@ function MacrosReferenceModal({ onClose }: { onClose: () => void }) {
             </p>
             <div className="space-y-2 border-y border-[var(--border)] py-3">
               <div>
-                <h4 className="text-[0.6875rem] font-semibold text-purple-400">Conditional blocks</h4>
+                <h4 className="text-[0.6875rem] font-semibold text-purple-400">Blocos condicionais</h4>
                 <p className="mt-1 text-[0.6875rem] text-[var(--muted-foreground)]">
                   
                   Usar <code>{"{{#if ...}}"}</code>, optional <code>{"{{else}}"}</code>, and <code>{"{{/if}}"}</code> to
@@ -2522,7 +2524,7 @@ function ConnectionSelector({
         onChange={(e) => setConnId(e.target.value)}
         className="flex-1 rounded-xl bg-[var(--secondary)] px-2.5 py-2 text-xs ring-1 ring-[var(--border)] focus:outline-none"
       >
-        <option value="">Select connection…</option>
+        <option value="">Selecionar conexão…</option>
         {connections.map((c) => (
           <option key={c.id} value={c.id}>
             {c.name}

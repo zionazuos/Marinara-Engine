@@ -435,7 +435,8 @@ export function LorebooksPanel() {
             disabled={sorted.length === 0}
             className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-amber-400 transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
           >
-            Select visible
+            
+            Selecionar visíveis
           </button>
           <button
             onClick={() => setSelectedLorebookIds(new Set())}

@@ -58,8 +58,8 @@ export function SwipeJumpControl({
           setSwipeByDisplayIndex(activeSwipeIndex);
         }}
         disabled={activeSwipeIndex <= 0}
-        aria-label="Previous swipe"
-        title="Previous swipe"
+        aria-label="Swipe anterior"
+        title="Swipe anterior"
       >
         <ChevronLeft size={iconSize} />
       </button>

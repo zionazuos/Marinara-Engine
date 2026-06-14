@@ -88,7 +88,7 @@ function HiddenFromAIMessageButton({
 
   if (!canCollapse) {
     return (
-      <span className={cn(statusClassName, "align-middle")} title="Hidden from AI">
+      <span className={cn(statusClassName, "align-middle")} title="Oculto da IA">
         <EyeOff size="0.7rem" className="shrink-0" />
       </span>
     );
@@ -130,7 +130,7 @@ function HiddenFromAIMessageSummary({ roleplay, onExpand }: { roleplay?: boolean
       aria-label="Expand hidden from AI message"
     >
       <EyeOff size="0.8rem" className="shrink-0" />
-      <span className="min-w-0 flex-1 truncate">Hidden from AI</span>
+      <span className="min-w-0 flex-1 truncate">Oculto da IA</span>
       <span className="shrink-0 text-[0.625rem] opacity-70">Mostrar</span>
     </button>
   );
@@ -1472,7 +1472,7 @@ export const ChatMessage = memo(function ChatMessage({
                 e.stopPropagation();
                 onDelete(message.id);
               }}
-              aria-label="Delete message"
+              aria-label="Excluir mensagem"
               className={cn(
                 "absolute -right-1 -top-1 rounded-md p-1 text-white/20 opacity-0 transition-all hover:bg-red-500/20 hover:text-red-400 group-hover:opacity-100",
                 showActions && "opacity-100",
@@ -1531,7 +1531,7 @@ export const ChatMessage = memo(function ChatMessage({
                 <button
                   type="button"
                   onClick={() => onDelete(message.id)}
-                  aria-label="Delete message"
+                  aria-label="Excluir mensagem"
                   className={cn(
                     "absolute right-2 top-2 rounded-md p-1 text-white/20 opacity-0 transition-all hover:bg-red-500/20 hover:text-red-400 group-hover:opacity-100",
                     showActions && "opacity-100",
@@ -1967,7 +1967,7 @@ export const ChatMessage = memo(function ChatMessage({
                 <ActionBtn
                   icon={<Brain size={MESSAGE_ACTION_ICON_SIZE} />}
                   onClick={() => setShowThinking(true)}
-                  title="View thoughts"
+                  title="Ver pensamentos"
                   dark
                 />
               )}
@@ -1983,7 +1983,7 @@ export const ChatMessage = memo(function ChatMessage({
                 <ActionBtn
                   icon={<GitBranch size={MESSAGE_ACTION_ICON_SIZE} />}
                   onClick={() => onCloneSceneFromHere(message.id)}
-                  title="Clone from here"
+                  title="Clonar a partir daqui"
                   disabled={isCloneSceneFromHereDisabled}
                   dark
                 />
@@ -2390,7 +2390,7 @@ export const ChatMessage = memo(function ChatMessage({
               <ActionBtn
                 icon={<Brain size={MESSAGE_ACTION_ICON_SIZE} />}
                 onClick={() => setShowThinking(true)}
-                title="View thoughts"
+                title="Ver pensamentos"
               />
             )}
             {onBranch && (
@@ -2404,7 +2404,7 @@ export const ChatMessage = memo(function ChatMessage({
               <ActionBtn
                 icon={<GitBranch size={MESSAGE_ACTION_ICON_SIZE} />}
                 onClick={() => onCloneSceneFromHere(message.id)}
-                title="Clone from here"
+                title="Clonar a partir daqui"
                 disabled={isCloneSceneFromHereDisabled}
               />
             )}
@@ -2538,12 +2538,13 @@ function ThinkingModal({ thinking, onClose }: { thinking: string; onClose: () =>
         <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
           <div className="flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
             <Brain size="0.875rem" className="text-[var(--muted-foreground)]" />
-            Model Thoughts
+            
+            Pensamentos do modelo
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close thoughts"
+            aria-label="Fechar pensamentos"
             className="rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
           >
             <X size="0.875rem" />

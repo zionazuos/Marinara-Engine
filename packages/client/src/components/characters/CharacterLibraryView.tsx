@@ -222,14 +222,16 @@ function CharacterLibraryDetailCard({
                 className="inline-flex items-center gap-2 rounded-2xl bg-[var(--primary)] px-4 py-2.5 text-sm font-medium text-[var(--primary-foreground)] shadow-lg shadow-pink-500/15 transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <MessageCircle size="0.875rem" />
-                Start New Chat
+                
+                Iniciar novo chat
               </button>
               <button
                 onClick={() => onEdit(character.id)}
                 className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-pink-400 to-rose-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-pink-500/15 transition-all hover:shadow-pink-500/25"
               >
                 <Pencil size="0.875rem" />
-                Edit Character
+                
+                Editar personagem
               </button>
             </div>
           </div>

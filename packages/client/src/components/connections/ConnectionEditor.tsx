@@ -783,7 +783,7 @@ export function ConnectionEditor() {
         <div className="mx-auto max-w-2xl space-y-6">
           {/* ── Connection Name ── */}
           <FieldGroup
-            label="Connection Name"
+            label="Nome da conexão"
             icon={<Tag size="0.875rem" className="text-sky-400" />}
             help="A friendly name to identify this connection. Use something descriptive like 'Claude Sonnet — RP' or 'GPT-4o Main'."
           >
@@ -916,7 +916,7 @@ export function ConnectionEditor() {
           {/* ── OpenRouter Provider Preference ── */}
           {localProvider === "openrouter" && (
             <FieldGroup
-              label="Preferred Provider"
+              label="Provedor preferido"
               icon={<Server size="0.875rem" className="text-sky-400" />}
               help="Choose which backend provider OpenRouter should route your requests to. Leave empty to let OpenRouter choose automatically based on price and availability."
             >
@@ -1063,7 +1063,7 @@ export function ConnectionEditor() {
               <p className="mt-1.5 flex items-start gap-1 text-[0.625rem] text-sky-400/80">
                 <AlertCircle size="0.625rem" className="mt-px shrink-0" />
                 <span>
-                  <strong>Windows users:</strong> If your proxy or local server isn't detected, Windows Defender
+                  <strong>Usuários do Windows:</strong> If your proxy or local server isn't detected, Windows Defender
                   Firewall may be blocking the connection. Open{" "}
                   <em>Windows Security → Firewall & network protection → Allow an app through firewall</em> and add
                   Node.js or your proxy application.
@@ -1150,7 +1150,7 @@ export function ConnectionEditor() {
                     value={modelSearch}
                     onChange={(e) => setModelSearch(e.target.value)}
                     className="flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--muted-foreground)]"
-                    placeholder="Search models…"
+                    placeholder="Buscar modelos…"
                     autoFocus
                     onClick={(e) => e.stopPropagation()}
                   />
@@ -1228,7 +1228,7 @@ export function ConnectionEditor() {
                       {fetchError && <p className="mt-1.5 text-[0.625rem] text-[var(--destructive)]">{fetchError}</p>}
                       {remoteModels.length > 0 && !fetchError && (
                         <p className="mt-1 text-[0.625rem] text-emerald-400">
-                          {remoteModels.length} model{remoteModels.length !== 1 ? "s" : ""} available from API
+                          {remoteModels.length} model{remoteModels.length !== 1 ? "s" : ""}  disponível pela API
                         </p>
                       )}
                     </div>
@@ -1486,7 +1486,7 @@ export function ConnectionEditor() {
           {/* ── Max Context ── */}
           {localProvider !== "image_generation" && (
             <FieldGroup
-              label="Max Context Window"
+              label="Janela de contexto máxima"
               icon={<Zap size="0.875rem" className="text-sky-400" />}
               help="The maximum number of tokens this model can process at once (your messages + its reply). This is auto-set when you pick a model from the list."
             >
@@ -1643,7 +1643,7 @@ export function ConnectionEditor() {
           {/* ── Prompt Caching (Anthropic + OpenRouter Claude) ── */}
           {(localProvider === "anthropic" || localProvider === "openrouter") && (
             <FieldGroup
-              label="Prompt Caching"
+              label="Cache de prompt"
               icon={<Zap size="0.875rem" className="text-amber-400" />}
               help={
                 localProvider === "anthropic"
@@ -1787,7 +1787,7 @@ export function ConnectionEditor() {
           {/* ── Embedding Model (for lorebook vectorization) ── */}
           {localProvider !== "image_generation" && localProvider !== "claude_subscription" && (
             <FieldGroup
-              label="Embedding Model"
+              label="Modelo de embedding"
               icon={<Server size="0.875rem" className="text-violet-400" />}
               help="Optional. The model used for generating embeddings when vectorizing lorebook entries. Leave empty to skip semantic matching. Examples: text-embedding-3-small, text-embedding-ada-002."
             >
@@ -1891,7 +1891,8 @@ export function ConnectionEditor() {
                   ) : (
                     <MessageSquare size="0.8125rem" />
                   )}
-                  Send Test Message
+                  
+                  Enviar mensagem de teste
                 </button>
               )}
               {localProvider === "image_generation" && (
@@ -1933,7 +1934,7 @@ export function ConnectionEditor() {
               {localProvider !== "image_generation" && (
                 <>
                   {" "}
-                  <strong>Send Test Message</strong> sends "hi" to the selected model endpoint and shows the response.
+                  <strong>Enviar mensagem de teste</strong> sends "hi" to the selected model endpoint and shows the response.
                 </>
               )}
               {localProvider === "image_generation" && (
@@ -1954,7 +1955,7 @@ export function ConnectionEditor() {
 
             {/* Connection test result */}
             {testResult && (
-              <TestResultCard label="Connection Test" success={testResult.success} latencyMs={testResult.latencyMs}>
+              <TestResultCard label="Teste de conexão" success={testResult.success} latencyMs={testResult.latencyMs}>
                 {testResult.message}
               </TestResultCard>
             )}
@@ -2475,7 +2476,7 @@ function ImageGenerationDefaultsPanel({
                     onChange={(sampler) => updateNovelAi({ sampler })}
                   />
                   <ChoiceSetting
-                    label="Noise Schedule"
+                    label="Cronograma de ruído"
                     value={novelai.noiseSchedule}
                     options={NOVELAI_NOISE_SCHEDULE_OPTIONS}
                     onChange={(noiseSchedule) => updateNovelAi({ noiseSchedule })}
@@ -2539,7 +2540,7 @@ function ChoiceSetting({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         className="mt-1 w-full rounded-lg bg-[var(--card)] px-3 py-2 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)]/60 focus:outline-none focus:ring-sky-400/50"
-        placeholder="Backend default"
+        placeholder="Padrão do backend"
       />
       <datalist id={listId}>
         {options.map((option) => (

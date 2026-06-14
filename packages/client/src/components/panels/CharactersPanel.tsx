@@ -609,10 +609,11 @@ export function CharactersPanel() {
       <button
         onClick={openCharacterLibrary}
         className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-2.5 text-xs font-medium text-[var(--foreground)] transition-all hover:border-[var(--primary)]/35 hover:bg-[var(--accent)]"
-        title="Open full library"
+        title="Abrir biblioteca completa"
       >
         <Users size="0.875rem" className="text-[var(--primary)]" />
-        Open Full Library
+        
+        Abrir biblioteca completa
       </button>
 
       {/* Search + Sort */}
@@ -821,7 +822,8 @@ export function CharactersPanel() {
             disabled={sortedCharacters.length === 0}
             className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-[var(--primary)] transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
           >
-            Select visible
+            
+            Selecionar visíveis
           </button>
           <button
             onClick={() => setSelectedCharacterIds(new Set())}
@@ -976,7 +978,7 @@ export function CharactersPanel() {
                               addGroupToChat(group.memberIds);
                             }}
                             className="rounded-lg p-1 transition-all hover:bg-[var(--accent)]"
-                            title="Add all to chat"
+                            title="Adicionar tudo ao chat"
                           >
                             <UserPlus size="0.6875rem" className="text-[var(--primary)]" />
                           </button>
@@ -1031,7 +1033,7 @@ export function CharactersPanel() {
                     <div className="ml-5 flex flex-col gap-0.5 border-l border-[var(--border)]/40 pl-3 pb-2">
                       {group.memberIds.length === 0 && (
                         <div className="py-2 text-[0.625rem] text-[var(--muted-foreground)] italic">
-                          No members — click <Users size="0.625rem" className="inline" /> to add characters
+                          No members — click <Users size="0.625rem" className="inline" />  para adicionar personagens
                         </div>
                       )}
                       {group.memberIds.map((memberId) => {
@@ -1090,7 +1092,7 @@ export function CharactersPanel() {
                               }}
                               disabled={isStartingChat}
                               className="rounded p-0.5 text-[var(--muted-foreground)] opacity-0 transition-all hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] group-hover/member:opacity-100 disabled:cursor-not-allowed disabled:opacity-50 max-md:opacity-100"
-                              title="Start New Chat"
+                              title="Iniciar novo chat"
                               aria-label={`Start New Chat with ${member.name}`}
                             >
                               <MessageCircle size="0.6875rem" />
@@ -1102,7 +1104,7 @@ export function CharactersPanel() {
                                   toggleGroupMember(group.id, memberId, group.memberIds);
                                 }}
                                 className="rounded p-0.5 opacity-0 transition-all hover:bg-[var(--destructive)]/15 group-hover/member:opacity-100"
-                                title="Remove from group"
+                                title="Remover do grupo"
                               >
                                 <UserMinus size="0.6875rem" className="text-[var(--destructive)]" />
                               </button>
@@ -1118,7 +1120,7 @@ export function CharactersPanel() {
 
             {parsedGroups.length === 0 && !creatingGroup && (
               <div className="py-2 text-center text-[0.625rem] text-[var(--muted-foreground)]">
-                No groups yet — click <FolderPlus size="0.625rem" className="inline" /> to create one
+                No groups yet — click <FolderPlus size="0.625rem" className="inline" />  para criar um
               </div>
             )}
           </div>

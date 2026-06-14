@@ -199,7 +199,8 @@ export function ChoiceSelectionModal({
                 </p>
                 {v.options.length === 1 && !v.multiSelect && (
                   <span className="flex items-center gap-0.5 rounded bg-purple-400/15 px-1.5 py-0.5 text-[0.5625rem] font-medium text-purple-400">
-                    Boolean toggle
+                    
+                    Alternância booleana
                   </span>
                 )}
                 {v.multiSelect && (

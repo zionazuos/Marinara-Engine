@@ -26,7 +26,7 @@ export function CreateLorebookModal({ open, onClose }: Props) {
   });
 
   return (
-    <Modal open={open} onClose={onClose} title="Create Lorebook">
+    <Modal open={open} onClose={onClose} title="Criar lorebook">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-400/20">
@@ -45,7 +45,7 @@ export function CreateLorebookModal({ open, onClose }: Props) {
             value={form.name}
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             autoFocus
-            placeholder="My World Lore..."
+            placeholder="Meu lore de mundo..."
             className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-sm outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]"
           />
         </label>
@@ -88,7 +88,8 @@ export function CreateLorebookModal({ open, onClose }: Props) {
             ) : (
               <BookOpen size="0.75rem" />
             )}
-            Create Lorebook
+            
+            Criar lorebook
           </button>
         </div>
       </div>

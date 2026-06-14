@@ -3013,7 +3013,7 @@ export function GameNarration({
               dangerouslySetInnerHTML={{ __html: getGameTranslationHtml(message, translatedText) }}
             />
           ) : (
-            <div className="text-xs text-sky-200/60">Translating...</div>
+            <div className="text-xs text-sky-200/60">Traduzindo...</div>
           )}
         </div>
       );
@@ -3420,7 +3420,7 @@ export function GameNarration({
                 onClick={onJumpToLatest}
                 className="flex items-center gap-1 self-stretch rounded-lg border border-amber-400/40 bg-amber-400/15 px-2 text-xs font-semibold text-amber-100 transition-colors hover:bg-amber-400/25 hover:text-amber-50 sm:px-2.5 dark:border-amber-400/40 dark:bg-amber-400/15 dark:text-amber-100 dark:hover:bg-amber-400/25"
                 title="Jump back to the present"
-                aria-label="Return to present"
+                aria-label="Voltar ao presente"
               >
                 <span className="hidden sm:inline">Voltar</span>
                 <span className="sm:hidden">⤴</span>
@@ -3502,7 +3502,7 @@ export function GameNarration({
                 type="button"
                 onClick={(event) => handleRestartGameVoiceButtonClick(event, voiceKey)}
                 className="inline-flex h-5 w-5 items-center justify-center rounded-full text-sky-200 transition-colors hover:bg-[var(--muted)]/40 dark:hover:bg-white/10"
-                title="Restart voice-over"
+                title="Reiniciar narração"
               >
                 <RotateCcw size={11} />
               </button>
@@ -4580,7 +4580,7 @@ export function GameNarration({
                                   type="button"
                                   onClick={(event) => handleRestartGameVoiceButtonClick(event, voiceKey)}
                                   className="inline-flex h-5 w-5 items-center justify-center rounded-full text-sky-200 transition-colors hover:bg-white/10"
-                                  title="Restart voice-over"
+                                  title="Reiniciar narração"
                                 >
                                   <RotateCcw size={11} />
                                 </button>

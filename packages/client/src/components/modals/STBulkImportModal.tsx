@@ -436,7 +436,8 @@ export function STBulkImportModal({ open, onClose }: Props) {
                     }}
                     className="rounded-lg bg-[var(--primary)] px-2.5 py-1 text-[0.625rem] font-medium text-[var(--primary-foreground)] transition-all hover:opacity-90 active:scale-95"
                   >
-                    Select This Folder
+                    
+                    Selecionar esta pasta
                   </button>
                 </div>
                 <div className="max-h-48 overflow-y-auto p-1">
@@ -513,7 +514,7 @@ export function STBulkImportModal({ open, onClose }: Props) {
               <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 p-2.5 text-xs text-amber-400">
                 <AlertTriangle size="0.875rem" className="mt-0.5 shrink-0" />
                 <span>
-                  {builtinPresetCount} built-in preset{builtinPresetCount !== 1 ? "s were" : " was"} detected and left
+                  {builtinPresetCount}  preset embutido{builtinPresetCount !== 1 ? "s were" : " was"} detected and left
                   unchecked by default so only likely custom presets come across unless you opt in.
                 </span>
               </div>

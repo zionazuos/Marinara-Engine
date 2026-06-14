@@ -204,7 +204,7 @@ function LearnedOptionChips({
                   onForget(option);
                 }}
                 aria-label={`Forget ${option}`}
-                title="Forget this option"
+                title="Esquecer esta opção"
                 className="ml-0.5 mr-1 inline-flex rounded-full p-0.5 opacity-40 transition-opacity hover:bg-[var(--destructive)]/20 hover:text-[var(--destructive)] hover:opacity-100 focus-visible:opacity-100 group-hover/learned:opacity-100"
               >
                 <X size={9} />
@@ -569,7 +569,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
   };
 
   return (
-    <Modal open={true} onClose={onCancel} title="New Game Setup" width="max-w-lg">
+    <Modal open={true} onClose={onCancel} title="Configuração de novo game" width="max-w-lg">
       {/* Step indicator */}
       <div className="mb-5 flex items-center gap-2">
         {steps.map((s, i) => (
@@ -784,7 +784,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
 
             {/* Content Rating */}
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Content Rating</label>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--foreground)]">Classificação de conteúdo</label>
               <div className="flex gap-1.5">
                 <button
                   onClick={() => setRating("sfw")}
@@ -864,7 +864,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                       : "bg-[var(--secondary)] ring-[var(--border)] hover:ring-[var(--primary)]/20",
                   )}
                 >
-                  <div className="font-medium text-[var(--foreground)]">Standalone GM</div>
+                  <div className="font-medium text-[var(--foreground)]">GM independente</div>
                   <div className="mt-1 text-[var(--muted-foreground)]">A snarky narrator running the show</div>
                 </button>
                 <button
@@ -912,7 +912,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                     <input
                       value={gmSearch}
                       onChange={(e) => setGmSearch(e.target.value)}
-                      placeholder="Search characters…"
+                      placeholder="Buscar personagens…"
                       className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]"
                     />
                   </div>
@@ -994,7 +994,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   <input
                     value={partySearch}
                     onChange={(e) => setPartySearch(e.target.value)}
-                    placeholder="Search characters…"
+                    placeholder="Buscar personagens…"
                     className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]"
                   />
                 </div>
@@ -1320,7 +1320,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                               }}
                               className="w-full rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-2.5 py-1.5 text-xs text-[var(--foreground)]"
                             >
-                              <option value="">Choose playlist...</option>
+                              <option value="">Escolher playlist...</option>
                               {spotifyPlaylistsQuery.data.playlists.map((playlist) => {
                                 const suffix =
                                   typeof playlist.trackCount === "number"
@@ -1490,7 +1490,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                     className={enableCustomWidgets ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"}
                   />
                   <div>
-                    <p className="text-xs font-medium text-[var(--foreground)]">Custom HUD Widgets</p>
+                    <p className="text-xs font-medium text-[var(--foreground)]">Widgets de HUD personalizados</p>
                     <p className="text-[0.55rem] text-[var(--muted-foreground)]">
                       Model designs custom widgets (health bars, inventories, etc.) for the game HUD
                     </p>
@@ -1623,7 +1623,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   <input
                     value={lbSearch}
                     onChange={(e) => setLbSearch(e.target.value)}
-                    placeholder="Search lorebooks…"
+                    placeholder="Buscar lorebooks…"
                     className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]"
                   />
                 </div>

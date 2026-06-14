@@ -1995,7 +1995,8 @@ export function GameCombatUI({
                       onClick={onOpenInventory}
                       className="rounded border border-white/15 px-2 py-0.5 text-[0.6rem] text-white/60 hover:bg-white/10 hover:text-white"
                     >
-                      Full inventory
+                      
+                      Inventário completo
                     </button>
                   )}
                 </div>
@@ -2559,7 +2560,8 @@ export function GameCombatUI({
                   onClick={onOpenInventory}
                   className="rounded border border-white/15 px-2 py-1 text-xs text-white/60 hover:bg-white/10 hover:text-white"
                 >
-                  Open Inventory
+                  
+                  Abrir inventário
                 </button>
               )}
             </div>

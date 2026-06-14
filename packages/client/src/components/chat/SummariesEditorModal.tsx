@@ -305,7 +305,7 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
           <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/20 px-3 py-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-[0.75rem] font-medium text-[var(--foreground)]">Missing Summaries</p>
+                <p className="text-[0.75rem] font-medium text-[var(--foreground)]">Resumos faltando</p>
                 <p className="text-[0.625rem] leading-snug text-[var(--muted-foreground)]">
                   Retry past days that failed or never received an automatic summary.
                 </p>
@@ -436,7 +436,8 @@ export function SummariesEditorModal({ chat, open, onClose }: SummariesEditorMod
                         className="mt-1 flex items-center gap-1 rounded-md px-2 py-1 text-[0.6875rem] text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
                       >
                         <Plus size="0.75rem" />
-                        Add key detail
+                        
+                        Adicionar detalhe-chave
                       </button>
                     </div>
                   </div>

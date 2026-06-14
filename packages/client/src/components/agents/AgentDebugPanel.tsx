@@ -66,7 +66,7 @@ export function AgentDebugPanel() {
             clearDebugLog();
           }}
           className="rounded p-0.5 text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-          title="Clear debug log"
+          title="Limpar log de depuração"
         >
           <X size="0.875rem" />
         </button>
@@ -177,7 +177,7 @@ export function AgentDebugPanel() {
               {/* Fallback: show lastResults when no debug log entries */}
               {resultEntries.length === 0 && toolEntries.length === 0 && lastResults.size > 0 && (
                 <div className="rounded-md bg-[var(--muted)]/30 p-2">
-                  <div className="font-semibold text-blue-400 mb-1">Last Agent Results</div>
+                  <div className="font-semibold text-blue-400 mb-1">Últimos resultados de agentes</div>
                   <div className="flex flex-col gap-0.5">
                     {Array.from(lastResults.entries()).map(([type, r]) => (
                       <div key={type} className="flex items-center gap-1.5">

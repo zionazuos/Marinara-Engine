@@ -1656,7 +1656,8 @@ export function ChatArea() {
                   </a>
                 </span>
                 <span>
-                  Partnered with{" "}
+                  
+                  Em parceria com{" "}
                   <a
                     href="https://linkapi.ai/"
                     target="_blank"
@@ -1667,7 +1668,8 @@ export function ChatArea() {
                   </a>
                 </span>
                 <span>
-                  Art and logo by{" "}
+                  
+                  Arte e logo por{" "}
                   <a
                     href="https://huntercolliex.carrd.co/"
                     target="_blank"

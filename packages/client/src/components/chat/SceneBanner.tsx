@@ -244,7 +244,7 @@ export function EndSceneBar({
       )}
       {onAbandon && confirmDiscard && (
         <div className="flex items-center gap-1.5">
-          <span className="text-[0.6875rem] text-[var(--destructive)]">Discard scene?</span>
+          <span className="text-[0.6875rem] text-[var(--destructive)]">Descartar cena?</span>
           <button
             onClick={() => onAbandon(sceneChatId)}
             className="rounded-lg px-2 py-0.5 text-[0.6875rem] font-medium transition-all hover:opacity-80"

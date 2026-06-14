@@ -709,7 +709,7 @@ export function SummaryPopover({
 
             <div className="max-h-[min(31rem,calc(100vh-10rem))] overflow-y-auto p-2.5">
               <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-2.5">
-                <p className="px-1 text-xs font-semibold text-[var(--popover-foreground)]">Summary Scope</p>
+                <p className="px-1 text-xs font-semibold text-[var(--popover-foreground)]">Escopo do resumo</p>
                 <div className="grid grid-cols-2 gap-1 rounded-lg bg-[var(--background)]/30 p-1">
                   {(["last", "range"] as const).map((mode) => (
                     <button
@@ -733,7 +733,7 @@ export function SummaryPopover({
                 <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/35 p-2.5">
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-[var(--popover-foreground)]">Summary Prompt</p>
+                      <p className="text-xs font-semibold text-[var(--popover-foreground)]">Prompt de resumo</p>
                     </div>
                     <button
                       type="button"
@@ -843,7 +843,7 @@ export function SummaryPopover({
                             value={templateNameDraft}
                             onChange={(event) => setTemplateNameDraft(event.target.value)}
                             maxLength={80}
-                            placeholder="Template name"
+                            placeholder="Nome do modelo"
                             className="w-full rounded-md bg-[var(--card)] px-2 py-1 text-[0.6875rem] font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                           />
                           <textarea
@@ -1240,7 +1240,7 @@ function SummaryEntryRow({
             onClick={onStartEdit}
             className="rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] active:scale-90"
             title="Editar"
-            aria-label="Edit summary entry"
+            aria-label="Editar entrada do resumo"
           >
             <PenLine size="0.75rem" />
           </button>
@@ -1313,7 +1313,7 @@ function SummaryEntryEditor({
         value={entry.title}
         onChange={(event) => onChange({ ...entry, title: event.target.value })}
         maxLength={120}
-        placeholder="Summary title"
+        placeholder="Título do resumo"
         className="w-full rounded-md bg-[var(--card)] px-2.5 py-1.5 text-xs font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
       />
       <textarea
@@ -1359,10 +1359,10 @@ function SummaryEntryOriginIcon({ entry }: { entry: ChatSummaryEntry }) {
   }
   if (entry.origin === "legacy") {
     return (
-      <ScrollText size="0.75rem" className="shrink-0 text-[var(--muted-foreground)]" aria-label="Legacy summary" />
+      <ScrollText size="0.75rem" className="shrink-0 text-[var(--muted-foreground)]" aria-label="Resumo legado" />
     );
   }
-  return <PenLine size="0.75rem" className="shrink-0 text-[var(--muted-foreground)]" aria-label="Manual summary" />;
+  return <PenLine size="0.75rem" className="shrink-0 text-[var(--muted-foreground)]" aria-label="Resumo manual" />;
 }
 
 interface SummaryReadableSectionProps {
@@ -1496,8 +1496,8 @@ function SummaryPromptTemplateRow({
         type="button"
         onClick={onCopy}
         className="shrink-0 rounded p-1 text-[var(--muted-foreground)] opacity-80 transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-        title="Duplicate template"
-        aria-label="Duplicate template"
+        title="Duplicar modelo"
+        aria-label="Duplicar modelo"
       >
         <Copy size="0.625rem" />
       </button>
@@ -1517,8 +1517,8 @@ function SummaryPromptTemplateRow({
           type="button"
           onClick={onDelete}
           className="shrink-0 rounded p-1 text-[var(--muted-foreground)] opacity-80 transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-          title="Delete template"
-          aria-label="Delete template"
+          title="Excluir modelo"
+          aria-label="Excluir modelo"
         >
           <Trash2 size="0.625rem" />
         </button>

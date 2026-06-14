@@ -392,7 +392,7 @@ function ConnectionRow({
               onMove();
             }}
             className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)] active:scale-90"
-            title="Move to folder"
+            title="Mover para pasta"
           >
             <FolderOpen size="0.75rem" />
           </button>
@@ -674,7 +674,8 @@ export function ConnectionsPanel() {
         className="flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-medium transition-all active:scale-[0.98] bg-gradient-to-r from-sky-400 to-blue-500 text-white shadow-md shadow-sky-400/15 hover:shadow-lg hover:shadow-sky-400/25"
       >
         <Plus size="0.8125rem" />
-        Add Connection
+        
+        Adicionar conexão
       </button>
 
       {/* ── New folder button / inline input ── */}
@@ -727,7 +728,7 @@ export function ConnectionsPanel() {
           <div className="animate-float flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400/20 to-blue-500/20">
             <Link size="1.25rem" className="text-sky-400" />
           </div>
-          <p className="text-xs text-[var(--muted-foreground)]">No connections yet</p>
+          <p className="text-xs text-[var(--muted-foreground)]">Nenhuma conexão ainda</p>
         </div>
       )}
 
@@ -754,7 +755,8 @@ export function ConnectionsPanel() {
               className="flex items-center gap-1.5 rounded-lg bg-sky-400/15 px-3 py-1.5 text-xs font-medium text-sky-400 transition-all hover:bg-sky-400/25"
             >
               <ExternalLink size="0.75rem" />
-              Visit LinkAPI
+              
+              Acessar o LinkAPI
             </a>
             <button
               onClick={dismissLinkApiBanner}
@@ -808,7 +810,7 @@ export function ConnectionsPanel() {
       <Modal
         open={movingConnectionId !== null}
         onClose={() => setMovingConnectionId(null)}
-        title="Move to Folder"
+        title="Mover para pasta"
         width="max-w-xs"
       >
         {movingConnection && (

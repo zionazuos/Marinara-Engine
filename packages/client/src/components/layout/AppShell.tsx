@@ -644,7 +644,7 @@ export function AppShell() {
         }}
         data-component={`TrackerDataSidebarDesktop.${side}`}
         data-tracker-size-profile={trackerPanelSizeProfile}
-        aria-label="Tracker data panel"
+        aria-label="Painel de dados de rastreador"
         className={cn(
           "mari-tracker-panel fixed z-30 hidden overflow-hidden bg-[var(--background)]/20 shadow-2xl ring-1 ring-[var(--border)]/35 backdrop-blur-2xl transition-[width] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[transform,opacity] md:block",
           side === "left" ? "rounded-r-xl" : "rounded-l-xl",
@@ -795,7 +795,7 @@ export function AppShell() {
               exit={{ x: trackerPanelSide === "left" ? "-100%" : "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 350 }}
               data-component="TrackerDataSidebarMobile"
-              aria-label="Tracker data panel"
+              aria-label="Painel de dados de rastreador"
               className={cn(
                 "mari-tracker-panel !fixed inset-y-0 z-50 w-[calc(100vw-0.5rem)] max-w-[24rem] overflow-hidden bg-[var(--background)]/65 pt-[env(safe-area-inset-top)] shadow-2xl backdrop-blur-xl",
                 trackerPanelSide === "left" ? "left-0" : "right-0",

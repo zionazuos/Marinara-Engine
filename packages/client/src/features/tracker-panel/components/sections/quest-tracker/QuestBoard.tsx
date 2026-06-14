@@ -51,7 +51,8 @@ export function QuestBoard({
       {!collapsed &&
         (quests.length === 0 ? (
           <div className={cn("relative px-1 py-1 text-[var(--foreground)]/35", TRACKER_TEXT_ROW)}>
-            Quest board empty.
+            
+            Quadro de missões vazio.
           </div>
         ) : (
           <div className="relative grid gap-0.5 pt-0.5">

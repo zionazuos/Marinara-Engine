@@ -428,7 +428,7 @@ export function ModelDownloadModal({ open, onClose }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Local AI Model" width="max-w-2xl" contentRef={modalScrollRef}>
+    <Modal open={open} onClose={onClose} title="Modelo de IA local" width="max-w-2xl" contentRef={modalScrollRef}>
       <div className="flex flex-col gap-5">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-500/10">
@@ -538,7 +538,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                       className="flex items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-4 py-2 text-sm text-[var(--foreground)] transition-colors hover:bg-[var(--secondary)]"
                     >
                       <Download size="0.875rem" />
-                      Reinstall Runtime
+                      
+                      Reinstalar runtime
                     </button>
                   )}
                 </>
@@ -556,7 +557,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                 ) : (
                   <MessageSquare size="0.875rem" />
                 )}
-                Send Test Message
+                
+                Enviar mensagem de teste
               </button>
             </div>
           )}
@@ -566,7 +568,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="flex flex-col gap-2">
                   <div className="text-xs font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-                    Runtime Target
+                    
+                    Alvo do runtime
                   </div>
                   {activeBackend === "mlx" ? (
                     <div className="rounded-xl border border-[var(--border)] bg-[var(--card)]/60 px-3 py-2 text-sm text-[var(--muted-foreground)]/75">
@@ -668,12 +671,14 @@ export function ModelDownloadModal({ open, onClose }: Props) {
 
               <div className="rounded-xl border border-[var(--border)] bg-[var(--card)]/50 p-4">
                 <div className="text-xs font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-                  Inference Settings
+                  
+                  Configurações de inferência
                 </div>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   <label className="flex flex-col gap-1.5">
                     <span className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]/60">
-                      Context Window
+                      
+                      Janela de contexto
                     </span>
                     <input
                       value={contextSizeInput}
@@ -747,7 +752,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                     disabled={!generationSettingsValid || !generationSettingsDirty}
                     className="flex shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--card)]/70 px-4 py-2 text-sm text-[var(--foreground)] transition-colors hover:bg-[var(--card)] disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Apply Settings
+                    
+                    Aplicar configurações
                   </button>
                 </div>
               </div>
@@ -757,7 +763,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                   <span>Status: {runtimeStatusLabel}</span>
                   {runtime.build && runtime.variant && (
                     <span>
-                      Runtime build: {runtime.build} • {runtime.variant}
+                      
+                      Build do runtime: {runtime.build} • {runtime.variant}
                     </span>
                   )}
                   {isSystemRuntime && runtime.systemPath && (
@@ -792,7 +799,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                         className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/20 px-4 py-2.5 text-sm text-amber-100 transition-colors hover:bg-amber-500/10"
                       >
                         <Download size="0.875rem" />
-                        Reinstall Runtime
+                        
+                        Reinstalar runtime
                       </button>
                     )}
                     <button
@@ -816,7 +824,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                   <div
                     className={`text-sm font-medium ${testMessageResult.success ? "text-emerald-300" : "text-red-300"}`}
                   >
-                    Local Test Message {testMessageResult.success ? "Succeeded" : "Failed"}
+                    
+                    Mensagem de teste local {testMessageResult.success ? "Succeeded" : "Failed"}
                   </div>
                   <div className="mt-1 text-xs text-[var(--muted-foreground)]/75">{testMessageResult.latencyMs}ms</div>
                   {testMessageResult.success ? (
@@ -850,7 +859,7 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                         <ResponseBlock label="Conteúdo da mensagem" value={testMessageResult.messageContent} />
                       )}
                       {!!testMessageResult.reasoningContent && (
-                        <ResponseBlock label="Reasoning Content" value={testMessageResult.reasoningContent} />
+                        <ResponseBlock label="Conteúdo de raciocínio" value={testMessageResult.reasoningContent} />
                       )}
                       {!testMessageResult.messageContent && !testMessageResult.reasoningContent && (
                         <ResponseBlock label="Resposta" value={testMessageResult.response} />
@@ -878,7 +887,8 @@ export function ModelDownloadModal({ open, onClose }: Props) {
                       <span>Detected GPU vendors: {runtimeDiagnostics.gpuVendors.join(", ")}</span>
                     )}
                     <span>
-                      Backend hints:
+                      
+                      Dicas de backend:
                       {runtimeDiagnostics.preferCuda ? " CUDA" : ""}
                       {runtimeDiagnostics.preferHip ? " HIP" : ""}
                       {runtimeDiagnostics.preferRocm ? " ROCm" : ""}

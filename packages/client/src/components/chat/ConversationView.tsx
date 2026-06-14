@@ -419,7 +419,7 @@ export function ConversationView({
       ) : (
         <ActiveWorldInfoButton chatId={chatId} buttonClassName={HEADER_BTN} />
       )}
-      <button onClick={onOpenFiles} className={compact ? MOBILE_MENU_BTN : HEADER_BTN} title="Manage Chat Files">
+      <button onClick={onOpenFiles} className={compact ? MOBILE_MENU_BTN : HEADER_BTN} title="Gerenciar arquivos do chat">
         <FolderOpen size="0.875rem" />
       </button>
       <button onClick={onOpenGallery} className={compact ? MOBILE_MENU_BTN : HEADER_BTN} title="Galeria">

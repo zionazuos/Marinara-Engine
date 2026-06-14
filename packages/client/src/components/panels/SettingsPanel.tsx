@@ -491,7 +491,8 @@ function TrackerPanelAppearanceDrawer({
           </span>
           <span className="min-w-0">
             <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--foreground)]">
-              Tracker Panel
+              
+              Painel de rastreadores
               <HelpTooltip text="Controls the Roleplay HUD side panel for the fixed tracker board." />
             </span>
             <span className="block truncate text-[0.625rem] text-[var(--muted-foreground)]">
@@ -1041,7 +1042,7 @@ function GeneralSettings() {
 
       {/* Messages per page */}
       <label className="flex items-center gap-2.5 rounded-lg p-1 transition-colors hover:bg-[var(--secondary)]/50">
-        <span className="text-xs">Messages per page</span>
+        <span className="text-xs">Mensagens por página</span>
         <DraftNumberInput
           value={messagesPerPage}
           min={0}
@@ -1485,7 +1486,8 @@ function AppearanceSettings() {
           className="mt-1 inline-flex items-center gap-1.5 self-start rounded-lg bg-[var(--secondary)] px-3 py-1.5 text-[0.6875rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
         >
           <FolderOpen size="0.75rem" />
-          Open Fonts Folder
+          
+          Abrir pasta de fontes
         </button>
       </label>
 
@@ -1553,7 +1555,8 @@ function AppearanceSettings() {
 
       <label className="flex flex-col gap-1">
         <span className="text-xs font-medium inline-flex items-center gap-1">
-          Chat Font Size{" "}
+          
+          Tamanho da fonte do chat{" "}
           <HelpTooltip text="Adjusts the font size of chat messages on this device. Drag the slider to find your preferred reading size. Default is 16px." />
         </span>
         <div className="flex items-center gap-3">
@@ -1580,7 +1583,7 @@ function AppearanceSettings() {
 
         {/* Chat Text Color */}
         <div className="flex flex-col gap-1">
-          <span className="text-[0.6875rem] font-medium">Chat Text Color</span>
+          <span className="text-[0.6875rem] font-medium">Cor do texto do chat</span>
           <div className="flex items-center gap-2">
             <input
               type="color"
@@ -1964,7 +1967,7 @@ function AppearanceSettings() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Palette size="0.75rem" className="text-[var(--muted-foreground)]" />
-            <span className="text-xs font-medium">Conversation Theme</span>
+            <span className="text-xs font-medium">Tema da conversa</span>
             <HelpTooltip text="Set a background gradient for all Conversation-mode chats, separately for dark and light color schemes." />
           </div>
           {/* Scheme tabs */}
@@ -2076,7 +2079,8 @@ function AppearanceSettings() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium inline-flex items-center gap-1">
-            Chat Background{" "}
+            
+            Fundo do chat{" "}
             <HelpTooltip text="Import one or more custom images, or choose from your game asset backgrounds. Supports JPG, PNG, GIF, WebP, and AVIF. Remove to use the default background." />
           </span>
           {chatBackground && (
@@ -2090,7 +2094,8 @@ function AppearanceSettings() {
         </div>
         <label className="flex flex-col gap-1 rounded-lg bg-[var(--secondary)]/45 p-3 ring-1 ring-[var(--border)]/70">
           <span className="inline-flex items-center gap-1 text-[0.6875rem] font-medium">
-            Background Blur
+            
+            Desfoque do fundo
             <HelpTooltip text="Softens selected Roleplay and Game mode background images behind the chat UI. Set to 0px to keep backgrounds sharp." />
           </span>
           <div className="flex items-center gap-3">
@@ -2244,7 +2249,7 @@ function BackgroundPicker({ selected, onSelect }: { selected: string | null; onS
   return (
     <div className="flex flex-col gap-2">
       <ImageUploadDropzone
-        label="Import Backgrounds"
+        label="Importar fundos"
         pending={uploading}
         pendingLabel="Importing..."
         dragLabel="Drop backgrounds to import"
@@ -2606,7 +2611,7 @@ function ThemesSettings() {
           type="text"
           value={themeName}
           onChange={(e) => setThemeName(e.target.value)}
-          placeholder="Theme name..."
+          placeholder="Nome do tema..."
           className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]/50"
         />
 
@@ -2638,7 +2643,7 @@ function ThemesSettings() {
               <span>--secondary</span>
               <span className="text-white/40">Cards / inputs</span>
               <span>--card</span>
-              <span className="text-white/40">Card background</span>
+              <span className="text-white/40">Fundo do card</span>
               <span>--border</span>
               <span className="text-white/40">Bordas</span>
               <span>--muted-foreground</span>
@@ -2646,7 +2651,7 @@ function ThemesSettings() {
               <span>--sidebar</span>
               <span className="text-white/40">Fundo da barra lateral</span>
               <span>--sidebar-border</span>
-              <span className="text-white/40">Sidebar border</span>
+              <span className="text-white/40">Borda da barra lateral</span>
               <span>--destructive</span>
               <span className="text-white/40">Error / delete</span>
               <span>--popover</span>
@@ -2740,7 +2745,7 @@ function ThemesSettings() {
             <button
               onClick={() => openEditTheme(t)}
               className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--primary)]/10 hover:text-[var(--primary)]"
-              title="Edit theme CSS"
+              title="Editar CSS do tema"
             >
               <Code size="0.6875rem" />
             </button>
@@ -3493,7 +3498,8 @@ function ImportSettings() {
 
       {/* Bulk ST import */}
       <span className="text-[0.625rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]">
-        SillyTavern Import
+        
+        Importação do SillyTavern
       </span>
 
       <button
@@ -3612,7 +3618,7 @@ function ImportButton({
         toast.error(`Import failed: ${data.error ?? "Unknown error"}`);
       }
     } catch {
-      toast.error("Import failed.");
+      toast.error("Falha na importação.");
     }
     e.target.value = "";
   };
@@ -3807,7 +3813,7 @@ function AdvancedSettings() {
       a.download = suggestedName;
       a.click();
       URL.revokeObjectURL(url);
-      toast.success("Backup downloaded!");
+      toast.success("Backup baixado!");
       qc.invalidateQueries({ queryKey: ["backups"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create backup");
@@ -3836,7 +3842,7 @@ function AdvancedSettings() {
   const deleteBackupMutation = useMutation({
     mutationFn: (name: string) => api.delete(`/backup/${name}`),
     onSuccess: () => {
-      toast.success("Backup deleted");
+      toast.success("Backup excluído");
       qc.invalidateQueries({ queryKey: ["backups"] });
     },
   });
@@ -3961,7 +3967,7 @@ function AdvancedSettings() {
     <div className="flex flex-col gap-3">
       <ExportFormatDialog
         open={exportProfileDialogOpen}
-        title="Export Profile"
+        title="Exportar perfil"
         description="Native creates a Marinara profile JSON for restoring your data in Marinara. If the JSON would be too large, Marinara will offer a profile ZIP instead."
         nativeDescription="Keeps Marinara fields, lorebook folders, character/persona metadata, presets, agents, themes, and inline assets for re-import."
         compatibleDescription="Exports direct character JSON, simple persona JSON, and folderless lorebooks for other roleplay tools."
@@ -4124,7 +4130,8 @@ function AdvancedSettings() {
                 )}
                 {installType === "docker" && updateCheck.data.dockerImageTag && (
                   <span className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Container tag:{" "}
+                    
+                    Tag de contêiner:{" "}
                     <code className="break-all rounded bg-[var(--background)] px-1 py-0.5">
                       {updateCheck.data.dockerImageTag}
                     </code>
@@ -4141,7 +4148,8 @@ function AdvancedSettings() {
                 )}
                 {manualUpdateCommand && (
                   <span className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    Manual update:{" "}
+                    
+                    Atualização manual:{" "}
                     <code className="break-all rounded bg-[var(--background)] px-1 py-0.5">{manualUpdateCommand}</code>
                   </span>
                 )}
@@ -4381,7 +4389,7 @@ function AdvancedSettings() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-1.5">
           <Download size="0.75rem" className="text-[var(--muted-foreground)]" />
-          <span className="text-xs font-medium">Backup & Export</span>
+          <span className="text-xs font-medium">Backup e exportação</span>
           <HelpTooltip text="Download a full backup as a .zip archive (storage snapshots + avatars, sprites, backgrounds, gallery, fonts, knowledge sources). Import Profile can restore the zip directly. The raw folders are for manual recovery." />
         </div>
         <button
@@ -4398,7 +4406,8 @@ function AdvancedSettings() {
           ) : (
             <>
               <Download size="0.8125rem" />
-              Download Backup
+              
+              Baixar backup
             </>
           )}
         </button>
@@ -4416,7 +4425,8 @@ function AdvancedSettings() {
           ) : (
             <>
               <Download size="0.8125rem" />
-              Export Profile
+              
+              Exportar perfil
             </>
           )}
         </button>
@@ -4508,7 +4518,8 @@ function AdvancedSettings() {
             className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--destructive)] px-3 py-2 text-xs font-medium text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
           >
             <Trash2 size="0.8125rem" />
-            Clear All Data
+            
+            Limpar todos os dados
           </button>
         </div>
         {confirmAction && (
@@ -4534,7 +4545,8 @@ function AdvancedSettings() {
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--destructive)] px-3 py-2 text-xs font-medium text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
               >
                 {isClearing ? <Loader2 size="0.75rem" className="animate-spin" /> : <Trash2 size="0.75rem" />}
-                Confirm Delete
+                
+                Confirmar exclusão
               </button>
             </div>
           </div>

@@ -197,7 +197,7 @@ function PersonaPicker({
         <PersonaAvatar persona={null} />
         <div className="min-w-0 flex-1">
           <span className="block truncate text-xs font-medium">Nenhum</span>
-          <span className="block truncate text-[0.625rem] text-[var(--muted-foreground)]">Stay anonymous</span>
+          <span className="block truncate text-[0.625rem] text-[var(--muted-foreground)]">Permanecer anônimo</span>
         </div>
         {!selectedId && <Check size="0.75rem" className="shrink-0 text-[var(--primary)]" />}
       </button>
@@ -652,7 +652,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                   <input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search characters…"
+                    placeholder="Buscar personagens…"
                     className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]"
                     autoFocus
                   />
@@ -803,7 +803,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
                   )}
                 >
                   <MessageCircle size="0.75rem" />
-                  Start Chatting
+                  
+                  Começar a conversar
                 </button>
               </div>
             ) : scheduleState === "generating" ? (
@@ -1243,7 +1244,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
             <input
               value={charSearch}
               onChange={(e) => setCharSearch(e.target.value)}
-              placeholder="Search characters…"
+              placeholder="Buscar personagens…"
               className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]"
             />
           </div>
@@ -1334,7 +1335,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
             <input
               value={lbSearch}
               onChange={(e) => setLbSearch(e.target.value)}
-              placeholder="Search lorebooks…"
+              placeholder="Buscar lorebooks…"
               className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]"
             />
           </div>
@@ -1518,7 +1519,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                       <input
                         value={charSearch}
                         onChange={(e) => setCharSearch(e.target.value)}
-                        placeholder="Search characters…"
+                        placeholder="Buscar personagens…"
                         className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]"
                       />
                     </div>
@@ -1623,7 +1624,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                 <div className="mb-3 flex justify-center">
                   <img
                     src={currentStep.sprite}
-                    alt="Professor Mari"
+                    alt="Professora Mari"
                     className="h-24 w-auto object-contain drop-shadow-lg sm:h-28"
                     style={currentStep.spriteFlip ? { transform: "scaleX(-1)" } : undefined}
                     draggable={false}

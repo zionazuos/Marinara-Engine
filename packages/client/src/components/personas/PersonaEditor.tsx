@@ -418,7 +418,7 @@ export function PersonaEditor() {
     <div className="flex flex-1 flex-col overflow-hidden bg-[var(--background)]">
       <ExportFormatDialog
         open={exportDialogOpen}
-        title="Export Persona"
+        title="Exportar persona"
         description="Native keeps Marinara persona metadata. Compatible exports simple persona JSON for other tools."
         compatibleDescription="Exports persona fields directly without the Marinara wrapper."
         onClose={() => setExportDialogOpen(false)}
@@ -508,7 +508,7 @@ export function PersonaEditor() {
           type="button"
           onClick={() => setExportDialogOpen(true)}
           className="rounded-xl p-2 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-          title="Export persona"
+          title="Exportar persona"
         >
           <svg width="1.125rem" height="1.125rem" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -527,7 +527,7 @@ export function PersonaEditor() {
           type="button"
           onClick={handleDelete}
           className="rounded-xl p-2 text-[var(--muted-foreground)] transition-all hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-          title="Delete persona"
+          title="Excluir persona"
         >
           <Trash2 size="1.125rem" />
         </button>
@@ -567,7 +567,8 @@ export function PersonaEditor() {
             onClick={forceClose}
             className="rounded-lg bg-amber-500/15 px-3 py-1 text-xs font-medium text-amber-500 transition-all hover:bg-amber-500/25"
           >
-            Discard & close
+            
+            Descartar e fechar
           </button>
           <button
             type="button"
@@ -1028,7 +1029,8 @@ function PersonaSpritesTab({
               : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
           )}
         >
-          Facial Expressions
+          
+          Expressões faciais
         </button>
         <button
           type="button"
@@ -1087,7 +1089,8 @@ function PersonaSpritesTab({
               title="Selecionar uma pasta de PNGs"
             >
               <FolderOpen size="0.8125rem" />
-              Upload Folder
+              
+              Enviar pasta
             </button>
             <button
               type="button"
@@ -1294,7 +1297,7 @@ function PersonaSpritesTab({
                 type="button"
                 onClick={() => setWandCleanupSprite(sprite)}
                 className="group/preview relative block aspect-[3/4] w-full bg-[var(--secondary)]"
-                title="Open wand cleanup"
+                title="Abrir limpeza com varinha"
               >
                 <img src={sprite.url} alt={sprite.expression} loading="lazy" className="h-full w-full object-contain" />
                 <span className="pointer-events-none absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--card)]/90 text-[var(--primary)] opacity-0 shadow-lg ring-1 ring-[var(--border)] transition-opacity group-hover/preview:opacity-100 max-md:opacity-100">
@@ -1350,7 +1353,7 @@ function PersonaSpritesTab({
         <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-[var(--border)] py-12 text-center">
           <Image size="1.75rem" className="text-[var(--muted-foreground)]/40" />
           <div>
-            <p className="text-sm font-medium text-[var(--muted-foreground)]">No sprites yet</p>
+            <p className="text-sm font-medium text-[var(--muted-foreground)]">Nenhum sprite ainda</p>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]/60">
               {category === "full-body"
                 ? "Upload full-body sprites above. Use transparent PNGs for best results."
@@ -1464,7 +1467,7 @@ function PersonaColorsTab({
   return (
     <div className="space-y-6">
       <SectionHeader
-        title="Persona Colors"
+        title="Cores da persona"
         subtitle="Customize how your persona appears in chats. Colors are applied to your name, dialogue, and message bubble."
       />
 
@@ -1535,7 +1538,7 @@ function PersonaColorsTab({
         value={formData.nameColor}
         onChange={(v) => updateField("nameColor", v)}
         gradient
-        label="Name Display Color"
+        label="Cor de exibição do nome"
         helpText="The color (or gradient) used for your persona's name in chat messages and persona selectors. Supports gradients!"
       />
 
@@ -1553,7 +1556,7 @@ function PersonaColorsTab({
       <ColorPicker
         value={formData.boxColor}
         onChange={(v) => updateField("boxColor", v)}
-        label="Message Box Color"
+        label="Cor da caixa de mensagem"
         helpText="Background color for your persona's chat message bubbles. Use a semi-transparent color for best results (e.g. rgba)."
       />
 
@@ -1565,7 +1568,7 @@ function PersonaColorsTab({
             display name in chat. Gradients use CSS linear-gradient.
           </li>
           <li>
-            &bull; <strong className="text-[var(--foreground)]">Dialogue color</strong> — All text inside dialogue
+            &bull; <strong className="text-[var(--foreground)]">Cor do diálogo</strong> — All text inside dialogue
             quotation marks is automatically colored with this value, and can optionally be bolded from Settings.
           </li>
           <li>
@@ -1787,7 +1790,7 @@ function PersonaStatsTab({
       {/* ── RPG Attributes ── */}
       <div className="border-t border-[var(--border)] pt-6">
         <SectionHeader
-          title="RPG Attributes"
+          title="Atributos de RPG"
           subtitle="Define your persona's RPG stats (STR, DEX, etc.) and HP — just like character cards. Tracked via Persona Stats in the game state."
         />
 

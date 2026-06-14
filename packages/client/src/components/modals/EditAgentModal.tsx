@@ -146,7 +146,7 @@ export function EditAgentModal({ open, onClose, agent }: Props) {
 
         {/* Phase */}
         <label className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-[var(--muted-foreground)]">Pipeline Phase</span>
+          <span className="text-xs font-medium text-[var(--muted-foreground)]">Fase do pipeline</span>
           <select
             value={form.phase}
             onChange={(e) => setForm((f) => ({ ...f, phase: e.target.value as AgentPhase }))}

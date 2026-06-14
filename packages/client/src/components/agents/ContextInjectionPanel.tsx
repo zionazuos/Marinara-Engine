@@ -422,7 +422,8 @@ function DirectorCadenceCard({
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-1.5">
             <span className="truncate text-[0.625rem] font-semibold text-[var(--popover-foreground)]">
-              Narrative Director
+              
+              Diretor narrativo
             </span>
             <span className="shrink-0 rounded-full bg-[var(--primary)]/15 px-1.5 py-px text-[0.5rem] font-semibold text-[var(--primary)] ring-1 ring-[var(--primary)]/25">
               {statusLabel}

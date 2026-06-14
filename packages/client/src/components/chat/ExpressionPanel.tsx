@@ -106,7 +106,7 @@ export function ExpressionPanel({ characterIds, messages, characterMap, isRolepl
               ? "text-white/40 hover:bg-white/10 hover:text-white/70"
               : "text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
           )}
-          title="Collapse panel"
+          title="Recolher painel"
         >
           <ChevronRight size="0.875rem" />
         </button>

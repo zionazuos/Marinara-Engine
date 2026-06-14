@@ -451,7 +451,7 @@ export function ToolEditor() {
           </FieldGroup>
 
           {/* ── Execution Type ── */}
-          <FieldGroup label="Execution Type" icon={<Wrench size="0.875rem" className="text-[var(--primary)]" />}>
+          <FieldGroup label="Tipo de execução" icon={<Wrench size="0.875rem" className="text-[var(--primary)]" />}>
             <div className="grid grid-cols-3 gap-2">
               {EXEC_TYPES.map((et) => {
                 const isActive = localExecType === et.value;
@@ -501,7 +501,7 @@ export function ToolEditor() {
 
           {/* ── Execution Config ── */}
           {localExecType === "static" && (
-            <FieldGroup label="Static Result" icon={<FileText size="0.875rem" className="text-[var(--primary)]" />}>
+            <FieldGroup label="Resultado estático" icon={<FileText size="0.875rem" className="text-[var(--primary)]" />}>
               <textarea
                 value={localStaticResult}
                 onChange={(e) => {

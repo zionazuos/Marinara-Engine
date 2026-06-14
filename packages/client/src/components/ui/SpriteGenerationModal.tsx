@@ -1955,7 +1955,7 @@ export function SpriteGenerationModal({
                           type="button"
                           onClick={handleCloseCellFrame}
                           className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                          aria-label="Close frame editor"
+                          aria-label="Fechar editor de quadros"
                           title="Fechar"
                         >
                           <X size={14} />
@@ -2006,7 +2006,8 @@ export function SpriteGenerationModal({
                 </div>
               )}
               <label className="mb-2 block text-xs font-medium text-[var(--foreground)]">
-                Review & Label{" "}
+                
+                Revisar e rotular{" "}
                 {fullBodyExpressionMode ? "Full-body Expressions" : spriteType === "full-body" ? "Poses" : "Sprites"} (
                 {selectedCount} selected)
               </label>

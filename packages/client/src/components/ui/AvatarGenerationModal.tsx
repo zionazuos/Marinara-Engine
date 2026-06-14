@@ -228,11 +228,11 @@ export function AvatarGenerationModal({
                 {generatedAvatar ? (
                   <img src={generatedAvatar} alt="Avatar gerado" className="h-full w-full object-cover" />
                 ) : defaultAvatarUrl ? (
-                  <img src={defaultAvatarUrl} alt="Current avatar" className="h-full w-full object-cover opacity-80" />
+                  <img src={defaultAvatarUrl} alt="Avatar atual" className="h-full w-full object-cover opacity-80" />
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-[var(--muted-foreground)]">
                     <ImagePlus size="1.75rem" />
-                    <span className="text-xs">No preview yet</span>
+                    <span className="text-xs">Sem pré-visualização ainda</span>
                   </div>
                 )}
               </div>

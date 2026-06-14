@@ -4620,7 +4620,7 @@ export function GameSurface({
         regenerateMessageId: msg.id,
       });
       if (receivedContent) {
-        toast.success("Turn regenerated.", { duration: 1800 });
+        toast.success("Turno regenerado.", { duration: 1800 });
       }
     } catch {
       /* generate handles its own error toast */
@@ -8011,7 +8011,7 @@ export function GameSurface({
                   <button
                     onClick={() => setTutorialOpen(true)}
                     className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/80 backdrop-blur-md transition-colors hover:bg-black/60 hover:text-white"
-                    title="Game Mode Tutorial"
+                    title="Tutorial do modo Game"
                   >
                     <HelpCircle size={14} />
                   </button>
@@ -8190,7 +8190,7 @@ export function GameSurface({
                             setMobileActionsOpen(false);
                           }}
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-white/85 transition-colors hover:bg-white/10 hover:text-white"
-                          title="Game Mode Tutorial"
+                          title="Tutorial do modo Game"
                         >
                           <HelpCircle size={14} />
                         </button>

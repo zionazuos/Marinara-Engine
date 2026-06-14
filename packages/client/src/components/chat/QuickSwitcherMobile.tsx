@@ -240,7 +240,7 @@ export function QuickSwitcherMobile() {
       <button
         ref={btnRef}
         onClick={() => setOpen((v) => !v)}
-        title="Quick Switcher"
+        title="Alternador rápido"
         className={cn(
           "flex h-11 w-11 items-center justify-center rounded-xl transition-all",
           open
@@ -423,7 +423,8 @@ export function QuickSwitcherMobile() {
                 })}
                 {sortedPersonas.length === 0 && (
                   <div className="px-3 py-4 text-center text-[0.6875rem] italic text-[var(--muted-foreground)]">
-                    No personas found.
+                    
+                    Nenhuma persona encontrada.
                   </div>
                 )}
               </>

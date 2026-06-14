@@ -1787,7 +1787,7 @@ export function ConversationInput({
             }
           >
             <div className="border-b border-[var(--border)] px-3 py-2">
-              <div className="truncate text-xs font-semibold">Saved Statuses</div>
+              <div className="truncate text-xs font-semibold">Status salvos</div>
               <div className="truncate text-[0.625rem] text-[var(--muted-foreground)]">
                 {activePersona?.name ?? "No persona selected"}
               </div>

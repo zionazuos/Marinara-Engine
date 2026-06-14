@@ -159,7 +159,7 @@ export function CharacterTrackerPanel({
     >
       <SectionHeader
         icon={<Users size="0.6875rem" />}
-        title="Present Characters"
+        title="Personagens presentes"
         action={action}
         addAction={
           addMode ? <AddRowButton title="Adicionar personagem" onClick={onAddCharacter} className="rounded-sm" /> : undefined

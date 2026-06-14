@@ -422,7 +422,7 @@ export function CombinedPlayerPanel({
               </span>
             </div>
             <div className="space-y-1">
-              {customTrackerFields.length === 0 && <div className={EMPTY_STATE}>No fields tracked</div>}
+              {customTrackerFields.length === 0 && <div className={EMPTY_STATE}>Nenhum campo rastreado</div>}
               {customTrackerFields.map((field, idx) => (
                 <div key={idx} className="flex items-center gap-1.5 rounded-lg bg-[var(--muted)]/20 px-2 py-1.5">
                   <SlidersHorizontal size="0.625rem" className="shrink-0 text-cyan-400/60" />
@@ -612,7 +612,7 @@ export function CharactersPanel({
     <>
       <div className="flex items-center justify-between border-b border-[var(--border)] px-3 py-1.5">
         <span className="text-[0.625rem] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider flex items-center gap-1">
-          <Users size="0.625rem" /> Present Characters
+          <Users size="0.625rem" />  Personagens presentes
         </span>
         <div className="flex items-center gap-2">
           <TrackerSectionRefresh
@@ -668,7 +668,7 @@ export function CharactersPanel({
                     fileInputRef.current?.click();
                   }}
                   className="shrink-0 w-8 h-8 rounded-full bg-[var(--muted)]/30 flex items-center justify-center text-[var(--muted-foreground)]/50 hover:text-purple-400 hover:bg-[var(--muted)]/50 transition-all ring-1 ring-[var(--border)]"
-                  title="Upload avatar"
+                  title="Enviar avatar"
                 >
                   <ImagePlus size="0.75rem" />
                 </button>
@@ -1291,14 +1291,15 @@ function PersonaStatusField({ value, onSave }: { value: string; onSave?: (v: str
       <div className="mb-0.5 flex items-center gap-1.5">
         <Sparkles size="0.5625rem" className="text-violet-300/60" />
         <span className="text-[0.5625rem] font-semibold uppercase tracking-wide text-violet-200/65">
-          Current Status
+          
+          Status atual
         </span>
       </div>
       <InlineEdit
         value={value}
         onSave={onSave ?? (() => {})}
         className="w-full !text-[0.6875rem] !text-[var(--foreground)]/85"
-        placeholder="Status not tracked"
+        placeholder="Status não rastreado"
         scrollOnHover
       />
     </div>

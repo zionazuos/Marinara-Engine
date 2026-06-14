@@ -61,8 +61,9 @@ export function ImagePromptReviewModal({
     >
       <div className="flex max-h-[72vh] flex-col gap-4">
         <div className="text-xs leading-relaxed text-[var(--muted-foreground)]">
-          Edit the prompt{items.length === 1 ? "" : "s"} below before Marinara sends the image request
-          {items.length === 1 ? "" : "s"} to your provider.
+          
+          Editar o prompt{items.length === 1 ? "" : "s"} below before Marinara sends the image request
+          {items.length === 1 ? "" : "s"}  ao seu provedor.
         </div>
 
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">

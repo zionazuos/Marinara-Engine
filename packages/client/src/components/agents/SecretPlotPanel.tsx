@@ -258,7 +258,8 @@ export function SecretPlotPanel({
             className={cn("shrink-0 text-[var(--primary)] transition-transform", open && "rotate-180")}
           />
           <span className="min-w-0 truncate font-semibold text-[var(--popover-foreground)]/75 group-hover:text-[var(--popover-foreground)]">
-            Story guidance
+            
+            Orientação da história
           </span>
           {hasUnsavedChanges && (
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" title="Edição não salva" />
@@ -480,7 +481,7 @@ export function SecretPlotPanel({
                     </p>
                     <div>
                       <div className="mb-0.5 flex min-h-5 items-center justify-between gap-2 text-[0.5625rem] font-medium text-[var(--muted-foreground)]">
-                        <span>Arc description</span>
+                        <span>Descrição do arco</span>
                         <label
                           className="inline-flex shrink-0 items-center gap-1 rounded border border-[var(--border)]/70 bg-[var(--secondary)]/30 px-1.5 py-0.5 text-[0.5rem] font-medium transition-colors hover:bg-[var(--accent)]/45 hover:text-[var(--accent-foreground)]"
                           title="Mark this long-term arc as complete without deleting the arc notes."

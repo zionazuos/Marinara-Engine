@@ -127,7 +127,7 @@ export function PersonaMakerModal({ open, onClose }: Props) {
       <div className="space-y-4">
         {/* Connection selector */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-[var(--muted-foreground)]">API Connection</label>
+          <label className="text-xs font-medium text-[var(--muted-foreground)]">Conexão de API</label>
           <div className="relative">
             <select
               value={connectionId}
@@ -207,7 +207,7 @@ export function PersonaMakerModal({ open, onClose }: Props) {
           <div className="space-y-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
             <div className="flex items-center gap-2">
               <CheckCircle size="0.875rem" className="text-emerald-500" />
-              <span className="text-xs font-medium text-emerald-500">Persona Generated!</span>
+              <span className="text-xs font-medium text-emerald-500">Persona gerada!</span>
             </div>
 
             {/* Preview card */}

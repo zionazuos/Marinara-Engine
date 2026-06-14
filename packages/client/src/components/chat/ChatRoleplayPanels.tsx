@@ -233,7 +233,8 @@ export function AuthorNotesPanel({
     <>
       <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]">
         <PenLine size="0.75rem" />
-        Author's Notes
+        
+        Notas do autor
         {isMobile && (
           <button
             onClick={onClose}

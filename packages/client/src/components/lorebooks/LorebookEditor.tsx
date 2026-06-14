@@ -1045,7 +1045,7 @@ export function LorebookEditor() {
     <div className="flex flex-1 flex-col overflow-hidden">
       <ExportFormatDialog
         open={exportDialogOpen}
-        title="Export Lorebook"
+        title="Exportar lorebook"
         description="Native keeps Marinara folders and entry fields. Compatible exports a folderless World Info JSON for other roleplay tools."
         onClose={() => setExportDialogOpen(false)}
         onSelect={(format: ExportFormatChoice) => {
@@ -1075,7 +1075,8 @@ export function LorebookEditor() {
             }}
             className="rounded-lg px-3 py-1 text-[0.6875rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
-            Discard & close
+            
+            Descartar e fechar
           </button>
           <button
             onClick={async () => {
@@ -1116,7 +1117,7 @@ export function LorebookEditor() {
         <button
           onClick={() => setExportDialogOpen(true)}
           className="rounded-lg p-2 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-          title="Export lorebook"
+          title="Exportar lorebook"
         >
           <svg width="0.875rem" height="0.875rem" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -1132,7 +1133,7 @@ export function LorebookEditor() {
         <button
           onClick={handleDelete}
           className="rounded-lg p-2 text-[var(--destructive)] transition-colors hover:bg-[var(--destructive)]/15"
-          title="Delete lorebook"
+          title="Excluir lorebook"
         >
           <Trash2 size="0.875rem" />
         </button>
@@ -1575,8 +1576,8 @@ export function LorebookEditor() {
                             type="button"
                             onClick={() => setKeywordPreviewText("")}
                             className="absolute right-2 top-2 rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                            title="Clear keyword test"
-                            aria-label="Clear keyword test"
+                            title="Limpar teste de palavra-chave"
+                            aria-label="Limpar teste de palavra-chave"
                           >
                             <X size="0.75rem" />
                           </button>
@@ -2167,7 +2168,7 @@ function VectorizeSection({
           )}
         >
           {allVectorized ? <Check size="0.625rem" /> : <AlertTriangle size="0.625rem" />}
-          {vectorizedCount}/{vectorizableEntryCount} entries vectorized
+          {vectorizedCount}/{vectorizableEntryCount}  entradas vetorizadas
         </span>
         {missingCount > 0 && <span>{missingCount} still need embeddings.</span>}
         {excludeFromVectorization ? <span>This lorebook excludes every entry.</span> : null}
@@ -2189,7 +2190,7 @@ function VectorizeSection({
               onChange={(e) => setSelectedConnectionId(e.target.value)}
               className="flex-1 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
             >
-              <option value="">No semantic search</option>
+              <option value="">Sem busca semântica</option>
               {embeddingConnections.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name} ({c.embeddingModel})

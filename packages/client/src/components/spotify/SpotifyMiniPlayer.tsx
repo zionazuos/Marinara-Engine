@@ -767,7 +767,7 @@ export function SpotifyMiniPlayer({ mobile = false }: { mobile?: boolean }) {
           title={SPOTIFY_VOLUME_UNSUPPORTED_MESSAGE}
         >
           <Volume2 size="0.75rem" className="shrink-0" />
-          <span className="min-w-0 truncate text-[0.58rem] font-medium leading-tight">Use device volume</span>
+          <span className="min-w-0 truncate text-[0.58rem] font-medium leading-tight">Usar volume do dispositivo</span>
         </button>
       );
     }

@@ -292,7 +292,7 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
     <div className="flex flex-col gap-2.5">
       <label className="flex flex-col gap-1">
         <span className="flex items-center justify-between gap-2">
-          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Registered prompt</span>
+          <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Prompt registrado</span>
           <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[0.5625rem] font-semibold", status.className)}>
             {loadingEntries ? "Loading" : status.label}
           </span>
@@ -303,7 +303,7 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
           onChange={(event) => setSelectedKey(event.target.value)}
           className="w-full rounded-lg bg-[var(--background)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-[var(--border)] focus:ring-[var(--primary)] disabled:opacity-60"
         >
-          {loadingEntries && <option value="">Loading prompts...</option>}
+          {loadingEntries && <option value="">Carregando prompts...</option>}
           {!loadingEntries && filteredEntries.length === 0 && <option value="">Nenhum prompt registrado</option>}
           {filteredEntries.map((entry) => (
             <option key={entry.key} value={entry.key}>
@@ -360,14 +360,15 @@ function PromptOverridesEditorBody({ keys, preferredKey }: { keys?: readonly str
       <div className="rounded-lg bg-[var(--background)]/55 p-2.5 ring-1 ring-[var(--border)]/70">
         <div className="mb-1.5 flex items-center justify-between gap-2">
           <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">Pré-visualização renderizada</span>
-          <span className="text-[0.5625rem] text-[var(--muted-foreground)]">Example values</span>
+          <span className="text-[0.5625rem] text-[var(--muted-foreground)]">Valores de exemplo</span>
         </div>
         <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-md bg-[var(--secondary)]/70 p-2 font-mono text-[0.625rem] leading-relaxed text-[var(--foreground)]">
           {loadingPrompt ? "Loading preview..." : renderedPreview.rendered || "Nothing to preview yet."}
         </pre>
         {renderedPreview.unknownVariables.length > 0 && (
           <p className="mt-1.5 text-[0.5625rem] text-amber-500">
-            Unknown variables: {renderedPreview.unknownVariables.join(", ")}
+            
+            Variáveis desconhecidas: {renderedPreview.unknownVariables.join(", ")}
           </p>
         )}
       </div>

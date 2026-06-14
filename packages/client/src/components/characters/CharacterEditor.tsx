@@ -511,7 +511,7 @@ export function CharacterEditor() {
       await removeAvatar.mutateAsync(characterId);
       setAvatarPreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast.success("Avatar removed.");
+      toast.success("Avatar removido.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to remove avatar.");
     }
@@ -702,7 +702,7 @@ export function CharacterEditor() {
         }}
         disabled={!characterId || isStartingChat}
         className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--primary)] px-3 py-2 text-xs font-medium text-[var(--primary-foreground)] transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 max-md:rounded-lg max-md:px-2.5 max-md:py-1.5"
-        title="Start new chat"
+        title="Iniciar novo chat"
       >
         <MessageCircle size="1rem" />
         <span className="max-sm:hidden">Iniciar chat</span>
@@ -861,7 +861,7 @@ export function CharacterEditor() {
               value={formData.name}
               onChange={(e) => updateField("name", e.target.value)}
               className="w-full bg-transparent text-lg font-bold outline-none"
-              placeholder="Character name"
+              placeholder="Nome do personagem"
             />
             <input
               value={characterComment}
@@ -918,7 +918,8 @@ export function CharacterEditor() {
             disabled={avatarUploading}
             className="rounded-lg bg-amber-500/15 px-3 py-1 text-xs font-medium text-amber-500 transition-all hover:bg-amber-500/25 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Discard & close
+            
+            Descartar e fechar
           </button>
           <button
             type="button"
@@ -1387,7 +1388,8 @@ function MetadataTab({
         </div>
         <label className="space-y-1.5">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-            Talkativeness{" "}
+            
+            Tagarelice{" "}
             <HelpTooltip text="How often this character speaks in group chats. 0% = rarely speaks unless addressed, 100% = responds to almost everything." />
           </span>
           <input
@@ -1911,7 +1913,8 @@ function AdvancedTab({
       <label className="block space-y-1.5">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
-            System Prompt{" "}
+            
+            Prompt de sistema{" "}
             <HelpTooltip text="Character-specific instructions inserted by the prompt preset's character block or wherever the preset uses {{charSysInfo}}. This does not replace the chat's main system prompt." />
           </span>
           <button
@@ -2012,7 +2015,7 @@ function AdvancedTab({
       <ExpandedTextarea
         open={expandedField === "system_prompt"}
         onClose={() => setExpandedField(null)}
-        title="System Prompt"
+        title="Prompt de sistema"
         value={formData.system_prompt}
         onChange={(value) => updateField("system_prompt", value)}
         placeholder="Character-specific instructions inserted through {{charSysInfo}} or the character prompt block…"
@@ -2556,7 +2559,8 @@ function SpritesTab({
               : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]",
           )}
         >
-          Facial Expressions
+          
+          Expressões faciais
         </button>
         <button
           type="button"
@@ -2615,7 +2619,8 @@ function SpritesTab({
               title="Select a folder of PNGs — each filename becomes the expression name"
             >
               <FolderOpen size="0.8125rem" />
-              Upload Folder
+              
+              Enviar pasta
             </button>
             <button
               type="button"
@@ -2824,7 +2829,7 @@ function SpritesTab({
                 type="button"
                 onClick={() => setWandCleanupSprite(sprite)}
                 className="group/preview relative block aspect-[3/4] w-full bg-[var(--secondary)]"
-                title="Open wand cleanup"
+                title="Abrir limpeza com varinha"
               >
                 <img src={sprite.url} alt={sprite.expression} loading="lazy" className="h-full w-full object-contain" />
                 <span className="pointer-events-none absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--card)]/90 text-[var(--primary)] opacity-0 shadow-lg ring-1 ring-[var(--border)] transition-opacity group-hover/preview:opacity-100 max-md:opacity-100">
@@ -2880,7 +2885,7 @@ function SpritesTab({
         <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-[var(--border)] py-12 text-center">
           <Image size="1.75rem" className="text-[var(--muted-foreground)]/40" />
           <div>
-            <p className="text-sm font-medium text-[var(--muted-foreground)]">No sprites yet</p>
+            <p className="text-sm font-medium text-[var(--muted-foreground)]">Nenhum sprite ainda</p>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]/60">
               {category === "full-body"
                 ? "Upload full-body sprites above. Use transparent PNGs for best results."
@@ -2895,7 +2900,7 @@ function SpritesTab({
         <h4 className="mb-1.5 text-xs font-semibold">Como os sprites funcionam</h4>
         <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
           <li>
-            • Upload sprites one by one, or use <strong className="text-[var(--foreground)]">Upload Folder</strong> to
+            • Upload sprites one by one, or use <strong className="text-[var(--foreground)]">Enviar pasta</strong> to
             bulk-import a folder of PNGs (each filename = expression name, e.g. admiration.png → "admiration")
           </li>
           <li>
@@ -3116,7 +3121,7 @@ function StatsTab({
 
           {/* Info */}
           <div className="rounded-xl bg-[var(--card)] p-4 ring-1 ring-[var(--border)]">
-            <h4 className="mb-1.5 text-xs font-semibold">How stats work</h4>
+            <h4 className="mb-1.5 text-xs font-semibold">Como os atributos funcionam</h4>
             <ul className="space-y-1 text-[0.6875rem] text-[var(--muted-foreground)]">
               <li>
                 &bull; <strong className="text-[var(--foreground)]">HP</strong> — Injected into the prompt so the AI
@@ -3240,7 +3245,7 @@ function ColorsTab({
         value={nameColor}
         onChange={(v) => updateExtension("nameColor", v)}
         gradient
-        label="Name Display Color"
+        label="Cor de exibição do nome"
         helpText="The color (or gradient) used for the character's name in chat messages and sidebar tabs. Supports gradients!"
       />
 
@@ -3258,7 +3263,7 @@ function ColorsTab({
       <ColorPicker
         value={boxColor}
         onChange={(v) => updateExtension("boxColor", v)}
-        label="Message Box Color"
+        label="Cor da caixa de mensagem"
         helpText="Background color for this character's chat message bubbles. Use a semi-transparent color for best results (e.g. rgba)."
       />
 
@@ -3271,7 +3276,7 @@ function ColorsTab({
             display name in chat. Gradients use CSS linear-gradient.
           </li>
           <li>
-            &bull; <strong className="text-[var(--foreground)]">Dialogue color</strong> — All text inside dialogue
+            &bull; <strong className="text-[var(--foreground)]">Cor do diálogo</strong> — All text inside dialogue
             quotation marks is automatically colored with this value, and can optionally be bolded from Settings.
           </li>
           <li>
@@ -3342,7 +3347,7 @@ function LorebookTab({ characterId, formData }: { characterId: string | null; fo
   return (
     <div className="space-y-4">
       <SectionHeader
-        title="Character Lorebook"
+        title="Lorebook do personagem"
         subtitle="World-building entries embedded in this character. Triggered by keywords in conversation."
       />
 

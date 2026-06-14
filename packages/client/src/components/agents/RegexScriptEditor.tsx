@@ -550,7 +550,7 @@ export function RegexScriptEditor() {
                 }}
                 className="flex items-center gap-1 self-start rounded-lg px-2.5 py-1.5 text-[0.625rem] font-medium text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
               >
-                <Plus size="0.625rem" /> Add trim string
+                <Plus size="0.625rem" />  Adicionar texto a aparar
               </button>
             </div>
           </FieldGroup>
@@ -566,7 +566,7 @@ export function RegexScriptEditor() {
               <div className="flex items-center gap-2.5">
                 <button
                   type="button"
-                  aria-label="Toggle Prompt Only"
+                  aria-label="Alternar apenas prompt"
                   aria-pressed={localPromptOnly}
                   onClick={() => {
                     setLocalPromptOnly((v) => !v);
@@ -590,7 +590,7 @@ export function RegexScriptEditor() {
 
               {/* Order */}
               <div className="flex items-center gap-3">
-                <span className="text-xs font-medium w-24">Execution Order</span>
+                <span className="text-xs font-medium w-24">Ordem de execução</span>
                 <input
                   type="number"
                   value={localOrder}
@@ -680,7 +680,8 @@ export function RegexScriptEditor() {
               </p>
               <ul className="ml-4 list-disc space-y-0.5">
                 <li>
-                  Remove asterisks: <code className="rounded bg-[var(--secondary)] px-1">\\*([^*]+)\\*</code> →{" "}
+                  
+                  Remover asteriscos: <code className="rounded bg-[var(--secondary)] px-1">\\*([^*]+)\\*</code> →{" "}
                   <code className="rounded bg-[var(--secondary)] px-1">$1</code>
                 </li>
                 <li>

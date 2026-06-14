@@ -485,7 +485,7 @@ export function LorebookEntryRow({
             }
           }}
           onClick={(e) => e.stopPropagation()}
-          placeholder="Untitled entry"
+          placeholder="Entrada sem título"
           className="min-w-[4rem] flex-1 truncate rounded bg-transparent px-1 text-sm font-medium outline-none transition-colors hover:bg-[var(--accent)]/40 focus:bg-[var(--accent)]/40 focus:ring-1 focus:ring-[var(--ring)] sm:min-w-[7rem]"
         />
 
@@ -542,7 +542,7 @@ export function LorebookEntryRow({
           {showMobileControls && (
             <div className="absolute right-0 top-full z-30 mt-1 w-64 max-w-[calc(100vw-2rem)] space-y-2 rounded-xl border border-[var(--border)] bg-[var(--popover)] p-3 text-[var(--popover-foreground)] shadow-xl">
               <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2">
-                <p className="text-[0.6875rem] font-semibold">Entry controls</p>
+                <p className="text-[0.6875rem] font-semibold">Controles da entrada</p>
                 <button
                   type="button"
                   onClick={() => setShowMobileControls(false)}
@@ -1202,7 +1202,7 @@ function ExpandedDrawer({
 
       {/* Secondary Keys + Logic */}
       <FieldGroup
-        label="Secondary Keys"
+        label="Chaves secundárias"
         icon={Key}
         help="Additional keywords used with AND/OR/NOT logic. 'AND' means both primary AND secondary must match. 'NOT' means primary must match but secondary must NOT."
       >
@@ -1250,7 +1250,7 @@ function ExpandedDrawer({
 
             <div className="space-y-2 rounded-lg bg-[var(--secondary)]/45 p-2 ring-1 ring-[var(--border)]">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.6875rem] font-medium">Character tags</span>
+                <span className="text-[0.6875rem] font-medium">Tags do personagem</span>
                 <FilterModeSelect
                   value={form.characterTagFilterMode ?? "any"}
                   onChange={(value) => update({ characterTagFilterMode: value })}
@@ -1327,7 +1327,7 @@ function ExpandedDrawer({
           onChange={(v) => update({ matchWholeWords: v })}
         />
         <ToggleButton
-          label="Case Sensitive"
+          label="Sensível a maiúsculas"
           value={form.caseSensitive ?? false}
           onChange={(v) => update({ caseSensitive: v })}
         />

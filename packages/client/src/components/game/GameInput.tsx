@@ -459,7 +459,7 @@ export function GameInput({
                   )}
                 >
                   <Users size={14} className="shrink-0" />
-                  <span className="flex-1">Talk to Party</span>
+                  <span className="flex-1">Falar com o grupo</span>
                   {addressMode === "party" && <span className="text-[0.625rem] uppercase tracking-wide">Ligado</span>}
                 </button>
               )}
@@ -581,7 +581,8 @@ export function GameInput({
             className="hidden text-[0.625rem] font-medium uppercase tracking-wide sm:inline"
             style={{ color: "#20C20E", opacity: 0.9 }}
           >
-            force interrupting
+            
+            forçar interrupção
           </span>
         )}
         <button
@@ -667,7 +668,7 @@ export function GameInput({
               ? "text-[var(--foreground)]/50 hover:bg-foreground/10 hover:text-[var(--foreground)]/70 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
               : "text-[var(--muted-foreground)]/40 dark:text-white/30",
           )}
-          aria-label="Send game turn"
+          aria-label="Enviar turno do game"
         >
           <Send size={18} />
         </button>

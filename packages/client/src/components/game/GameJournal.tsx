@@ -258,7 +258,7 @@ export function GameJournal({
   if (!journal) {
     return (
       <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-        <div className="text-sm text-white/60">Loading journal...</div>
+        <div className="text-sm text-white/60">Carregando diário...</div>
       </div>
     );
   }

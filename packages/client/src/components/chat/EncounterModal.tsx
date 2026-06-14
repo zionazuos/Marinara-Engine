@@ -197,7 +197,7 @@ function TargetSelection({ attackType, enemies, party, onSelect, onCancel }: Tar
               <span className="text-lg">💥</span>
               <div>
                 <div className="text-xs font-bold text-[var(--foreground)]">Todos os inimigos</div>
-                <div className="text-[0.625rem] text-[var(--muted-foreground)]/70">Area of Effect</div>
+                <div className="text-[0.625rem] text-[var(--muted-foreground)]/70">Área de efeito</div>
               </div>
             </button>
           )}
@@ -970,7 +970,8 @@ class EncounterErrorBoundary extends Component<{ children: ReactNode; onReset: (
               }}
               className="rounded-xl bg-red-600 px-6 py-2.5 text-xs font-medium text-foreground transition-all hover:bg-red-500"
             >
-              Close Encounter
+              
+              Fechar encontro
             </button>
           </div>
         </div>

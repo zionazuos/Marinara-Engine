@@ -201,7 +201,8 @@ export function PresetsPanel() {
             disabled={filteredPresets.length === 0}
             className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-purple-400 transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
           >
-            Select visible
+            
+            Selecionar visíveis
           </button>
           <button
             onClick={() => setSelectedPresetIds(new Set())}

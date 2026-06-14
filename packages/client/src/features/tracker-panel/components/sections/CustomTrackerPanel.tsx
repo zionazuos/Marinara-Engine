@@ -182,7 +182,7 @@ export function CustomTrackerPanel({
           addAction={
             addMode ? (
               <AddRowButton
-                title="Add custom stat"
+                title="Adicionar atributo personalizado"
                 onClick={() => onUpdateFields([...fields, { name: "New Field", value: "" }])}
                 className="rounded-sm"
               />

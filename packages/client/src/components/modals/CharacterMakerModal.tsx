@@ -158,7 +158,7 @@ export function CharacterMakerModal({ open, onClose }: Props) {
       <div className="space-y-4">
         {/* Connection selector */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-[var(--muted-foreground)]">API Connection</label>
+          <label className="text-xs font-medium text-[var(--muted-foreground)]">Conexão de API</label>
           <div className="relative">
             <select
               value={connectionId}
@@ -206,7 +206,8 @@ export function CharacterMakerModal({ open, onClose }: Props) {
           ) : (
             <>
               <Wand2 size="0.9375rem" />
-              Generate Character
+              
+              Gerar personagem
             </>
           )}
         </button>

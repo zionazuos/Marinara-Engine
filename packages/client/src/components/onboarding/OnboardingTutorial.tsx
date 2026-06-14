@@ -259,7 +259,7 @@ function TourCardContent({
         <div className="mb-2 flex justify-center">
           <img
             src={currentStep.sprite.src}
-            alt="Professor Mari"
+            alt="Professora Mari"
             className="h-32 max-h-[15vh] w-auto object-contain drop-shadow-lg"
             style={currentStep.sprite.flip ? { transform: "scaleX(-1)" } : undefined}
             draggable={false}

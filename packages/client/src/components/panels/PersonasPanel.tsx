@@ -335,7 +335,8 @@ export function PersonasPanel() {
     <div className="flex flex-col gap-2 p-3">
       {/* Header help */}
       <div className="flex items-center gap-1.5 text-xs text-[var(--muted-foreground)]">
-        Your personas
+        
+        Suas personas
         <HelpTooltip text="Personas are your different identities. The active persona determines how the AI refers to you and sees your description, personality, backstory, and appearance. Great for switching between different player characters!" />
       </div>
 
@@ -512,7 +513,8 @@ export function PersonasPanel() {
             disabled={list.length === 0}
             className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-emerald-400 transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
           >
-            Select visible
+            
+            Selecionar visíveis
           </button>
           <button
             onClick={() => setSelectedPersonaIds(new Set())}
@@ -668,7 +670,7 @@ export function PersonasPanel() {
                               ? "bg-[var(--primary)]/15 text-[var(--primary)]"
                               : "text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
                           )}
-                          title="Assign personas"
+                          title="Atribuir personas"
                         >
                           <UserPlus size="0.75rem" />
                         </button>
@@ -714,7 +716,7 @@ export function PersonasPanel() {
                     <div className="border-t border-[var(--border)]/50 px-2.5 py-1.5">
                       {group.memberIds.length === 0 ? (
                         <p className="py-1 text-[0.625rem] italic text-[var(--muted-foreground)]">
-                          No members — use <UserPlus size="0.5rem" className="inline" /> to assign personas
+                          No members — use <UserPlus size="0.5rem" className="inline" />  para atribuir personas
                         </p>
                       ) : (
                         <div className="flex flex-col gap-0.5">
@@ -755,7 +757,7 @@ export function PersonasPanel() {
                                       toggleGroupMember(group.id, pid, group.memberIds);
                                     }}
                                     className="rounded p-0.5 text-[var(--muted-foreground)] opacity-0 transition-all hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)] group-hover/member:opacity-100 max-md:opacity-100"
-                                    title="Remove from group"
+                                    title="Remover do grupo"
                                   >
                                     <UserMinus size="0.625rem" />
                                   </button>

@@ -455,14 +455,15 @@ export function HomeFaq() {
                 <div className="mx-auto flex h-28 w-20 shrink-0 items-start justify-center overflow-hidden rounded-[1.25rem] border border-[var(--border)] bg-[var(--card)]/80 shadow-[0_10px_24px_rgba(0,0,0,0.22)] sm:mx-0 sm:h-32 sm:w-24">
                   <img
                     src="/sprites/mari/Mari_explaining.png"
-                    alt="Professor Mari"
+                    alt="Professora Mari"
                     className="h-full w-full object-cover object-[center_14%]"
                   />
                 </div>
                 <div className="min-w-0 text-center sm:text-left">
                   <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--muted)]/50 px-2.5 py-1 text-[0.5625rem] uppercase tracking-[0.18em] text-[var(--muted-foreground)]/85 dark:border-white/10 dark:bg-black/20">
                     <Sparkles size="0.6875rem" />
-                    Professor Mari
+                    
+                    Professora Mari
                   </div>
                   <p className="mt-2 text-sm font-semibold tracking-tight text-[var(--foreground)]">
                     Start here before you go hunting through Discord logs.

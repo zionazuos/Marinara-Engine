@@ -336,7 +336,7 @@ export function MobileWidgetPanel({ widgets, position, chatId }: MobileWidgetPan
                     type="button"
                     onClick={() => setExpandedId(null)}
                     className="flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium text-white/40 transition-colors hover:bg-white/10 hover:text-white"
-                    title="Collapse widget"
+                    title="Recolher widget"
                   >
                     ×
                   </button>
@@ -664,7 +664,7 @@ function WidgetEditorModal({
         {widget.type === "timer" && (
           <div className="space-y-3">
             <label className="space-y-1.5">
-              <span className="text-xs font-medium text-[var(--muted-foreground)]">Seconds remaining</span>
+              <span className="text-xs font-medium text-[var(--muted-foreground)]">Segundos restantes</span>
               <input
                 type="number"
                 min={0}
@@ -688,7 +688,7 @@ function WidgetEditorModal({
 
         {hintEntries.length > 0 && (
           <div className="rounded-xl border border-[var(--border)] bg-[var(--accent)]/40 px-3 py-2">
-            <p className="mb-1 text-xs font-medium text-[var(--foreground)]">Model value hints</p>
+            <p className="mb-1 text-xs font-medium text-[var(--foreground)]">Dicas de valor do modelo</p>
             <div className="space-y-1 text-xs text-[var(--muted-foreground)]">
               {hintEntries.map(([key, value]) => (
                 <p key={key}>

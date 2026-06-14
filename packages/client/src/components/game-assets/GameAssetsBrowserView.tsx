@@ -505,7 +505,7 @@ export function GameAssetsBrowserView() {
       if (modal.type === "create-folder") {
         const newPath = selectedPath ? `${selectedPath}/${modalValue}` : modalValue;
         await createFolder.mutateAsync(newPath);
-        toast.success("Folder created");
+        toast.success("Pasta criada");
       } else if (modal.type === "new-text-file" || modal.type === "new-markdown-file") {
         const ext = modal.type === "new-text-file" ? ".txt" : ".md";
         const filename = modalValue.endsWith(ext) ? modalValue : `${modalValue}${ext}`;
@@ -523,7 +523,7 @@ export function GameAssetsBrowserView() {
       } else if (modal.type === "delete") {
         if (modal.node.type === "folder") {
           await deleteFolder.mutateAsync({ path: modal.node.path, recursive: deleteRecursive });
-          toast.success("Folder deleted");
+          toast.success("Pasta excluída");
         } else {
           await deleteAsset.mutateAsync(modal.node.path);
           toast.success("Arquivo excluído");
@@ -801,7 +801,7 @@ export function GameAssetsBrowserView() {
             <button
               onClick={handleClearSelection}
               className="rounded-md p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-              title="Clear selection"
+              title="Limpar seleção"
             >
               <X size="0.875rem" />
             </button>

@@ -125,7 +125,7 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
         <div className="absolute inset-0 z-40 bg-black/30 backdrop-blur-[2px]" onClick={onClose} />
         <div className="absolute right-0 top-0 z-50 flex h-full w-80 max-md:w-full flex-col border-l border-[var(--border)] bg-[var(--background)] shadow-2xl animate-fade-in-up max-md:pt-[env(safe-area-inset-top)]">
           <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-            <h3 className="text-sm font-bold">Manage Chat Files</h3>
+            <h3 className="text-sm font-bold">Gerenciar arquivos do chat</h3>
             <button
               type="button"
               onClick={onClose}
@@ -200,7 +200,7 @@ export function ChatFilesDrawer({ chat, open, onClose }: ChatFilesDrawerProps) {
       <div className="absolute right-0 top-0 z-50 flex h-full w-80 max-md:w-full flex-col border-l border-[var(--border)] bg-[var(--background)] shadow-2xl animate-fade-in-up max-md:pt-[env(safe-area-inset-top)]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-          <h3 className="text-sm font-bold">Manage Chat Files</h3>
+          <h3 className="text-sm font-bold">Gerenciar arquivos do chat</h3>
           <button
             type="button"
             onClick={onClose}
