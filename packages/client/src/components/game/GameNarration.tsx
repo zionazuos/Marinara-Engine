@@ -35,12 +35,14 @@ import {
   Loader2,
   Wand2,
   RotateCcw,
+  GitBranch,
 } from "lucide-react";
 import { cn, copyToClipboard, getAvatarCropStyle, type AvatarCrop, type LegacyAvatarCrop } from "../../lib/utils";
 import { findNamedMapValue } from "../../lib/game-character-name-match";
 import type { GameSegmentEdit } from "../../lib/game-segment-edits";
 import { parseGmTags, stripGmTagsKeepReadables } from "../../lib/game-tag-parser";
 import { audioManager } from "../../lib/game-audio";
+import { normalizeSpriteExpressionKey, resolveSpriteExpression } from "../../lib/sprite-expression-match";
 import {
   DIALOGUE_QUOTE_CAPTURE_GROUP_PATTERN_SOURCE,
   HTML_SAFE_DIALOGUE_QUOTE_PATTERN_SOURCE,
@@ -53,6 +55,8 @@ import { useApplyRegex } from "../../hooks/use-apply-regex";
 import { useGameAssetStore } from "../../stores/game-asset.store";
 import { useGameModeStore } from "../../stores/game-mode.store";
 import { useUIStore } from "../../stores/ui.store";
+import { useChatStore } from "../../stores/chat.store";
+import { parseChatMetadata } from "../../lib/chat-display";
 import { createMessageMacroResolver, findCharacterByName } from "../../lib/chat-macros";
 import { animateTextHtml } from "./AnimatedText";
 import { ttsService } from "../../lib/tts-service";
@@ -89,14 +93,6 @@ function nameColorStyle(color?: string): CSSProperties | undefined {
     };
   }
   return { color };
-}
-
-function normalizeSpriteExpressionKey(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/^full_/, "")
-    .replace(/[_\s-]+/g, "_");
 }
 
 const GAME_TTS_EMOTIONS = [
@@ -417,6 +413,8 @@ interface GameNarrationProps {
   onRetryCombatGeneration?: () => void;
   /** Open the standard delete-message flow for a backing chat message. */
   onDeleteMessage?: (messageId: string) => void;
+  /** Create a chat branch ending at a user-authored game log message. */
+  onBranchMessage?: (messageId: string) => void;
   /** Whether the global multi-delete bar is active. */
   multiSelectMode?: boolean;
   /** Chat message ids selected for global multi-delete. */
@@ -924,6 +922,7 @@ export function GameNarration({
   combatGenerationFailed,
   onRetryCombatGeneration,
   onDeleteMessage,
+  onBranchMessage,
   multiSelectMode = false,
   selectedMessageIds,
   onDeleteSegment,
@@ -954,6 +953,10 @@ export function GameNarration({
 }: GameNarrationProps) {
   const { translations, translating } = useTranslate();
   const { applyToAIOutput } = useApplyRegex();
+  // Parse the chat metadata in a memo (not the store selector) so streaming ticks
+  // don't re-parse the whole metadata object on every update.
+  const activeChatMetadata = useChatStore((s) => s.activeChat?.metadata);
+  const scopedRegexMode = useMemo(() => parseChatMetadata(activeChatMetadata).scopedRegexMode, [activeChatMetadata]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [visibleChars, setVisibleChars] = useState(0);
   const [logsOpen, setLogsOpen] = useState(false);
@@ -994,9 +997,26 @@ export function GameNarration({
   const gameVoiceCacheRef = useRef<Map<string, GameSegmentVoiceEntry>>(new Map());
   const gameVoicePendingRef = useRef<Map<string, AbortController>>(new Map());
   const gameVoiceAudioRef = useRef<HTMLAudioElement | null>(null);
+  // Every voice <audio> currently created/playing. gameVoiceAudioRef only tracks
+  // the single most-recent element, so when two playback attempts interleave the
+  // earlier element is dropped from the ref and never paused — it plays to the end
+  // while new clips stack on top (issue #2647 overlap). This set lets
+  // stopGameVoicePlayback tear down ALL live elements, guaranteeing at most one
+  // voice clip is ever audible.
+  const gameVoiceActiveAudiosRef = useRef<Set<HTMLAudioElement>>(new Set());
   const gameVoiceSequenceRef = useRef(0);
   const gameVoiceGenerationTailRef = useRef<Promise<void>>(Promise.resolve());
   const lastAutoPlayedVoiceKeyRef = useRef<string | null>(null);
+  // Keys for which an auto-play attempt has been launched but not yet confirmed
+  // started. The committed dedup refs (lastAutoPlayedVoiceKeyRef /
+  // autoPlayedSideVoiceKeysRef) are only written in the async onStarted callback,
+  // so without these synchronous in-flight markers a gameVoiceVersion bump (fired
+  // as each clip finishes generating) re-runs the auto-play effects before the
+  // current clip reports playing and relaunches it — restarting the same line on
+  // a loop. onStarted clears in-flight after committing dedup; onBlocked clears it
+  // so the autoplay-blocked retry path still works. See issue #2647.
+  const autoPlayInFlightVoiceKeyRef = useRef<string | null>(null);
+  const autoPlayInFlightSideVoiceKeysRef = useRef<Set<string>>(new Set());
   const autoPlayedSideVoiceKeysRef = useRef<Set<string>>(new Set());
   const sideVoiceAutoPlayFailuresRef = useRef<Map<string, number>>(new Map());
   const sideVoiceAutoPlayRetryPendingRef = useRef<Set<string>>(new Set());
@@ -1074,6 +1094,13 @@ export function GameNarration({
     for (let index = messages.length - 1, depth = 0; index >= 0; index--, depth++) {
       byId.set(messages[index]!.id, depth);
     }
+    return byId;
+  }, [messages]);
+
+  // Per-message speaker, so scoped regex can match a segment's character in exclusive mode.
+  const messageCharacterById = useMemo(() => {
+    const byId = new Map<string, string | null>();
+    for (const m of messages) byId.set(m.id, m.characterId ?? null);
     return byId;
   }, [messages]);
 
@@ -1338,9 +1365,11 @@ export function GameNarration({
       return applyToAIOutput(text, {
         depth: sourceMessageId ? messageDepthById.get(sourceMessageId) : undefined,
         resolveMacros: resolveMacrosForText,
+        scopedMode: scopedRegexMode,
+        characterId: sourceMessageId ? messageCharacterById.get(sourceMessageId) : undefined,
       });
     },
-    [applyToAIOutput, messageDepthById],
+    [applyToAIOutput, messageDepthById, messageCharacterById, scopedRegexMode],
   );
 
   const prepareSegmentText = useCallback(
@@ -1736,14 +1765,16 @@ export function GameNarration({
   const stopGameVoicePlayback = useCallback(() => {
     gameVoiceSequenceRef.current += 1;
     queueLogScrollTopRestore();
-    const audio = gameVoiceAudioRef.current;
-    if (audio) {
+    // Tear down every live voice element, not just the current ref — interleaved
+    // playback attempts can orphan earlier elements off the single ref (#2647).
+    for (const audio of gameVoiceActiveAudiosRef.current) {
       audio.pause();
       audio.onended = null;
       audio.onerror = null;
       audio.onplaying = null;
-      gameVoiceAudioRef.current = null;
     }
+    gameVoiceActiveAudiosRef.current.clear();
+    gameVoiceAudioRef.current = null;
     setGameVoicePlayingKey(null);
     setGameVoicePausedKey(null);
   }, [queueLogScrollTopRestore]);
@@ -1796,6 +1827,7 @@ export function GameNarration({
         audio.preload = "auto";
         audioManager.setMediaElementVolume(audio, normalizedGameVoiceVolume);
         audio.muted = normalizedGameVoiceVolume <= 0;
+        gameVoiceActiveAudiosRef.current.add(audio);
         gameVoiceAudioRef.current = audio;
 
         let started = false;
@@ -1805,6 +1837,7 @@ export function GameNarration({
           options?.onStarted?.(key);
         };
         const markFailed = () => {
+          gameVoiceActiveAudiosRef.current.delete(audio);
           if (gameVoiceSequenceRef.current !== sequence || gameVoiceAudioRef.current !== audio) return;
           queueLogScrollTopRestore();
           setGameVoicePlayingKey(null);
@@ -1815,12 +1848,29 @@ export function GameNarration({
 
         audio.onplaying = markStarted;
         audio.onended = () => {
+          gameVoiceActiveAudiosRef.current.delete(audio);
           if (gameVoiceSequenceRef.current !== sequence || gameVoiceAudioRef.current !== audio) return;
           urlIndex += 1;
           playNext();
         };
         audio.onerror = markFailed;
-        void audio.play().then(markStarted).catch(markFailed);
+        void audio
+          .play()
+          .then(markStarted)
+          .catch(() => {
+            // Browsers can reject the play() promise (typically AbortError) when a
+            // rapid re-trigger "interrupts" it, even though playback actually
+            // started and continues. Dropping such a still-playing clip from the
+            // tracking set would orphan it so stopGameVoicePlayback() can never
+            // pause it — the clips stack and overlap (#2647). Only treat the
+            // rejection as a real failure when the element is genuinely not
+            // playing; otherwise treat it as a normal start.
+            if (!audio.paused && !audio.ended) {
+              markStarted();
+              return;
+            }
+            markFailed();
+          });
       };
 
       playNext();
@@ -2543,7 +2593,12 @@ export function GameNarration({
         ? null
         : (() => {
             const avatar = findNamedMapValue(speakerAvatarInfos, active.speaker);
-            return avatar ? { name: active.speaker, avatarUrl: avatar.url, expression: active.sprite } : null;
+            if (avatar) return { name: active.speaker, avatarUrl: avatar.url, expression: active.sprite };
+            const sprites = spriteMap ? findNamedMapValue(spriteMap, active.speaker) : null;
+            const expressionSprites = sprites?.filter((sprite) => !sprite.expression.toLowerCase().startsWith("full_"));
+            if (!expressionSprites?.length) return null;
+            const sprite = resolveSpriteExpression(expressionSprites, active.sprite ?? "neutral");
+            return sprite ? { name: active.speaker, avatarUrl: sprite.url, expression: active.sprite } : null;
           })();
 
     // Composite key catches legitimate expression/avatar changes, not just name
@@ -2551,7 +2606,7 @@ export function GameNarration({
     if (nextKey === lastReportedSpeakerRef.current) return;
     lastReportedSpeakerRef.current = nextKey;
     onActiveSpeakerChange(next);
-  }, [active, speakerAvatarInfos, onActiveSpeakerChange]);
+  }, [active, speakerAvatarInfos, spriteMap, onActiveSpeakerChange]);
 
   // How many segments are prepended before the actual GM narration segments
   const playerSegmentOffset = latestUserMessage?.content && latestAssistant ? 1 : 0;
@@ -2838,6 +2893,8 @@ export function GameNarration({
 
   useEffect(() => {
     lastAutoPlayedVoiceKeyRef.current = null;
+    autoPlayInFlightVoiceKeyRef.current = null;
+    autoPlayInFlightSideVoiceKeysRef.current.clear();
     autoPlayedSideVoiceKeysRef.current.clear();
     sideVoiceAutoPlayFailuresRef.current.clear();
     clearSideVoiceAutoPlayRetry();
@@ -2848,6 +2905,8 @@ export function GameNarration({
     if (gameVoiceEnabled && !isStreaming && !scenePreparing && !directionsActive && !gameVoicePlaybackBlocked) return;
     if (isStreaming || scenePreparing || directionsActive || gameVoicePlaybackBlocked) {
       lastAutoPlayedVoiceKeyRef.current = null;
+      autoPlayInFlightVoiceKeyRef.current = null;
+      autoPlayInFlightSideVoiceKeysRef.current.clear();
       autoPlayedSideVoiceKeysRef.current.clear();
       sideVoiceAutoPlayFailuresRef.current.clear();
       clearSideVoiceAutoPlayRetry();
@@ -2867,12 +2926,23 @@ export function GameNarration({
     if (!gameVoiceEnabled || !activeVoiceKey) return;
     if (isStreaming || scenePreparing || directionsActive || gameVoicePlaybackBlocked) return;
     if (lastAutoPlayedVoiceKeyRef.current === activeVoiceKey) return;
+    // A launch is already pending for this key; don't relaunch on version churn.
+    if (autoPlayInFlightVoiceKeyRef.current === activeVoiceKey) return;
     const entry = gameVoiceCacheRef.current.get(activeVoiceKey);
     if (!entry || entry.status !== "ready") return;
+    autoPlayInFlightVoiceKeyRef.current = activeVoiceKey;
     playGameVoiceKey(activeVoiceKey, {
       onStarted: (startedKey) => {
         if (startedKey === activeVoiceKey) {
           lastAutoPlayedVoiceKeyRef.current = activeVoiceKey;
+        }
+        if (autoPlayInFlightVoiceKeyRef.current === startedKey) {
+          autoPlayInFlightVoiceKeyRef.current = null;
+        }
+      },
+      onBlocked: (blockedKey) => {
+        if (autoPlayInFlightVoiceKeyRef.current === blockedKey) {
+          autoPlayInFlightVoiceKeyRef.current = null;
         }
       },
     });
@@ -2906,18 +2976,22 @@ export function GameNarration({
       (key, index) =>
         entries[index]?.status === "ready" &&
         !autoPlayedSideVoiceKeysRef.current.has(key) &&
+        !autoPlayInFlightSideVoiceKeysRef.current.has(key) &&
         !sideVoiceAutoPlayRetryPendingRef.current.has(key) &&
         (sideVoiceAutoPlayFailuresRef.current.get(key) ?? 0) < SIDE_VOICE_AUTOPLAY_MAX_FAILURES,
     );
     if (playableKeys.length > 0) {
+      for (const key of playableKeys) autoPlayInFlightSideVoiceKeysRef.current.add(key);
       playGameVoiceKeys(playableKeys, {
         onStarted: (startedKey) => {
+          autoPlayInFlightSideVoiceKeysRef.current.delete(startedKey);
           autoPlayedSideVoiceKeysRef.current.add(startedKey);
           sideVoiceAutoPlayFailuresRef.current.delete(startedKey);
           sideVoiceAutoPlayRetryPendingRef.current.delete(startedKey);
           setGameVoiceVersion((version) => version + 1);
         },
         onBlocked: (blockedKey) => {
+          autoPlayInFlightSideVoiceKeysRef.current.delete(blockedKey);
           const failures = (sideVoiceAutoPlayFailuresRef.current.get(blockedKey) ?? 0) + 1;
           sideVoiceAutoPlayFailuresRef.current.set(blockedKey, failures);
           if (failures < SIDE_VOICE_AUTOPLAY_MAX_FAILURES) {
@@ -3198,16 +3272,8 @@ export function GameNarration({
       const expressionSprites = sprites.filter((s) => !s.expression.toLowerCase().startsWith("full_"));
       if (!expressionSprites.length) return null;
 
-      const exact = expressionSprites.find((s) => normalizeSpriteExpressionKey(s.expression) === exprKey);
-      if (exact) return { url: exact.url };
-
-      const partial = expressionSprites.find((s) => {
-        const spriteKey = normalizeSpriteExpressionKey(s.expression);
-        return spriteKey.includes(exprKey) || exprKey.includes(spriteKey);
-      });
-      if (partial) return { url: partial.url };
-
-      return { url: expressionSprites[0]!.url };
+      const match = resolveSpriteExpression(expressionSprites, exprKey);
+      return match ? { url: match.url } : null;
     },
     [spriteMap],
   );
@@ -3225,6 +3291,8 @@ export function GameNarration({
     "flex items-center gap-1.5 rounded-lg bg-[var(--muted)]/30 px-3 py-1.5 text-xs text-[var(--foreground)]/70 transition-colors hover:bg-[var(--muted)]/50 hover:text-[var(--foreground)] dark:bg-white/10 dark:text-white/70 dark:hover:bg-white/20 dark:hover:text-white";
   const NARRATION_META_BTN =
     "flex min-h-7 items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--muted)]/20 px-2.5 py-1 text-xs text-[var(--foreground)]/75 transition-colors hover:bg-[var(--muted)]/40 dark:border-white/10 dark:bg-white/5 dark:text-white/75 dark:hover:bg-white/10";
+  const NARRATION_COUNT_BADGE =
+    "absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--foreground)] px-0.5 text-[0.55rem] font-bold text-[var(--background)] ring-1 ring-[var(--background)]/20 dark:bg-white/90 dark:text-black dark:ring-black/20";
   const combatMetaButton = onRequestCombatStart ? (
     <button
       type="button"
@@ -3234,7 +3302,7 @@ export function GameNarration({
         NARRATION_META_BTN,
         "relative",
         combatGenerationFailed
-          ? "border-rose-300/30 bg-rose-500/15 text-rose-100 hover:bg-rose-500/25"
+          ? "border-[var(--destructive)]/30 bg-[var(--destructive)]/15 text-[var(--destructive)] hover:bg-[var(--destructive)]/25"
           : "border-amber-300/20 bg-amber-500/10 text-amber-100/90 hover:bg-amber-500/20",
         combatStarting && "cursor-wait opacity-80",
       )}
@@ -3250,7 +3318,7 @@ export function GameNarration({
         className={cn(
           "mt-2 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-xs",
           combatGenerationFailed
-            ? "border-rose-300/25 bg-rose-500/10 text-rose-100"
+            ? "border-[var(--destructive)]/25 bg-[var(--destructive)]/10 text-[var(--destructive)]"
             : "border-amber-300/20 bg-amber-500/10 text-amber-100",
         )}
       >
@@ -3446,7 +3514,8 @@ export function GameNarration({
             seg.partyType === "side" && "bg-sky-500/15 text-sky-200/70",
             seg.partyType === "extra" && "bg-sky-500/15 text-sky-200/70",
             seg.partyType === "thought" && "bg-purple-500/15 text-purple-200/70",
-            seg.partyType === "whisper" && "bg-rose-500/15 text-rose-200/70",
+            seg.partyType === "whisper" &&
+              "bg-[var(--marinara-chat-chrome-highlight-bg)] text-[var(--marinara-chat-chrome-panel-text)]",
           )}
         >
           {PARTY_TYPE_ICONS[seg.partyType] ?? ""} {seg.partyType}
@@ -3925,7 +3994,8 @@ export function GameNarration({
                               className={cn(
                                 "rounded-full px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wide",
                                 active.partyType === "thought" && "bg-purple-500/15 text-purple-200/70",
-                                active.partyType === "whisper" && "bg-rose-500/15 text-rose-200/70",
+                                active.partyType === "whisper" &&
+                                  "bg-[var(--marinara-chat-chrome-highlight-bg)] text-[var(--marinara-chat-chrome-panel-text)]",
                               )}
                             >
                               {PARTY_TYPE_ICONS[active.partyType] ?? ""} {active.partyType}
@@ -4061,11 +4131,7 @@ export function GameNarration({
                     <button onClick={onOpenInventory} className={cn("relative", NARRATION_META_BTN)}>
                       <Package size={12} />
                       <span className="hidden sm:inline">Inventário</span>
-                      {(inventoryCount ?? 0) > 0 && (
-                        <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-0.5 text-[0.55rem] font-bold text-black">
-                          {inventoryCount}
-                        </span>
-                      )}
+                      {(inventoryCount ?? 0) > 0 && <span className={NARRATION_COUNT_BADGE}>{inventoryCount}</span>}
                     </button>
                   )}
                   {combatMetaButton}
@@ -4180,11 +4246,7 @@ export function GameNarration({
                     <button onClick={onOpenInventory} className={cn("relative", NARRATION_META_BTN)}>
                       <Package size={12} />
                       <span className="hidden sm:inline">Inventário</span>
-                      {(inventoryCount ?? 0) > 0 && (
-                        <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-0.5 text-[0.55rem] font-bold text-black">
-                          {inventoryCount}
-                        </span>
-                      )}
+                      {(inventoryCount ?? 0) > 0 && <span className={NARRATION_COUNT_BADGE}>{inventoryCount}</span>}
                     </button>
                   )}
                   {combatMetaButton}
@@ -4409,9 +4471,11 @@ export function GameNarration({
                       const sourceMessageId = seg.sourceMessageId ?? entry.messageId;
                       const hasSourceSegmentIndex = seg.sourceSegmentIndex != null;
                       const sourceSegmentIndex = seg.sourceSegmentIndex ?? 0;
-                      const sourceRole =
-                        seg.sourceRole ??
-                        (sourceMessageId ? (sourceMessagesById.get(sourceMessageId)?.role ?? null) : null);
+                      const sourceMessageRole = sourceMessageId
+                        ? (sourceMessagesById.get(sourceMessageId)?.role ?? null)
+                        : null;
+                      const sourceRole = seg.sourceRole ?? sourceMessageRole;
+                      const isUserAuthoredSource = sourceRole === "user" || sourceMessageRole === "user";
                       const isActiveSeg = active?.id === seg.id;
                       const liveSegmentIndex = segments.findIndex((s) => s.id === seg.id);
                       const canJumpToSeg =
@@ -4449,7 +4513,7 @@ export function GameNarration({
                       const jumpRowClasses = canJumpToSeg
                         ? "cursor-pointer hover:ring-1 hover:ring-white/15 focus:outline-none focus-visible:ring-1 focus-visible:ring-white/30"
                         : "";
-                      const canEditMessage = !!onEditMessage && !!sourceMessageId && sourceRole === "user";
+                      const canEditMessage = !!onEditMessage && !!sourceMessageId && isUserAuthoredSource;
                       const canEditSegment =
                         !!onEditSegment &&
                         !!sourceMessageId &&
@@ -4459,7 +4523,8 @@ export function GameNarration({
                         sourceMessageId !== "party-chat";
                       const canEdit = canEditMessage || canEditSegment;
                       const canDeleteMessage =
-                        !!onDeleteMessage && !!sourceMessageId && (sourceRole === "user" || sourceRole === "system");
+                        !!onDeleteMessage && !!sourceMessageId && (isUserAuthoredSource || sourceRole === "system");
+                      const canBranchMessage = !!onBranchMessage && !!sourceMessageId && isUserAuthoredSource;
                       const canDeleteThisSegment =
                         !!onDeleteSegment &&
                         !!sourceMessageId &&
@@ -4494,6 +4559,23 @@ export function GameNarration({
                           {copiedMessageKey === copyKey ? <Check size={11} /> : <Copy size={11} />}
                         </button>
                       ) : null;
+                      const branchButton = canBranchMessage ? (
+                        <button
+                          type="button"
+                          onPointerDown={stopLogActionPointerDown}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            onBranchMessage?.(sourceMessageId);
+                            setLogsOpen(false);
+                          }}
+                          className="rounded-lg border border-zinc-600/70 bg-zinc-950/85 p-1 text-zinc-100 shadow-sm transition-colors hover:bg-zinc-800 hover:text-white"
+                          title="Ramificar a partir daqui"
+                          aria-label="Ramificar a partir daqui"
+                        >
+                          <GitBranch size={11} />
+                        </button>
+                      ) : null;
                       const deleteButton = showDeleteButton ? (
                         <button
                           type="button"
@@ -4524,7 +4606,8 @@ export function GameNarration({
                               seg.partyType === "side" && "bg-sky-500/15 text-sky-200/70",
                               seg.partyType === "extra" && "bg-sky-500/15 text-sky-200/70",
                               seg.partyType === "thought" && "bg-purple-500/15 text-purple-200/70",
-                              seg.partyType === "whisper" && "bg-rose-500/15 text-rose-200/70",
+                              seg.partyType === "whisper" &&
+                                "bg-[var(--marinara-chat-chrome-highlight-bg)] text-[var(--marinara-chat-chrome-panel-text)]",
                             )}
                           >
                             {PARTY_TYPE_ICONS[seg.partyType] ?? ""} {seg.partyType}
@@ -4659,12 +4742,13 @@ export function GameNarration({
                       );
 
                       const actionButtons =
-                        deleteButton || copyButton || editButtons ? (
+                        deleteButton || branchButton || copyButton || editButtons ? (
                           <div
                             onPointerDown={stopLogActionPointerDown}
                             onClick={(event) => event.stopPropagation()}
                             className="absolute right-1.5 top-1.5 z-10 flex items-center gap-0.5"
                           >
+                            {branchButton}
                             {deleteButton}
                             {copyButton}
                             {editButtons}
@@ -4994,7 +5078,12 @@ function PartyOverlayBox({
     side: { border: "border-white/15", bg: "bg-black/75", icon: "💬", labelColor: "text-white/85" },
     extra: { border: "border-white/15", bg: "bg-black/75", icon: "💬", labelColor: "text-white/85" },
     thought: { border: "border-purple-400/20", bg: "bg-purple-950/70", icon: "💭", labelColor: "text-purple-200/80" },
-    whisper: { border: "border-rose-400/20", bg: "bg-rose-950/70", icon: "🤫", labelColor: "text-rose-200/80" },
+    whisper: {
+      border: "border-[var(--marinara-chat-chrome-button-border)]",
+      bg: "bg-[var(--marinara-chat-chrome-panel-bg)]",
+      icon: "🤫",
+      labelColor: "text-[var(--marinara-chat-chrome-panel-text)]",
+    },
   };
   const style = styleByType[line.type] ?? styleByType.side!;
 
@@ -5085,9 +5174,9 @@ const EXPRESSION_REACTIONS: Record<string, { symbol: string; color: string; effe
   mischievous: { symbol: "😈", color: "text-purple-300", effect: "pop" },
 
   // Affection
-  flirty: { symbol: "💗", color: "text-pink-400", effect: "heart" },
-  tender: { symbol: "💕", color: "text-pink-300", effect: "heart" },
-  loving: { symbol: "💕", color: "text-pink-300", effect: "heart" },
+  flirty: { symbol: "💗", color: "text-[var(--marinara-chat-chrome-panel-text)]", effect: "heart" },
+  tender: { symbol: "💕", color: "text-[var(--marinara-chat-chrome-panel-text)]", effect: "heart" },
+  loving: { symbol: "💕", color: "text-[var(--marinara-chat-chrome-panel-text)]", effect: "heart" },
 
   // Sadness
   sad: { symbol: "💧", color: "text-blue-300", effect: "tear" },
@@ -5690,7 +5779,7 @@ export function formatNarration(content: string, boldDialogue = true): string {
       const modifier = attrs.modifier ? `${attrs.stat || "modifier"} ${formatSignedNumber(attrs.modifier)}` : "";
       const turns = attrs.turns || attrs.duration ? `${attrs.turns || attrs.duration} turns` : "";
       return commandBadge(
-        "bg-rose-500/15 text-rose-200 ring-1 ring-rose-400/20",
+        "bg-[var(--destructive)]/15 text-[var(--destructive)] ring-1 ring-[var(--destructive)]/20",
         "✦ Status",
         [attrs.effect || attrs.name || "Effect", attrs.target ? `on ${attrs.target}` : "", turns, modifier]
           .filter(Boolean)
@@ -5730,7 +5819,7 @@ export function formatNarration(content: string, boldDialogue = true): string {
     .replace(/\[reputation:\s*([^\]]+)\]/gi, (_match, rawAttrs: string) => {
       const attrs = parseCommandAttributes(rawAttrs);
       return commandBadge(
-        "bg-fuchsia-500/15 text-fuchsia-200 ring-1 ring-fuchsia-400/20",
+        "bg-[var(--marinara-chat-chrome-highlight-bg)] text-[var(--marinara-chat-chrome-panel-text)] ring-1 ring-[var(--marinara-chat-chrome-button-border)]",
         "◆ Reputation",
         [attrs.npc, attrs.action].filter(Boolean).join(": "),
       );

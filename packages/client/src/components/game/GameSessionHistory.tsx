@@ -1,11 +1,13 @@
 // ──────────────────────────────────────────────
 // Game: Session History Panel (view past sessions)
 // ──────────────────────────────────────────────
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   BookOpen,
   CheckCircle2,
+  Eye,
+  EyeOff,
   GitBranch,
   History,
   ChevronDown,
@@ -195,7 +197,12 @@ interface GameSessionHistoryProps {
   onRegenerateSession?: (sessionNumber: number) => Promise<void> | void;
   onRegenerateLorebook?: (sessionNumber: number) => Promise<void> | void;
   onUpdatePlotArcs?: (sessionNumber: number) => Promise<void> | void;
+  currentSessionActionLabel?: string;
+  currentSessionActionIcon?: ReactNode;
+  currentSessionActionDisabled?: boolean;
+  onCurrentSessionAction?: () => void;
   onClose: () => void;
+  embedded?: boolean;
 }
 
 export function GameSessionHistory({
@@ -215,7 +222,12 @@ export function GameSessionHistory({
   onRegenerateSession,
   onRegenerateLorebook,
   onUpdatePlotArcs,
+  currentSessionActionLabel,
+  currentSessionActionIcon,
+  currentSessionActionDisabled = false,
+  onCurrentSessionAction,
   onClose,
+  embedded = false,
 }: GameSessionHistoryProps) {
   const [expandedSession, setExpandedSession] = useState<number | null>(null);
   const [editingSession, setEditingSession] = useState<number | null>(null);
@@ -359,44 +371,68 @@ export function GameSessionHistory({
       });
 
   return (
-    <div className="absolute inset-0 z-40 flex flex-col bg-[var(--card)]/95 backdrop-blur-sm">
-      <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-        <div className="flex items-center gap-2">
-          <History size={16} className="text-[var(--muted-foreground)]" />
-          <span className="text-sm font-semibold text-[var(--foreground)]">Histórico de sessões</span>
-          <span className="text-xs text-[var(--muted-foreground)]">
-            ({sorted.length}  sessão passada{sorted.length !== 1 ? "s" : ""})
-          </span>
+    <div
+      className={
+        embedded
+          ? "flex min-h-0 flex-1 flex-col"
+          : "absolute inset-0 z-40 flex flex-col bg-[var(--card)]/95 backdrop-blur-sm"
+      }
+    >
+      {!embedded && (
+        <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
+          <div className="flex items-center gap-2">
+            <History size={16} className="text-[var(--muted-foreground)]" />
+            <span className="text-sm font-semibold text-[var(--foreground)]">Histórico de sessões</span>
+            <span className="text-xs text-[var(--muted-foreground)]">
+              ({sorted.length}  sessão passada{sorted.length !== 1 ? "s" : ""})
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
+          >
+            <X size={16} />
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          className="rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-        >
-          <X size={16} />
-        </button>
-      </div>
+      )}
 
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className={embedded ? "min-h-0 flex-1 overflow-y-auto px-1 py-2" : "flex-1 overflow-y-auto px-4 py-3"}>
         <div className="flex flex-col gap-2">
-          <div className="rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/5">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/45">
             <div className="flex flex-wrap items-center gap-3 px-4 py-3">
               <span className="text-sm font-semibold text-[var(--foreground)]">
                 
                 Sessão {currentSessionNumber} (Current)
               </span>
               <span className="text-xs text-[var(--muted-foreground)]">{currentSessionDateStr}</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setSpoilersVisible((visible) => !visible);
-                  if (!spoilersVisible && currentSecrets) {
-                    setSecretDraft(buildCurrentSecretsDraft(currentSecrets));
-                  }
-                }}
-                className="ml-auto rounded-md bg-amber-500/15 px-2.5 py-1 text-[0.6875rem] font-semibold text-amber-500 ring-1 ring-amber-500/25 transition-colors hover:bg-amber-500/25"
-              >
-                {spoilersVisible ? "Hide Spoilers" : "Show Spoilers"}
-              </button>
+              <div className="ml-auto flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSpoilersVisible((visible) => !visible);
+                    if (!spoilersVisible && currentSecrets) {
+                      setSecretDraft(buildCurrentSecretsDraft(currentSecrets));
+                    }
+                  }}
+                  className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--secondary)] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
+                  title={spoilersVisible ? "Hide Spoilers" : "Show Spoilers"}
+                  aria-label={spoilersVisible ? "Hide Spoilers" : "Show Spoilers"}
+                >
+                  {spoilersVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                </button>
+                {onCurrentSessionAction && currentSessionActionIcon && currentSessionActionLabel && (
+                  <button
+                    type="button"
+                    onClick={onCurrentSessionAction}
+                    disabled={currentSessionActionDisabled}
+                    className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--secondary)] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
+                    title={currentSessionActionLabel}
+                    aria-label={currentSessionActionLabel}
+                  >
+                    {currentSessionActionIcon}
+                  </button>
+                )}
+              </div>
             </div>
 
             {spoilersVisible && (
@@ -417,7 +453,7 @@ export function GameSessionHistory({
                         }
                         rows={5}
                         disabled={savingCurrentSecrets}
-                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                       />
                     </label>
                     <label className="flex flex-col gap-1">
@@ -432,7 +468,7 @@ export function GameSessionHistory({
                         }
                         rows={5}
                         disabled={savingCurrentSecrets}
-                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                       />
                     </label>
                     <label className="flex flex-col gap-1">
@@ -448,7 +484,7 @@ export function GameSessionHistory({
                         rows={5}
                         disabled={savingCurrentSecrets}
                         placeholder="Uma reviravolta por linha"
-                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                       />
                     </label>
                     <label className="flex flex-col gap-1">
@@ -463,7 +499,7 @@ export function GameSessionHistory({
                         }
                         rows={8}
                         disabled={savingCurrentSecrets}
-                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                       />
                     </label>
                     <label className="flex flex-col gap-1">
@@ -478,7 +514,7 @@ export function GameSessionHistory({
                         }
                         rows={10}
                         disabled={savingCurrentSecrets}
-                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                       />
                     </label>
                     <label className="flex flex-col gap-1">
@@ -493,7 +529,7 @@ export function GameSessionHistory({
                         }
                         rows={8}
                         disabled={savingCurrentSecrets}
-                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                       />
                     </label>
                     <label className="flex flex-col gap-1">
@@ -508,7 +544,7 @@ export function GameSessionHistory({
                         }
                         rows={8}
                         disabled={savingCurrentSecrets}
-                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                        className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                       />
                     </label>
                     <div className="flex items-center justify-end gap-2">
@@ -525,7 +561,7 @@ export function GameSessionHistory({
                         type="button"
                         onClick={() => void handleSaveCurrentSecrets()}
                         disabled={savingCurrentSecrets}
-                        className="rounded-md bg-[var(--primary)] px-2.5 py-1.5 text-[0.6875rem] font-medium text-white transition-colors hover:bg-[var(--primary)]/90 disabled:opacity-50"
+                        className="rounded-md bg-[var(--foreground)]/12 px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--foreground)]/18 disabled:opacity-50"
                       >
                         {savingCurrentSecrets ? "Saving..." : "Save Spoilers"}
                       </button>
@@ -698,7 +734,7 @@ export function GameSessionHistory({
                                 }
                                 disabled={isSaving}
                                 rows={8}
-                                className="min-h-32 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                                className="min-h-32 rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -714,7 +750,7 @@ export function GameSessionHistory({
                                 disabled={isSaving}
                                 rows={4}
                                 placeholder="Como a próxima sessão deve continuar"
-                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -729,7 +765,7 @@ export function GameSessionHistory({
                                 }
                                 disabled={isSaving}
                                 rows={4}
-                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -744,7 +780,7 @@ export function GameSessionHistory({
                                 }
                                 disabled={isSaving}
                                 rows={3}
-                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -760,7 +796,7 @@ export function GameSessionHistory({
                                 disabled={isSaving}
                                 rows={4}
                                 placeholder="Um fato de continuidade por linha, incluindo descobertas, reviravoltas e revelações"
-                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -776,7 +812,7 @@ export function GameSessionHistory({
                                 disabled={isSaving}
                                 rows={4}
                                 placeholder="Um momento por linha"
-                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -792,7 +828,7 @@ export function GameSessionHistory({
                                 disabled={isSaving}
                                 rows={4}
                                 placeholder="Uma pequena preferência, hábito, promessa ou detalhe do passado por linha"
-                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -808,7 +844,7 @@ export function GameSessionHistory({
                                 disabled={isSaving}
                                 rows={4}
                                 placeholder="Uma atualização por linha"
-                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                               />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -823,7 +859,7 @@ export function GameSessionHistory({
                                 }
                                 disabled={isSaving}
                                 rows={8}
-                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--primary)]"
+                                className="rounded-lg border border-[var(--border)] bg-[var(--secondary)] px-3 py-2 font-mono text-xs leading-relaxed text-[var(--foreground)] outline-none transition-colors focus:border-[var(--foreground)]/40"
                               />
                             </label>
                             <div className="flex items-center justify-end gap-2">
@@ -838,7 +874,7 @@ export function GameSessionHistory({
                               <button
                                 onClick={() => void handleSaveSession(session)}
                                 disabled={isSaving || !(draft?.summary ?? "").trim()}
-                                className="rounded-md bg-[var(--primary)] px-2.5 py-1.5 text-[0.6875rem] font-medium text-white transition-colors hover:bg-[var(--primary)]/90 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rounded-md bg-[var(--foreground)]/12 px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--foreground)]/18 disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 {isSaving ? "Saving..." : "Save Details"}
                               </button>
@@ -971,11 +1007,6 @@ export function GameSessionHistory({
             })
           )}
         </div>
-      </div>
-
-      <div className="border-t border-[var(--border)] px-4 py-2 text-center text-xs text-[var(--muted-foreground)]">
-        
-        Atualmente em sessão {currentSessionNumber}
       </div>
     </div>
   );

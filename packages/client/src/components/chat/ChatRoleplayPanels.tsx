@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { AlertTriangle, ChevronDown, ChevronRight, Globe, Loader2, PenLine, X } from "lucide-react";
+import { AlertTriangle, BookOpen, ChevronDown, ChevronRight, Loader2, PenLine, X } from "lucide-react";
 import { useUpdateChatMetadata } from "../../hooks/use-chats";
 import { type BudgetSkippedLorebookEntry, useActiveLorebookEntries } from "../../hooks/use-lorebooks";
+import { cn } from "../../lib/utils";
+import { ROLEPLAY_POPOVER_SUBTITLE, ROLEPLAY_POPOVER_TITLE } from "./roleplay-popover-styles";
 
-function WorldInfoEntryRow({
+function ActiveLorebookEntryRow({
   entry,
 }: {
   entry: { name: string; keys: string[]; content: string; constant: boolean; order: number };
@@ -121,7 +123,7 @@ function BudgetSkippedEntriesNotice({ entries }: { entries: BudgetSkippedLoreboo
   );
 }
 
-export function WorldInfoPanel({
+export function ActiveLorebookEntriesPanel({
   chatId,
   isMobile,
   onClose,
@@ -136,10 +138,10 @@ export function WorldInfoPanel({
 
   return (
     <>
-      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]">
-        <Globe size="0.75rem" />
+      <h3 className={cn(ROLEPLAY_POPOVER_TITLE, "mb-2")}>
+        <BookOpen size="0.75rem" />
         
-        Info de mundo ativa
+        Contexto ativo
         {isMobile && (
           <button
             onClick={onClose}
@@ -168,7 +170,7 @@ export function WorldInfoPanel({
           <BudgetSkippedEntriesNotice entries={skippedEntries} />
           <div className="space-y-1.5">
             {entries.map((entry) => (
-              <WorldInfoEntryRow key={entry.id} entry={entry} />
+              <ActiveLorebookEntryRow key={entry.id} entry={entry} />
             ))}
           </div>
         </>
@@ -232,7 +234,7 @@ export function AuthorNotesPanel({
 
   return (
     <>
-      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]">
+      <h3 className={cn(ROLEPLAY_POPOVER_TITLE, "mb-2")}>
         <PenLine size="0.75rem" />
         
         Notas do autor
@@ -245,7 +247,7 @@ export function AuthorNotesPanel({
           </button>
         )}
       </h3>
-      <p className="mb-2 text-[0.625rem] text-[var(--muted-foreground)]">
+      <p className={cn(ROLEPLAY_POPOVER_SUBTITLE, "mb-2")}>
         
         O texto aqui é injetado no prompt na profundidade escolhida a cada geração.
       </p>
@@ -273,7 +275,7 @@ export function AuthorNotesPanel({
         />
       </div>
       <p className="mt-1 text-[0.5625rem] text-[var(--muted-foreground)]/60">
-        Depth 0 = end of conversation, 4 = four messages from the end.
+        Depth 0 = after the latest message, 4 = four messages from the end.
       </p>
     </>
   );

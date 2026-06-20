@@ -28,8 +28,20 @@ export class LocalSidecarProvider extends BaseLLMProvider {
     );
   }
 
-  private applyRuntimeSettings(options: ChatOptions): ChatOptions {
+  private assertToolCallsAvailable(options: ChatOptions): void {
+    if (!options.tools?.length) return;
     const config = sidecarModelService.getConfig();
+    if (sidecarModelService.getResolvedBackend() === "llama_cpp" && !config.enableNativeToolCalls) {
+      throw new Error(
+        "Local sidecar native tool calls are disabled. Open Local AI Model > Runtime Settings and enable Native Tool Calls before using tools with the local sidecar.",
+      );
+    }
+  }
+
+  private applyRuntimeSettings(options: ChatOptions): ChatOptions {
+    if (options.suppressModelParameters) return options;
+    const config = sidecarModelService.getConfig();
+    const structuredOutput = !!options.responseFormat || !!options.tools?.length;
     const requestedMaxTokens =
       typeof options.maxTokens === "number" && Number.isFinite(options.maxTokens)
         ? Math.max(1, Math.floor(options.maxTokens))
@@ -37,13 +49,14 @@ export class LocalSidecarProvider extends BaseLLMProvider {
     return {
       ...options,
       maxTokens: requestedMaxTokens !== undefined ? Math.min(requestedMaxTokens, config.maxTokens) : config.maxTokens,
-      temperature: config.temperature,
-      topP: config.topP,
-      topK: config.topK,
+      temperature: structuredOutput ? 0 : config.temperature,
+      topP: structuredOutput ? 1 : config.topP,
+      topK: structuredOutput ? 0 : config.topK,
     };
   }
 
   async *chat(messages: ChatMessage[], options: ChatOptions): AsyncGenerator<string, LLMUsage | void, unknown> {
+    this.assertToolCallsAvailable(options);
     const delegate = await this.createDelegate();
     return yield* delegate.chat(messages, {
       ...this.applyRuntimeSettings(options),
@@ -52,6 +65,7 @@ export class LocalSidecarProvider extends BaseLLMProvider {
   }
 
   async chatComplete(messages: ChatMessage[], options: ChatOptions): Promise<ChatCompletionResult> {
+    this.assertToolCallsAvailable(options);
     const delegate = await this.createDelegate();
     return delegate.chatComplete(messages, {
       ...this.applyRuntimeSettings(options),
