@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────
 // Chat Setup Wizard — step-by-step new chat configuration
 // ──────────────────────────────────────────────
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -34,6 +34,7 @@ import { api } from "../../lib/api-client";
 import { filterLanguageGenerationConnections } from "../../lib/connection-filters";
 import { getAgentRunIntervalMeta } from "../../lib/agent-cadence";
 import { getCharacterTitle, parseCharacterDisplayData } from "../../lib/character-display";
+import { addSilentGreetingSwipes } from "../../lib/message-swipes";
 import { ChoiceSelectionModal } from "../presets/ChoiceSelectionModal";
 import {
   BUILT_IN_AGENTS,
@@ -127,6 +128,11 @@ const CONVERSATION_STEPS: WizardStep[] = [
     body: "Name the conversation and choose the connection characters should use.",
   },
   {
+    key: "prompt",
+    title: "Prompt Preset",
+    body: "Choose which preset supplies the Conversation mode prompt.",
+  },
+  {
     key: "participants",
     title: "Persona & Characters",
     body: "Choose your persona and the characters in this private DM or group chat.",
@@ -152,6 +158,7 @@ const CONVERSATION_COMMAND_TOGGLE_OPTIONS: Array<{
   { id: "haptic", label: "Haptics", description: "Let characters control connected haptic devices." },
   { id: "influence", label: "Influence", description: "Let characters influence a connected chat." },
   { id: "note", label: "Notes", description: "Let characters save durable notes for a connected chat." },
+  { id: "uno", label: "UNO", description: "Let characters start a game of UNO at the table when you agree to play." },
 ];
 
 // ─── Main component ───────────────────────────
@@ -206,7 +213,7 @@ const WIZARD_PANEL_CLASS = cn(
 
 const WIZARD_FIELD_LABEL = "text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]";
 const WIZARD_INPUT_CLASS =
-  "w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-[var(--border)] transition-shadow placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40";
+  "w-full min-w-0 truncate rounded-lg bg-[var(--secondary)] px-3 py-2 pr-8 text-xs text-[var(--foreground)] outline-none ring-1 ring-[var(--border)] transition-shadow placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40";
 const WIZARD_NUMBER_INPUT_CLASS =
   "w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs text-[var(--foreground)] outline-none ring-1 ring-transparent transition-shadow placeholder:text-[var(--muted-foreground)] focus:ring-[var(--primary)]/40";
 const WIZARD_GHOST_BUTTON_CLASS =
@@ -226,6 +233,12 @@ function readChatMetadata(chat: Chat): Record<string, unknown> {
     }
   }
   return raw ?? {};
+}
+
+function readChatActiveAgentIds(chat: Chat): string[] {
+  const metadata = readChatMetadata(chat);
+  const activeIds = metadata.activeAgentIds;
+  return Array.isArray(activeIds) ? activeIds.filter((id): id is string => typeof id === "string") : [];
 }
 
 function readConversationCommandToggles(value: unknown): Partial<Record<ConversationCommandKey, boolean>> {
@@ -610,26 +623,43 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
   const currentStep = CONVERSATION_STEPS[step]!;
   const isLast = step === CONVERSATION_STEPS.length - 1;
   const { data: connections } = useConnections();
+  const { data: presets } = usePresets();
+  const { data: defaultPreset } = useDefaultPreset();
+  const [selectedPromptPresetId, setSelectedPromptPresetId] = useState<string | null>(chat.promptPresetId ?? null);
+  const { data: presetFull, isLoading: presetFullLoading } = usePresetFull(selectedPromptPresetId);
   const { data: allCharacters } = useCharacters();
   const { data: allPersonas } = usePersonas();
   const updateChat = useUpdateChat();
   const updateMeta = useUpdateChatMetadata();
+  const queryClient = useQueryClient();
   const openRightPanel = useUIStore((s) => s.openRightPanel);
   const [scheduleState, setScheduleState] = useState<"idle" | "generating" | "done">("idle");
   const [autonomousEnabled, setAutonomousEnabled] = useState(true);
   const [generateSchedule, setGenerateSchedule] = useState(false);
+  const [showChoiceModal, setShowChoiceModal] = useState(false);
+  const [promptPresetTouched, setPromptPresetTouched] = useState(false);
+  const defaultPromptPresetAppliedRef = useRef<string | null>(null);
+  const selectedConnectionChatIdRef = useRef(chat.id);
+  const latestChatConnectionIdRef = useRef(chat.connectionId);
+  const [selectedConnectionId, setSelectedConnectionId] = useState(chat.connectionId ?? "");
+
+  useEffect(() => {
+    setSelectedPromptPresetId(chat.promptPresetId ?? null);
+  }, [chat.id, chat.promptPresetId]);
+
+  useEffect(() => {
+    latestChatConnectionIdRef.current = chat.connectionId;
+  }, [chat.connectionId]);
+
+  useEffect(() => {
+    if (selectedConnectionChatIdRef.current === chat.id) return;
+    selectedConnectionChatIdRef.current = chat.id;
+    setSelectedConnectionId(latestChatConnectionIdRef.current ?? "");
+  }, [chat.id]);
 
   // Track whether the user has manually edited the chat name.
   // If not, auto-rename to match the selected character name(s).
   const [userEditedName, setUserEditedName] = useState(false);
-
-  // Apply the saved custom conversation prompt immediately so it persists even if the wizard is skipped
-  useEffect(() => {
-    const savedPrompt = useUIStore.getState().customConversationPrompt;
-    if (savedPrompt) {
-      updateMeta.mutate({ id: chat.id, customSystemPrompt: savedPrompt });
-    }
-  }, [chat.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const characters = useMemo(
     () =>
@@ -658,8 +688,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
     [connections],
   );
   const selectedConnection = useMemo(
-    () => connectionOptions.find((connection) => connection.id === chat.connectionId) ?? null,
-    [connectionOptions, chat.connectionId],
+    () => connectionOptions.find((connection) => connection.id === selectedConnectionId) ?? null,
+    [connectionOptions, selectedConnectionId],
   );
   const parameterDefaults = useMemo(
     () => getEditableGenerationParameters(CHAT_PARAMETER_DEFAULTS, selectedConnection?.defaultParameters),
@@ -742,10 +772,40 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
 
   const setConnection = useCallback(
     (connectionId: string | null) => {
-      updateChat.mutate({ id: chat.id, connectionId });
+      setSelectedConnectionId(connectionId ?? "");
+      updateChat.mutate(
+        { id: chat.id, connectionId },
+        {
+          onSuccess: () => {
+            latestChatConnectionIdRef.current = connectionId;
+          },
+          onError: () => setSelectedConnectionId(latestChatConnectionIdRef.current ?? ""),
+        },
+      );
     },
     [chat.id, updateChat],
   );
+
+  const setPreset = useCallback(
+    (presetId: string | null) => {
+      setPromptPresetTouched(true);
+      setSelectedPromptPresetId(presetId);
+      updateChat.mutate({ id: chat.id, promptPresetId: presetId });
+    },
+    [chat.id, updateChat],
+  );
+
+  useEffect(() => {
+    const defaultId = defaultPreset?.id ?? null;
+    if (promptPresetTouched || chat.promptPresetId || !defaultId) return;
+
+    const applyKey = `${chat.id}:${defaultId}`;
+    if (defaultPromptPresetAppliedRef.current === applyKey) return;
+
+    defaultPromptPresetAppliedRef.current = applyKey;
+    setSelectedPromptPresetId(defaultId);
+    updateChat.mutate({ id: chat.id, promptPresetId: defaultId });
+  }, [chat.id, chat.promptPresetId, defaultPreset?.id, promptPresetTouched, updateChat]);
 
   const setPersona = useCallback(
     (personaId: string | null) => {
@@ -768,13 +828,15 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
     setStep((value) => Math.max(0, value - 1));
   }, []);
   const goNext = useCallback(() => {
+    if (currentStep.key === "prompt" && selectedPromptPresetId && presetFull?.choiceBlocks?.length) {
+      setShowChoiceModal(true);
+      return;
+    }
     setStep((value) => Math.min(CONVERSATION_STEPS.length - 1, value + 1));
-  }, []);
+  }, [currentStep.key, presetFull?.choiceBlocks?.length, selectedPromptPresetId]);
 
   const handleStartChatting = useCallback(async () => {
     if (!hasConnection || !hasCharacters) return;
-    // Apply user's saved custom conversation prompt (if any) to this new chat
-    const savedPrompt = useUIStore.getState().customConversationPrompt;
     await updateMeta.mutateAsync({
       id: chat.id,
       autonomousMessages: autonomousEnabled,
@@ -782,7 +844,6 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
       characterCommands: commandsEnabled,
       conversationCommandToggles,
       chatParameters: customizeParameters ? generationParameters : null,
-      ...(savedPrompt ? { customSystemPrompt: savedPrompt } : {}),
     });
     if (autonomousEnabled && generateSchedule) {
       setScheduleState("generating");
@@ -793,6 +854,8 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
           characterIds: chatCharIds,
           scheduleGenerationPreferences,
         });
+        await queryClient.invalidateQueries({ queryKey: chatKeys.detail(chat.id) });
+        await queryClient.invalidateQueries({ queryKey: ["conversation-status", chat.id] });
       } catch {
         // Schedule generation is non-critical — continue anyway
       }
@@ -814,6 +877,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
     generationParameters,
     commandsEnabled,
     conversationCommandToggles,
+    queryClient,
   ]);
 
   const renderConnectionStep = () => (
@@ -839,7 +903,7 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
       <div className="space-y-1.5">
         <label className={WIZARD_FIELD_LABEL}>Conexão</label>
         <select
-          value={chat.connectionId ?? ""}
+          value={selectedConnectionId}
           onChange={(event) => setConnection(event.target.value || null)}
           className={WIZARD_INPUT_CLASS}
         >
@@ -872,6 +936,27 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
           onChange={setGenerationParameters}
         />
       </div>
+    </div>
+  );
+
+  const renderPromptStep = () => (
+    <div className="space-y-2">
+      <label className={WIZARD_FIELD_LABEL}>Conversation Prompt</label>
+      <select
+        value={selectedPromptPresetId ?? ""}
+        onChange={(event) => setPreset(event.target.value || null)}
+        className={WIZARD_INPUT_CLASS}
+      >
+        <option value="">Nenhum</option>
+        {((presets ?? []) as Array<{ id: string; name: string; isDefault?: boolean | string }>).map((preset) => (
+          <option key={preset.id} value={preset.id}>
+            {preset.name}
+          </option>
+        ))}
+      </select>
+      <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
+        This selects the Conversation mode prompt stored in the preset. Chat Settings can still override it per chat.
+      </p>
     </div>
   );
 
@@ -1139,9 +1224,12 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
   const content =
     currentStep.key === "connection"
       ? renderConnectionStep()
+      : currentStep.key === "prompt"
+        ? renderPromptStep()
       : currentStep.key === "participants"
         ? renderParticipantsStep()
         : renderAutomationStep();
+  const nextDisabled = currentStep.key === "prompt" && !!selectedPromptPresetId && presetFullLoading;
 
   const busyContent =
     scheduleState === "generating" ? (
@@ -1162,23 +1250,34 @@ function ConversationQuickSetup({ chat, onFinish }: ChatSetupWizardProps) {
   return (
     <>
       <WizardBackdrop onClose={onFinish} />
-      <SetupWizardShell
-        title="Nova conversa"
-        steps={CONVERSATION_STEPS}
-        step={step}
-        currentStep={currentStep}
-        animationKey={`conversation-${currentStep.key}`}
-        onClose={onFinish}
-        onBack={step > 0 ? goBack : undefined}
-        onSkip={onFinish}
-        onPrimary={isLast ? handleStartChatting : goNext}
-        primaryLabel={isLast ? "Start Chatting" : "Next"}
-        primaryIcon={isLast ? <MessageCircle size="0.75rem" /> : <ChevronRight size="0.75rem" />}
-        primaryDisabled={isLast && (!hasConnection || !hasCharacters)}
-        busyContent={busyContent}
-      >
-        {content}
-      </SetupWizardShell>
+      <ChoiceSelectionModal
+        open={showChoiceModal}
+        onClose={() => {
+          setShowChoiceModal(false);
+          setStep((value) => Math.min(CONVERSATION_STEPS.length - 1, value + 1));
+        }}
+        presetId={selectedPromptPresetId}
+        chatId={chat.id}
+      />
+      {!showChoiceModal && (
+        <SetupWizardShell
+          title="Nova conversa"
+          steps={CONVERSATION_STEPS}
+          step={step}
+          currentStep={currentStep}
+          animationKey={`conversation-${currentStep.key}`}
+          onClose={onFinish}
+          onBack={step > 0 ? goBack : undefined}
+          onSkip={onFinish}
+          onPrimary={isLast ? handleStartChatting : goNext}
+          primaryLabel={isLast ? "Start Chatting" : "Next"}
+          primaryIcon={isLast ? <MessageCircle size="0.75rem" /> : <ChevronRight size="0.75rem" />}
+          primaryDisabled={nextDisabled || (isLast && (!hasConnection || !hasCharacters))}
+          busyContent={busyContent}
+        >
+          {content}
+        </SetupWizardShell>
+      )}
     </>
   );
 }
@@ -1297,6 +1396,10 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
       ),
     [metadata.activeAgentIds],
   );
+  const readLatestActiveAgentIds = useCallback(() => {
+    const latestChat = queryClient.getQueryData<Chat>(chatKeys.detail(chat.id));
+    return latestChat ? readChatActiveAgentIds(latestChat) : [...activeAgentIds];
+  }, [activeAgentIds, chat.id, queryClient]);
   const agentsEnabled = metadata.enableAgents === true;
   const agentConfigsByType = useMemo(() => {
     const map = new Map<string, AgentConfigRow>();
@@ -1483,14 +1586,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
                   .mutateAsync({ role: "assistant", content: firstMes, characterId: charId })
                   .then(async (msg) => {
                     if (msg?.id && altGreetings.length > 0) {
-                      for (const greeting of altGreetings) {
-                        if (greeting.trim()) {
-                          await api.post(`/chats/${chat.id}/messages/${msg.id}/swipes`, {
-                            content: greeting,
-                            silent: true,
-                          });
-                        }
-                      }
+                      await addSilentGreetingSwipes(chat.id, msg.id, altGreetings);
                       queryClient.invalidateQueries({ queryKey: chatKeys.messages(chat.id) });
                     }
                   })
@@ -1622,13 +1718,14 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
 
   const removeAgentFromChat = useCallback(
     (agentId: string) => {
+      const latestActiveAgentIds = readLatestActiveAgentIds();
       updateMeta.mutate({
         id: chat.id,
-        activeAgentIds: activeAgentIds.filter((id) => id !== agentId),
+        activeAgentIds: latestActiveAgentIds.filter((id) => id !== agentId),
       });
       if (agentAddPreview?.agent.id === agentId) setAgentAddPreview(null);
     },
-    [activeAgentIds, agentAddPreview?.agent.id, chat.id, updateMeta],
+    [agentAddPreview?.agent.id, chat.id, readLatestActiveAgentIds, updateMeta],
   );
 
   const confirmAddAgent = useCallback(async () => {
@@ -1648,7 +1745,8 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
     const nextEnabledTools = nextSettings.enabledTools;
     if (
       builtInMeta &&
-      (!Array.isArray(nextEnabledTools) || (agent.id === "spotify" && nextEnabledTools.length === 0))
+      (!Array.isArray(nextEnabledTools) ||
+        (agent.id === "spotify" && nextSettings.musicProvider === "spotify" && nextEnabledTools.length === 0))
     ) {
       nextSettings.enabledTools = DEFAULT_AGENT_TOOLS[agent.id] ?? [];
     }
@@ -1656,14 +1754,13 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
     setAddingAgentToChat(true);
     try {
       if (config) {
-        await updateAgentConfig.mutateAsync({ id: config.id, enabled: true, settings: nextSettings });
+        await updateAgentConfig.mutateAsync({ id: config.id, settings: nextSettings });
       } else if (builtInMeta) {
         await createAgent.mutateAsync({
           type: builtInMeta.id,
           name: agent.name,
           description: agent.description,
           phase: normalizeAgentPhaseForType(agent.id, agent.phase),
-          enabled: true,
           connectionId: null,
           promptTemplate: "",
           settings: nextSettings,
@@ -1673,11 +1770,12 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
       await updateMeta.mutateAsync({
         id: chat.id,
         enableAgents: true,
-        activeAgentIds: Array.from(new Set([...activeAgentIds, agent.id])),
+        activeAgentIds: Array.from(new Set([...readLatestActiveAgentIds(), agent.id])),
         ...buildAgentAddMetadataPatch(agent.id, setup, metadata, {
           allowSecretPlot: supportsNarrativeDirectorSecretPlot,
         }),
       });
+      toast.success(`Added ${agent.name}! You can access its settings in Agents section in Chat Settings!`);
       setAgentAddPreview(null);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not add this agent to the chat.");
@@ -1685,11 +1783,11 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
       setAddingAgentToChat(false);
     }
   }, [
-    activeAgentIds,
     agentAddPreview,
     chat.id,
     createAgent,
     metadata,
+    readLatestActiveAgentIds,
     supportsNarrativeDirectorSecretPlot,
     updateAgentConfig,
     updateMeta,
@@ -2026,7 +2124,7 @@ function RoleplaySetupWizard({ chat, onFinish }: ChatSetupWizardProps) {
             updateMeta.mutate({
               id: chat.id,
               enableAgents: !agentsEnabled,
-              activeAgentIds: !agentsEnabled ? activeAgentIds : [],
+              activeAgentIds: !agentsEnabled ? readLatestActiveAgentIds() : [],
             })
           }
           className={cn(

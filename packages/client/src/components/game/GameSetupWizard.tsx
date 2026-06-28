@@ -3,6 +3,7 @@
 // ──────────────────────────────────────────────
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Wand2,
   ArrowRight,
@@ -26,7 +27,6 @@ import { DEFAULT_GAME_SYSTEM_PROMPT, type GameSetupConfig, type GameGmMode } fro
 import { getCharacterTitle } from "../../lib/character-display";
 import { api } from "../../lib/api-client";
 import { cn, getAvatarCropStyle, parseAvatarCropJson, type AvatarCropValue } from "../../lib/utils";
-import { Modal } from "../ui/Modal";
 import {
   GenerationParametersFields,
   getEditableGenerationParameters,
@@ -34,11 +34,20 @@ import {
   type EditableGenerationParameters,
 } from "../ui/GenerationParametersEditor";
 import {
+  NEUTRAL_PANEL_HEADER,
+  NEUTRAL_PANEL_SCROLL_AREA,
+  NEUTRAL_PANEL_SHELL,
+  NEUTRAL_PANEL_SUBTITLE,
+  NEUTRAL_PANEL_TITLE,
+} from "../ui/neutral-surface-styles";
+import {
   createDefaultGameHudWidget,
+  GameWidgetFileControls,
   GameWidgetSetupEditor,
   normalizeGameHudWidgets,
 } from "./GameWidgetSetupEditor";
 import { useConnections } from "../../hooks/use-connections";
+import { useDefaultPreset, usePresets } from "../../hooks/use-presets";
 import { usePersonas } from "../../hooks/use-characters";
 import { useSidecarStore } from "../../stores/sidecar.store";
 import { useLorebooks } from "../../hooks/use-lorebooks";
@@ -137,6 +146,48 @@ const GAME_SETUP_GHOST_BUTTON_CLASS =
   "flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]";
 const GAME_SETUP_PRIMARY_BUTTON_CLASS =
   "flex items-center gap-1 rounded-lg bg-[var(--primary)] px-4 py-1.5 text-xs font-medium text-[var(--primary-foreground)] transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50";
+const GAME_SETUP_WIZARD_PANEL_CLASS = cn(
+  NEUTRAL_PANEL_SHELL,
+  "pointer-events-auto flex max-h-[calc(100dvh-1.5rem)] w-full max-w-lg flex-col overflow-hidden sm:max-h-[min(90dvh,44rem)]",
+);
+
+const GAME_SETUP_STEPS = [
+  {
+    key: "connection",
+    title: "Connection",
+    body: "Name the game and choose which AI connection should run the Game Master.",
+  },
+  {
+    key: "world",
+    title: "World",
+    body: "Pick genre, tone, difficulty, rating, and the starting language.",
+  },
+  {
+    key: "party",
+    title: "Party",
+    body: "Choose your player persona, Game Master style, and party members.",
+  },
+  {
+    key: "goals",
+    title: "Goals",
+    body: "Tell the GM what you want from the adventure and which mood to prioritize.",
+  },
+  {
+    key: "lorebooks",
+    title: "Lorebooks",
+    body: "Attach optional lorebooks to seed the world with durable context.",
+  },
+  {
+    key: "features",
+    title: "Features",
+    body: "Choose optional visual, music, lore, and HUD features for the session.",
+  },
+  {
+    key: "gm",
+    title: "GM",
+    body: "Review advanced GM instructions before starting the world.",
+  },
+] as const;
 
 type GameSpotifySourceType = "liked" | "playlist" | "artist" | "any";
 
@@ -324,6 +375,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
     normalizeGameHudWidgets([createDefaultGameHudWidget("progress_bar", [])]),
   );
   const [gameSpecialInstructions, setGameSpecialInstructions] = useState("");
+  const [promptPresetId, setPromptPresetId] = useState<string | null>(null);
+  const [promptPresetTouched, setPromptPresetTouched] = useState(false);
   const [customGamePromptEnabled, setCustomGamePromptEnabled] = useState(false);
   const [gameSystemPromptDraft, setGameSystemPromptDraft] = useState(DEFAULT_GAME_SYSTEM_PROMPT);
   const [language, setLanguage] = useState("English");
@@ -359,6 +412,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
   const sceneModelValue = useLocalScene && sidecarAvailable ? "local" : sceneConnectionId;
 
   const { data: connectionsList } = useConnections();
+  const { data: promptPresetsList } = usePresets();
+  const { data: defaultPreset } = useDefaultPreset();
   const { data: personasList } = usePersonas();
   const { data: lorebooksList } = useLorebooks();
   const spotifyPlaylistsQuery = useQuery({
@@ -398,6 +453,14 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
     [selectedGmConnection?.defaultParameters],
   );
   const imageConnections = useMemo(() => connections.filter((c) => c.provider === "image_generation"), [connections]);
+  const promptPresets = useMemo(
+    () => (promptPresetsList as Array<{ id: string; name: string; isDefault?: boolean | string }>) ?? [],
+    [promptPresetsList],
+  );
+  const selectedPromptPresetName = useMemo(
+    () => promptPresets.find((preset) => preset.id === promptPresetId)?.name ?? null,
+    [promptPresetId, promptPresets],
+  );
   const personas = useMemo(
     () =>
       (personasList as Array<{
@@ -437,8 +500,8 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
     [personas, personaSearch],
   );
 
-  const steps = ["Connection", "World", "Party", "Goals", "Lorebooks", "Features", "GM"];
-  const currentStepName = steps[step] ?? steps[0]!;
+  const steps = GAME_SETUP_STEPS;
+  const currentStep = steps[step] ?? steps[0]!;
   const learnedGenres = useMemo(
     () => filterLearnedOptions(learnedGameSetupOptions?.genres, [...GENRES, ...genres]),
     [genres, learnedGameSetupOptions?.genres],
@@ -525,6 +588,17 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
     setGenerationParameters(gmParameterDefaults);
   }, [gmParameterDefaults]);
 
+  useEffect(() => {
+    if (!promptPresetTouched && !promptPresetId && defaultPreset?.id) {
+      setPromptPresetId(defaultPreset.id);
+    }
+  }, [defaultPreset?.id, promptPresetId, promptPresetTouched]);
+
+  const handlePromptPresetChange = useCallback((presetId: string | null) => {
+    setPromptPresetTouched(true);
+    setPromptPresetId(presetId);
+  }, []);
+
   const canStart = !!gmConnectionId;
   const normalizedLanguage = normalizeGameLanguage(language);
 
@@ -592,6 +666,7 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
         enableLorebookKeeper: enableLorebookKeeper || undefined,
         language: normalizedLanguage || undefined,
         generationParameters: customizeParameters ? generationParameters : undefined,
+        promptPresetId,
         gameSystemPrompt: customGameSystemPrompt,
         gameSpecialInstructions: trimmedGameSpecialInstructions || null,
       },
@@ -604,13 +679,39 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
   };
 
   return (
-    <Modal open={true} onClose={onCancel} title="New Game" width="max-w-lg">
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold text-[var(--foreground)]">{currentStepName}</h3>
-      </div>
+    <>
+      <div className="fixed inset-0 z-[10000] bg-black/45 backdrop-blur-[2px]" onClick={onCancel} />
+      <div className="fixed inset-0 z-[10001] flex items-center justify-center p-3 pointer-events-none max-md:pt-[max(0.75rem,env(safe-area-inset-top))] max-md:pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStep.key}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="game-setup-wizard-title"
+            initial={{ opacity: 0, y: 12, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -12, scale: 0.97 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className={GAME_SETUP_WIZARD_PANEL_CLASS}
+          >
+            <div className={cn(NEUTRAL_PANEL_HEADER, "flex shrink-0 items-center justify-between")}>
+              <h3 id="game-setup-wizard-title" className={NEUTRAL_PANEL_TITLE}>
+                New Game
+              </h3>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
+                aria-label="Close setup"
+              >
+                <X size="0.875rem" />
+              </button>
+            </div>
 
-      {/* Step content */}
-      <div className="mb-5 space-y-4">
+            <div className={cn(NEUTRAL_PANEL_SCROLL_AREA, "min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4")}>
+              <h4 className="text-sm font-semibold text-[var(--foreground)]">{currentStep.title}</h4>
+              <p className={cn(NEUTRAL_PANEL_SUBTITLE, "mb-4")}>{currentStep.body}</p>
+              <div className="space-y-4">
         {step === 0 && (
           <>
             <div>
@@ -1532,6 +1633,17 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
               </button>
               {enableCustomWidgets && (
                 <div className="mt-3 space-y-3 border-t border-[var(--border)] pt-3">
+                  <GameWidgetFileControls
+                    widgets={customHudWidgets}
+                    onImport={(widgets) => {
+                      setCustomHudWidgets(normalizeGameHudWidgets(widgets));
+                      setManualWidgetSetupEnabled(true);
+                    }}
+                    exportFilename="game-setup-widgets"
+                    importSuccessMessage={(count) =>
+                      `Imported ${count === 1 ? "1 widget" : `${count} widgets`} for this game setup.`
+                    }
+                  />
                   <button
                     type="button"
                     onClick={() => setManualWidgetSetupEnabled((enabled) => !enabled)}
@@ -1757,6 +1869,28 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             <div>
               <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-[var(--foreground)]">
                 <Feather size={12} />
+                Game Prompt Preset
+              </label>
+              <select
+                value={promptPresetId ?? ""}
+                onChange={(event) => handlePromptPresetChange(event.target.value || null)}
+                className={GAME_SETUP_INPUT_CLASS}
+              >
+                <option value="">Nenhum</option>
+                {promptPresets.map((preset) => (
+                  <option key={preset.id} value={preset.id}>
+                    {preset.name}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-[0.575rem] leading-relaxed text-[var(--muted-foreground)]">
+                Uses the Game mode prompt from the selected preset unless the custom GM prompt below is enabled.
+              </p>
+            </div>
+
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-[var(--foreground)]">
+                <Feather size={12} />
                 Extra Instructions
               </label>
               <textarea
@@ -1786,13 +1920,17 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
                   <div className="min-w-0">
                     <p className="text-xs font-medium text-[var(--foreground)]">GM Prompt</p>
                     <p className="text-[0.55rem] text-[var(--muted-foreground)]">
-                      {customGamePromptEnabled ? "Custom prompt will replace the default" : "Using default game prompt"}
+                      {customGamePromptEnabled
+                        ? "Custom prompt will override the selected preset"
+                        : selectedPromptPresetName
+                          ? `Using ${selectedPromptPresetName}`
+                          : "Using default game prompt"}
                     </p>
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="rounded-full bg-[var(--background)] px-2 py-0.5 text-[0.5625rem] font-medium text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                    {customGamePromptEnabled ? "Custom" : "Default"}
+                    {customGamePromptEnabled ? "Custom" : selectedPromptPresetName ? "Preset" : "Default"}
                   </span>
                   <div
                     className={cn(
@@ -1838,80 +1976,83 @@ export function GameSetupWizard({ onComplete, onCancel, isLoading, characters }:
             </div>
           </>
         )}
-      </div>
+              </div>
+            </div>
 
-      {/* Footer */}
-      <div className="sticky bottom-0 -mx-5 -mb-4 border-t border-[var(--border)]/30 bg-[var(--card)] px-5 pb-4 pt-3 shadow-[0_-12px_18px_rgba(0,0,0,0.18)]">
-        <div className="mb-3 flex items-center justify-center gap-1.5">
-          {steps.map((s, i) => (
-            <button
-              key={s}
-              type="button"
-              aria-label={`Go to ${s}`}
-              aria-current={i === step ? "step" : undefined}
-              disabled={i >= step}
-              onClick={() => {
-                if (i < step) setStep(i);
-              }}
-              className={cn(
-                "h-1.5 rounded-full transition-all duration-300 disabled:cursor-default",
-                i === step
-                  ? "w-5 bg-[var(--primary)]"
-                  : i < step
-                    ? "w-3 bg-[var(--primary)]/45 hover:bg-[var(--primary)]/70"
-                    : "w-1.5 bg-[var(--muted-foreground)]/25",
+            <div className="shrink-0 border-t border-[var(--border)]/70 px-5 py-3">
+              <div className="mb-3 flex items-center justify-center gap-1.5">
+                {steps.map((item, i) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    aria-label={`Go to ${item.title}`}
+                    aria-current={i === step ? "step" : undefined}
+                    disabled={i >= step}
+                    onClick={() => {
+                      if (i < step) setStep(i);
+                    }}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all duration-300 disabled:cursor-default",
+                      i === step
+                        ? "w-5 bg-[var(--primary)]"
+                        : i < step
+                          ? "w-3 bg-[var(--primary)]/45 hover:bg-[var(--primary)]/70"
+                          : "w-1.5 bg-[var(--muted-foreground)]/25",
+                    )}
+                  />
+                ))}
+              </div>
+
+              {step === steps.length - 1 && !canStart && (
+                <p className="mb-3 text-center text-[0.6875rem] text-[var(--destructive)]">
+                  Select a connection on the first step before starting.
+                </p>
               )}
-            />
-          ))}
-        </div>
 
-        {step === steps.length - 1 && !canStart && (
-          <p className="mb-3 text-center text-[0.6875rem] text-[var(--destructive)]">
-            Select a connection on the first step before starting.
-          </p>
-        )}
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={step === 0 ? onCancel : () => setStep(step - 1)}
+                  className={GAME_SETUP_GHOST_BUTTON_CLASS}
+                >
+                  <ArrowLeft size={14} />
+                  {step === 0 ? "Cancel" : "Back"}
+                </button>
 
-        <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={step === 0 ? onCancel : () => setStep(step - 1)}
-            className={GAME_SETUP_GHOST_BUTTON_CLASS}
-          >
-            <ArrowLeft size={14} />
-            {step === 0 ? "Cancel" : "Back"}
-          </button>
-
-          {step < steps.length - 1 ? (
-            <button type="button" onClick={() => setStep(step + 1)} className={GAME_SETUP_PRIMARY_BUTTON_CLASS}>
-              
-              Próximo
-              <ArrowRight size={14} />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleComplete}
-              disabled={isLoading || !canStart}
-              className={GAME_SETUP_PRIMARY_BUTTON_CLASS}
-              title={!canStart ? "Select a connection on the first step" : undefined}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 size={14} className="animate-spin" />
-                  
-                  Gerando mundo…
-                </>
-              ) : (
-                <>
-                  <Wand2 size={14} />
-                  
-                  Iniciar game
-                </>
-              )}
-            </button>
-          )}
-        </div>
+                {step < steps.length - 1 ? (
+                  <button type="button" onClick={() => setStep(step + 1)} className={GAME_SETUP_PRIMARY_BUTTON_CLASS}>
+                    
+                    Próximo
+                    <ArrowRight size={14} />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleComplete}
+                    disabled={isLoading || !canStart}
+                    className={GAME_SETUP_PRIMARY_BUTTON_CLASS}
+                    title={!canStart ? "Select a connection on the first step" : undefined}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        
+                        Gerando mundo…
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 size={14} />
+                        
+                        Iniciar game
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
-    </Modal>
+    </>
   );
 }

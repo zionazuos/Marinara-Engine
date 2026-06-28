@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────
 // App: Root component with layout
 // ──────────────────────────────────────────────
-import { lazy, Suspense, useEffect } from "react";
+import { Component, lazy, Suspense, useEffect, useMemo, type ErrorInfo, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { APP_VERSION } from "@marinara-engine/shared";
 import { AppShell } from "./components/layout/AppShell";
@@ -10,7 +10,7 @@ import { ModelDownloadModal } from "./components/modals/ModelDownloadModal";
 import { AppDialogRenderer } from "./components/ui/AppDialogRenderer";
 import { ChibiProfessorMariEasterEgg } from "./components/ui/ChibiProfessorMariEasterEgg";
 import { CsrfOriginWarningBanner } from "./components/diagnostics/CsrfOriginWarningBanner";
-import { Toaster } from "sonner";
+import { Toaster, toast } from "sonner";
 import {
   getDefaultAppAccentColor,
   getDefaultAppBackgroundColor,
@@ -20,8 +20,14 @@ import {
 import { useSidecarStore } from "./stores/sidecar.store";
 import { api } from "./lib/api-client";
 import { forceRefreshSpa } from "./lib/browser-runtime";
-import { getCssColorFallback, getCssGradientColorStops, isCssGradient } from "./lib/css-colors";
-import { useLegacyThemeMigration } from "./hooks/use-themes";
+import {
+  getCssColorFallback,
+  getCssGradientColorStops,
+  isCssGradient,
+  RAINBOW_GRADIENT_PRESET,
+} from "./lib/css-colors";
+import { normalizeThemeCss } from "./lib/theme-css";
+import { useLegacyThemeMigration, useThemes } from "./hooks/use-themes";
 import { useLegacyExtensionMigration } from "./hooks/use-extensions";
 import { useSettingsSync } from "./hooks/use-settings-sync";
 
@@ -59,9 +65,86 @@ const APP_ACCENT_CUSTOM_VARIABLES = [
   "--marinara-chat-chrome-accent",
   "--marinara-chat-chrome-accent-gradient",
 ] as const;
-const ACCENT_RGB_TICK_MS = 120;
-const ACCENT_RGB_SOLID_CYCLE_MS = 5_200;
-const ACCENT_RGB_GRADIENT_STOP_MS = 4_500;
+const ACCENT_RGB_TICK_MS = 500;
+const ACCENT_RGB_SOLID_CYCLE_MS = 7_200;
+const ACCENT_RGB_GRADIENT_STOP_MS = 6_000;
+const TOAST_DURATION_MS = 6_000;
+const TOAST_VISIBLE_LIMIT = 3;
+const THEME_ACCENT_PULSE_VARIABLE = "--marinara-theme-accent-pulse";
+const THEME_ACCENT_PULSE_SOURCE_VARIABLE = "--marinara-theme-accent-pulse-source";
+const THEME_ACCENT_PULSE_ENABLED_VALUES = new Set(["1", "true", "yes", "on", "enabled", "enable", "pulse"]);
+const ACCENT_SOURCE_SELF_REFERENCE_RE =
+  /var\(\s*--(?:primary|ring|accent|sidebar-accent|sidebar-accent-foreground|marinara-app-accent-solid|marinara-app-accent-gradient|marinara-chat-chrome-accent|marinara-chat-chrome-accent-gradient)\b/i;
+
+function formatRecoveryError(error: unknown) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  try {
+    return JSON.stringify(error) ?? "Unknown render error";
+  } catch {
+    return String(error);
+  }
+}
+
+export class AppRecoveryBoundary extends Component<{ children: ReactNode }, { error: unknown; hasError: boolean }> {
+  state: { error: unknown; hasError: boolean } = { error: null, hasError: false };
+
+  static getDerivedStateFromError(error: unknown) {
+    return { error, hasError: true };
+  }
+
+  componentDidCatch(error: unknown, info: ErrorInfo) {
+    console.error("[AppRecoveryBoundary] Unhandled render error", error, info.componentStack);
+  }
+
+  private resetLocalUiState = () => {
+    try {
+      window.localStorage.removeItem("marinara-engine-ui");
+      window.localStorage.removeItem("marinara-active-chat-id");
+      window.localStorage.removeItem("marinara-input-drafts");
+      window.sessionStorage.removeItem("marinara-input-drafts");
+    } catch {
+      /* ignore storage reset errors */
+    }
+    window.location.reload();
+  };
+
+  render() {
+    if (!this.state.hasError) return this.props.children;
+    const errorMessage = formatRecoveryError(this.state.error);
+
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[var(--background,#050312)] px-4 text-[var(--foreground,#f8fafc)]">
+        <div className="w-full max-w-lg rounded-xl border border-[var(--border,rgba(255,255,255,0.16))] bg-[var(--card,rgba(15,23,42,0.88))] p-5 shadow-2xl">
+          <h1 className="text-lg font-semibold">Marinara hit a recoverable UI error.</h1>
+          <p className="mt-2 text-sm text-[var(--muted-foreground,#cbd5e1)]">
+            The app shell crashed while rendering. Reload first; reset local UI state only if the same screen keeps
+            returning after restart.
+          </p>
+          <pre className="mt-3 max-h-32 overflow-auto rounded-lg bg-black/30 p-2 text-xs text-[var(--muted-foreground,#cbd5e1)]">
+            {errorMessage}
+          </pre>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="rounded-lg bg-[var(--primary,#d4acfb)] px-3 py-2 text-sm font-semibold text-[var(--primary-foreground,#120718)]"
+            >
+              Reload
+            </button>
+            <button
+              type="button"
+              onClick={this.resetLocalUiState}
+              className="rounded-lg border border-[var(--border,rgba(255,255,255,0.16))] px-3 py-2 text-sm font-semibold"
+            >
+              Reset local UI state
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
 
 function stripFontFamilyQuotes(family: string): string {
   const trimmed = family.trim();
@@ -105,6 +188,44 @@ function getAccentSurface(accent: string, theme: "dark" | "light") {
 
 function getAccentGlow(accent: string, theme: "dark" | "light") {
   return `color-mix(in srgb, ${accent} ${theme === "light" ? "12%" : "18%"}, transparent)`;
+}
+
+function stripCssComments(css: string) {
+  return css.replace(/\/\*[\s\S]*?\*\//g, "");
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function readCssCustomProperty(css: string, name: string) {
+  const match = css.match(new RegExp(`${escapeRegExp(name)}\\s*:\\s*([^;{}\\n\\r]+)`, "i"));
+  return match?.[1]?.trim() ?? "";
+}
+
+function isEnabledCssValue(value: string) {
+  return THEME_ACCENT_PULSE_ENABLED_VALUES.has(value.trim().toLowerCase());
+}
+
+function getFirstThemeAccentSource(css: string) {
+  const sourceCandidates = [
+    readCssCustomProperty(css, THEME_ACCENT_PULSE_SOURCE_VARIABLE),
+    readCssCustomProperty(css, "--marinara-app-accent-gradient"),
+    readCssCustomProperty(css, "--marinara-app-accent-solid"),
+    readCssCustomProperty(css, "--primary"),
+  ];
+
+  return sourceCandidates.find((value) => value && !ACCENT_SOURCE_SELF_REFERENCE_RE.test(value)) ?? "";
+}
+
+function getThemeAccentPulseConfig(css: string | null | undefined) {
+  const normalizedCss = stripCssComments(normalizeThemeCss(css ?? ""));
+  const enabled = isEnabledCssValue(readCssCustomProperty(normalizedCss, THEME_ACCENT_PULSE_VARIABLE));
+
+  return {
+    enabled,
+    source: enabled ? getFirstThemeAccentSource(normalizedCss) : "",
+  };
 }
 
 function applyAppAccentVariables({
@@ -158,12 +279,8 @@ function clearCustomAppAccentVariables(root: HTMLElement) {
   APP_ACCENT_CUSTOM_VARIABLES.forEach((variable) => root.style.removeProperty(variable));
 }
 
-function canRunAccentAnimation() {
-  return (
-    document.visibilityState === "visible" &&
-    document.hasFocus() &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+function canRunAccentAnimation(reducedMotionQuery: MediaQueryList, forcePaused = false) {
+  return document.visibilityState === "visible" && document.hasFocus() && !reducedMotionQuery.matches && !forcePaused;
 }
 
 async function recoverFromVersionSkew(serverVersion: string) {
@@ -187,9 +304,20 @@ export function App() {
   const fontFamily = useUIStore((s) => s.fontFamily);
   const appBackgroundColor = useUIStore((s) => s.appBackgroundColor);
   const appAccentColor = useUIStore((s) => s.appAccentColor);
+  const appAccentPulseMode = useUIStore((s) => s.appAccentPulseMode);
   const appAccentRgbMode = useUIStore((s) => s.appAccentRgbMode);
   const chatChromeTextColor = useUIStore((s) => s.chatChromeTextColor);
   const hasModalOpen = useUIStore((s) => s.modal !== null);
+  const rightPanelOpen = useUIStore((s) => s.rightPanelOpen);
+  const rightPanel = useUIStore((s) => s.rightPanel);
+  const settingsTab = useUIStore((s) => s.settingsTab);
+  const appearanceSettingsActive = rightPanelOpen && rightPanel === "settings" && settingsTab === "appearance";
+  const { data: syncedThemes = [] } = useThemes();
+  const activeCustomTheme = useMemo(() => syncedThemes.find((themeItem) => themeItem.isActive) ?? null, [syncedThemes]);
+  const themeAccentPulseConfig = useMemo(
+    () => getThemeAccentPulseConfig(activeCustomTheme?.css),
+    [activeCustomTheme?.css],
+  );
   useLegacyThemeMigration();
   useLegacyExtensionMigration();
   useSettingsSync();
@@ -264,14 +392,48 @@ export function App() {
 
   useEffect(() => {
     const root = document.documentElement;
+    const syncEffectsPausedState = () => {
+      if (document.visibilityState === "visible" && document.hasFocus() && !appearanceSettingsActive) {
+        delete root.dataset.marinaraEffectsPaused;
+      } else {
+        root.dataset.marinaraEffectsPaused = "true";
+      }
+    };
+
+    syncEffectsPausedState();
+    document.addEventListener("visibilitychange", syncEffectsPausedState);
+    window.addEventListener("focus", syncEffectsPausedState);
+    window.addEventListener("blur", syncEffectsPausedState);
+    window.addEventListener("pageshow", syncEffectsPausedState);
+    window.addEventListener("pagehide", syncEffectsPausedState);
+
+    return () => {
+      document.removeEventListener("visibilitychange", syncEffectsPausedState);
+      window.removeEventListener("focus", syncEffectsPausedState);
+      window.removeEventListener("blur", syncEffectsPausedState);
+      window.removeEventListener("pageshow", syncEffectsPausedState);
+      window.removeEventListener("pagehide", syncEffectsPausedState);
+      delete root.dataset.marinaraEffectsPaused;
+    };
+  }, [appearanceSettingsActive]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const accent = appAccentColor.trim();
     const defaultAccent = getDefaultAppAccentColor(theme);
-    const accentSource = accent || defaultAccent;
+    const accentSource = themeAccentPulseConfig.source || accent || defaultAccent;
     const solidAccent = getCssColorFallback(accentSource, defaultAccent);
     const accentIsGradient = isCssGradient(accentSource);
-    const gradientStops = accentIsGradient ? getCssGradientColorStops(accentSource, solidAccent) : [solidAccent];
+    const animatedAccentSource = appAccentRgbMode ? RAINBOW_GRADIENT_PRESET : accentSource;
+    const animatedSolidAccent = getCssColorFallback(animatedAccentSource, solidAccent);
+    const animatedAccentIsGradient = isCssGradient(animatedAccentSource);
+    const animatedGradientStops = animatedAccentIsGradient
+      ? getCssGradientColorStops(animatedAccentSource, animatedSolidAccent)
+      : [animatedSolidAccent];
+    const accentAnimationEnabled = appAccentRgbMode || appAccentPulseMode || themeAccentPulseConfig.enabled;
 
-    let accentAnimationTimer: ReturnType<typeof window.setInterval> | null = null;
+    let accentAnimationTimer: ReturnType<typeof window.setTimeout> | null = null;
 
     const setAccentModeDataset = () => {
       if (accentIsGradient) {
@@ -300,7 +462,9 @@ export function App() {
 
     const applyLiveAccent = () => {
       const liveAccent =
-        accentIsGradient && gradientStops.length > 1 ? getGradientRgbAccent(gradientStops) : getSolidRgbAccent(solidAccent);
+        animatedAccentIsGradient && animatedGradientStops.length > 1
+          ? getGradientRgbAccent(animatedGradientStops)
+          : getSolidRgbAccent(animatedSolidAccent);
 
       applyAppAccentVariables({
         root,
@@ -314,35 +478,52 @@ export function App() {
 
     const stopAccentAnimation = () => {
       if (accentAnimationTimer !== null) {
-        window.clearInterval(accentAnimationTimer);
+        window.clearTimeout(accentAnimationTimer);
         accentAnimationTimer = null;
       }
       delete root.dataset.marinaraAccentAnimation;
       applyStaticAccent();
     };
 
+    const queueAccentAnimationTick = () => {
+      if (accentAnimationTimer !== null) return;
+
+      accentAnimationTimer = window.setTimeout(() => {
+        accentAnimationTimer = null;
+        if (!accentAnimationEnabled || !canRunAccentAnimation(reducedMotionQuery, appearanceSettingsActive)) {
+          stopAccentAnimation();
+          return;
+        }
+
+        applyLiveAccent();
+        queueAccentAnimationTick();
+      }, ACCENT_RGB_TICK_MS);
+    };
+
     const startAccentAnimation = () => {
-      root.dataset.marinaraAccentAnimation = accentIsGradient && gradientStops.length > 1 ? "gradient" : "solid";
+      root.dataset.marinaraAccentAnimation =
+        animatedAccentIsGradient && animatedGradientStops.length > 1 ? "gradient" : "solid";
       applyLiveAccent();
-      if (accentAnimationTimer === null) {
-        accentAnimationTimer = window.setInterval(applyLiveAccent, ACCENT_RGB_TICK_MS);
-      }
+      queueAccentAnimationTick();
     };
 
     const syncAccentAnimationState = () => {
-      if (appAccentRgbMode && canRunAccentAnimation()) {
+      if (accentAnimationEnabled && canRunAccentAnimation(reducedMotionQuery, appearanceSettingsActive)) {
         startAccentAnimation();
       } else {
         stopAccentAnimation();
       }
     };
 
-    if (!appAccentRgbMode) {
+    const handleVisibilityChange = () => {
+      syncAccentAnimationState();
+    };
+
+    if (!accentAnimationEnabled) {
       applyStaticAccent();
     }
     syncAccentAnimationState();
-    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    document.addEventListener("visibilitychange", syncAccentAnimationState);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("focus", syncAccentAnimationState);
     window.addEventListener("blur", syncAccentAnimationState);
     window.addEventListener("pageshow", syncAccentAnimationState);
@@ -350,18 +531,26 @@ export function App() {
     reducedMotionQuery.addEventListener("change", syncAccentAnimationState);
 
     return () => {
-      document.removeEventListener("visibilitychange", syncAccentAnimationState);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("focus", syncAccentAnimationState);
       window.removeEventListener("blur", syncAccentAnimationState);
       window.removeEventListener("pageshow", syncAccentAnimationState);
       window.removeEventListener("pagehide", syncAccentAnimationState);
       reducedMotionQuery.removeEventListener("change", syncAccentAnimationState);
       if (accentAnimationTimer !== null) {
-        window.clearInterval(accentAnimationTimer);
+        window.clearTimeout(accentAnimationTimer);
       }
       delete root.dataset.marinaraAccentAnimation;
     };
-  }, [appAccentColor, appAccentRgbMode, theme]);
+  }, [
+    appAccentColor,
+    appAccentPulseMode,
+    appAccentRgbMode,
+    appearanceSettingsActive,
+    theme,
+    themeAccentPulseConfig.enabled,
+    themeAccentPulseConfig.source,
+  ]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -516,21 +705,32 @@ export function App() {
       )}
       <AppDialogRenderer />
       <CsrfOriginWarningBanner />
-      <Toaster
-        position="top-center"
-        offset="4rem"
-        theme={theme}
-        closeButton
-        toastOptions={{
-          style: {
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            color: "var(--foreground)",
-            userSelect: "text",
-            WebkitUserSelect: "text",
-          },
+      <div
+        onClickCapture={(event) => {
+          if (!(event.target instanceof Element)) return;
+          if (event.target.closest("[data-close-button],button[aria-label^='Close'],button[aria-label^='Dismiss']")) {
+            toast.dismiss();
+          }
         }}
-      />
+      >
+        <Toaster
+          position="top-center"
+          offset="4rem"
+          theme={theme}
+          closeButton
+          duration={TOAST_DURATION_MS}
+          visibleToasts={TOAST_VISIBLE_LIMIT}
+          toastOptions={{
+            style: {
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              color: "var(--foreground)",
+              userSelect: "text",
+              WebkitUserSelect: "text",
+            },
+          }}
+        />
+      </div>
     </>
   );
 }

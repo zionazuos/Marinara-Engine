@@ -50,6 +50,7 @@ export type AgentResultType =
   | "custom_tracker_update"
   | "spotify_control"
   | "youtube_control"
+  | "local_music_control"
   | "haptic_command"
   | "cyoa_choices"
   | "secret_plot"
@@ -486,6 +487,7 @@ const CUSTOM_AGENT_RESULT_CAPABILITY: Partial<Record<AgentResultType, CustomAgen
   character_tracker_update: "edit_trackers",
   persona_stats_update: "edit_trackers",
   custom_tracker_update: "edit_trackers",
+  quest_update: "edit_trackers",
   game_state_update: "edit_trackers",
   image_prompt: "trigger_image_generation",
   prompt_patch: "edit_main_prompt",
@@ -577,13 +579,21 @@ export function mergeBuiltInAgentSettings(agentType: string, settings: unknown):
   const defaultPromptTemplates = normalizeAgentPromptTemplateOptions(defaults.promptTemplates);
   const savedPromptTemplates = normalizeAgentPromptTemplateOptions(parsed.promptTemplates);
   const obsoleteIds = OBSOLETE_BUILT_IN_PROMPT_TEMPLATE_IDS[agentType] ?? new Set<string>();
-  const usedIds = new Set(defaultPromptTemplates.map((entry) => entry.id));
+  const savedPromptTemplatesById = new Map(
+    savedPromptTemplates.filter((entry) => !obsoleteIds.has(entry.id)).map((entry) => [entry.id, entry]),
+  );
+  const usedIds = new Set<string>();
+  const mergedDefaultPromptTemplates = defaultPromptTemplates.map((defaultOption) => {
+    usedIds.add(defaultOption.id);
+    const savedOption = savedPromptTemplatesById.get(defaultOption.id);
+    return savedOption ? { ...defaultOption, ...savedOption } : defaultOption;
+  });
   const customPromptTemplates = savedPromptTemplates.filter((entry) => {
     if (obsoleteIds.has(entry.id) || usedIds.has(entry.id)) return false;
     usedIds.add(entry.id);
     return true;
   });
-  const promptTemplates = [...defaultPromptTemplates, ...customPromptTemplates];
+  const promptTemplates = [...mergedDefaultPromptTemplates, ...customPromptTemplates];
 
   if (promptTemplates.length) {
     merged.promptTemplates = promptTemplates;

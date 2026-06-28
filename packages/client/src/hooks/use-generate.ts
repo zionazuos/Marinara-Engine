@@ -8,9 +8,12 @@ import { toast, type ExternalToast } from "sonner";
 import { api } from "../lib/api-client";
 import { formatAgentFailuresToast, toAgentFailure, type AgentFailure } from "../lib/agent-failures";
 import { chatBackgroundMetadataToUrl } from "../lib/backgrounds";
+import { formatGenerationParameterError } from "../lib/generation-parameter-errors";
 import { requestChatScrollToBottom } from "../lib/chat-scroll-events";
 import { agentKeys } from "./use-agents";
+import { discardPendingGameStatePatch } from "./use-game-state-patcher";
 import type { PendingAgentWriteApproval, PendingCardUpdate } from "../stores/agent.store";
+import type { DelayedCharacterInfo } from "../stores/chat.store";
 import {
   applyQuestUpdatesToPlayerStats,
   applyTrackerFieldLocksToGameStatePatch,
@@ -35,8 +38,9 @@ type RetryAgentsFn = (chatId: string, agentTypes: string[], options?: RetryAgent
 
 /** Show a persistent, copyable error toast and log to console */
 function showError(msg: string, options?: Pick<ExternalToast, "action">) {
+  const formatted = formatGenerationParameterError(msg);
   console.error("[Generation]", msg);
-  toast.error(msg, { duration: 15000, ...options });
+  toast.error(formatted, { duration: 15000, ...options });
 }
 
 function showAgentFailuresError(failures: AgentFailure[], onRetry?: () => void) {
@@ -372,6 +376,7 @@ import { useChatStore } from "../stores/chat.store";
 import { useAgentStore } from "../stores/agent.store";
 import { useGameModeStore } from "../stores/game-mode.store";
 import { useGameStateStore } from "../stores/game-state.store";
+import { useUnoGameStore } from "../stores/uno-game.store";
 import { useTranslationStore } from "../stores/translation.store";
 import { useUIStore } from "../stores/ui.store";
 import {
@@ -384,7 +389,8 @@ import { characterKeys } from "./use-characters";
 import { connectionKeys } from "./use-connections";
 import { lorebookKeys } from "./use-lorebooks";
 import { presetKeys } from "./use-presets";
-import { playNotificationPing } from "../lib/notification-sound";
+import { playConfiguredNotificationPing } from "../lib/notification-sound";
+import { messageHasPendingPostProcessing } from "../lib/chat-message-extra";
 import { stripGmTagsKeepReadables } from "../lib/game-tag-parser";
 import type { APIConnection, Chat, GameMap, Message } from "@marinara-engine/shared";
 
@@ -885,6 +891,8 @@ export function useGenerate() {
   const clearCyoaChoices = useAgentStore((s) => s.clearCyoaChoices);
   const setYoutubePlay = useAgentStore((s) => s.setYoutubePlay);
   const setYoutubeVolume = useAgentStore((s) => s.setYoutubeVolume);
+  const setLocalMusicPlay = useAgentStore((s) => s.setLocalMusicPlay);
+  const setLocalMusicVolume = useAgentStore((s) => s.setLocalMusicVolume);
   const enqueuePendingCardUpdate = useAgentStore((s) => s.enqueuePendingCardUpdate);
   const enqueuePendingAgentWriteApproval = useAgentStore((s) => s.enqueuePendingAgentWriteApproval);
   const setFailedAgentFailures = useAgentStore((s) => s.setFailedAgentFailures);
@@ -898,10 +906,14 @@ export function useGenerate() {
       lorebookIds?: string[];
       userMessage?: string;
       regenerateMessageId?: string;
+      continueMessageId?: string;
       impersonate?: boolean;
+      autonomous?: boolean;
+      autonomousIntentKey?: string;
       attachments?: Array<{ type: string; data: string; filename?: string; name?: string }>;
       mentionedCharacterNames?: string[];
       forCharacterId?: string;
+      skipPresenceDelay?: boolean;
       narrativeDirectorMode?: "natural" | "random";
       generationGuide?: string;
       generationGuideSource?: "narrator" | "guide" | "game_start";
@@ -910,6 +922,8 @@ export function useGenerate() {
       impersonateConnectionId?: string;
       impersonateBlockAgents?: boolean;
       impersonatePromptTemplate?: string;
+      /** When true, this generation drives the active turn-game's bot seats instead of a chat reply. */
+      turnGameBots?: boolean;
     }) => {
       // Prevent concurrent generations for the same chat. Different chats may
       // keep generating in the background while the user navigates elsewhere.
@@ -920,10 +934,6 @@ export function useGenerate() {
         return false;
       }
       activeGenerateLocks.add(params.chatId);
-
-      // Abort any in-progress generation for the SAME chat before starting a new one.
-      const prev = useChatStore.getState().abortControllers.get(params.chatId);
-      if (prev) prev.abort();
 
       // Create an AbortController so the stop button can cancel this generation.
       const abortController = new AbortController();
@@ -953,7 +963,9 @@ export function useGenerate() {
         clearFailedAgentTypes();
         setRegenerateMessageId(params.regenerateMessageId ?? null);
       }
-      console.warn("[Generate] Starting generation for chat:", params.chatId);
+      if (useUIStore.getState().debugMode) {
+        console.warn("[Generate] Starting generation for chat:", params.chatId);
+      }
 
       // A stale in-flight message refetch can overwrite the saved assistant
       // message after it is upserted into the cache. Cancel early so the
@@ -1045,7 +1057,8 @@ export function useGenerate() {
       const transportStreaming = useUIStore.getState().enableStreaming;
       const streamingEnabled = transportStreaming;
       const chatModeForGeneration = getCachedChatMode(qc, params.chatId);
-      const shouldDisplayRawStream = chatModeForGeneration !== "conversation" || !!params.regenerateMessageId;
+      const shouldDisplayRawStream =
+        chatModeForGeneration !== "conversation" || !!params.regenerateMessageId || !!params.continueMessageId;
       const leadingSpeakerPrefixFilter = createLeadingSpeakerPrefixFilter([
         ...getCachedChatSpeakerNames(qc, params.chatId),
         ...(params.mentionedCharacterNames ?? []),
@@ -1117,13 +1130,6 @@ export function useGenerate() {
       let typewriterRemainder = 0;
       const canInspectPageFocus = typeof document !== "undefined";
       const shouldFlushTypewriterForBackground = () => canInspectPageFocus && document.visibilityState !== "visible";
-
-      console.log(
-        "[Typewriter] streaming=%s, speed=%d, charsPerSecond=%s",
-        streamingEnabled,
-        useUIStore.getState().streamingSpeed,
-        getCharsPerSecond(),
-      );
 
       const flushTypewriterBuffer = () => {
         cancelAnimationFrame(rafId);
@@ -1378,17 +1384,18 @@ export function useGenerate() {
                 durationMs: number;
               };
 
-              // Always log agent results to console for visibility (use warn so it shows even if Info is filtered)
-              if (result.success) {
-                console.warn(
-                  `[Agent] ✓ ${result.agentName} (${result.agentType}) — ${(result.durationMs / 1000).toFixed(1)}s`,
-                  result.data,
-                );
-              } else {
-                console.warn(
-                  `[Agent] ✗ ${result.agentName} (${result.agentType}) — ${result.error ?? "unknown error"}`,
-                  result.data,
-                );
+              if (debugMode) {
+                if (result.success) {
+                  console.warn(
+                    `[Agent] ✓ ${result.agentName} (${result.agentType}) — ${(result.durationMs / 1000).toFixed(1)}s`,
+                    result.data,
+                  );
+                } else {
+                  console.warn(
+                    `[Agent] ✗ ${result.agentName} (${result.agentType}) — ${result.error ?? "unknown error"}`,
+                    result.data,
+                  );
+                }
               }
 
               if (result.success) {
@@ -1473,6 +1480,30 @@ export function useGenerate() {
                     setYoutubePlay({ searchQuery: d.searchQuery.trim(), mood: (d.mood as string) ?? "" });
                   }
                 }
+
+                // Drive the embedded Custom local player from the agent's exact asset pick.
+                if (result.resultType === "local_music_control") {
+                  const d = result.data as Record<string, unknown>;
+                  const action = d.action as string;
+                  if (typeof d.volume === "number" && Number.isFinite(d.volume)) {
+                    setLocalMusicVolume(Math.max(0, Math.min(100, d.volume)));
+                  }
+                  const path = typeof d.path === "string" ? d.path.trim() : "";
+                  if (action === "play" && path) {
+                    const trackName = typeof d.trackName === "string" ? d.trackName.trim() : "";
+                    const fallbackTitle =
+                      path
+                        .split("/")
+                        .pop()
+                        ?.replace(/\.[^.]+$/, "")
+                        .replace(/[-_]+/g, " ") || "Local track";
+                    setLocalMusicPlay({
+                      path,
+                      title: trackName || fallbackTitle,
+                      mood: (d.mood as string) ?? "",
+                    });
+                  }
+                }
               }
 
               // Character card updates are never applied automatically — enqueue
@@ -1506,11 +1537,13 @@ export function useGenerate() {
               if (result.success && result.agentType === "quest" && result.data) {
                 const qd = result.data as Record<string, unknown>;
                 const updates = Array.isArray(qd.updates) ? qd.updates : [];
-                console.warn(`[Agent] Quest data:`, qd);
-                console.warn(`[Agent] Quest updates: ${updates.length} update(s)`, updates);
+                if (debugMode) {
+                  console.warn(`[Agent] Quest data:`, qd);
+                  console.warn(`[Agent] Quest updates: ${updates.length} update(s)`, updates);
+                }
                 if (updates.length > 0) {
                   const cur = useGameStateStore.getState().current;
-                  console.warn(`[Agent] Quest merge — current gameState:`, cur);
+                  if (debugMode) console.warn(`[Agent] Quest merge — current gameState:`, cur);
                   const existing = cur?.playerStats ?? {
                     stats: [],
                     attributes: null,
@@ -1521,9 +1554,9 @@ export function useGenerate() {
                   };
                   const questMerge = applyQuestUpdatesToPlayerStats(existing, updates);
                   const quests = questMerge.quests;
-                  console.warn(`[Agent] Quest merge result — activeQuests:`, quests);
+                  if (debugMode) console.warn(`[Agent] Quest merge result — activeQuests:`, quests);
                   applyGameStatePatchToStore(params.chatId, { playerStats: questMerge.playerStats });
-                } else {
+                } else if (debugMode) {
                   console.warn(`[Agent] Quest agent returned success but 0 updates — data shape:`, Object.keys(qd));
                 }
               }
@@ -1633,9 +1666,10 @@ export function useGenerate() {
                   const soundOn = isRpMode
                     ? useUIStore.getState().rpNotificationSound
                     : useUIStore.getState().convoNotificationSound;
-                  if (soundOn) {
-                    playNotificationPing();
-                  }
+                  playConfiguredNotificationPing(
+                    soundOn && !messageHasPendingPostProcessing(previousGroupMessage),
+                    useUIStore.getState().notificationSoundsOnlyWhenUnfocused,
+                  );
                 }
                 // Reset the stream buffer for the new character
                 fullBuffer = "";
@@ -1672,9 +1706,16 @@ export function useGenerate() {
             case "game_state":
             case "game_state_patch": {
               const patch = event.data as Record<string, unknown>;
-              console.warn(`[Generate] ${event.type} received:`, patch);
+              if (debugMode) console.warn(`[Generate] ${event.type} received:`, patch);
               if (!isActiveChat()) break;
+              discardPendingGameStatePatch(params.chatId);
               applyGameStatePatchToStore(params.chatId, patch, gameStatePatchAnchor);
+              break;
+            }
+
+            case "turn_game_state_patch": {
+              if (!isActiveChat()) break;
+              useUnoGameStore.getState().setUno(event.data as never, params.chatId);
               break;
             }
 
@@ -1687,6 +1728,12 @@ export function useGenerate() {
             case "chat_summary": {
               // Refresh the chat detail so the summary popover picks up the new value
               qc.invalidateQueries({ queryKey: chatKeys.detail(params.chatId) });
+              // When the server auto-hid summarized messages (opt-in token compression),
+              // refresh the message list so their hidden state shows in the UI.
+              const summaryData = event.data as { hiddenMessageIds?: unknown };
+              if (Array.isArray(summaryData.hiddenMessageIds) && summaryData.hiddenMessageIds.length > 0) {
+                qc.invalidateQueries({ queryKey: chatKeys.messages(params.chatId) });
+              }
               break;
             }
 
@@ -1723,13 +1770,19 @@ export function useGenerate() {
                 leadingSpeakerPrefixFilter.discard();
                 if (holdingTextRewrite && heldTextRewriteMessage) {
                   thinkingStreamFilter.reset();
-                  if (streamingEnabled && shouldDisplayRawStream) {
-                    replaceGeneratedContentWithTypewriter(rewrittenText, { retype: true });
+                  const textRewriteUsesLiveStream =
+                    streamingEnabled &&
+                    shouldDisplayRawStream &&
+                    !useChatStore.getState().committedStreamChatIds.has(params.chatId);
+                  if (textRewriteUsesLiveStream) {
+                    replaceGeneratedContentWithTypewriter(rewrittenText, { retype: rw.rewriteApplied === true });
                     await waitForTypewriterDrain();
                   } else {
                     fullBuffer = rewrittenText;
                     pendingText = "";
-                    setStreamBuffer(fullBuffer, params.chatId);
+                    if (!useChatStore.getState().committedStreamChatIds.has(params.chatId)) {
+                      setStreamBuffer(fullBuffer, params.chatId);
+                    }
                   }
                   const heldExtra = parseMessageExtraRecordForMerge(heldTextRewriteMessage.extra);
                   delete heldExtra.postProcessingPending;
@@ -1826,23 +1879,30 @@ export function useGenerate() {
                   pendingPostProcessingAgentType === "continuity" ||
                   pendingPostProcessingAgentType === "text-rewrite")
               ) {
-                holdingTextRewrite = true;
-                heldTextRewriteMessage = savedMessage;
-                receivedContent = true;
-                leadingSpeakerPrefixFilter.discard();
+                const heldExtra = { ...savedExtra };
+                delete heldExtra.postProcessingPending;
+                flushThinkingStreamFilter();
+                flushLeadingSpeakerPrefix();
                 thinkingStreamFilter.reset();
-                cancelAnimationFrame(rafId);
-                pendingText = "";
-                typingActive = false;
-                fullBuffer = normalizeLineBreakSpacing(savedMessage.content || "Rewrite agents are working!");
-                setStreamCommitted(params.chatId, false);
-                setStreamBuffer(fullBuffer, params.chatId);
+                const generatedText = normalizeLineBreakSpacing(fullBuffer + pendingText);
+                const heldMessage = {
+                  ...savedMessage,
+                  content: generatedText || savedMessage.content,
+                  extra: heldExtra as unknown as Message["extra"],
+                };
+                holdingTextRewrite = true;
+                heldTextRewriteMessage = heldMessage;
+                receivedContent = true;
+                persistedMessages.set(heldMessage.id, heldMessage);
+                if (!streamingEnabled || !shouldDisplayRawStream) {
+                  upsertPersistedMessages(qc, params.chatId, [heldMessage]);
+                }
                 break;
               }
               // Once an ordinary roleplay stream is saved, the durable message
               // should own the transcript even if post-generation agents
               // (Illustrator, Spotify, etc.) are still running.
-              if (params.regenerateMessageId || !streamingEnabled) {
+              if (params.regenerateMessageId || params.continueMessageId || !streamingEnabled) {
                 upsertPersistedMessages(qc, params.chatId, [savedMessage]);
               } else if (shouldDisplayRawStream && !isGameGeneration) {
                 await waitForTypewriterDrain();
@@ -1860,9 +1920,6 @@ export function useGenerate() {
             }
 
             case "schedule_updated": {
-              const schedData = event.data as { characterId: string; status?: string; activity?: string };
-              const charName = schedData.activity || schedData.status || "schedule";
-              console.log(`[commands] Schedule updated for ${schedData.characterId}: ${charName}`);
               break;
             }
 
@@ -1988,22 +2045,6 @@ export function useGenerate() {
             }
 
             case "haptic_command": {
-              const hapData = event.data as {
-                action?: string;
-                intensity?: number;
-                duration?: number;
-                commands?: unknown[];
-                reasoning?: string;
-              };
-              if (hapData.commands) {
-                console.log(
-                  `[haptic] Agent sent ${(hapData.commands as unknown[]).length} command(s): ${hapData.reasoning ?? ""}`,
-                );
-              } else {
-                console.log(
-                  `[haptic] ${hapData.action} intensity=${hapData.intensity ?? "?"} duration=${hapData.duration ?? "indefinite"}`,
-                );
-              }
               break;
             }
 
@@ -2085,7 +2126,13 @@ export function useGenerate() {
               if (spriteChangeReceived) {
                 qc.invalidateQueries({ queryKey: chatKeys.messages(params.chatId) });
               }
-              if (isActiveChat()) setProcessing(false);
+              if (isActiveChat()) {
+                if (useChatStore.getState().streamingChatId === params.chatId) {
+                  setStreaming(false);
+                  clearStreamBuffer(params.chatId);
+                }
+                setProcessing(false);
+              }
               clearMariPhaseForThisChat();
               break;
             }
@@ -2105,9 +2152,21 @@ export function useGenerate() {
               const delayedNames = (event as any).characters as string[] | undefined;
               const delayedLabel =
                 delayedNames?.length === 1 ? delayedNames[0] : (delayedNames?.join(", ") ?? "Character");
-              const delayedStatus = ((event as any).status as string) ?? "idle";
-              useChatStore.getState().setPerChatDelayed(params.chatId, { name: delayedLabel, status: delayedStatus });
-              if (isActiveChat()) setDelayedCharacterInfo({ name: delayedLabel, status: delayedStatus });
+              const delayedStatus = (((event as any).status as DelayedCharacterInfo["status"] | undefined) ?? "idle");
+              const delayedInfo: DelayedCharacterInfo = {
+                name: delayedLabel,
+                status: delayedStatus,
+                characterIds: Array.isArray((event as any).characterIds)
+                  ? ((event as any).characterIds as string[])
+                  : undefined,
+                characterNames: delayedNames,
+                characterStatuses:
+                  (event as any).characterStatuses && typeof (event as any).characterStatuses === "object"
+                    ? ((event as any).characterStatuses as DelayedCharacterInfo["characterStatuses"])
+                    : undefined,
+              };
+              useChatStore.getState().setPerChatDelayed(params.chatId, delayedInfo);
+              if (isActiveChat()) setDelayedCharacterInfo(delayedInfo);
               // Refresh character data so sidebar status dots update immediately
               qc.invalidateQueries({ queryKey: characterKeys.list() });
               break;
@@ -2197,14 +2256,21 @@ export function useGenerate() {
         if (canInspectPageFocus) {
           document.removeEventListener("visibilitychange", flushBackgroundedTypewriter);
         }
+        const stillOwnerAtCleanupStart =
+          useChatStore.getState().abortControllers.get(params.chatId) === abortController;
+        if (stillOwnerAtCleanupStart) {
+          useChatStore.getState().clearPerChatState(params.chatId);
+          useChatStore.getState().setAbortController(params.chatId, null);
+        }
 
         if (shouldRefreshGameState) {
           // Refresh game state from DB so HUD/sidebar trackers settle on the
           // persisted active-swipe row after generation-time SSE patches.
           await refreshVisibleGameStateAfterGeneration(params.chatId);
         }
-        if (isGameGeneration && sawDoneEvent && receivedContent && useUIStore.getState().gameNotificationSound) {
-          playNotificationPing();
+        if (isGameGeneration && sawDoneEvent && receivedContent) {
+          const uiState = useUIStore.getState();
+          playConfiguredNotificationPing(uiState.gameNotificationSound, uiState.notificationSoundsOnlyWhenUnfocused);
           gameTurnLoadedSoundPlayed = true;
         }
         // Re-sort sidebar so this chat floats to the top
@@ -2247,17 +2313,43 @@ export function useGenerate() {
             : isRp
               ? uiState.rpNotificationSound
               : uiState.convoNotificationSound;
-          if (soundEnabled) {
-            playNotificationPing();
-          }
+          playConfiguredNotificationPing(soundEnabled, uiState.notificationSoundsOnlyWhenUnfocused);
         }
         // Only clean up global streaming state if this generation still
         // "owns" it. We check AbortController identity rather than chatId
         // because two generations can target the same chat (e.g. autonomous
         // + user send). The latest generation replaces the AbortController,
         // so the superseded one knows it no longer owns the state.
-        const stillOwner = useChatStore.getState().abortControllers.get(params.chatId) === abortController;
-        const persistedForRefresh = [...persistedMessages.values()];
+        const stillOwner = stillOwnerAtCleanupStart;
+        const partialContent = normalizeLineBreakSpacing(fullBuffer + pendingText).trim();
+        const unpersistedPartialMessage: Message | null =
+          receivedContent &&
+          persistedMessages.size === 0 &&
+          partialContent &&
+          !params.regenerateMessageId &&
+          !params.continueMessageId
+            ? {
+                id: `__partial_${params.chatId}_${Date.now()}`,
+                chatId: params.chatId,
+                role: params.impersonate ? "user" : "assistant",
+                characterId: params.impersonate
+                  ? null
+                  : (params.forCharacterId ?? useChatStore.getState().streamingCharacterId ?? null),
+                content: partialContent,
+                activeSwipeIndex: 0,
+                extra: {
+                  displayText: null,
+                  isGenerated: !params.impersonate,
+                  tokenCount: null,
+                  generationInfo: null,
+                },
+                createdAt: new Date().toISOString(),
+              }
+            : null;
+        const persistedForRefresh = [
+          ...persistedMessages.values(),
+          ...(unpersistedPartialMessage ? [unpersistedPartialMessage] : []),
+        ];
         const primeMessagesFromSaved = () => {
           if (persistedForRefresh.length > 0) {
             upsertPersistedMessages(qc, params.chatId, persistedForRefresh);
@@ -2302,9 +2394,6 @@ export function useGenerate() {
             setTypingCharacterName(null);
             setDelayedCharacterInfo(null);
           }
-          // Always clean up per-chat tracking for this generation
-          useChatStore.getState().clearPerChatState(params.chatId);
-          useChatStore.getState().setAbortController(params.chatId, null);
         } else {
           // Not the owner but still need messages up to date
           if (isGameGeneration || (receivedContent && persistedForRefresh.length === 0)) {
@@ -2318,25 +2407,31 @@ export function useGenerate() {
         // Always notify game surface that generation completed for this chat.
         // Dispatched unconditionally — GameSurface uses lastProcessedMsgRef
         // to prevent duplicate processing.
-        console.warn("[use-generate] dispatching generation-complete for chat:", params.chatId);
+        if (useUIStore.getState().debugMode) {
+          console.warn("[use-generate] dispatching generation-complete for chat:", params.chatId);
+        }
         window.dispatchEvent(new CustomEvent("marinara:generation-complete", { detail: { chatId: params.chatId } }));
 
         // Auto-translate newly generated assistant messages if enabled
         if (receivedContent) {
           try {
             const chatData = qc.getQueryData<Chat>(chatKeys.detail(params.chatId));
-            const meta =
-              chatData?.metadata != null
-                ? typeof chatData.metadata === "string"
-                  ? JSON.parse(chatData.metadata)
-                  : chatData.metadata
-                : {};
+            const meta = parseChatMetadata(chatData?.metadata);
             if (meta.autoTranslate) {
               const store = useTranslationStore.getState();
+              const chatSystemPrompt =
+                typeof meta.translationPrompt === "string" && meta.translationPrompt.trim().length > 0
+                  ? meta.translationPrompt
+                  : store.config.systemPrompt;
               for (const [id, msg] of persistedMessages) {
                 const textToTranslate =
                   chatData?.mode === "game" ? stripGmTagsKeepReadables(msg.content ?? "").trim() : (msg.content ?? "");
-                if (msg.role === "assistant" && textToTranslate && !store.translations[id]) {
+                if (
+                  msg.role === "assistant" &&
+                  textToTranslate &&
+                  !store.translations[id] &&
+                  !store.hiddenTranslationIds[id]
+                ) {
                   store.setTranslating(id, true);
                   api
                     .post<{ translatedText: string }>("/translate", {
@@ -2344,6 +2439,7 @@ export function useGenerate() {
                       provider: store.config.provider,
                       targetLanguage: store.config.targetLanguage,
                       connectionId: store.config.connectionId,
+                      systemPrompt: chatSystemPrompt,
                       deeplApiKey: store.config.deeplApiKey,
                       deeplxUrl: store.config.deeplxUrl,
                     })
@@ -2354,6 +2450,7 @@ export function useGenerate() {
                       api
                         .patch(`/chats/${params.chatId}/messages/${id}/extra`, {
                           translation: result.translatedText,
+                          translationHidden: false,
                         })
                         .catch(() => {});
                     })
@@ -2396,6 +2493,8 @@ export function useGenerate() {
       clearCyoaChoices,
       setYoutubePlay,
       setYoutubeVolume,
+      setLocalMusicPlay,
+      setLocalMusicVolume,
       enqueuePendingCardUpdate,
       enqueuePendingAgentWriteApproval,
       clearFailedAgentTypes,
@@ -2407,7 +2506,16 @@ export function useGenerate() {
     async (chatId: string, agentTypes: string[], options?: RetryAgentsOptions): Promise<boolean> => {
       const isActiveChat = () => useChatStore.getState().activeChatId === chatId;
       const abortController = new AbortController();
+      if (useChatStore.getState().abortControllers.has(chatId)) {
+        console.warn("[RetryAgents] Skipped — generation already in progress for this chat");
+        return false;
+      }
+      useChatStore.getState().setAbortController(chatId, abortController);
+      const isTrackerRetry = agentTypes.some(
+        (agentType) => BUILT_IN_TRACKER_AGENT_TYPE_SET.has(agentType) || !BUILT_IN_AGENT_TYPE_SET.has(agentType),
+      );
       setProcessing(true);
+      if (isTrackerRetry) useGameStateStore.getState().setRefreshingChat(chatId);
       clearFailedAgentTypes();
       clearThoughtBubbles();
       let hasError = false;
@@ -2426,17 +2534,15 @@ export function useGenerate() {
         let agentResultCount = 0;
         let trackerPatchCount = 0;
         let spriteChangeReceived = false;
-        const isTrackerRetry = agentTypes.some(
-          (agentType) => BUILT_IN_TRACKER_AGENT_TYPE_SET.has(agentType) || !BUILT_IN_AGENT_TYPE_SET.has(agentType),
-        );
         const failedRetryFailures: Array<ReturnType<typeof toAgentFailure>> = [];
+        const retryDebugMode = useUIStore.getState().debugMode;
         for await (const event of api.streamEvents(
           "/generate/retry-agents",
           {
             chatId,
             agentTypes,
             streaming: useUIStore.getState().enableStreaming,
-            debugMode: useUIStore.getState().debugMode,
+            debugMode: retryDebugMode,
             musicPlayerEnabled: useUIStore.getState().musicPlayerEnabled,
             musicPlayerSource: useUIStore.getState().musicPlayerSource,
             lorebookKeeperBackfill: options?.lorebookKeeperBackfill === true,
@@ -2464,17 +2570,18 @@ export function useGenerate() {
               };
               agentResultCount += 1;
 
-              // Log agent results (same as main generate handler)
-              if (result.success) {
-                console.warn(
-                  `[Retry Agent] ✓ ${result.agentName} (${result.agentType}) — ${(result.durationMs / 1000).toFixed(1)}s`,
-                  result.data,
-                );
-              } else {
-                console.warn(
-                  `[Retry Agent] ✗ ${result.agentName} (${result.agentType}) — ${result.error ?? "unknown error"}`,
-                  result.data,
-                );
+              if (retryDebugMode) {
+                if (result.success) {
+                  console.warn(
+                    `[Retry Agent] ✓ ${result.agentName} (${result.agentType}) — ${(result.durationMs / 1000).toFixed(1)}s`,
+                    result.data,
+                  );
+                } else {
+                  console.warn(
+                    `[Retry Agent] ✗ ${result.agentName} (${result.agentType}) — ${result.error ?? "unknown error"}`,
+                    result.data,
+                  );
+                }
               }
 
               if (result.success) {
@@ -2551,6 +2658,28 @@ export function useGenerate() {
                     setYoutubePlay({ searchQuery: d.searchQuery.trim(), mood: (d.mood as string) ?? "" });
                   }
                 }
+                if (result.resultType === "local_music_control" && isActiveChat()) {
+                  const d = result.data as Record<string, unknown>;
+                  const action = d.action as string;
+                  if (typeof d.volume === "number" && Number.isFinite(d.volume)) {
+                    setLocalMusicVolume(Math.max(0, Math.min(100, d.volume)));
+                  }
+                  const path = typeof d.path === "string" ? d.path.trim() : "";
+                  if (action === "play" && path) {
+                    const trackName = typeof d.trackName === "string" ? d.trackName.trim() : "";
+                    const fallbackTitle =
+                      path
+                        .split("/")
+                        .pop()
+                        ?.replace(/\.[^.]+$/, "")
+                        .replace(/[-_]+/g, " ") || "Local track";
+                    setLocalMusicPlay({
+                      path,
+                      title: trackName || fallbackTitle,
+                      mood: (d.mood as string) ?? "",
+                    });
+                  }
+                }
                 if (result.resultType === "background_change") {
                   const bg = result.data as { chosen?: string | null };
                   if (bg.chosen) {
@@ -2616,10 +2745,16 @@ export function useGenerate() {
             case "game_state":
             case "game_state_patch": {
               const patch = event.data as Record<string, unknown>;
-              console.warn(`[Retry] ${event.type} received:`, patch);
+              if (retryDebugMode) console.warn(`[Retry] ${event.type} received:`, patch);
               if (patch && Object.keys(patch).length > 0) trackerPatchCount += 1;
               if (!isActiveChat()) break;
+              discardPendingGameStatePatch(chatId);
               applyGameStatePatchToStore(chatId, patch);
+              break;
+            }
+            case "turn_game_state_patch": {
+              if (!isActiveChat()) break;
+              useUnoGameStore.getState().setUno(event.data as never, chatId);
               break;
             }
             case "game_map_update": {
@@ -2691,6 +2826,10 @@ export function useGenerate() {
         showError(msg);
       } finally {
         setProcessing(false);
+        if (useChatStore.getState().abortControllers.get(chatId) === abortController) {
+          useChatStore.getState().setAbortController(chatId, null);
+        }
+        if (isTrackerRetry) useGameStateStore.getState().clearRefreshingChat(chatId);
         if (hasError && isActiveChat()) {
           void refreshMessagesAuthoritatively(qc, chatId);
         }
@@ -2712,6 +2851,8 @@ export function useGenerate() {
       setCyoaChoices,
       setYoutubePlay,
       setYoutubeVolume,
+      setLocalMusicPlay,
+      setLocalMusicVolume,
       setFailedAgentFailures,
       setProcessing,
       qc,
@@ -2850,6 +2991,17 @@ function formatAgentBubble(agentType: string, agentName: string, data: unknown):
       const display = typeof d.display === "string" ? d.display.trim() : "";
       if (action === "none") return mood ? `🎵 Keeping current track — ${mood}` : "🎵 Keeping current track";
       if (action === "play") {
+        const localPath = typeof d.path === "string" ? d.path.trim() : "";
+        if (localPath) {
+          const trackName = typeof d.trackName === "string" ? d.trackName.trim() : "";
+          const fallbackTitle =
+            localPath
+              .split("/")
+              .pop()
+              ?.replace(/\.[^.]+$/, "")
+              .replace(/[-_]+/g, " ") || localPath;
+          return `🎵 ${trackName || fallbackTitle}${mood ? ` — ${mood}` : ""}`;
+        }
         // Support both array and singular formats
         const trackNames: string[] = Array.isArray(d.trackNames)
           ? (d.trackNames as string[])

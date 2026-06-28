@@ -699,15 +699,23 @@ export function resolveBudgetAndRecursivelyActivateLorebookEntriesWithDiagnostic
   tokenBudget: number,
   maxEntries: number,
   resolveContent?: LorebookFinalContentResolver,
+  recursiveLorebookIds?: ReadonlySet<string>,
 ): { selected: ActivatedEntry[]; budgetSkippedEntries: LorebookBudgetSkippedEntry[] } {
   let state = createLorebookBudgetSelectionState();
   const processedIds = new Set<string>();
-  let frontier = scanForActivatedEntries(messages, entries, options);
+  const selectedGroups = new Set<string>();
+  const probabilityDecisions = options.probabilityDecisions ?? new Map<string, boolean>();
+  const scanOptions = { ...options, probabilityDecisions };
+  const canRecurseEntry = (entry: LorebookEntry) => !recursiveLorebookIds || recursiveLorebookIds.has(entry.lorebookId);
+  let frontier = scanForActivatedEntries(messages, entries, scanOptions);
   const budgetSkippedEntries: LorebookBudgetSkippedEntry[] = [];
 
   for (let depth = 0; frontier.length > 0; depth++) {
     const candidates = frontier.filter(
-      (candidate) => !processedIds.has(candidate.entry.id) && !state.selectedIds.has(candidate.entry.id),
+      (candidate) =>
+        !processedIds.has(candidate.entry.id) &&
+        !state.selectedIds.has(candidate.entry.id) &&
+        !(candidate.entry.group && selectedGroups.has(candidate.entry.group)),
     );
     for (const candidate of candidates) {
       processedIds.add(candidate.entry.id);
@@ -723,9 +731,12 @@ export function resolveBudgetAndRecursivelyActivateLorebookEntriesWithDiagnostic
     );
     state = selectedBatch.state;
     budgetSkippedEntries.push(...selectedBatch.budgetSkippedEntries);
+    for (const selected of selectedBatch.selectedFromCandidates) {
+      if (selected.entry.group) selectedGroups.add(selected.entry.group);
+    }
 
     const recursiveContentParts = selectedBatch.selectedFromCandidates
-      .filter((selected) => !selected.entry.preventRecursion)
+      .filter((selected) => canRecurseEntry(selected.entry) && !selected.entry.preventRecursion)
       .map((selected) => selected.entry.content);
 
     if (depth >= maxDepth) break;
@@ -734,10 +745,20 @@ export function resolveBudgetAndRecursivelyActivateLorebookEntriesWithDiagnostic
     const recursiveContent = recursiveContentParts.join("\n");
     if (!recursiveContent) break;
 
-    const remaining = entries.filter((entry) => !processedIds.has(entry.id) && !state.selectedIds.has(entry.id));
+    const remaining = entries.filter(
+      (entry) =>
+        !processedIds.has(entry.id) &&
+        !state.selectedIds.has(entry.id) &&
+        canRecurseEntry(entry) &&
+        !entry.excludeRecursion &&
+        !(entry.group && selectedGroups.has(entry.group)),
+    );
     if (remaining.length === 0) break;
 
-    frontier = scanForActivatedEntries([{ role: "system", content: recursiveContent }], remaining, options);
+    frontier = scanForActivatedEntries([{ role: "system", content: recursiveContent }], remaining, {
+      ...scanOptions,
+      recursionPass: true,
+    });
   }
 
   return {
@@ -755,6 +776,7 @@ export function resolveBudgetAndRecursivelyActivateLorebookEntries(
   tokenBudget: number,
   maxEntries: number,
   resolveContent?: LorebookFinalContentResolver,
+  recursiveLorebookIds?: ReadonlySet<string>,
 ): ActivatedEntry[] {
   return resolveBudgetAndRecursivelyActivateLorebookEntriesWithDiagnostics(
     messages,
@@ -765,6 +787,7 @@ export function resolveBudgetAndRecursivelyActivateLorebookEntries(
     tokenBudget,
     maxEntries,
     resolveContent,
+    recursiveLorebookIds,
   ).selected;
 }
 
@@ -802,6 +825,8 @@ export async function processLorebooks(
     generationTriggers?: string[];
     /** Resolves prompt macros for final included lorebook entries. May apply macro side effects. */
     resolveContent?: LorebookFinalContentResolver;
+    /** Optional random source for probability and weighted group selection. */
+    random?: () => number;
   },
 ): Promise<LorebookScanResult> {
   const storage = createLorebooksStorage(db);
@@ -897,11 +922,15 @@ export async function processLorebooks(
     additionalMatchingSourceText: matchingContext.additionalMatchingSourceText,
     timingStates,
     currentMessageIndex,
+    ...(options?.random ? { random: options.random } : {}),
   };
 
   // Determine recursion settings from relevant enabled lorebooks only.
+  const recursiveLorebookIds = new Set(
+    relevantLorebooks.filter((b: { recursiveScanning: boolean }) => b.recursiveScanning).map((b) => b.id),
+  );
   const anyRecursive =
-    options?.enableRecursive || relevantLorebooks.some((b: { recursiveScanning: boolean }) => b.recursiveScanning);
+    options?.enableRecursive || recursiveLorebookIds.size > 0;
   const maxRecursionDepth = relevantLorebooks.reduce(
     (max: number, b: { recursiveScanning: boolean; maxRecursionDepth?: number }) => {
       if (!b.recursiveScanning) return max;
@@ -920,6 +949,7 @@ export async function processLorebooks(
         tokenBudget,
         0,
         options?.resolveContent,
+        options?.enableRecursive ? undefined : recursiveLorebookIds,
       )
     : resolveAndBudgetActivatedLorebookEntriesWithDiagnostics(
         scanForActivatedEntries(messages, allEntries, scanOpts),

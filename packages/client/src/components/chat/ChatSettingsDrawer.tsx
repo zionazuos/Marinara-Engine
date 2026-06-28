@@ -50,6 +50,8 @@ import {
   Loader2,
 } from "lucide-react";
 import {
+  ROLEPLAY_POPOVER_CLOSE_BUTTON,
+  ROLEPLAY_POPOVER_CLOSE_ICON_SIZE,
   ROLEPLAY_POPOVER_HEADER,
   ROLEPLAY_POPOVER_SCROLL_AREA,
   ROLEPLAY_POPOVER_SHELL,
@@ -79,7 +81,7 @@ import { SecretPlotPanel } from "../agents/SecretPlotPanel";
 import { SummariesEditorModal } from "./SummariesEditorModal";
 import { useCharacters, usePersonas, useCharacterGroups, type SpriteInfo } from "../../hooks/use-characters";
 import { useLorebooks, useEntriesAcrossLorebooks } from "../../hooks/use-lorebooks";
-import { usePresetFull, usePresets } from "../../hooks/use-presets";
+import { useDefaultPreset, usePresetFull, usePresets } from "../../hooks/use-presets";
 import { useConnections } from "../../hooks/use-connections";
 import { useKnowledgeSources, useUploadKnowledgeSource } from "../../hooks/use-knowledge-sources";
 import { useGenerate } from "../../hooks/use-generate";
@@ -107,6 +109,7 @@ import { useRegexScripts, useUpdateRegexScript, type RegexScriptRow } from "../.
 import { api } from "../../lib/api-client";
 import { filterLanguageGenerationConnections } from "../../lib/connection-filters";
 import { getConnectedChatDisplayName } from "../../lib/chat-display";
+import { getTouchReorderDropIndex } from "../../lib/touch-reorder";
 import {
   getAgentRunIntervalMeta,
   getCadenceInputValue,
@@ -116,7 +119,9 @@ import {
 import { getCharacterTitle, parseCharacterDisplayData } from "../../lib/character-display";
 import { extractCreatorNotesCss } from "../../lib/creator-notes-css";
 import { isLorebookScopeActiveForChat } from "../../lib/lorebook-scope";
+import { addSilentGreetingSwipes } from "../../lib/message-swipes";
 import { useUIStore } from "../../stores/ui.store";
+import { useTouchFolderDrag } from "../../hooks/use-touch-folder-drag";
 import {
   useChatPresets,
   useSaveChatPresetSettings,
@@ -142,6 +147,7 @@ import type {
   HudWidget,
   KnowledgeAgentSourceSettings,
   Message,
+  PromptPreset,
 } from "@marinara-engine/shared";
 import { useAgentConfigs, useCreateAgent, useUpdateAgent, type AgentConfigRow } from "../../hooks/use-agents";
 import { useAgentStore } from "../../stores/agent.store";
@@ -156,8 +162,10 @@ import {
   getChatModeCapabilities,
   LIMITS,
   MIN_AGENT_MAX_TOKENS,
+  PROFESSOR_MARI_ID,
   estimateAgentLoadCost,
   getAgentPromptTemplateOptions,
+  includesTextForMatch,
   AGENT_COST_HIGH_CALLS,
   AGENT_COST_HIGH_TOKENS,
   CONVERSATION_COMMAND_KEYS,
@@ -187,6 +195,7 @@ import {
   useHapticStartScan,
 } from "../../hooks/use-haptic";
 import { normalizeSpritePlacements } from "./sprite-placement";
+import type { LocalSpriteVisualSettings } from "./local-sprite-visual-settings";
 import {
   DEFAULT_SPRITE_DISPLAY_MODES,
   SPRITE_DISPLAY_OPACITY_MAX,
@@ -208,18 +217,22 @@ import {
   buildInitialAgentAddSetupState,
   type AgentAddSetupState,
   type AgentAddSpriteSubject,
+  type MusicProvider,
 } from "./AgentAddSetupFields";
-import { GameWidgetSetupEditor, normalizeGameHudWidgets } from "../game/GameWidgetSetupEditor";
+import { GameWidgetFileControls, GameWidgetSetupEditor, normalizeGameHudWidgets } from "../game/GameWidgetSetupEditor";
 
 interface ChatSettingsDrawerProps {
   chat: Chat;
   open: boolean;
   onClose: () => void;
   anchor?: { right: number; top: number } | null;
+  initialSection?: "autonomous" | null;
   spriteArrangeMode?: boolean;
   onToggleSpriteArrange?: () => void;
   onResetSpritePlacements?: () => void;
   onSpriteSideChange?: (side: "left" | "right") => void;
+  spriteVisualSettings?: LocalSpriteVisualSettings;
+  onSpriteVisualSettingsChange?: (patch: Partial<LocalSpriteVisualSettings>) => void;
 }
 
 type SpotifySourceType = "liked" | "playlist" | "artist" | "any";
@@ -230,6 +243,19 @@ const SPOTIFY_SOURCE_OPTIONS: Array<{ id: SpotifySourceType; label: string; desc
   { id: "artist", label: "Artist", description: "Search only around a named artist, like HOYO-MiX." },
   { id: "any", label: "Any Spotify", description: "Let the DJ use Spotify search when it fits." },
 ];
+
+function getMusicProviderLabel(provider: MusicProvider): string {
+  return provider === "spotify" ? "Spotify" : provider === "youtube" ? "YouTube" : "Custom";
+}
+
+function normalizeCustomMusicFolder(value: unknown): string {
+  const raw = typeof value === "string" ? value.trim().replace(/\\/g, "/") : "";
+  const normalized = raw.replace(/^\/+/, "").replace(/\/+$/g, "");
+  if (!normalized || normalized.includes("..")) return "music";
+  return normalized.startsWith("music") ? normalized : `music/${normalized}`;
+}
+
+const AUTONOMOUS_DAILY_CAP_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 const DEFAULT_PROSE_GUARDIAN_BANNED_WORDS = "ozone";
 const DEFAULT_PROSE_GUARDIAN_AVOID =
@@ -263,8 +289,7 @@ function getAgentSettingsMenuId(chatId: string, agentId: string): string {
 
 function renderRoleplayAgentMenuIcon(agentId: string, variant: "card" | "chip" = "card"): React.ReactNode {
   const size = variant === "chip" ? "0.6875rem" : "0.75rem";
-  const className =
-    variant === "chip" ? "shrink-0 text-[var(--primary)]" : "mt-0.5 shrink-0 text-[var(--primary)]";
+  const className = variant === "chip" ? "shrink-0 text-[var(--primary)]" : "mt-0.5 shrink-0 text-[var(--primary)]";
   switch (agentId) {
     case "lorebook-keeper":
       return <BookOpen size={size} className={className} />;
@@ -357,6 +382,11 @@ const CONVERSATION_COMMAND_TOGGLE_OPTIONS: Array<{
     label: "Notes",
     description: "Let characters save durable notes for a connected chat.",
   },
+  {
+    id: "uno",
+    label: "UNO",
+    description: "Let characters start a game of UNO at the table when you agree to play.",
+  },
 ];
 
 function normalizeSpotifySourceType(value: unknown): SpotifySourceType {
@@ -390,6 +420,9 @@ const MODE_INTROS: Record<ChatMode, string> = {
   game: "Full Game Master with built-in dice, combat, encounters, world state, and session/map tracking — the Scene Analysis toggle below adds optional cinematic visuals (backgrounds, music, weather).",
 };
 
+const MARINARA_UNIVERSAL_PRESET_NAME = "Marinara's Universal Preset";
+const MARINARA_UNIVERSAL_PRESET_AUTHOR = "Marinara";
+
 const CHAT_SETTINGS_ORDER = {
   settingsPresets: -1600,
   modeIntro: -1500,
@@ -413,6 +446,8 @@ const CHAT_SETTINGS_ORDER = {
   translation: -100,
   gamePrompt: 0,
 } as const;
+
+const CHAT_PRESET_UNAPPLIED_SELECT_VALUE = "__chat_preset_unapplied__";
 
 type AvailableAgent = {
   id: string;
@@ -552,17 +587,37 @@ function getChatActiveAgentIds(chat: Chat): string[] {
   return Array.isArray(activeIds) ? activeIds.filter((id): id is string => typeof id === "string") : [];
 }
 
+function getChatActiveLorebookIds(chat: Chat): string[] {
+  const metadata = typeof chat.metadata === "string" ? JSON.parse(chat.metadata) : (chat.metadata ?? {});
+  const activeIds =
+    metadata && typeof metadata === "object" ? (metadata as { activeLorebookIds?: unknown }).activeLorebookIds : [];
+  return Array.isArray(activeIds) ? activeIds.filter((id): id is string => typeof id === "string") : [];
+}
+
+function getChatExcludedLorebookIds(chat: Chat): string[] {
+  const metadata = typeof chat.metadata === "string" ? JSON.parse(chat.metadata) : (chat.metadata ?? {});
+  const excludedIds =
+    metadata && typeof metadata === "object" ? (metadata as { excludedLorebookIds?: unknown }).excludedLorebookIds : [];
+  return Array.isArray(excludedIds) ? excludedIds.filter((id): id is string => typeof id === "string") : [];
+}
+
 export function ChatSettingsDrawer({
   chat,
   open,
   onClose,
   anchor,
+  initialSection,
   spriteArrangeMode = false,
   onToggleSpriteArrange,
   onResetSpritePlacements,
   onSpriteSideChange,
+  spriteVisualSettings,
+  onSpriteVisualSettingsChange,
 }: ChatSettingsDrawerProps) {
   const qc = useQueryClient();
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const scheduleControlsRef = useRef<HTMLDivElement | null>(null);
+  const modePromptDefaultAppliedRef = useRef<string | null>(null);
   const updateChat = useUpdateChat();
   const updateMeta = useUpdateChatMetadata();
   const updateGameWidgets = useUpdateGameWidgets();
@@ -582,19 +637,58 @@ export function ChatSettingsDrawer({
   const imageSelfieHeight = useUIStore((s) => s.imageSelfieHeight);
   const imageStyleProfiles = useUIStore((s) => s.imageStyleProfiles);
   const musicPlayerSource = useUIStore((s) => s.musicPlayerSource);
+  const setMusicPlayerSource = useUIStore((s) => s.setMusicPlayerSource);
   const openToolDetail = useUIStore((s) => s.openToolDetail);
+  const openPresetDetail = useUIStore((s) => s.openPresetDetail);
 
-  const { data: allCharacters } = useCharacters();
+  const { data: allCharacters } = useCharacters({ includeBuiltIn: true });
   const { data: characterGroups } = useCharacterGroups();
   const { data: lorebooks } = useLorebooks();
   const { data: presets } = usePresets();
+  const { data: defaultPromptPreset } = useDefaultPreset();
   const chatMode = (chat as unknown as { mode?: ChatMode }).mode ?? "roleplay";
   const isConversation = chatMode === "conversation";
   const isGame = chatMode === "game";
   const isRoleplayMode = chatMode === "roleplay" || chatMode === "visual_novel";
   const supportsNarrativeDirectorSecretPlot = chatMode === "roleplay";
   const modeCapabilities = useMemo(() => getChatModeCapabilities(chatMode), [chatMode]);
-  const { data: currentPromptPresetFull } = usePresetFull(isConversation ? null : (chat.promptPresetId ?? null));
+  const metadata = useMemo(
+    () => (typeof chat.metadata === "string" ? JSON.parse(chat.metadata) : (chat.metadata ?? {})),
+    [chat.metadata],
+  );
+  const { data: currentPromptPresetFull } = usePresetFull(isRoleplayMode ? (chat.promptPresetId ?? null) : null);
+  const promptPresetOptionsLoaded = Array.isArray(presets);
+  const promptPresetOptions = useMemo(() => (presets ?? []) as PromptPreset[], [presets]);
+  const marinaraUniversalPromptPreset = useMemo(
+    () =>
+      promptPresetOptions.find(
+        (preset) =>
+          preset.name === MARINARA_UNIVERSAL_PRESET_NAME && preset.author === MARINARA_UNIVERSAL_PRESET_AUTHOR,
+      ) ?? null,
+    [promptPresetOptions],
+  );
+  const fallbackPromptPreset = useMemo(() => {
+    return (
+      marinaraUniversalPromptPreset ??
+      defaultPromptPreset ??
+      promptPresetOptions.find((preset) => preset.isDefault) ??
+      null
+    );
+  }, [defaultPromptPreset, marinaraUniversalPromptPreset, promptPresetOptions]);
+  const hasModeCustomPrompt =
+    isConversation && typeof metadata.customSystemPrompt === "string" && metadata.customSystemPrompt.trim().length > 0
+      ? true
+      : isGame && typeof metadata.gameSystemPrompt === "string" && metadata.gameSystemPrompt.trim().length > 0;
+  const shouldApplyModePromptDefault = (isConversation || isGame) && promptPresetOptionsLoaded && !hasModeCustomPrompt;
+  const effectiveModePromptPresetId =
+    chat.promptPresetId ?? (shouldApplyModePromptDefault ? (fallbackPromptPreset?.id ?? null) : null);
+  const selectedModePromptPreset = useMemo(() => {
+    if (!effectiveModePromptPresetId) return null;
+    return (
+      promptPresetOptions.find((preset) => preset.id === effectiveModePromptPresetId) ??
+      (fallbackPromptPreset?.id === effectiveModePromptPresetId ? fallbackPromptPreset : null)
+    );
+  }, [effectiveModePromptPresetId, fallbackPromptPreset, promptPresetOptions]);
   const { data: connections } = useConnections();
   const imageConnectionsList = useMemo(
     () =>
@@ -614,7 +708,7 @@ export function ChatSettingsDrawer({
   const { data: agentConfigs } = useAgentConfigs();
   const { data: customTools } = useCustomTools();
   const { data: customToolCapabilities } = useCustomToolCapabilities();
-  const { data: allChats } = useChats();
+  const { data: allChats } = useChats({ refetchOnMount: false });
   const personas = useMemo(() => (allPersonas ?? []) as DrawerPersona[], [allPersonas]);
 
   const chatCharIds: string[] = useMemo(
@@ -622,10 +716,6 @@ export function ChatSettingsDrawer({
     [chat.characterIds],
   );
 
-  const metadata = useMemo(
-    () => (typeof chat.metadata === "string" ? JSON.parse(chat.metadata) : (chat.metadata ?? {})),
-    [chat.metadata],
-  );
   const gameWidgetSource = useMemo<HudWidget[]>(() => {
     const persistedWidgets = normalizeGameHudWidgets(metadata.gameWidgetState);
     if (persistedWidgets.length > 0 || Array.isArray(metadata.gameWidgetState)) return persistedWidgets;
@@ -720,7 +810,13 @@ export function ChatSettingsDrawer({
     [chatCharIds, inactiveCharacterIds],
   );
   const supportsCharacterActivityToggle = chatCharIds.length > 1 && !isGame;
-  const isSceneChat = metadata.sceneStatus === "active" || typeof metadata.sceneOriginChatId === "string";
+  useEffect(() => {
+    if (!open || initialSection !== "autonomous" || !isConversation) return;
+    const frame = window.requestAnimationFrame(() => {
+      scheduleControlsRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [initialSection, isConversation, open]);
   const hasGeneratedConversationSchedules =
     !!metadata.characterSchedules &&
     typeof metadata.characterSchedules === "object" &&
@@ -728,15 +824,32 @@ export function ChatSettingsDrawer({
   const conversationSchedulesEnabled =
     metadata.conversationSchedulesEnabled === true ||
     (metadata.conversationSchedulesEnabled == null && hasGeneratedConversationSchedules);
+  const autonomousDailyCapOverride =
+    typeof metadata.autonomousDailyCapOverride === "number" && Number.isFinite(metadata.autonomousDailyCapOverride)
+      ? Math.max(1, Math.floor(metadata.autonomousDailyCapOverride))
+      : null;
   const activeLorebookIds = useMemo<string[]>(
     () => (Array.isArray(metadata.activeLorebookIds) ? metadata.activeLorebookIds : []),
     [metadata.activeLorebookIds],
   );
+  const readLatestActiveLorebookIds = useCallback(() => {
+    const latestChat = qc.getQueryData<Chat>(chatKeys.detail(chat.id));
+    return latestChat ? getChatActiveLorebookIds(latestChat) : [...activeLorebookIds];
+  }, [activeLorebookIds, chat.id, qc]);
+  const excludedLorebookIds = useMemo<string[]>(
+    () => (Array.isArray(metadata.excludedLorebookIds) ? metadata.excludedLorebookIds : []),
+    [metadata.excludedLorebookIds],
+  );
+  const readLatestExcludedLorebookIds = useCallback(() => {
+    const latestChat = qc.getQueryData<Chat>(chatKeys.detail(chat.id));
+    return latestChat ? getChatExcludedLorebookIds(latestChat) : [...excludedLorebookIds];
+  }, [chat.id, excludedLorebookIds, qc]);
   const gameLorebookKeeperEnabled = metadata.gameLorebookKeeperEnabled === true;
   const gameLorebookKeeperLorebookId =
     typeof metadata.gameLorebookKeeperLorebookId === "string" ? metadata.gameLorebookKeeperLorebookId : null;
   const activeLorebooks = useMemo<ActiveLorebookView[]>(() => {
     const pinnedIds = new Set(activeLorebookIds);
+    const excludedIds = new Set(excludedLorebookIds);
     const lorebookList = (lorebooks ?? []) as Lorebook[];
 
     return lorebookList.flatMap((lorebook) => {
@@ -769,10 +882,13 @@ export function ChatSettingsDrawer({
         if (lorebook.chatId === chat.id && !reasons.includes("Chat")) reasons.push("Chat");
       }
 
-      return reasons.length > 0 ? [{ ...lorebook, activeReasons: reasons, isPinned }] : [];
+      return reasons.length > 0
+        ? [{ ...lorebook, activeReasons: reasons, isPinned, isExcluded: excludedIds.has(lorebook.id) }]
+        : [];
     });
   }, [
     activeLorebookIds,
+    excludedLorebookIds,
     chat.id,
     chat.personaId,
     chatCharIds,
@@ -809,6 +925,11 @@ export function ChatSettingsDrawer({
       ),
     [deletedBuiltInAgentTypes, metadata.activeAgentIds],
   );
+  const readLatestActiveAgentIds = useCallback(() => {
+    const latestChat = qc.getQueryData<Chat>(chatKeys.detail(chat.id));
+    const ids = latestChat ? getChatActiveAgentIds(latestChat) : [...activeAgentIds];
+    return ids.filter((id) => !deletedBuiltInAgentTypes.has(id));
+  }, [activeAgentIds, chat.id, deletedBuiltInAgentTypes, qc]);
   const activeToolIds: string[] = metadata.activeToolIds ?? [];
   const spotifyActive = activeAgentIds.includes("spotify");
   const gameLorebookKeeperLorebook = gameLorebookKeeperLorebookId
@@ -824,11 +945,14 @@ export function ChatSettingsDrawer({
   const gameSpotifyPlaylistId =
     typeof metadata.gameSpotifyPlaylistId === "string" ? metadata.gameSpotifyPlaylistId : "";
   const gameSpotifyArtist = typeof metadata.gameSpotifyArtist === "string" ? metadata.gameSpotifyArtist : "";
+  const musicDjSettings = mergeBuiltInAgentSettings("spotify", agentConfigsByType.get("spotify")?.settings);
+  const customMusicFolder = normalizeCustomMusicFolder(metadata.customMusicFolder ?? musicDjSettings.customMusicFolder);
   const gameMusicDjEnabled =
     metadata.gameUseMusicDj === true || gameUseSpotifyMusic || activeAgentIds.includes("youtube");
   const spriteCharacterIds: string[] = Array.isArray(metadata.spriteCharacterIds) ? metadata.spriteCharacterIds : [];
   const spriteDisplayModes = normalizeSpriteDisplayModes(metadata.spriteDisplayModes);
-  const spritePosition: "left" | "right" = metadata.spritePosition === "right" ? "right" : "left";
+  const spritePosition: "left" | "right" =
+    spriteVisualSettings?.spritePosition ?? (metadata.spritePosition === "right" ? "right" : "left");
   const spriteScale = normalizeSpriteDisplayValue(
     metadata.spriteScale,
     roleplaySpriteScale,
@@ -836,13 +960,13 @@ export function ChatSettingsDrawer({
     SPRITE_DISPLAY_SCALE_MAX,
   );
   const expressionSpriteScale = normalizeSpriteDisplayValue(
-    metadata.expressionSpriteScale,
+    spriteVisualSettings?.expressionSpriteScale ?? metadata.expressionSpriteScale,
     spriteScale,
     SPRITE_DISPLAY_SCALE_MIN,
     SPRITE_DISPLAY_SCALE_MAX,
   );
   const fullBodySpriteScale = normalizeSpriteDisplayValue(
-    metadata.fullBodySpriteScale,
+    spriteVisualSettings?.fullBodySpriteScale ?? metadata.fullBodySpriteScale,
     spriteScale,
     SPRITE_DISPLAY_SCALE_MIN,
     SPRITE_DISPLAY_SCALE_MAX,
@@ -854,18 +978,19 @@ export function ChatSettingsDrawer({
     SPRITE_DISPLAY_OPACITY_MAX,
   );
   const expressionSpriteOpacity = normalizeSpriteDisplayValue(
-    metadata.expressionSpriteOpacity,
+    spriteVisualSettings?.expressionSpriteOpacity ?? metadata.expressionSpriteOpacity,
     spriteOpacity,
     SPRITE_DISPLAY_OPACITY_MIN,
     SPRITE_DISPLAY_OPACITY_MAX,
   );
   const fullBodySpriteOpacity = normalizeSpriteDisplayValue(
-    metadata.fullBodySpriteOpacity,
+    spriteVisualSettings?.fullBodySpriteOpacity ?? metadata.fullBodySpriteOpacity,
     spriteOpacity,
     SPRITE_DISPLAY_OPACITY_MIN,
     SPRITE_DISPLAY_OPACITY_MAX,
   );
-  const expressionAvatarsEnabled = metadata.expressionAvatarsEnabled === true;
+  const expressionAvatarsEnabled =
+    (spriteVisualSettings?.expressionAvatarsEnabled ?? metadata.expressionAvatarsEnabled) === true;
   const [expressionSpriteScalePercent, setExpressionSpriteScalePercent] = useState(() =>
     Math.round(expressionSpriteScale * 100),
   );
@@ -878,7 +1003,12 @@ export function ChatSettingsDrawer({
   const [fullBodySpriteOpacityPercent, setFullBodySpriteOpacityPercent] = useState(() =>
     Math.round(fullBodySpriteOpacity * 100),
   );
-  const hasCustomSpritePlacements = Object.keys(normalizeSpritePlacements(metadata.spritePlacements)).length > 0;
+  const hasLocalSpritePlacements =
+    !!spriteVisualSettings && Object.prototype.hasOwnProperty.call(spriteVisualSettings, "spritePlacements");
+  const spritePlacementSource = hasLocalSpritePlacements
+    ? spriteVisualSettings?.spritePlacements
+    : metadata.spritePlacements;
+  const hasCustomSpritePlacements = Object.keys(normalizeSpritePlacements(spritePlacementSource)).length > 0;
   const spotifyPlaylistsQuery = useQuery({
     queryKey: ["spotify", "playlists", 50],
     queryFn: () =>
@@ -1040,7 +1170,7 @@ export function ChatSettingsDrawer({
   });
   const musicDjAgentMeta = getAgentDisplayMeta("spotify", {
     name: "Music DJ",
-    description: "Analyzes the narrative mood and plays matching music.",
+    description: "Analyzes the narrative mood and plays matching music through Spotify or YouTube.",
   });
   const knowledgeRetrievalAgentMeta = getAgentDisplayMeta("knowledge-retrieval", {
     name: "Knowledge Retrieval",
@@ -1366,6 +1496,10 @@ export function ChatSettingsDrawer({
       }>,
     [allCharacters],
   );
+  const selectableCharacters = useMemo(
+    () => characters.filter((character) => character.id !== PROFESSOR_MARI_ID),
+    [characters],
+  );
 
   const chatCharacters = useMemo(
     () =>
@@ -1495,11 +1629,7 @@ export function ChatSettingsDrawer({
     });
     // Add alternate greetings as swipes on the first message
     if (msg?.id && firstMesConfirm.alternateGreetings.length > 0) {
-      for (const greeting of firstMesConfirm.alternateGreetings) {
-        if (greeting.trim()) {
-          await api.post(`/chats/${chat.id}/messages/${msg.id}/swipes`, { content: greeting, silent: true });
-        }
-      }
+      await addSilentGreetingSwipes(chat.id, msg.id, firstMesConfirm.alternateGreetings);
       qc.invalidateQueries({ queryKey: chatKeys.messages(chat.id) });
     }
     setFirstMesConfirm(null);
@@ -1653,13 +1783,17 @@ export function ChatSettingsDrawer({
         Math.min(SPRITE_DISPLAY_SCALE_PERCENT_MAX, nextPercent),
       );
       setExpressionSpriteScalePercent(clampedPercent);
+      if (onSpriteVisualSettingsChange) {
+        onSpriteVisualSettingsChange({ expressionSpriteScale: clampedPercent / 100 });
+        return;
+      }
       updateMeta.mutate({
         id: chat.id,
         expressionSpriteScale: clampedPercent / 100,
         spriteScale: clampedPercent / 100,
       });
     },
-    [chat.id, updateMeta],
+    [chat.id, onSpriteVisualSettingsChange, updateMeta],
   );
 
   const setFullBodySpriteScale = useCallback(
@@ -1669,12 +1803,16 @@ export function ChatSettingsDrawer({
         Math.min(SPRITE_DISPLAY_SCALE_PERCENT_MAX, nextPercent),
       );
       setFullBodySpriteScalePercent(clampedPercent);
+      if (onSpriteVisualSettingsChange) {
+        onSpriteVisualSettingsChange({ fullBodySpriteScale: clampedPercent / 100 });
+        return;
+      }
       updateMeta.mutate({
         id: chat.id,
         fullBodySpriteScale: clampedPercent / 100,
       });
     },
-    [chat.id, updateMeta],
+    [chat.id, onSpriteVisualSettingsChange, updateMeta],
   );
 
   const setExpressionSpriteOpacity = useCallback(
@@ -1684,13 +1822,17 @@ export function ChatSettingsDrawer({
         Math.min(SPRITE_DISPLAY_OPACITY_PERCENT_MAX, nextPercent),
       );
       setExpressionSpriteOpacityPercent(clampedPercent);
+      if (onSpriteVisualSettingsChange) {
+        onSpriteVisualSettingsChange({ expressionSpriteOpacity: clampedPercent / 100 });
+        return;
+      }
       updateMeta.mutate({
         id: chat.id,
         expressionSpriteOpacity: clampedPercent / 100,
         spriteOpacity: clampedPercent / 100,
       });
     },
-    [chat.id, updateMeta],
+    [chat.id, onSpriteVisualSettingsChange, updateMeta],
   );
 
   const setFullBodySpriteOpacity = useCallback(
@@ -1700,12 +1842,16 @@ export function ChatSettingsDrawer({
         Math.min(SPRITE_DISPLAY_OPACITY_PERCENT_MAX, nextPercent),
       );
       setFullBodySpriteOpacityPercent(clampedPercent);
+      if (onSpriteVisualSettingsChange) {
+        onSpriteVisualSettingsChange({ fullBodySpriteOpacity: clampedPercent / 100 });
+        return;
+      }
       updateMeta.mutate({
         id: chat.id,
         fullBodySpriteOpacity: clampedPercent / 100,
       });
     },
-    [chat.id, updateMeta],
+    [chat.id, onSpriteVisualSettingsChange, updateMeta],
   );
 
   // ── Character drag-and-drop reordering ──
@@ -1726,6 +1872,21 @@ export function ChatSettingsDrawer({
     setDropIdx(e.clientY < midY ? cardIdx : cardIdx + 1);
   };
 
+  const commitCharacterReorder = useCallback(
+    (sourceIdx: number, targetIdx: number) => {
+      if (sourceIdx < 0 || sourceIdx >= chatCharIds.length || targetIdx < 0 || targetIdx > chatCharIds.length) return;
+      let insertAt = targetIdx;
+      if (sourceIdx < insertAt) insertAt--;
+      if (sourceIdx === insertAt) return;
+      const ids = [...chatCharIds];
+      const [moved] = ids.splice(sourceIdx, 1);
+      if (!moved) return;
+      ids.splice(insertAt, 0, moved);
+      updateChat.mutate({ id: chat.id, characterIds: ids });
+    },
+    [chat.id, chatCharIds, updateChat],
+  );
+
   const handleCharDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const src = dragIdx;
@@ -1733,13 +1894,7 @@ export function ChatSettingsDrawer({
     setDragIdx(null);
     setDropIdx(null);
     if (src === null || tgt === null) return;
-    let insertAt = tgt;
-    if (src < insertAt) insertAt--;
-    if (src === insertAt) return;
-    const ids = [...chatCharIds];
-    const [moved] = ids.splice(src, 1);
-    ids.splice(insertAt, 0, moved!);
-    updateChat.mutate({ id: chat.id, characterIds: ids });
+    commitCharacterReorder(src, tgt);
   };
 
   const handleCharDragEnd = () => {
@@ -1747,17 +1902,49 @@ export function ChatSettingsDrawer({
     setDropIdx(null);
   };
 
+  const { startTouchDrag: startCharacterReorderTouchDrag } = useTouchFolderDrag({
+    onActivate: (characterId) => {
+      const idx = chatCharIds.indexOf(characterId);
+      if (idx < 0) return;
+      setDragIdx(idx);
+    },
+    onDrop: (characterId, x, y) => {
+      const sourceIdx = chatCharIds.indexOf(characterId);
+      const targetIdx = getTouchReorderDropIndex({
+        x,
+        y,
+        itemSelector: '[data-touch-reorder-item="chat-settings-character"]',
+        rootSelector: "[data-chat-settings-character-root]",
+        itemCount: chatCharIds.length,
+      });
+      setDragIdx(null);
+      setDropIdx(null);
+      if (sourceIdx < 0 || targetIdx === null) return;
+      commitCharacterReorder(sourceIdx, targetIdx);
+    },
+    onCancel: () => {
+      setDragIdx(null);
+      setDropIdx(null);
+    },
+  });
+
   const toggleLorebook = (lbId: string) => {
-    const current = [...activeLorebookIds];
+    const current = readLatestActiveLorebookIds();
     const idx = current.indexOf(lbId);
     if (idx >= 0) current.splice(idx, 1);
     else current.push(lbId);
     updateMeta.mutate({ id: chat.id, activeLorebookIds: current });
   };
 
-  const pinLorebookToChat = (lbId: string) => {
-    if (activeLorebookIds.includes(lbId)) return;
-    updateMeta.mutate({ id: chat.id, activeLorebookIds: [...activeLorebookIds, lbId] });
+  // Disable / re-enable an auto-activated (character/global/persona) lorebook for
+  // this chat. Unlike unpinning, this does not touch activeLorebookIds — it adds
+  // the book to excludedLorebookIds so the scope filter drops it before injection.
+  const setLorebookExcluded = (lbId: string, excluded: boolean) => {
+    const current = readLatestExcludedLorebookIds();
+    const has = current.includes(lbId);
+    if (excluded === has) return;
+    const next = excluded ? [...current, lbId] : current.filter((id) => id !== lbId);
+    updateMeta.mutate({ id: chat.id, excludedLorebookIds: next });
   };
 
   const hasSecretPlotMemory = (memory: Record<string, unknown> | null | undefined) => {
@@ -1792,11 +1979,6 @@ export function ChatSettingsDrawer({
   };
 
   const toggleAgent = async (agentId: string, options?: { skipDirectorRemovalWarning?: boolean }) => {
-    const readLatestActiveAgentIds = () => {
-      const latestChat = qc.getQueryData<Chat>(chatKeys.detail(chat.id));
-      const ids = latestChat ? getChatActiveAgentIds(latestChat) : [...activeAgentIds];
-      return ids.filter((id) => !deletedBuiltInAgentTypes.has(id));
-    };
     const wasRemoving = readLatestActiveAgentIds().includes(agentId);
     if (wasRemoving && agentId === "director" && !options?.skipDirectorRemovalWarning) {
       const warningMessage = await getNarrativeDirectorRemovalWarning();
@@ -1955,32 +2137,40 @@ export function ChatSettingsDrawer({
     lorebooks,
   ]);
   const showLorebookMarkerWarning =
-    !!chat.promptPresetId && hasScopedOrGlobalLorebooks && !currentPromptPresetHasLorebookMarker;
+    !!chat.promptPresetId &&
+    !isConversation &&
+    !isGame &&
+    hasScopedOrGlobalLorebooks &&
+    !currentPromptPresetHasLorebookMarker;
 
-  const setPreset = (presetId: string | null) => {
-    updateChat.mutate(
-      { id: chat.id, promptPresetId: presetId },
-      {
-        onSuccess: async () => {
-          if (!presetId) {
-            setChoiceModalPresetId(null);
-            return;
-          }
+  const [choiceModalPresetId, setChoiceModalPresetId] = useState<string | null>(null);
+  const setPreset = useCallback(
+    (presetId: string | null) => {
+      updateChat.mutate(
+        { id: chat.id, promptPresetId: presetId },
+        {
+          onSuccess: async () => {
+            if (!presetId) {
+              setChoiceModalPresetId(null);
+              return;
+            }
 
-          try {
-            const presetFull = await api.get<{ choiceBlocks?: unknown[] }>(`/prompts/${presetId}/full`);
-            if ((presetFull.choiceBlocks?.length ?? 0) > 0) {
-              setChoiceModalPresetId(presetId);
-            } else {
+            try {
+              const presetFull = await api.get<{ choiceBlocks?: unknown[] }>(`/prompts/${presetId}/full`);
+              if ((presetFull.choiceBlocks?.length ?? 0) > 0) {
+                setChoiceModalPresetId(presetId);
+              } else {
+                setChoiceModalPresetId(null);
+              }
+            } catch {
               setChoiceModalPresetId(null);
             }
-          } catch {
-            setChoiceModalPresetId(null);
-          }
+          },
         },
-      },
-    );
-  };
+      );
+    },
+    [chat.id, updateChat],
+  );
 
   const setConnection = (connectionId: string | null) => {
     updateChat.mutate({ id: chat.id, connectionId });
@@ -2010,7 +2200,6 @@ export function ChatSettingsDrawer({
   const [charSearch, setCharSearch] = useState("");
   const [lbSearch, setLbSearch] = useState("");
   const [toolSearch, setToolSearch] = useState("");
-  const [choiceModalPresetId, setChoiceModalPresetId] = useState<string | null>(null);
   const [agentAddPreview, setAgentAddPreview] = useState<AgentAddPreview | null>(null);
   const [agentAddCadenceInputFocused, setAgentAddCadenceInputFocused] = useState(false);
   const [addingAgentToChat, setAddingAgentToChat] = useState(false);
@@ -2018,6 +2207,11 @@ export function ChatSettingsDrawer({
   // Synchronous lock to close the re-entry gap: React state commits are async, so two
   // fast clicks can both pass the `isRegeneratingSchedules` check before the state updates.
   const isRegeneratingSchedulesRef = useRef(false);
+  type ScheduleGenerationResult = { status: string; schedule?: Record<string, unknown> };
+  type ScheduleGenerationResponse = {
+    results?: Record<string, ScheduleGenerationResult>;
+    schedules?: Record<string, unknown>;
+  };
   const generateConversationSchedules = useCallback(
     async (forceRefresh = false) => {
       if (isRegeneratingSchedulesRef.current) return;
@@ -2025,15 +2219,61 @@ export function ChatSettingsDrawer({
       setIsRegeneratingSchedules(true);
       try {
         const scheduleGenerationPreferences = useUIStore.getState().scheduleGenerationPreferences;
-        await api.post("/conversation/schedule/generate", {
+        const result = await api.post<ScheduleGenerationResponse>("/conversation/schedule/generate", {
           chatId: chat.id,
           characterIds: chatCharIds,
           forceRefresh,
           scheduleGenerationPreferences,
         });
-        qc.invalidateQueries({ queryKey: chatKeys.detail(chat.id) });
-      } catch {
-        // non-critical
+        await qc.refetchQueries({ queryKey: chatKeys.detail(chat.id) });
+        await qc.invalidateQueries({ queryKey: chatKeys.list() });
+        await qc.invalidateQueries({ queryKey: ["conversation-status", chat.id] });
+
+        const statuses = Object.values(result.results ?? {}).map((entry) => entry.status);
+        const generatedCount = statuses.filter((status) => status === "generated").length;
+        const sharedCount = statuses.filter((status) => status === "shared").length;
+        const freshCount = statuses.filter((status) => status === "fresh").length;
+        const skippedCount = statuses.filter((status) => status === "skipped_assistant").length;
+        const errorMessages = statuses
+          .filter((status) => status.startsWith("error:"))
+          .map((status) => status.slice("error:".length).trim())
+          .filter(Boolean);
+
+        if (errorMessages.length > 0) {
+          const prefix = errorMessages[0]?.startsWith("Refused to fetch")
+            ? "Connection failed"
+            : "Schedule generation failed";
+          const summary = `${prefix}: ${errorMessages[0]}`;
+          if (generatedCount + sharedCount + freshCount > 0) {
+            toast.error(
+              `${summary} (${generatedCount} generated, ${sharedCount} reused, ${freshCount} already fresh).`,
+            );
+          } else {
+            toast.error(summary);
+          }
+          return;
+        }
+
+        if (generatedCount > 0 || sharedCount > 0) {
+          const parts: string[] = [];
+          if (generatedCount > 0) parts.push(`${generatedCount} generated`);
+          if (sharedCount > 0) parts.push(`${sharedCount} reused`);
+          if (freshCount > 0) parts.push(`${freshCount} already fresh`);
+          if (skippedCount > 0) parts.push(`${skippedCount} skipped`);
+          toast.success(`Schedules ready: ${parts.join(", ")}.`);
+          return;
+        }
+
+        if (freshCount > 0) {
+          toast.info(`Schedules are already up to date${freshCount > 1 ? ` for ${freshCount} characters` : ""}.`);
+          return;
+        }
+
+        if (skippedCount > 0) {
+          toast.info("No schedules were needed for the selected characters.");
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to generate schedules.");
       } finally {
         isRegeneratingSchedulesRef.current = false;
         setIsRegeneratingSchedules(false);
@@ -2080,13 +2320,16 @@ export function ChatSettingsDrawer({
   const setActiveChatPreset = useSetActiveChatPreset();
   const presetList = useMemo(() => (chatPresets ?? []) as ChatPreset[], [chatPresets]);
   const appliedPresetId = (metadata.appliedChatPresetId as string | undefined) ?? null;
-  const selectedChatPreset = useMemo(() => {
-    if (appliedPresetId) {
-      const match = presetList.find((p) => p.id === appliedPresetId);
-      if (match) return match;
-    }
-    return presetList.find((p) => p.isDefault) ?? null;
+  const appliedChatPreset = useMemo(() => {
+    if (!appliedPresetId) return null;
+    return presetList.find((p) => p.id === appliedPresetId) ?? null;
   }, [presetList, appliedPresetId]);
+  const selectedChatPreset = useMemo(() => {
+    if (appliedChatPreset) return appliedChatPreset;
+    return presetList.find((p) => p.isDefault) ?? null;
+  }, [presetList, appliedChatPreset]);
+  const chatPresetSelectValue =
+    appliedChatPreset?.id ?? (presetList.length > 0 ? CHAT_PRESET_UNAPPLIED_SELECT_VALUE : "");
   const [renamingPreset, setRenamingPreset] = useState(false);
   const [renamePresetVal, setRenamePresetVal] = useState("");
   const presetFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -2107,6 +2350,18 @@ export function ChatSettingsDrawer({
   }, [chat.id, metadata.gameSystemPrompt]);
 
   useEffect(() => {
+    modePromptDefaultAppliedRef.current = null;
+  }, [chat.id]);
+
+  useEffect(() => {
+    if (!open || !shouldApplyModePromptDefault || chat.promptPresetId || !fallbackPromptPreset?.id) return;
+    const fallbackKey = `${chat.id}:${fallbackPromptPreset.id}`;
+    if (modePromptDefaultAppliedRef.current === fallbackKey) return;
+    modePromptDefaultAppliedRef.current = fallbackKey;
+    updateChat.mutate({ id: chat.id, promptPresetId: fallbackPromptPreset.id });
+  }, [chat.id, chat.promptPresetId, fallbackPromptPreset?.id, open, shouldApplyModePromptDefault, updateChat]);
+
+  useEffect(() => {
     setGameSpecialInstructionsDraft((metadata.gameSpecialInstructions as string) ?? "");
   }, [chat.id, metadata.gameSpecialInstructions]);
 
@@ -2117,6 +2372,29 @@ export function ChatSettingsDrawer({
   useEffect(() => {
     setSpotifyArtistDraft(spotifyArtist);
   }, [chat.id, spotifyArtist]);
+
+  const handleModePromptPresetChange = useCallback(
+    (promptPresetId: string | null) => {
+      if (!promptPresetId && fallbackPromptPreset?.id) {
+        modePromptDefaultAppliedRef.current = `${chat.id}:${fallbackPromptPreset.id}`;
+      }
+      setPreset(promptPresetId);
+      if (isConversation) {
+        updateMeta.mutate({ id: chat.id, customSystemPrompt: null });
+      }
+      if (isGame) {
+        setGamePromptDraft("");
+        updateMeta.mutate({ id: chat.id, gameSystemPrompt: null });
+      }
+    },
+    [chat.id, fallbackPromptPreset?.id, isConversation, isGame, setPreset, updateMeta],
+  );
+
+  const openSelectedModePromptPreset = useCallback(() => {
+    if (!effectiveModePromptPresetId) return;
+    onClose();
+    openPresetDetail(effectiveModePromptPresetId);
+  }, [effectiveModePromptPresetId, onClose, openPresetDetail]);
 
   const openAgentAddModal = (agent: AvailableAgent) => {
     setAgentAddCadenceInputFocused(false);
@@ -2163,7 +2441,8 @@ export function ChatSettingsDrawer({
     const nextEnabledTools = nextSettings.enabledTools;
     if (
       builtInMeta &&
-      (!Array.isArray(nextEnabledTools) || (agent.id === "spotify" && nextEnabledTools.length === 0))
+      (!Array.isArray(nextEnabledTools) ||
+        (agent.id === "spotify" && nextSettings.musicProvider === "spotify" && nextEnabledTools.length === 0))
     ) {
       nextSettings.enabledTools = DEFAULT_AGENT_TOOLS[agent.id] ?? [];
     }
@@ -2171,14 +2450,13 @@ export function ChatSettingsDrawer({
     setAddingAgentToChat(true);
     try {
       if (config) {
-        await updateAgentConfig.mutateAsync({ id: config.id, enabled: true, settings: nextSettings });
+        await updateAgentConfig.mutateAsync({ id: config.id, settings: nextSettings });
       } else if (builtInMeta) {
         await createAgent.mutateAsync({
           type: builtInMeta.id,
           name: agent.name,
           description: agent.description,
           phase: normalizeAgentPhaseForType(agent.id, agent.phase),
-          enabled: true,
           connectionId: null,
           promptTemplate: "",
           settings: nextSettings,
@@ -2187,11 +2465,13 @@ export function ChatSettingsDrawer({
 
       await updateMeta.mutateAsync({
         id: chat.id,
-        activeAgentIds: Array.from(new Set([...activeAgentIds, agent.id])),
+        enableAgents: true,
+        activeAgentIds: Array.from(new Set([...readLatestActiveAgentIds(), agent.id])),
         ...buildAgentAddMetadataPatch(agent.id, setup, metadata, {
           allowSecretPlot: supportsNarrativeDirectorSecretPlot,
         }),
       });
+      toast.success(`Added ${agent.name}! You can access its settings in Agents section in Chat Settings!`);
       setAgentAddPreview(null);
     } catch (error) {
       await showAlertDialog({
@@ -2204,7 +2484,7 @@ export function ChatSettingsDrawer({
   };
 
   const ensureMusicDjAgent = useCallback(
-    async (provider: "spotify" | "youtube") => {
+    async (provider: MusicProvider) => {
       const builtInMeta = BUILT_IN_AGENTS.find((entry) => entry.id === "spotify");
       if (!builtInMeta) throw new Error("Music DJ agent metadata is missing.");
       const config = agentConfigsByType.get("spotify") ?? null;
@@ -2212,11 +2492,12 @@ export function ChatSettingsDrawer({
         ...mergeBuiltInAgentSettings("spotify", config?.settings),
         musicProvider: provider,
         musicPlayerSource: provider,
-        enabledTools: provider === "youtube" ? [] : (DEFAULT_AGENT_TOOLS.spotify ?? []),
+        customMusicFolder,
+        enabledTools: provider === "spotify" ? (DEFAULT_AGENT_TOOLS.spotify ?? []) : [],
       };
 
       if (config) {
-        await updateAgentConfig.mutateAsync({ id: config.id, enabled: true, settings: nextSettings });
+        await updateAgentConfig.mutateAsync({ id: config.id, settings: nextSettings });
         return;
       }
 
@@ -2225,22 +2506,60 @@ export function ChatSettingsDrawer({
         name: builtInMeta.name,
         description: builtInMeta.description,
         phase: normalizeAgentPhaseForType(builtInMeta.id, builtInMeta.phase),
-        enabled: true,
         connectionId: null,
         promptTemplate: "",
         settings: nextSettings,
       });
     },
-    [agentConfigsByType, createAgent, updateAgentConfig],
+    [agentConfigsByType, createAgent, customMusicFolder, updateAgentConfig],
+  );
+
+  const changeMusicDjProvider = useCallback(
+    async (provider: MusicProvider) => {
+      setMusicPlayerSource(provider);
+      const musicDjActive = gameMusicDjEnabled || activeAgentIds.includes("spotify");
+      if (!musicDjActive) return;
+      try {
+        await ensureMusicDjAgent(provider);
+        if (isGame && gameMusicDjEnabled) {
+          updateMeta.mutate({
+            id: chat.id,
+            gameUseSpotifyMusic: provider === "spotify",
+          });
+        }
+      } catch (error) {
+        await showAlertDialog({
+          title: "Couldn't Update Music DJ",
+          message: error instanceof Error ? error.message : "Music DJ provider could not be updated.",
+        });
+      }
+    },
+    [activeAgentIds, chat.id, ensureMusicDjAgent, gameMusicDjEnabled, isGame, setMusicPlayerSource, updateMeta],
+  );
+
+  const saveCustomMusicFolder = useCallback(
+    async (value: string) => {
+      const folder = normalizeCustomMusicFolder(value);
+      updateMeta.mutate({ id: chat.id, customMusicFolder: folder });
+      const config = agentConfigsByType.get("spotify") ?? null;
+      if (!config) return;
+      const nextSettings = {
+        ...mergeBuiltInAgentSettings("spotify", config.settings),
+        customMusicFolder: folder,
+      };
+      await updateAgentConfig.mutateAsync({ id: config.id, settings: nextSettings });
+    },
+    [agentConfigsByType, chat.id, updateAgentConfig, updateMeta],
   );
 
   const toggleGameMusicDj = useCallback(async () => {
+    const latestActiveAgentIds = readLatestActiveAgentIds();
     if (gameMusicDjEnabled) {
       await updateMeta.mutateAsync({
         id: chat.id,
         gameUseMusicDj: false,
         gameUseSpotifyMusic: false,
-        activeAgentIds: activeAgentIds.filter((id) => id !== "spotify" && id !== "youtube"),
+        activeAgentIds: latestActiveAgentIds.filter((id) => id !== "spotify" && id !== "youtube"),
       });
       return;
     }
@@ -2253,7 +2572,7 @@ export function ChatSettingsDrawer({
         gameUseMusicDj: true,
         gameUseSpotifyMusic: musicPlayerSource === "spotify",
         gameSpotifySourceType,
-        activeAgentIds: Array.from(new Set([...activeAgentIds.filter((id) => id !== "youtube"), "spotify"])),
+        activeAgentIds: Array.from(new Set([...latestActiveAgentIds.filter((id) => id !== "youtube"), "spotify"])),
       });
     } catch (error) {
       await showAlertDialog({
@@ -2265,12 +2584,12 @@ export function ChatSettingsDrawer({
       });
     }
   }, [
-    activeAgentIds,
     chat.id,
     ensureMusicDjAgent,
     gameMusicDjEnabled,
     gameSpotifySourceType,
     musicPlayerSource,
+    readLatestActiveAgentIds,
     updateMeta,
   ]);
 
@@ -2285,7 +2604,8 @@ export function ChatSettingsDrawer({
   }, [chat.id, gameWidgetDrafts, updateGameWidgets]);
 
   const toggleGameLorebookKeeper = useCallback(() => {
-    const nextActiveAgentIds = activeAgentIds.filter((id) => id !== "lorebook-keeper");
+    const latestActiveAgentIds = readLatestActiveAgentIds();
+    const nextActiveAgentIds = latestActiveAgentIds.filter((id) => id !== "lorebook-keeper");
     if (gameLorebookKeeperEnabled) {
       const keeperLorebookIds = new Set(
         ((lorebooks ?? []) as Lorebook[])
@@ -2308,12 +2628,12 @@ export function ChatSettingsDrawer({
       activeAgentIds: nextActiveAgentIds,
     });
   }, [
-    activeAgentIds,
     activeLorebookIds,
     chat.id,
     gameLorebookKeeperEnabled,
     gameLorebookKeeperLorebookId,
     lorebooks,
+    readLatestActiveAgentIds,
     updateMeta,
   ]);
 
@@ -2325,13 +2645,13 @@ export function ChatSettingsDrawer({
   const snapshotCurrentPresetSettings = useCallback((): ChatPresetSettings => {
     return {
       connectionId: chat.connectionId ?? null,
-      promptPresetId: isConversation ? null : (chat.promptPresetId ?? null),
+      promptPresetId: chat.promptPresetId ?? null,
       metadata: { ...metadata },
     };
-  }, [chat.connectionId, chat.promptPresetId, isConversation, metadata]);
+  }, [chat.connectionId, chat.promptPresetId, metadata]);
 
   const handleSelectPreset = (id: string) => {
-    if (!id || id === selectedChatPreset?.id) return;
+    if (!id || id === CHAT_PRESET_UNAPPLIED_SELECT_VALUE || id === appliedChatPreset?.id) return;
     applyChatPreset.mutate({ presetId: id, chatId: chat.id });
   };
 
@@ -2498,8 +2818,8 @@ export function ChatSettingsDrawer({
     );
   };
 
-  const renderCustomAgentPicker = () => {
-    if (customAgents.length === 0) return null;
+  const renderCustomAgentPicker = ({ showWhenEmpty = false }: { showWhenEmpty?: boolean } = {}) => {
+    if (customAgents.length === 0 && !showWhenEmpty) return null;
     return (
       <AgentCategorySection
         label="Agentes personalizados"
@@ -2525,30 +2845,138 @@ export function ChatSettingsDrawer({
               </button>
             ))}
           </div>
+        ) : customAgents.length === 0 ? (
+          <div className="space-y-2 px-1">
+            <p className="text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
+              No custom agents are available yet. Create one in the Agents panel, then attach it to this game here.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                const ui = useUIStore.getState();
+                ui.openRightPanel("agents");
+                ui.openAgentDetail("__new__");
+              }}
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[var(--secondary)] px-3 py-2 text-[0.6875rem] font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--accent)]"
+            >
+              <Plus size="0.75rem" />
+              Create Custom Agent
+            </button>
+          </div>
         ) : (
           <p className="px-1 text-[0.625rem] text-[var(--muted-foreground)]">
-            All custom agents are active. Configure them below the other agent menus.
+            {isGame && !metadata.enableAgents
+              ? "All custom agents are already attached. Enable Agents to configure or run them."
+              : "All custom agents are active. Configure them below the other agent menus."}
           </p>
         )}
       </AgentCategorySection>
     );
   };
 
+  const renderActiveCustomAgentSettingsCard = () => {
+    if (!metadata.enableAgents || activeCustomAgents.length === 0) return null;
+    return (
+      <AgentSettingsCard
+        id={getAgentSettingsMenuId(chat.id, "custom-agents")}
+        icon={renderRoleplayAgentMenuIcon("custom-agents")}
+        title="Agentes personalizados"
+        description="Configure custom agents currently attached to this chat."
+        order={CUSTOM_AGENT_SETTINGS_ORDER}
+      >
+        <div className="space-y-1.5">
+          {activeCustomAgents.map((agent) => {
+            const tokenEst = agentLoadCost.tokensByType.get(agent.id);
+            const promptOptions = getPromptOptionsForAgent(agent.id);
+            return (
+              <div
+                key={agent.id}
+                className="rounded-lg bg-[var(--background)]/75 px-3 py-2 ring-1 ring-[var(--border)]"
+              >
+                <div className="flex items-start gap-2.5">
+                  <Sparkles size="0.875rem" className="mt-0.5 shrink-0 text-[var(--primary)]" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex min-w-0 items-center gap-1.5">
+                      <span className="block min-w-0 truncate text-xs font-medium">{agent.name}</span>
+                      {tokenEst != null ? (
+                        <span
+                          className="shrink-0 tabular-nums text-[0.625rem] text-[var(--muted-foreground)]"
+                          title={`~${tokenEst.toLocaleString()} tokens of agent instructions (estimated)`}
+                        >
+                          ~{tokenEst.toLocaleString()}
+                        </span>
+                      ) : null}
+                    </div>
+                    <span className="mt-0.5 block text-[0.625rem] leading-tight text-[var(--muted-foreground)] line-clamp-2">
+                      {agent.description}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      void toggleAgent(agent.id);
+                    }}
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
+                    title="Remover do chat"
+                  >
+                    <Trash2 size="0.6875rem" />
+                  </button>
+                </div>
+                <AgentPromptTemplateSelect
+                  options={promptOptions}
+                  selectedId={agentPromptTemplateSelections[agent.id] ?? DEFAULT_AGENT_PROMPT_TEMPLATE_ID}
+                  onChange={(promptTemplateId) => updateAgentPromptTemplateSelection(agent.id, promptTemplateId)}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </AgentSettingsCard>
+    );
+  };
+
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (panelRef.current?.contains(target)) return;
+      if (target instanceof Element && target.closest("[data-chat-floating-panel]")) return;
+      onClose();
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () => document.removeEventListener("pointerdown", handlePointerDown, true);
+  }, [onClose, open]);
+
   if (!open) return null;
+  const anchoredOnMobile = !!anchor && typeof window !== "undefined" && window.innerWidth < 768;
   const panelStyle: CSSProperties | undefined = anchor
-    ? { right: `${anchor.right}px`, top: `${anchor.top}px` }
+    ? anchoredOnMobile
+      ? {
+          bottom: "auto",
+          left: "auto",
+          maxHeight: `min(42rem, calc(100dvh - ${anchor.top}px - 0.75rem - env(safe-area-inset-bottom)))`,
+          right: `${anchor.right}px`,
+          top: `${anchor.top}px`,
+          width: `min(34rem, calc(100vw - ${anchor.right}px - 0.75rem))`,
+        }
+      : { right: `${anchor.right}px`, top: `${anchor.top}px` }
     : undefined;
 
   return (
     <>
-      <div className="fixed inset-0 z-[65] bg-transparent" onClick={onClose} />
-
       {/* Floating panel */}
       <div
+        ref={panelRef}
+        data-chat-floating-panel
         className={cn(
           ROLEPLAY_POPOVER_SHELL,
-          "fixed bottom-3 z-[70] flex min-h-0 w-[min(34rem,calc(100vw-1.5rem))] flex-col overflow-hidden max-md:inset-x-2 max-md:bottom-[calc(0.75rem+env(safe-area-inset-bottom))] max-md:top-[calc(3.5rem+env(safe-area-inset-top))] max-md:w-auto",
-          anchor ? "" : "right-3 top-14",
+          "mari-chat-settings-popover",
+          "mari-chat-settings-drawer",
+          "fixed bottom-3 z-[70] flex min-h-0 w-[min(34rem,calc(100vw-var(--mari-chat-ui-inset-left,0px)-var(--mari-chat-ui-inset-right,0px)-1.5rem))] flex-col overflow-hidden max-md:inset-x-2 max-md:bottom-[calc(0.75rem+env(safe-area-inset-bottom))] max-md:top-[calc(3.5rem+env(safe-area-inset-top))] max-md:w-auto",
+          anchor ? "" : "right-[calc(var(--mari-chat-ui-inset-right,0px)+0.75rem)] top-14",
         )}
         style={panelStyle}
       >
@@ -2560,10 +2988,12 @@ export function ChatSettingsDrawer({
             Configurações do chat
           </h3>
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)]"
+            aria-label="Close chat settings"
+            className={ROLEPLAY_POPOVER_CLOSE_BUTTON}
           >
-            <X size="1rem" />
+            <X size={ROLEPLAY_POPOVER_CLOSE_ICON_SIZE} />
           </button>
         </div>
 
@@ -2573,8 +3003,8 @@ export function ChatSettingsDrawer({
             "flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain pb-[calc(1rem+env(safe-area-inset-bottom))]",
           )}
         >
-          {/* Chat Settings Preset bar — hidden in Game Mode and scene chats. */}
-          {modeCapabilities.supportsChatSettingsPresets && !isSceneChat && (
+          {/* Chat Settings Preset bar — hidden in Game Mode. Scene chats keep it, but scene instructions stay chat-owned. */}
+          {modeCapabilities.supportsChatSettingsPresets && (
             <div
               style={{ order: CHAT_SETTINGS_ORDER.settingsPresets }}
               className="flex shrink-0 flex-col gap-2 border-b border-[var(--border)] px-4 py-3"
@@ -2603,12 +3033,17 @@ export function ChatSettingsDrawer({
                   />
                 ) : (
                   <select
-                    value={selectedChatPreset?.id ?? ""}
+                    value={chatPresetSelectValue}
                     onChange={(e) => handleSelectPreset(e.target.value)}
                     title="Aplicar um preset de configurações a este chat"
                     className="flex-1 min-w-0 rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                   >
                     {presetList.length === 0 && <option value="">Carregando…</option>}
+                    {!appliedChatPreset && presetList.length > 0 && (
+                      <option value={CHAT_PRESET_UNAPPLIED_SELECT_VALUE}>
+                        {appliedPresetId ? "Missing preset - choose a preset" : "Custom settings - choose a preset"}
+                      </option>
+                    )}
                     {presetList.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.isDefault ? "Default" : p.name}
@@ -2644,9 +3079,9 @@ export function ChatSettingsDrawer({
                 <HelpTooltip
                   side="left"
                   text={
-                    isConversation
-                      ? "Presets bundle this chat's connection, tools, translation, memory recall, advanced parameters, and other settings. Prompt presets are not applied in conversation mode. Characters, persona, lorebooks, sprites, summary, tags, and scene prompt stay tied to the chat. Star a preset to use it as the default for new chats in this mode."
-                      : "Presets bundle this chat's connection, prompt preset, agents, tools, translation, memory recall, advanced parameters, and other settings. They never touch your characters, persona, lorebooks, sprites, summary, tags, or scene prompt — those stay tied to the chat. Star a preset to use it as the default for new chats in this mode."
+                    isRoleplayMode
+                      ? "Presets bundle this chat's connection, prompt preset, agents, tools, translation, memory recall, advanced parameters, and other settings. They never touch your characters, persona, lorebooks, sprites, summary, tags, or scene prompt. Star a preset to use it as the default for new chats in this mode."
+                      : "Presets bundle this chat's connection, prompt source, agents, tools, translation, memory recall, advanced parameters, and other settings. Characters, persona, lorebooks, sprites, summary, tags, and scene prompt stay tied to the chat. Star a preset to use it as the default for new chats in this mode."
                   }
                 />
               </div>
@@ -2744,12 +3179,12 @@ export function ChatSettingsDrawer({
             />
           </div>
 
-          {/* Preset — hidden for conversation mode and game mode */}
-          {modeCapabilities.supportsPromptPresets && !metadata.sceneSystemPrompt && (
+          {/* Roleplay prompt preset */}
+          {modeCapabilities.supportsPromptPresets && isRoleplayMode && !metadata.sceneSystemPrompt && (
             <div style={{ order: CHAT_SETTINGS_ORDER.promptPreset }}>
               <PromptPresetSection
                 promptPresetId={chat.promptPresetId ?? null}
-                presets={(presets ?? []) as Array<{ id: string; name: string }>}
+                presets={promptPresetOptions}
                 hasVariables={currentPromptPresetHasVariables}
                 showLorebookMarkerWarning={showLorebookMarkerWarning}
                 onEditVariables={() => {
@@ -2760,14 +3195,34 @@ export function ChatSettingsDrawer({
             </div>
           )}
 
-          {/* Prompt — game mode only */}
+          {/* Conversation/Game prompt preset */}
+          {isConversation && (
+            <div style={{ order: CHAT_SETTINGS_ORDER.promptPreset }}>
+              <ConversationPromptSection
+                chatId={chat.id}
+                customPrompt={(metadata.customSystemPrompt as string) ?? ""}
+                promptPresetId={effectiveModePromptPresetId}
+                promptPresets={promptPresetOptions}
+                selectedPresetName={selectedModePromptPreset?.name ?? null}
+                selectedPresetPrompt={selectedModePromptPreset?.conversationPrompt ?? ""}
+                onCustomPromptChange={(id, customSystemPrompt) => updateMeta.mutate({ id, customSystemPrompt })}
+                onPromptPresetChange={handleModePromptPresetChange}
+                onOpenPromptPreset={openSelectedModePromptPreset}
+              />
+            </div>
+          )}
+
           {isGame && (
-            <div style={{ order: CHAT_SETTINGS_ORDER.gamePrompt }}>
+            <div style={{ order: CHAT_SETTINGS_ORDER.promptPreset }}>
               <GameExtraPromptSection
                 expanded={gamePromptExpanded}
                 storedValue={(metadata.gameSystemPrompt as string) ?? ""}
                 value={gamePromptDraft}
                 specialInstructionsValue={gameSpecialInstructionsDraft}
+                promptPresetId={effectiveModePromptPresetId}
+                promptPresets={promptPresetOptions}
+                selectedPresetName={selectedModePromptPreset?.name ?? null}
+                selectedPresetPrompt={selectedModePromptPreset?.gamePrompt ?? ""}
                 onCommit={(gameSystemPrompt) => updateMeta.mutate({ id: chat.id, gameSystemPrompt })}
                 onSpecialInstructionsCommit={(gameSpecialInstructions) =>
                   updateMeta.mutate({ id: chat.id, gameSpecialInstructions })
@@ -2775,6 +3230,8 @@ export function ChatSettingsDrawer({
                 onExpandedChange={setGamePromptExpanded}
                 onValueChange={setGamePromptDraft}
                 onSpecialInstructionsChange={setGameSpecialInstructionsDraft}
+                onPromptPresetChange={handleModePromptPresetChange}
+                onOpenPromptPreset={openSelectedModePromptPreset}
               />
             </div>
           )}
@@ -2816,7 +3273,7 @@ export function ChatSettingsDrawer({
                               className="h-7 w-7 shrink-0 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
+                            <div className="mari-avatar-placeholder mari-avatar-placeholder--persona flex h-7 w-7 shrink-0 items-center justify-center rounded-full">
                               <User size="0.75rem" />
                             </div>
                           )}
@@ -2881,8 +3338,8 @@ export function ChatSettingsDrawer({
                     {personas
                       .filter(
                         (p) =>
-                          p.name.toLowerCase().includes(personaSearch.toLowerCase()) ||
-                          (p.comment && p.comment.toLowerCase().includes(personaSearch.toLowerCase())),
+                          includesTextForMatch(p.name, personaSearch) ||
+                          includesTextForMatch(p.comment ?? "", personaSearch),
                       )
                       .map((p) => (
                         <button
@@ -2904,7 +3361,7 @@ export function ChatSettingsDrawer({
                               className="h-6 w-6 shrink-0 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
+                            <div className="mari-avatar-placeholder mari-avatar-placeholder--persona flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                               <User size="0.625rem" />
                             </div>
                           )}
@@ -2923,8 +3380,8 @@ export function ChatSettingsDrawer({
                       ))}
                     {personas.filter(
                       (p) =>
-                        p.name.toLowerCase().includes(personaSearch.toLowerCase()) ||
-                        (p.comment && p.comment.toLowerCase().includes(personaSearch.toLowerCase())),
+                        includesTextForMatch(p.name, personaSearch) ||
+                        includesTextForMatch(p.comment ?? "", personaSearch),
                     ).length === 0 && (
                       <p className="px-3 py-2 text-[0.6875rem] text-[var(--muted-foreground)]">
                         {personas.length === 0 ? "No personas created yet." : "No matches."}
@@ -2969,7 +3426,7 @@ export function ChatSettingsDrawer({
                                 />
                               </span>
                             ) : (
-                              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[0.625rem] font-bold">
+                              <div className="mari-avatar-placeholder mari-avatar-placeholder--character flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-bold">
                                 {name[0]}
                               </div>
                             )}
@@ -3013,13 +3470,13 @@ export function ChatSettingsDrawer({
                   onClose={() => setShowCharPicker(false)}
                   placeholder="Buscar personagens…"
                 >
-                  {characters
+                  {selectableCharacters
                     .filter((c) => !chatCharIds.includes(c.id))
-                    .filter((c) => {
-                      const query = charSearch.toLowerCase();
-                      const title = charTitle(c)?.toLowerCase() ?? "";
-                      return charName(c).toLowerCase().includes(query) || title.includes(query);
-                    })
+                    .filter(
+                      (c) =>
+                        includesTextForMatch(charName(c), charSearch) ||
+                        includesTextForMatch(charTitle(c) ?? "", charSearch),
+                    )
                     .map((c) => {
                       const name = charName(c);
                       const title = charTitle(c);
@@ -3072,7 +3529,7 @@ export function ChatSettingsDrawer({
                             className="h-7 w-7 shrink-0 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
+                          <div className="mari-avatar-placeholder mari-avatar-placeholder--persona flex h-7 w-7 shrink-0 items-center justify-center rounded-full">
                             <User size="0.75rem" />
                           </div>
                         )}
@@ -3139,8 +3596,8 @@ export function ChatSettingsDrawer({
                   {personas
                     .filter(
                       (p) =>
-                        p.name.toLowerCase().includes(personaSearch.toLowerCase()) ||
-                        (p.comment && p.comment.toLowerCase().includes(personaSearch.toLowerCase())),
+                        includesTextForMatch(p.name, personaSearch) ||
+                        includesTextForMatch(p.comment ?? "", personaSearch),
                     )
                     .map((p) => (
                       <button
@@ -3162,7 +3619,7 @@ export function ChatSettingsDrawer({
                             className="h-6 w-6 shrink-0 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
+                          <div className="mari-avatar-placeholder mari-avatar-placeholder--persona flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                             <User size="0.625rem" />
                           </div>
                         )}
@@ -3181,8 +3638,8 @@ export function ChatSettingsDrawer({
                     ))}
                   {personas.filter(
                     (p) =>
-                      p.name.toLowerCase().includes(personaSearch.toLowerCase()) ||
-                      (p.comment && p.comment.toLowerCase().includes(personaSearch.toLowerCase())),
+                      includesTextForMatch(p.name, personaSearch) ||
+                      includesTextForMatch(p.comment ?? "", personaSearch),
                   ).length === 0 && (
                     <p className="px-3 py-2 text-[0.6875rem] text-[var(--muted-foreground)]">
                       {personas.length === 0 ? "No personas created yet." : "No matches."}
@@ -3207,6 +3664,7 @@ export function ChatSettingsDrawer({
                 <p className="text-[0.6875rem] text-[var(--muted-foreground)]">Nenhum personagem adicionado a este chat.</p>
               ) : (
                 <div
+                  data-chat-settings-character-root
                   className="flex flex-col gap-1"
                   onDragOver={(e) => {
                     e.preventDefault();
@@ -3225,6 +3683,8 @@ export function ChatSettingsDrawer({
                           <div className="h-0.5 rounded-full bg-[var(--primary)] mx-2 mb-1" />
                         )}
                         <div
+                          data-touch-reorder-item="chat-settings-character"
+                          data-touch-reorder-index={i}
                           draggable
                           onDragStart={(e) => handleCharDragStart(i, e)}
                           onDragOver={(e) => {
@@ -3242,6 +3702,15 @@ export function ChatSettingsDrawer({
                           <div
                             className="cursor-grab text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors active:cursor-grabbing"
                             title="Arraste para reordenar"
+                            onTouchStart={(event) => {
+                              event.stopPropagation();
+                              startCharacterReorderTouchDrag(event, c.id, {
+                                allowInteractiveTarget: true,
+                                sourceElement: event.currentTarget.closest<HTMLElement>(
+                                  '[data-touch-reorder-item="chat-settings-character"]',
+                                ),
+                              });
+                            }}
                           >
                             <GripVertical size="0.75rem" />
                           </div>
@@ -3264,7 +3733,7 @@ export function ChatSettingsDrawer({
                                 />
                               </span>
                             ) : (
-                              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--accent)] text-[0.625rem] font-bold">
+                              <div className="mari-avatar-placeholder mari-avatar-placeholder--character flex h-7 w-7 items-center justify-center rounded-full text-[0.625rem] font-bold">
                                 {name[0]}
                               </div>
                             )}
@@ -3328,13 +3797,13 @@ export function ChatSettingsDrawer({
                   onClose={() => setShowCharPicker(false)}
                   placeholder="Buscar personagens…"
                 >
-                  {characters
+                  {selectableCharacters
                     .filter((c) => !chatCharIds.includes(c.id))
-                    .filter((c) => {
-                      const query = charSearch.toLowerCase();
-                      const title = charTitle(c)?.toLowerCase() ?? "";
-                      return charName(c).toLowerCase().includes(query) || title.includes(query);
-                    })
+                    .filter(
+                      (c) =>
+                        includesTextForMatch(charName(c), charSearch) ||
+                        includesTextForMatch(charTitle(c) ?? "", charSearch),
+                    )
                     .map((c) => {
                       const name = charName(c);
                       const title = charTitle(c);
@@ -3358,7 +3827,7 @@ export function ChatSettingsDrawer({
                               />
                             </span>
                           ) : (
-                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--accent)] text-[0.5625rem] font-bold">
+                            <div className="mari-avatar-placeholder mari-avatar-placeholder--character flex h-6 w-6 items-center justify-center rounded-full text-[0.5625rem] font-bold">
                               {name[0]}
                             </div>
                           )}
@@ -3374,15 +3843,15 @@ export function ChatSettingsDrawer({
                         </button>
                       );
                     })}
-                  {characters
+                  {selectableCharacters
                     .filter((c) => !chatCharIds.includes(c.id))
-                    .filter((c) => {
-                      const query = charSearch.toLowerCase();
-                      const title = charTitle(c)?.toLowerCase() ?? "";
-                      return charName(c).toLowerCase().includes(query) || title.includes(query);
-                    }).length === 0 && (
+                    .filter(
+                      (c) =>
+                        includesTextForMatch(charName(c), charSearch) ||
+                        includesTextForMatch(charTitle(c) ?? "", charSearch),
+                    ).length === 0 && (
                     <p className="px-3 py-2 text-[0.6875rem] text-[var(--muted-foreground)]">
-                      {characters.filter((c) => !chatCharIds.includes(c.id)).length === 0
+                      {selectableCharacters.filter((c) => !chatCharIds.includes(c.id)).length === 0
                         ? "All characters already added."
                         : "No matches."}
                     </p>
@@ -3451,14 +3920,6 @@ export function ChatSettingsDrawer({
                   </PickerDropdown>
                 ))}
             </Section>
-          )}
-
-          {isConversation && (
-            <ConversationPromptSection
-              chatId={chat.id}
-              customPrompt={(metadata.customSystemPrompt as string) ?? ""}
-              onCustomPromptChange={(id, customSystemPrompt) => updateMeta.mutate({ id, customSystemPrompt })}
-            />
           )}
 
           {/* Card Theming — only shown when an active character ships creator-notes CSS */}
@@ -3861,38 +4322,73 @@ export function ChatSettingsDrawer({
               label="Mensagens autônomas"
               icon={<Bot size="0.875rem" />}
               help="Characters can message you unprompted based on their personality, your status, and optional schedules. Chatty characters will reach out sooner when you're inactive."
+              initialOpen={initialSection === "autonomous"}
             >
               <div className="space-y-2">
                 {/* Enable autonomous messages toggle */}
-                <button
-                  onClick={() => {
-                    updateMeta.mutate({ id: chat.id, autonomousMessages: !metadata.autonomousMessages });
-                  }}
+                <div
                   className={cn(
-                    "mari-chat-option-field flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-all",
+                    "mari-chat-option-field rounded-lg transition-all",
                     metadata.autonomousMessages && "mari-chat-option-field--active",
                   )}
                 >
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs font-medium">Mensagens autônomas</span>
-                    <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                      Characters message you when you&apos;re inactive, even without schedules
-                    </p>
-                  </div>
-                  <div
-                    className={cn(
-                      "mari-chat-option-switch h-5 w-9 shrink-0 rounded-full p-0.5 transition-colors",
-                      metadata.autonomousMessages && "mari-chat-option-switch--active",
-                    )}
+                  <button
+                    onClick={() => {
+                      updateMeta.mutate({ id: chat.id, autonomousMessages: !metadata.autonomousMessages });
+                    }}
+                    className="flex w-full items-center justify-between px-3 py-2.5 text-left"
                   >
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-medium">Mensagens autônomas</span>
+                      <p className="text-[0.625rem] text-[var(--muted-foreground)]">
+                        Characters message you when you&apos;re inactive, even without schedules
+                      </p>
+                    </div>
                     <div
                       className={cn(
-                        "h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
-                        metadata.autonomousMessages && "translate-x-3.5",
+                        "mari-chat-option-switch h-5 w-9 shrink-0 rounded-full p-0.5 transition-colors",
+                        metadata.autonomousMessages && "mari-chat-option-switch--active",
                       )}
-                    />
-                  </div>
-                </button>
+                    >
+                      <div
+                        className={cn(
+                          "h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
+                          metadata.autonomousMessages && "translate-x-3.5",
+                        )}
+                      />
+                    </div>
+                  </button>
+
+                  {metadata.autonomousMessages && (
+                    <div className="border-t border-[var(--border)]/50 px-3 pb-2.5 pt-2">
+                      <label className="space-y-1.5">
+                        <span className="block text-[0.625rem] font-medium text-[var(--muted-foreground)]">
+                          Daily Check-In Cap
+                        </span>
+                        <select
+                          value={autonomousDailyCapOverride ?? ""}
+                          onChange={(e) =>
+                            updateMeta.mutate({
+                              id: chat.id,
+                              autonomousDailyCapOverride: e.target.value ? Number(e.target.value) : null,
+                            })
+                          }
+                          className="w-full rounded-lg bg-[var(--secondary)] px-3 py-2 text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
+                        >
+                          <option value="">Default (talkativeness-based)</option>
+                          {AUTONOMOUS_DAILY_CAP_OPTIONS.map((cap) => (
+                            <option key={cap} value={cap}>
+                              {cap} check-in{cap === 1 ? "" : "s"} / day
+                            </option>
+                          ))}
+                        </select>
+                        <p className="text-[0.55rem] text-[var(--muted-foreground)]">
+                          Overrides the talkativeness-based daily limit for each character.
+                        </p>
+                      </label>
+                    </div>
+                  )}
+                </div>
 
                 <button
                   onClick={() => {
@@ -3966,10 +4462,15 @@ export function ChatSettingsDrawer({
                 <button
                   onClick={() => {
                     const nextEnabled = !conversationSchedulesEnabled;
-                    updateMeta.mutate({ id: chat.id, conversationSchedulesEnabled: nextEnabled });
                     if (nextEnabled && !hasGeneratedConversationSchedules) {
+                      if (chatCharIds.length === 0) {
+                        updateMeta.mutate({ id: chat.id, conversationSchedulesEnabled: nextEnabled });
+                        return;
+                      }
                       void generateConversationSchedules(false);
+                      return;
                     }
+                    updateMeta.mutate({ id: chat.id, conversationSchedulesEnabled: nextEnabled });
                   }}
                   className={cn(
                     "mari-chat-option-field flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-all",
@@ -3998,58 +4499,57 @@ export function ChatSettingsDrawer({
                   </div>
                 </button>
 
-                {/* Schedule status */}
-                <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2.5">
-                  <div className="flex-1 min-w-0">
-                    <span className="text-[0.6875rem] leading-snug text-[var(--muted-foreground)]">
-                      {!conversationSchedulesEnabled
-                        ? "Schedules are off: autonomy uses talkativeness and your status."
+                <div ref={scheduleControlsRef} className="scroll-mt-2 space-y-2">
+                  {/* Schedule status */}
+                  <div className="flex items-center gap-2 rounded-lg bg-[var(--secondary)] px-3 py-2.5">
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[0.6875rem] leading-snug text-[var(--muted-foreground)]">
+                        {!conversationSchedulesEnabled
+                          ? "Schedules are off: autonomy uses talkativeness and your status."
+                          : hasGeneratedConversationSchedules
+                            ? "Schedules generated — status is derived from character routines."
+                            : "Schedules enabled — generate routines when you're ready."}
+                      </span>
+                      <p className="text-[0.59375rem] mt-0.5 text-[var(--muted-foreground)]/60">
+                        {conversationSchedulesEnabled
+                          ? "Schedules refresh only after you enable or regenerate them."
+                          : "Turn schedules on if you want availability and busy delays to matter."}
+                      </p>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        await generateConversationSchedules(true);
+                      }}
+                      disabled={isRegeneratingSchedules || chatCharIds.length === 0}
+                      className={cn(
+                        "flex items-center gap-1 rounded-md px-2 py-1 text-[0.625rem] font-medium transition-colors",
+                        isRegeneratingSchedules || chatCharIds.length === 0
+                          ? "cursor-not-allowed text-[var(--muted-foreground)]/60"
+                          : "text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
+                      )}
+                      title={isRegeneratingSchedules ? "Regenerating schedules…" : "Generate schedules"}
+                    >
+                      <RefreshCw size="0.6875rem" className={cn(isRegeneratingSchedules && "animate-spin")} />
+                      {isRegeneratingSchedules
+                        ? "Regenerating…"
                         : hasGeneratedConversationSchedules
-                          ? "Schedules generated — status is derived from character routines."
-                          : "Schedules enabled — generate routines when you're ready."}
-                    </span>
-                    <p className="text-[0.59375rem] text-[var(--muted-foreground)]/60 mt-0.5">
-                      {conversationSchedulesEnabled
-                        ? "Schedules refresh only after you enable or regenerate them."
-                        : "Turn schedules on if you want availability and busy delays to matter."}
-                    </p>
+                          ? "Regenerate"
+                          : "Generate"}
+                    </button>
                   </div>
-                  <button
-                    onClick={async () => {
-                      if (!conversationSchedulesEnabled) {
-                        updateMeta.mutate({ id: chat.id, conversationSchedulesEnabled: true });
-                      }
-                      await generateConversationSchedules(true);
-                    }}
-                    disabled={isRegeneratingSchedules || chatCharIds.length === 0}
-                    className={cn(
-                      "flex items-center gap-1 rounded-md px-2 py-1 text-[0.625rem] font-medium transition-colors",
-                      isRegeneratingSchedules || chatCharIds.length === 0
-                        ? "cursor-not-allowed text-[var(--muted-foreground)]/60"
-                        : "text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
-                    )}
-                    title={isRegeneratingSchedules ? "Regenerating schedules…" : "Generate schedules"}
-                  >
-                    <RefreshCw size="0.6875rem" className={cn(isRegeneratingSchedules && "animate-spin")} />
-                    {isRegeneratingSchedules
-                      ? "Regenerating…"
-                      : hasGeneratedConversationSchedules
-                        ? "Regenerate"
-                        : "Generate"}
-                  </button>
-                </div>
 
-                {/* Schedule editor per character */}
-                {conversationSchedulesEnabled && hasGeneratedConversationSchedules && (
-                  <ScheduleEditor
-                    characterSchedules={metadata.characterSchedules}
-                    chatCharIds={chatCharIds}
-                    charNameMap={charNameMap}
-                    onSave={(updated) => {
-                      updateMeta.mutate({ id: chat.id, characterSchedules: updated });
-                    }}
-                  />
-                )}
+                  {/* Schedule editor per character */}
+                  {conversationSchedulesEnabled && hasGeneratedConversationSchedules && (
+                    <ScheduleEditor
+                      characterSchedules={metadata.characterSchedules}
+                      chatCharIds={chatCharIds}
+                      charNameMap={charNameMap}
+                      onSave={(updated) => {
+                        updateMeta.mutate({ id: chat.id, characterSchedules: updated });
+                      }}
+                    />
+                  )}
+                </div>
               </div>
             </Section>
           )}
@@ -4421,7 +4921,7 @@ export function ChatSettingsDrawer({
                         c.id !== chat.id &&
                         (c.mode === "roleplay" || c.mode === "game") &&
                         !c.connectedChatId &&
-                        getConnectedChatDisplayName(c).toLowerCase().includes(connectionSearch.toLowerCase()),
+                        includesTextForMatch(getConnectedChatDisplayName(c), connectionSearch),
                     )
                     .map((c) => (
                       <button
@@ -4605,7 +5105,7 @@ export function ChatSettingsDrawer({
                         c.id !== chat.id &&
                         c.mode === "conversation" &&
                         !c.connectedChatId &&
-                        getConnectedChatDisplayName(c).toLowerCase().includes(connectionSearch.toLowerCase()),
+                        includesTextForMatch(getConnectedChatDisplayName(c), connectionSearch),
                     )
                     .map((c) => (
                       <button
@@ -4641,9 +5141,9 @@ export function ChatSettingsDrawer({
               onLorebookTokenBudgetChange={(lorebookTokenBudget) =>
                 updateMeta.mutate({ id: chat.id, lorebookTokenBudget })
               }
-              onPinLorebook={pinLorebookToChat}
               onShowLorebookPickerChange={setShowLbPicker}
               onToggleLorebook={toggleLorebook}
+              onSetLorebookExcluded={setLorebookExcluded}
             />
           </div>
 
@@ -4659,8 +5159,8 @@ export function ChatSettingsDrawer({
               <div className="space-y-2">
                 {isGame && metadata.enableAgents && (
                   <p className="px-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                    
-                    Ative ou desative agentes para esta sessão de game. Apenas os listados abaixo são permitidos para garantir que o formato do game não quebre.
+                    Toggle scene analysis and custom agents for this game session. Roleplay-only built-ins stay hidden
+                    so the game's format doesn't break.
                   </p>
                 )}
                 <button
@@ -4675,10 +5175,10 @@ export function ChatSettingsDrawer({
                   )}
                 >
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs font-medium">{isGame ? "Enable Scene Analysis" : "Enable Agents"}</span>
+                    <span className="text-xs font-medium">Enable Agents</span>
                     <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                       {isGame
-                        ? "Analyse scenes for backgrounds, music, weather, and cinematic effects after each GM turn."
+                        ? "Run scene analysis and any attached custom agents during generation."
                         : "Run AI agents during generation (world state, expressions, etc.)"}
                     </p>
                     {isGame &&
@@ -4840,10 +5340,31 @@ export function ChatSettingsDrawer({
                   >
                     <AgentSettingsToggle
                       label="Music DJ"
-                      description={`Active player: ${musicPlayerSource === "spotify" ? "Spotify" : "YouTube"}.`}
+                      description={`Active player: ${getMusicProviderLabel(musicPlayerSource)}.`}
                       enabled={gameMusicDjEnabled}
                       onToggle={() => void toggleGameMusicDj()}
                     />
+
+                    <div className="grid grid-cols-3 gap-1 rounded-xl border border-[var(--border)] bg-[var(--background)]/65 p-1">
+                      {(["spotify", "youtube", "custom"] as const).map((provider) => {
+                        const active = musicPlayerSource === provider;
+                        return (
+                          <button
+                            key={provider}
+                            type="button"
+                            onClick={() => void changeMusicDjProvider(provider)}
+                            className={cn(
+                              "rounded-lg px-2 py-1.5 text-[0.625rem] font-semibold transition-colors",
+                              active
+                                ? "bg-[var(--primary)]/18 text-[var(--foreground)] shadow-sm"
+                                : "text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
+                            )}
+                          >
+                            {getMusicProviderLabel(provider)}
+                          </button>
+                        );
+                      })}
+                    </div>
 
                     {gameMusicDjEnabled && musicPlayerSource === "spotify" && (
                       <div className="space-y-2">
@@ -4955,6 +5476,25 @@ export function ChatSettingsDrawer({
                           </label>
                         )}
                       </div>
+                    )}
+
+                    {gameMusicDjEnabled && musicPlayerSource === "custom" && (
+                      <label className="flex flex-col gap-1">
+                        <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">
+                          Custom music folder
+                        </span>
+                        <input
+                          key={`${chat.id}-game-custom-music-${customMusicFolder}`}
+                          defaultValue={customMusicFolder}
+                          onBlur={(event) => void saveCustomMusicFolder(event.target.value)}
+                          placeholder="music"
+                          className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-2.5 py-2 font-mono text-xs text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/50"
+                        />
+                        <span className="text-[0.5625rem] text-[var(--muted-foreground)]">
+                          Reads local audio from Game Assets, for example <code>music</code> or{" "}
+                          <code>music/combat</code>.
+                        </span>
+                      </label>
                     )}
                   </AgentSettingsCard>
                 )}
@@ -5306,9 +5846,14 @@ export function ChatSettingsDrawer({
 
                         <button
                           type="button"
-                          onClick={() =>
-                            updateMeta.mutate({ id: chat.id, expressionAvatarsEnabled: !expressionAvatarsEnabled })
-                          }
+                          onClick={() => {
+                            const nextEnabled = !expressionAvatarsEnabled;
+                            if (onSpriteVisualSettingsChange) {
+                              onSpriteVisualSettingsChange({ expressionAvatarsEnabled: nextEnabled });
+                              return;
+                            }
+                            updateMeta.mutate({ id: chat.id, expressionAvatarsEnabled: nextEnabled });
+                          }}
                           className={cn(
                             "flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-all",
                             expressionAvatarsEnabled
@@ -5384,7 +5929,14 @@ export function ChatSettingsDrawer({
                                         />
                                       </span>
                                     ) : (
-                                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent)] text-[0.625rem] font-bold">
+                                      <div
+                                        className={cn(
+                                          "flex h-8 w-8 items-center justify-center rounded-full text-[0.625rem] font-bold",
+                                          isPersona
+                                            ? "mari-avatar-placeholder mari-avatar-placeholder--persona"
+                                            : "mari-avatar-placeholder mari-avatar-placeholder--character",
+                                        )}
+                                      >
                                         {name[0]}
                                       </div>
                                     )}
@@ -5634,8 +6186,29 @@ export function ChatSettingsDrawer({
                         onRemove={getRoleplayAgentMenuRemoveHandler("spotify", musicDjAgentMeta.name)}
                       >
                         <p className="text-[0.55rem] text-[var(--muted-foreground)]/80">
-                          Active player: {musicPlayerSource === "spotify" ? "Spotify" : "YouTube"}.
+                          Active player: {getMusicProviderLabel(musicPlayerSource)}.
                         </p>
+
+                        <div className="grid grid-cols-3 gap-1 rounded-xl border border-[var(--border)] bg-[var(--background)]/65 p-1">
+                          {(["spotify", "youtube", "custom"] as const).map((provider) => {
+                            const active = musicPlayerSource === provider;
+                            return (
+                              <button
+                                key={provider}
+                                type="button"
+                                onClick={() => void changeMusicDjProvider(provider)}
+                                className={cn(
+                                  "rounded-lg px-2 py-1.5 text-[0.625rem] font-semibold transition-colors",
+                                  active
+                                    ? "bg-[var(--primary)]/18 text-[var(--foreground)] shadow-sm"
+                                    : "text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
+                                )}
+                              >
+                                {getMusicProviderLabel(provider)}
+                              </button>
+                            );
+                          })}
+                        </div>
 
                         {musicPlayerSource === "spotify" && (
                           <>
@@ -5754,74 +6327,36 @@ export function ChatSettingsDrawer({
                           </>
                         )}
 
+                        {musicPlayerSource === "custom" && (
+                          <label className="flex flex-col gap-1">
+                            <span className="text-[0.625rem] font-medium text-[var(--muted-foreground)]">
+                              Custom music folder
+                            </span>
+                            <input
+                              key={`${chat.id}-roleplay-custom-music-${customMusicFolder}`}
+                              defaultValue={customMusicFolder}
+                              onBlur={(event) => void saveCustomMusicFolder(event.target.value)}
+                              placeholder="music"
+                              className="w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-2.5 py-2 font-mono text-xs text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/50"
+                            />
+                            <span className="text-[0.5625rem] text-[var(--muted-foreground)]">
+                              Reads local audio from Game Assets, for example <code>music</code> or{" "}
+                              <code>music/combat</code>.
+                            </span>
+                          </label>
+                        )}
+
                         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
                           {musicPlayerSource === "spotify"
                             ? "Roleplay DJ queues several fitting tracks when it changes music."
-                            : "YouTube mode uses the Music DJ agent's YouTube connection and embedded player."}
+                            : musicPlayerSource === "youtube"
+                              ? "YouTube mode uses the Music DJ agent's YouTube connection and embedded player."
+                              : "Custom mode picks from local Game Assets music and plays it in Marinara Engine."}
                         </p>
                       </AgentSettingsCard>
                     )}
 
-                    {metadata.enableAgents && activeCustomAgents.length > 0 && (
-                      <AgentSettingsCard
-                        id={getAgentSettingsMenuId(chat.id, "custom-agents")}
-                        icon={renderRoleplayAgentMenuIcon("custom-agents")}
-                        title="Agentes personalizados"
-                        description="Configure custom agents currently attached to this chat."
-                        order={CUSTOM_AGENT_SETTINGS_ORDER}
-                      >
-                        <div className="space-y-1.5">
-                          {activeCustomAgents.map((agent) => {
-                            const tokenEst = agentLoadCost.tokensByType.get(agent.id);
-                            const promptOptions = getPromptOptionsForAgent(agent.id);
-                            return (
-                              <div
-                                key={agent.id}
-                                className="rounded-lg bg-[var(--background)]/75 px-3 py-2 ring-1 ring-[var(--border)]"
-                              >
-                                <div className="flex items-start gap-2.5">
-                                  <Sparkles size="0.875rem" className="mt-0.5 shrink-0 text-[var(--primary)]" />
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex min-w-0 items-center gap-1.5">
-                                      <span className="block min-w-0 truncate text-xs font-medium">{agent.name}</span>
-                                      {tokenEst != null ? (
-                                        <span
-                                          className="shrink-0 tabular-nums text-[0.625rem] text-[var(--muted-foreground)]"
-                                          title={`~${tokenEst.toLocaleString()} tokens of agent instructions (estimated)`}
-                                        >
-                                          ~{tokenEst.toLocaleString()}
-                                        </span>
-                                      ) : null}
-                                    </div>
-                                    <span className="mt-0.5 block text-[0.625rem] leading-tight text-[var(--muted-foreground)] line-clamp-2">
-                                      {agent.description}
-                                    </span>
-                                  </div>
-                                  <button
-                                    onClick={() => {
-                                      void toggleAgent(agent.id);
-                                    }}
-                                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                                    title="Remover do chat"
-                                  >
-                                    <Trash2 size="0.6875rem" />
-                                  </button>
-                                </div>
-                                <AgentPromptTemplateSelect
-                                  options={promptOptions}
-                                  selectedId={
-                                    agentPromptTemplateSelections[agent.id] ?? DEFAULT_AGENT_PROMPT_TEMPLATE_ID
-                                  }
-                                  onChange={(promptTemplateId) =>
-                                    updateAgentPromptTemplateSelection(agent.id, promptTemplateId)
-                                  }
-                                />
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </AgentSettingsCard>
-                    )}
+                    {renderActiveCustomAgentSettingsCard()}
 
                     {/* Haptic Feedback — not for game mode */}
                     {metadata.enableAgents && !isGame && hapticActive && (
@@ -5929,19 +6464,19 @@ export function ChatSettingsDrawer({
                   </div>
                 )}
 
-                {/* Image Generation — game mode only */}
+                {/* Illustrator — game mode only */}
                 {isGame && (
                   <AgentSettingsCard
                     icon={<Image size="0.75rem" className="mt-0.5 text-[var(--primary)]" />}
-                    title="Geração de imagem"
-                    description="Gerar automaticamente retratos de NPC e fundos de locais durante o jogo."
+                    title="Illustrator"
+                    description="Auto-generate scene illustrations, NPC portraits, and location backgrounds during gameplay."
                   >
                     <AgentSettingsToggle
-                      label="Game Image Generation"
+                      label="Game Illustrator"
                       description={
                         metadata.enableSpriteGeneration
-                          ? "Scene image generation is enabled for this game."
-                          : "Allow the game to request scene images from your image connection."
+                          ? "Illustrator is enabled for this game."
+                          : "Allow the game to request scene images, portraits, and backgrounds from your image connection."
                       }
                       enabled={!!metadata.enableSpriteGeneration}
                       onToggle={() =>
@@ -6048,15 +6583,17 @@ export function ChatSettingsDrawer({
                                 <div key={agent.id} className="space-y-1.5">
                                   <button
                                     onClick={() => {
+                                      const latestActiveAgentIds = readLatestActiveAgentIds();
                                       if (active) {
                                         updateMeta.mutate({
                                           id: chat.id,
-                                          activeAgentIds: activeAgentIds.filter((id) => id !== agent.id),
+                                          activeAgentIds: latestActiveAgentIds.filter((id) => id !== agent.id),
                                         });
                                       } else {
                                         updateMeta.mutate({
                                           id: chat.id,
-                                          activeAgentIds: [...activeAgentIds, agent.id],
+                                          enableAgents: true,
+                                          activeAgentIds: Array.from(new Set([...latestActiveAgentIds, agent.id])),
                                         });
                                       }
                                     }}
@@ -6135,7 +6672,7 @@ export function ChatSettingsDrawer({
                             })}
                           </div>
                         )}
-                        {renderCustomAgentPicker()}
+                        {renderActiveCustomAgentSettingsCard()}
                       </div>
                     ) : (
                       <>
@@ -6164,8 +6701,7 @@ export function ChatSettingsDrawer({
 
                         {visibleActiveAgentIds.length === 0 && (
                           <p className="text-[0.6875rem] text-[var(--muted-foreground)] px-1">
-                            
-                            Sem substituições de agente por chat. Os agentes padrão do workspace serão usados neste chat.
+                            No agents are active for this chat yet. Add one below to let it run here.
                           </p>
                         )}
 
@@ -6285,6 +6821,7 @@ export function ChatSettingsDrawer({
                     )}
                   </>
                 )}
+                {isGame && renderCustomAgentPicker({ showWhenEmpty: true })}
               </div>
             </Section>
           )}
@@ -6323,6 +6860,15 @@ export function ChatSettingsDrawer({
                     <span>{updateGameWidgets.isPending ? "Saving..." : "Save Widgets"}</span>
                   </button>
                 </div>
+                <GameWidgetFileControls
+                  widgets={gameWidgetDrafts}
+                  onImport={(widgets) => setGameWidgetDrafts(normalizeGameHudWidgets(widgets))}
+                  disabled={updateGameWidgets.isPending}
+                  exportFilename={`${chat.name || "game"}-widgets`}
+                  importSuccessMessage={(count) =>
+                    `Imported ${count === 1 ? "1 widget" : `${count} widgets`}. Save Widgets to apply them.`
+                  }
+                />
               </div>
             </Section>
           )}
@@ -6507,6 +7053,7 @@ export function ChatSettingsDrawer({
         presetId={choiceModalPresetId}
         chatId={chat.id}
         existingChoices={metadata.presetChoices ?? {}}
+        chatFloatingPanel
       />
 
       {/* Automatic summarization editor */}
@@ -6517,6 +7064,7 @@ export function ChatSettingsDrawer({
         chatId={chat.id}
         open={showMemoriesModal}
         onClose={() => setShowMemoriesModal(false)}
+        chatFloatingPanel
       />
 
       <Modal
@@ -6526,6 +7074,7 @@ export function ChatSettingsDrawer({
         }}
         title={agentAddPreview ? `Add ${agentAddPreview.agent.name}` : "Add Agent"}
         width="max-w-lg"
+        chatFloatingPanel
       >
         {agentAddPreview && (
           <div className="space-y-4">
@@ -6798,11 +7347,14 @@ export function ChatSettingsDrawer({
       {/* First message confirmation dialog */}
       {firstMesConfirm && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 max-md:pt-[env(safe-area-inset-top)]"
-          onClick={() => setFirstMesConfirm(null)}
+          className="fixed inset-0 z-[95] flex items-center justify-center bg-black/60 max-md:pt-[env(safe-area-inset-top)]"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setFirstMesConfirm(null);
+          }}
         >
           <div
             className="relative mx-4 flex w-full max-w-sm flex-col rounded-xl bg-[var(--card)] shadow-2xl ring-1 ring-[var(--border)]"
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3">
@@ -6866,7 +7418,17 @@ const MEMORY_CONTENT_CLASS =
 const MAX_MEMORY_RECALL_IMPORT_FILE_BYTES = 25 * 1024 * 1024;
 const MAX_MEMORY_RECALL_IMPORT_FILE_LABEL = "25 MB";
 
-function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; open: boolean; onClose: () => void }) {
+function MemoryRecallMemoriesModal({
+  chatId,
+  open,
+  onClose,
+  chatFloatingPanel = false,
+}: {
+  chatId: string;
+  open: boolean;
+  onClose: () => void;
+  chatFloatingPanel?: boolean;
+}) {
   const memoriesQuery = useChatMemories(chatId, open);
   const deleteMemory = useDeleteChatMemory(chatId);
   const clearMemories = useClearChatMemories(chatId);
@@ -6942,7 +7504,13 @@ function MemoryRecallMemoriesModal({ chatId, open, onClose }: { chatId: string; 
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Memórias deste chat" width="max-w-3xl">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Memórias deste chat"
+      width="max-w-3xl"
+      chatFloatingPanel={chatFloatingPanel}
+    >
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[var(--secondary)]/70 px-3 py-2 ring-1 ring-[var(--border)]">
           <div className="text-[0.6875rem] text-[var(--muted-foreground)]">

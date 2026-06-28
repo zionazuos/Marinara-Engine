@@ -7,11 +7,28 @@ import {
   getEditableGenerationParameters,
   type EditableGenerationParameters,
   ROLEPLAY_PARAMETER_DEFAULTS,
+  STRICT_CONNECTION_PARAMETER_SEND_DEFAULTS,
 } from "../../../components/ui/GenerationParametersEditor";
 import { DraftNumberInput } from "../../../components/ui/DraftNumberInput";
 import { SettingsSwitch } from "../../../components/panels/settings/SettingControls";
 import { useSaveConnectionDefaults } from "../../../hooks/use-connections";
 import { cn } from "../../../lib/utils";
+
+const EDITABLE_PARAMETER_KEYS: Array<keyof EditableGenerationParameters> = [
+  "temperature",
+  "maxTokens",
+  "topP",
+  "topK",
+  "frequencyPenalty",
+  "presencePenalty",
+  "reasoningEffort",
+  "verbosity",
+  "serviceTier",
+  "assistantPrefill",
+  "customThinkingTags",
+  "customParameters",
+  "enabledParameters",
+];
 
 interface AdvancedParametersSectionProps {
   metadata: Record<string, unknown>;
@@ -37,8 +54,12 @@ export function AdvancedParametersSection({
   onExcludePastReasoningChange,
 }: AdvancedParametersSectionProps) {
   const modeDefaults = isConversation ? CHAT_PARAMETER_DEFAULTS : ROLEPLAY_PARAMETER_DEFAULTS;
+  const strictModeDefaults: EditableGenerationParameters = {
+    ...modeDefaults,
+    enabledParameters: STRICT_CONNECTION_PARAMETER_SEND_DEFAULTS,
+  };
   const conn = connectionId ? connections.find((connection) => connection.id === connectionId) : null;
-  const defaults = getEditableGenerationParameters(modeDefaults, conn?.defaultParameters);
+  const defaults = getEditableGenerationParameters(strictModeDefaults, conn?.defaultParameters);
   const saveDefaults = useSaveConnectionDefaults();
   const [expanded, setExpanded] = useState(false);
   const params = (metadata.chatParameters as Record<string, unknown>) ?? {};
@@ -46,7 +67,17 @@ export function AdvancedParametersSection({
   const excludeReasoningEnabled = excludePastReasoning !== false;
 
   const setParameters = (next: EditableGenerationParameters) => {
-    onChatParametersChange({ ...params, ...next });
+    const editableKeys = new Set<string>(EDITABLE_PARAMETER_KEYS);
+    const sparse: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(params)) {
+      if (!editableKeys.has(key)) sparse[key] = value;
+    }
+    for (const key of EDITABLE_PARAMETER_KEYS) {
+      if (JSON.stringify(next[key]) !== JSON.stringify(defaults[key])) {
+        sparse[key] = next[key];
+      }
+    }
+    onChatParametersChange(sparse);
   };
   const toggleExpanded = () => setExpanded((open) => !open);
   const handleHeaderKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -86,6 +117,7 @@ export function AdvancedParametersSection({
           <GenerationParametersFields
             value={effectiveParams}
             showOpenRouterServiceTier={conn?.provider === "openrouter"}
+            enabledParametersFallback={STRICT_CONNECTION_PARAMETER_SEND_DEFAULTS}
             onChange={setParameters}
           />
           <div className="space-y-2 pt-3">
@@ -147,7 +179,7 @@ export function AdvancedParametersSection({
             </button>
           )}
           <button
-            onClick={() => onChatParametersChange(defaults)}
+            onClick={() => onChatParametersChange({})}
             className="w-full rounded-lg bg-[var(--secondary)] px-3 py-1.5 text-[0.625rem] text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
           >
             

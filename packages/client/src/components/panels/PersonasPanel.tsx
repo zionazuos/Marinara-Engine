@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────
 // Panel: User Personas
 // ──────────────────────────────────────────────
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import {
   usePersonas,
@@ -35,10 +35,12 @@ import {
 } from "lucide-react";
 import { confirmNonEmptyFolderDelete, showConfirmDialog } from "../../lib/app-dialogs";
 import { handleFolderRenameKeyDown, useFolderRenameGesture } from "../../hooks/use-folder-rename-gesture";
+import { useTouchFolderDrag } from "../../hooks/use-touch-folder-drag";
 import { cn, getAvatarCropStyle, parseAvatarCropJson } from "../../lib/utils";
 import { api } from "../../lib/api-client";
 import { SelectionActionBar } from "../ui/SelectionActionBar";
 import { SmoothFolderContent } from "../ui/SmoothFolderContent";
+import { TouchDragHandle } from "../ui/TouchDragHandle";
 
 type PersonaRow = {
   id: string;
@@ -98,6 +100,31 @@ function getPersonaPreviewMetadata(p: PersonaRow): string | null {
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
+function useTouchSafePersonaDragMode() {
+  const readTouchSafeMode = useCallback(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(max-width: 767px)").matches;
+  }, []);
+  const [touchSafeMode, setTouchSafeMode] = useState(readTouchSafeMode);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+    const mobileViewportQuery = window.matchMedia("(max-width: 767px)");
+    const update = () => setTouchSafeMode(readTouchSafeMode());
+
+    update();
+    coarsePointerQuery.addEventListener("change", update);
+    mobileViewportQuery.addEventListener("change", update);
+    return () => {
+      coarsePointerQuery.removeEventListener("change", update);
+      mobileViewportQuery.removeEventListener("change", update);
+    };
+  }, [readTouchSafeMode]);
+
+  return touchSafeMode;
+}
+
 export function PersonasPanel() {
   const { data: personas, isLoading } = usePersonas();
   const deletePersona = useDeletePersona();
@@ -127,9 +154,10 @@ export function PersonasPanel() {
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [editGroupName, setEditGroupName] = useState("");
   const [draggedPersonaId, setDraggedPersonaId] = useState<string | null>(null);
-  const personaTouchDragRef = useRef<{ id: string; timer: number | null; active: boolean } | null>(null);
   const suppressPersonaClickRef = useRef(false);
   const handleFolderRenameGesture = useFolderRenameGesture();
+  const touchSafePersonaDragMode = useTouchSafePersonaDragMode();
+  const nativePersonaDragEnabled = !touchSafePersonaDragMode;
 
   const isActive = (p: PersonaRow) => p.isActive === true || p.isActive === "true";
 
@@ -316,40 +344,15 @@ export function PersonasPanel() {
     [draggedPersonaId, movePersonasToFolder],
   );
 
-  const startPersonaTouchDrag = useCallback((event: React.TouchEvent, personaId: string) => {
-    const timer = window.setTimeout(() => {
-      personaTouchDragRef.current = { id: personaId, timer: null, active: true };
-      suppressPersonaClickRef.current = true;
-      setDraggedPersonaId(personaId);
-    }, 450);
-    personaTouchDragRef.current = { id: personaId, timer, active: false };
-    event.currentTarget.addEventListener(
-      "touchcancel",
-      () => {
-        const current = personaTouchDragRef.current;
-        if (current?.timer) window.clearTimeout(current.timer);
-        personaTouchDragRef.current = null;
-        setDraggedPersonaId(null);
-      },
-      { once: true },
-    );
-  }, []);
-
   const finishPersonaTouchDrag = useCallback(
-    (event: React.TouchEvent) => {
-      const current = personaTouchDragRef.current;
-      if (!current) return;
-      if (current.timer) window.clearTimeout(current.timer);
-      personaTouchDragRef.current = null;
-      if (!current.active) return;
-      const touch = event.changedTouches[0];
-      const target = touch ? document.elementFromPoint(touch.clientX, touch.clientY) : null;
+    (personaId: string, x: number, y: number) => {
+      const target = document.elementFromPoint(x, y);
       const folderElement = target?.closest("[data-persona-folder-id]") as HTMLElement | null;
       const rootElement = target?.closest("[data-persona-folder-root]") as HTMLElement | null;
       if (folderElement?.dataset.personaFolderId) {
-        void movePersonasToFolder(getDraggedPersonaIds(current.id), folderElement.dataset.personaFolderId);
+        void movePersonasToFolder(getDraggedPersonaIds(personaId), folderElement.dataset.personaFolderId);
       } else if (rootElement) {
-        void movePersonasToFolder(getDraggedPersonaIds(current.id), null);
+        void movePersonasToFolder(getDraggedPersonaIds(personaId), null);
       }
       setDraggedPersonaId(null);
       window.setTimeout(() => {
@@ -358,6 +361,26 @@ export function PersonasPanel() {
     },
     [getDraggedPersonaIds, movePersonasToFolder],
   );
+
+  const cancelPersonaTouchDrag = useCallback((_personaId: string, wasActive: boolean) => {
+    setDraggedPersonaId(null);
+    if (wasActive) {
+      window.setTimeout(() => {
+        suppressPersonaClickRef.current = false;
+      }, 0);
+    } else {
+      suppressPersonaClickRef.current = false;
+    }
+  }, []);
+
+  const { startTouchDrag: startPersonaTouchDrag } = useTouchFolderDrag({
+    onActivate: (personaId) => {
+      suppressPersonaClickRef.current = true;
+      setDraggedPersonaId(personaId);
+    },
+    onDrop: finishPersonaTouchDrag,
+    onCancel: cancelPersonaTouchDrag,
+  });
 
   const filteredList = useMemo(() => {
     let arr = rawList;
@@ -756,6 +779,7 @@ export function PersonasPanel() {
                         return (
                           <div
                             key={pid}
+                            data-touch-drag-card="persona"
                             onClick={() => {
                               if (suppressPersonaClickRef.current) return;
                               if (selectionMode) {
@@ -774,8 +798,15 @@ export function PersonasPanel() {
                                 openPersonaDetail(pid);
                               }
                             }}
-                            draggable
+                            draggable={nativePersonaDragEnabled}
+                            onContextMenu={(event) => {
+                              if (touchSafePersonaDragMode) event.preventDefault();
+                            }}
                             onDragStart={(event) => {
+                              if (!nativePersonaDragEnabled) {
+                                event.preventDefault();
+                                return;
+                              }
                               const ids = getDraggedPersonaIds(pid);
                               setDraggedPersonaId(pid);
                               event.dataTransfer.effectAllowed = "move";
@@ -783,17 +814,16 @@ export function PersonasPanel() {
                               event.dataTransfer.setData("text/plain", pid);
                             }}
                             onDragEnd={() => setDraggedPersonaId(null)}
-                            onTouchStart={(event) => startPersonaTouchDrag(event, pid)}
-                            onTouchEnd={finishPersonaTouchDrag}
                             role="button"
                             tabIndex={0}
-	                            className={cn(
-	                              "group/member flex cursor-pointer items-center gap-2 rounded-lg p-1.5 text-xs transition-all hover:bg-[var(--sidebar-accent)]",
-	                              selectionMode &&
-	                                isBulkSelected &&
-	                                "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
-	                              draggedPersonaId === pid && "opacity-50",
-	                            )}
+                            className={cn(
+                              "group group/member flex touch-pan-y cursor-pointer items-center gap-2 rounded-lg p-1.5 text-xs transition-all hover:bg-[var(--sidebar-accent)]",
+                              touchSafePersonaDragMode && "select-none",
+                              selectionMode &&
+                                isBulkSelected &&
+                                "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
+                              draggedPersonaId === pid && "opacity-50",
+                            )}
                           >
                             {selectionMode && (
                               <button
@@ -803,17 +833,29 @@ export function PersonasPanel() {
                                   toggleSelection(pid);
                                 }}
                                 className={cn(
-	                                  "flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors",
-	                                  isBulkSelected
-	                                    ? "border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-button-bg-active)] text-[var(--marinara-chat-chrome-button-text-active)]"
-	                                    : "border-[var(--muted-foreground)]/40 bg-[var(--secondary)] text-transparent",
-	                                )}
+                                  "flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors",
+                                  isBulkSelected
+                                    ? "border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-button-bg-active)] text-[var(--marinara-chat-chrome-button-text-active)]"
+                                    : "border-[var(--muted-foreground)]/40 bg-[var(--secondary)] text-transparent",
+                                )}
                                 aria-label={isBulkSelected ? "Deselect persona" : "Select persona"}
                               >
                                 <Check size="0.75rem" />
                               </button>
                             )}
-                            <div className="relative flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
+                            <TouchDragHandle
+                              label="Drag persona"
+                              size="0.75rem"
+                              onTouchStart={(event) => {
+                                startPersonaTouchDrag(event, pid, {
+                                  allowInteractiveTarget: true,
+                                  sourceElement: event.currentTarget.closest<HTMLElement>(
+                                    '[data-touch-drag-card="persona"]',
+                                  ),
+                                });
+                              }}
+                            />
+                            <div className="mari-avatar-placeholder mari-avatar-placeholder--persona relative flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg">
                               {p.avatarPath ? (
                                 <img
                                   src={p.avatarPath}
@@ -881,29 +923,25 @@ export function PersonasPanel() {
         </div>
       )}
 
-      <div
-        data-persona-folder-root
-        onDragOver={(event) => {
-          if (draggedPersonaId) {
+      {draggedPersonaId && (
+        <div
+          data-persona-folder-root
+          onDragOver={(event) => {
             event.preventDefault();
             event.dataTransfer.dropEffect = "move";
-          }
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          const payload = event.dataTransfer.getData("application/x-marinara-persona-ids");
-          handlePersonaDrop(null, parseDroppedPersonaIds(payload));
-        }}
-        className={cn(
-          "stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors",
-          draggedPersonaId && "ring-1 ring-emerald-400/20",
-        )}
-      >
-        {draggedPersonaId && (
-          <div className="rounded-xl border border-dashed border-emerald-400/35 bg-emerald-400/5 px-3 py-2 text-[0.625rem] text-emerald-300">
-            Drop here to move out of folder
-          </div>
-        )}
+          }}
+          onDrop={(event) => {
+            event.preventDefault();
+            const payload = event.dataTransfer.getData("application/x-marinara-persona-ids");
+            handlePersonaDrop(null, parseDroppedPersonaIds(payload));
+          }}
+          className="rounded-xl border border-dashed border-emerald-400/35 bg-emerald-400/5 px-3 py-2 text-[0.625rem] text-emerald-300"
+        >
+          Drop here to move out of folder
+        </div>
+      )}
+
+      <div className="stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors">
         {visibleRootPersonas.map((persona) => {
           const active = isActive(persona);
           const isBulkSelected = selectedPersonaIds.has(persona.id);
@@ -912,15 +950,17 @@ export function PersonasPanel() {
           return (
             <div
               key={persona.id}
-	              className={cn(
-	                "group relative flex items-center gap-3 rounded-xl p-2.5 transition-all hover:bg-[var(--sidebar-accent)] cursor-pointer",
-	                selectionMode &&
-	                  isBulkSelected &&
-	                  "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
-	                active &&
-	                  "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
-	                draggedPersonaId === persona.id && "opacity-50",
-	              )}
+              data-touch-drag-card="persona"
+              className={cn(
+                "group relative flex touch-pan-y cursor-pointer items-center gap-3 rounded-xl p-2.5 transition-all hover:bg-[var(--sidebar-accent)]",
+                selectionMode &&
+                  isBulkSelected &&
+                  "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
+                active &&
+                  "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
+                draggedPersonaId === persona.id && "opacity-50",
+                touchSafePersonaDragMode && "select-none",
+              )}
               onClick={() => {
                 if (suppressPersonaClickRef.current) return;
                 if (selectionMode) {
@@ -929,8 +969,15 @@ export function PersonasPanel() {
                   openPersonaDetail(persona.id);
                 }
               }}
-              draggable
+              draggable={nativePersonaDragEnabled}
+              onContextMenu={(event) => {
+                if (touchSafePersonaDragMode) event.preventDefault();
+              }}
               onDragStart={(event) => {
+                if (!nativePersonaDragEnabled) {
+                  event.preventDefault();
+                  return;
+                }
                 const ids = getDraggedPersonaIds(persona.id);
                 setDraggedPersonaId(persona.id);
                 event.dataTransfer.effectAllowed = "move";
@@ -938,8 +985,6 @@ export function PersonasPanel() {
                 event.dataTransfer.setData("text/plain", persona.id);
               }}
               onDragEnd={() => setDraggedPersonaId(null)}
-              onTouchStart={(event) => startPersonaTouchDrag(event, persona.id)}
-              onTouchEnd={finishPersonaTouchDrag}
             >
               {selectionMode && (
                 <button
@@ -959,10 +1004,19 @@ export function PersonasPanel() {
                   <Check size="0.75rem" />
                 </button>
               )}
+              <TouchDragHandle
+                label="Drag persona"
+                onTouchStart={(event) => {
+                  startPersonaTouchDrag(event, persona.id, {
+                    allowInteractiveTarget: true,
+                    sourceElement: event.currentTarget.closest<HTMLElement>('[data-touch-drag-card="persona"]'),
+                  });
+                }}
+              />
               {/* Avatar */}
               <button
                 onClick={(e) => handleAvatarClick(e, persona.id)}
-                className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-sm group/avatar"
+                className="mari-avatar-placeholder mari-avatar-placeholder--persona relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-sm group/avatar"
                 title="Alterar avatar"
               >
                 {/* Inner clip wrapper — needed because new-format avatarCrop renders the
@@ -1069,6 +1123,7 @@ export function PersonasPanel() {
 
       {selectionMode && (
         <SelectionActionBar
+          placement="panel"
           selectedCount={selectedPersonaIds.size}
           onExport={() => void handleExportSelected()}
           onDelete={handleDeleteSelected}

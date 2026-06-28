@@ -5,6 +5,7 @@ export interface TranslationConfig {
   provider: "ai" | "deeplx" | "deepl" | "google";
   targetLanguage: string;
   connectionId?: string;
+  systemPrompt?: string;
   deeplApiKey?: string;
   deeplxUrl?: string;
 }
@@ -16,6 +17,8 @@ interface TranslationStore {
   setConfig: (config: TranslationConfig) => void;
   /** messageId -> translated text */
   translations: Record<string, string>;
+  /** messageId -> hidden translation display state */
+  hiddenTranslationIds: Record<string, boolean>;
   /** messageId -> currently translating */
   translating: Record<string, boolean>;
   setTranslation: (id: string, text: string) => void;
@@ -31,15 +34,23 @@ export const useTranslationStore = create<TranslationStore>((set) => ({
   config: { provider: "google", targetLanguage: "en" },
   setConfig: (config) => set({ config }),
   translations: {},
+  hiddenTranslationIds: {},
   translating: {},
-  setTranslation: (id, text) => set((s) => ({ translations: { ...s.translations, [id]: text } })),
+  setTranslation: (id, text) =>
+    set((s) => {
+      const { [id]: _, ...hiddenRest } = s.hiddenTranslationIds;
+      return {
+        translations: { ...s.translations, [id]: text },
+        hiddenTranslationIds: hiddenRest,
+      };
+    }),
   removeTranslation: (id) =>
     set((s) => {
       const { [id]: _, ...rest } = s.translations;
-      return { translations: rest };
+      return { translations: rest, hiddenTranslationIds: { ...s.hiddenTranslationIds, [id]: true } };
     }),
   setTranslating: (id, val) => set((s) => ({ translating: { ...s.translating, [id]: val } })),
-  clearAll: () => set({ translations: {}, translating: {} }),
+  clearAll: () => set({ translations: {}, translating: {}, hiddenTranslationIds: {} }),
   seedFromMessages: (messages) =>
     set((s) => {
       const seeded: Record<string, string> = {};
@@ -47,7 +58,12 @@ export const useTranslationStore = create<TranslationStore>((set) => ({
         if (!msg.extra) continue;
         try {
           const extra = typeof msg.extra === "string" ? JSON.parse(msg.extra) : msg.extra;
-          if (extra.translation && typeof extra.translation === "string") {
+          if (
+            extra.translation &&
+            typeof extra.translation === "string" &&
+            extra.translationHidden !== true &&
+            !s.hiddenTranslationIds[msg.id]
+          ) {
             seeded[msg.id] = extra.translation;
           }
         } catch {

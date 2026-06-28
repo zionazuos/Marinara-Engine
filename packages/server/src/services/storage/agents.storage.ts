@@ -10,6 +10,7 @@ import {
   getDefaultBuiltInAgentSettings,
   markAgentConfigDeletedSettings,
   normalizeAgentPhaseForType,
+  parseAgentSettingsRecord,
   type CreateAgentConfigInput,
   type AgentResult,
 } from "@marinara-engine/shared";
@@ -62,6 +63,28 @@ function parseRunData(value: string): unknown {
   } catch {
     return value;
   }
+}
+
+function mergeBuiltInCreateUpdate(
+  existing: AgentConfigRow,
+  input: CreateAgentConfigInput,
+): Partial<CreateAgentConfigInput> {
+  const currentSettings = parseAgentSettingsRecord(existing.settings);
+  const nextSettings = { ...currentSettings, ...(input.settings ?? {}) };
+  if (input.resultType !== undefined) nextSettings.resultType = input.resultType;
+
+  const update: Partial<CreateAgentConfigInput> = {
+    name: input.name,
+    description: input.description,
+    phase: input.phase,
+    settings: nextSettings,
+  };
+
+  if (input.connectionId !== null) update.connectionId = input.connectionId;
+  if (input.imagePath !== null) update.imagePath = input.imagePath;
+  if (input.promptTemplate.trim().length > 0) update.promptTemplate = input.promptTemplate;
+
+  return update;
 }
 
 function serializeRunWithConfig(row: { agent_runs: AgentRunRow; agent_configs: AgentConfigRow }) {
@@ -137,7 +160,7 @@ export function createAgentsStorage(db: DB) {
         name: builtIn.name,
         description: builtIn.description,
         phase: normalizeAgentPhaseForType(builtIn.id, builtIn.phase),
-        enabled: String(builtIn.enabledByDefault),
+        enabled: "true",
         connectionId: null,
         imagePath: null,
         promptTemplate: "",
@@ -172,8 +195,7 @@ export function createAgentsStorage(db: DB) {
     },
 
     async listEnabled() {
-      const rows = await listLatest();
-      return rows.filter((row) => row.enabled === "true");
+      return listLatest();
     },
 
     getById,
@@ -187,7 +209,7 @@ export function createAgentsStorage(db: DB) {
       if (builtInType) {
         const existing = await getByType(input.type);
         if (existing) {
-          return this.update(existing.id, input);
+          return this.update(existing.id, mergeBuiltInCreateUpdate(existing, input));
         }
       }
 
@@ -203,7 +225,7 @@ export function createAgentsStorage(db: DB) {
         name: input.name,
         description: input.description ?? "",
         phase: normalizeAgentPhaseForType(type, input.phase),
-        enabled: String(input.enabled ?? true),
+        enabled: "true",
         connectionId: input.connectionId ?? null,
         imagePath: input.imagePath ?? null,
         promptTemplate: input.promptTemplate ?? "",
@@ -222,7 +244,6 @@ export function createAgentsStorage(db: DB) {
         const current = await getById(id);
         updateFields.phase = normalizeAgentPhaseForType(current?.type ?? "", data.phase);
       }
-      if (data.enabled !== undefined) updateFields.enabled = String(data.enabled);
       if (data.connectionId !== undefined) updateFields.connectionId = data.connectionId;
       if (data.imagePath !== undefined) updateFields.imagePath = data.imagePath;
       if (data.promptTemplate !== undefined) updateFields.promptTemplate = data.promptTemplate;
@@ -233,7 +254,7 @@ export function createAgentsStorage(db: DB) {
           updateFields.settings = JSON.stringify(settings);
         } else {
           const current = await getById(id);
-          const currentSettings = current?.settings ? JSON.parse(current.settings as string) : {};
+          const currentSettings = parseAgentSettingsRecord(current?.settings);
           updateFields.settings = JSON.stringify({ ...currentSettings, resultType: data.resultType });
         }
       }
@@ -254,7 +275,6 @@ export function createAgentsStorage(db: DB) {
       if (existing) {
         await removeRuntimeData(existing.id);
         return this.update(existing.id, {
-          enabled: false,
           settings: markAgentConfigDeletedSettings(existing.settings),
         });
       }
@@ -264,7 +284,6 @@ export function createAgentsStorage(db: DB) {
         name: builtIn.name,
         description: builtIn.description,
         phase: normalizeAgentPhaseForType(builtIn.id, builtIn.phase),
-        enabled: false,
         connectionId: null,
         imagePath: null,
         promptTemplate: "",

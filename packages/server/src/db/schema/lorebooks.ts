@@ -14,7 +14,7 @@ export const lorebooks = sqliteTable("lorebooks", {
   entryLimit: integer("entry_limit").notNull().default(100),
   recursiveScanning: text("recursive_scanning").notNull().default("false"),
   maxRecursionDepth: integer("max_recursion_depth").notNull().default(3),
-  excludeFromVectorization: text("exclude_from_vectorization").notNull().default("false"),
+  excludeFromVectorization: text("exclude_from_vectorization").notNull().default("true"),
   characterId: text("character_id"),
   personaId: text("persona_id"),
   chatId: text("chat_id"),
@@ -108,7 +108,7 @@ export const lorebookEntries = sqliteTable("lorebook_entries", {
   enabled: text("enabled").notNull().default("true"),
   constant: text("constant").notNull().default("false"),
   selective: text("selective").notNull().default("false"),
-  selectiveLogic: text("selective_logic", { enum: ["and", "or", "not"] })
+  selectiveLogic: text("selective_logic", { enum: ["and", "and_all", "or", "not", "not_all"] })
     .notNull()
     .default("and"),
   probability: integer("probability"),
@@ -162,7 +162,13 @@ export const lorebookEntries = sqliteTable("lorebook_entries", {
   schedule: text("schedule"),
 
   /** When true, this entry's content won't trigger further entries during recursive scanning */
-  preventRecursion: text("prevent_recursion").notNull().default("false"),
+  preventRecursion: text("prevent_recursion").notNull().default("true"),
+
+  /** When true, recursive scanning cannot activate this entry */
+  excludeRecursion: text("exclude_recursion").notNull().default("false"),
+
+  /** When true, only recursive scanning can activate this entry */
+  delayUntilRecursion: text("delay_until_recursion").notNull().default("false"),
 
   /** When true, bulk vectorization skips this entry and semantic matching ignores stored vectors */
   excludeFromVectorization: text("exclude_from_vectorization").notNull().default("false"),

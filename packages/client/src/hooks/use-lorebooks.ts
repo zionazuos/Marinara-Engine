@@ -392,6 +392,8 @@ export interface ActiveLorebookEntry {
   lorebookId: string;
   order: number;
   constant: boolean;
+  selective: boolean;
+  matchedKeys?: string[];
 }
 
 export interface BudgetSkippedLorebookEntry {

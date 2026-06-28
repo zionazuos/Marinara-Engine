@@ -2,7 +2,16 @@
 // Panel: Lorebooks (overhauled)
 // Category tabs, search, click-to-edit, AI generate
 // ──────────────────────────────────────────────
-import { useState, useMemo, useCallback, useRef, type ChangeEvent, type DragEvent, type TouchEvent } from "react";
+import {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+  type ChangeEvent,
+  type DragEvent,
+  type TouchEvent,
+} from "react";
 import { toast } from "sonner";
 import {
   Plus,
@@ -22,7 +31,7 @@ import {
   Trash2,
   Camera,
 } from "lucide-react";
-import { useUIStore } from "../../stores/ui.store";
+import { useUIStore, type LorebookPanelCategory, type LorebookPanelSort } from "../../stores/ui.store";
 import { useChatStore } from "../../stores/chat.store";
 import {
   useLorebooks,
@@ -46,8 +55,10 @@ import {
   useUpdateLibraryFolder,
 } from "../../hooks/use-library-folders";
 import { handleFolderRenameKeyDown, useFolderRenameGesture } from "../../hooks/use-folder-rename-gesture";
+import { useTouchFolderDrag } from "../../hooks/use-touch-folder-drag";
 import { SelectionActionBar } from "../ui/SelectionActionBar";
 import { SmoothFolderContent } from "../ui/SmoothFolderContent";
+import { TouchDragHandle } from "../ui/TouchDragHandle";
 
 const CATEGORIES: Array<{ id: LorebookCategory | "all" | "active"; label: string }> = [
   { id: "all", label: "All" },
@@ -70,6 +81,23 @@ const CATEGORY_COLORS: Record<string, string> = {
   all: "from-amber-400 to-orange-500",
 };
 
+function usePanelMobileOverlay() {
+  const [isMobileOverlay, setIsMobileOverlay] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia("(max-width: 767px)").matches : false,
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const query = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobileOverlay(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  return isMobileOverlay;
+}
+
 function remapLorebookEntryRelationships(
   relationships: Record<string, string> | null | undefined,
   entryIdMap: Map<string, string>,
@@ -86,21 +114,26 @@ function remapLorebookEntryRelationships(
 }
 
 export function LorebooksPanel() {
-  const [activeCategory, setActiveCategory] = useState<LorebookCategory | "all" | "active">("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sort, setSort] = useState<"name-asc" | "name-desc" | "newest" | "oldest" | "tokens">("name-asc");
-  const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [tagsExpanded, setTagsExpanded] = useState(false);
+  const activeCategory = useUIStore((s) => s.lorebookPanelCategory);
+  const setActiveCategory = useUIStore((s) => s.setLorebookPanelCategory);
+  const searchQuery = useUIStore((s) => s.lorebookPanelSearch);
+  const setSearchQuery = useUIStore((s) => s.setLorebookPanelSearch);
+  const sort = useUIStore((s) => s.lorebookPanelSort);
+  const setSort = useUIStore((s) => s.setLorebookPanelSort);
+  const activeTag = useUIStore((s) => s.lorebookPanelActiveTag);
+  const setActiveTag = useUIStore((s) => s.setLorebookPanelActiveTag);
+  const tagsExpanded = useUIStore((s) => s.lorebookPanelTagsExpanded);
+  const setTagsExpanded = useUIStore((s) => s.setLorebookPanelTagsExpanded);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedLorebookIds, setSelectedLorebookIds] = useState<Set<string>>(new Set());
   const [exportingSelected, setExportingSelected] = useState(false);
+  const isMobileOverlay = usePanelMobileOverlay();
   const [expandedFolderId, setExpandedFolderId] = useState<string | null>(null);
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [editFolderName, setEditFolderName] = useState("");
   const [draggedLorebookId, setDraggedLorebookId] = useState<string | null>(null);
   const lorebookImageInputRef = useRef<HTMLInputElement>(null);
   const imageTargetLorebookIdRef = useRef<string | null>(null);
-  const lorebookTouchDragRef = useRef<{ id: string; timer: number | null; active: boolean } | null>(null);
   const suppressLorebookClickRef = useRef(false);
   const handleFolderRenameGesture = useFolderRenameGesture();
 
@@ -227,7 +260,7 @@ export function LorebooksPanel() {
         toast.error("Falha ao remover a tag de alguns lorebooks");
       }
     },
-    [lorebooks, updateLorebook, activeTag],
+    [lorebooks, updateLorebook, activeTag, setActiveTag],
   );
 
   // Filter by search
@@ -579,43 +612,15 @@ export function LorebooksPanel() {
     [draggedLorebookId, moveLorebooksToFolder],
   );
 
-  const startLorebookTouchDrag = useCallback(
-    (event: TouchEvent, lorebookId: string) => {
-      const timer = window.setTimeout(() => {
-        lorebookTouchDragRef.current = { id: lorebookId, timer: null, active: true };
-        suppressLorebookClickRef.current = true;
-        setDraggedLorebookId(lorebookId);
-      }, 450);
-      lorebookTouchDragRef.current = { id: lorebookId, timer, active: false };
-      event.currentTarget.addEventListener(
-        "touchcancel",
-        () => {
-          const current = lorebookTouchDragRef.current;
-          if (current?.timer) window.clearTimeout(current.timer);
-          lorebookTouchDragRef.current = null;
-          setDraggedLorebookId(null);
-        },
-        { once: true },
-      );
-    },
-    [],
-  );
-
   const finishLorebookTouchDrag = useCallback(
-    (event: TouchEvent) => {
-      const current = lorebookTouchDragRef.current;
-      if (!current) return;
-      if (current.timer) window.clearTimeout(current.timer);
-      lorebookTouchDragRef.current = null;
-      if (!current.active) return;
-      const touch = event.changedTouches[0];
-      const target = touch ? document.elementFromPoint(touch.clientX, touch.clientY) : null;
+    (lorebookId: string, x: number, y: number) => {
+      const target = document.elementFromPoint(x, y);
       const folderElement = target?.closest("[data-lorebook-folder-id]") as HTMLElement | null;
       const rootElement = target?.closest("[data-lorebook-folder-root]") as HTMLElement | null;
       if (folderElement?.dataset.lorebookFolderId) {
-        moveLorebooksToFolder(getDraggedLorebookIds(current.id), folderElement.dataset.lorebookFolderId);
+        moveLorebooksToFolder(getDraggedLorebookIds(lorebookId), folderElement.dataset.lorebookFolderId);
       } else if (rootElement) {
-        moveLorebooksToFolder(getDraggedLorebookIds(current.id), null);
+        moveLorebooksToFolder(getDraggedLorebookIds(lorebookId), null);
       }
       setDraggedLorebookId(null);
       window.setTimeout(() => {
@@ -624,6 +629,26 @@ export function LorebooksPanel() {
     },
     [getDraggedLorebookIds, moveLorebooksToFolder],
   );
+
+  const cancelLorebookTouchDrag = useCallback((_lorebookId: string, wasActive: boolean) => {
+    setDraggedLorebookId(null);
+    if (wasActive) {
+      window.setTimeout(() => {
+        suppressLorebookClickRef.current = false;
+      }, 0);
+    } else {
+      suppressLorebookClickRef.current = false;
+    }
+  }, []);
+
+  const { startTouchDrag: startLorebookTouchDrag } = useTouchFolderDrag({
+    onActivate: (lorebookId) => {
+      suppressLorebookClickRef.current = true;
+      setDraggedLorebookId(lorebookId);
+    },
+    onDrop: finishLorebookTouchDrag,
+    onCancel: cancelLorebookTouchDrag,
+  });
 
   const renderLorebookRow = useCallback(
     (lb: Lorebook) => {
@@ -656,9 +681,10 @@ export function LorebooksPanel() {
           selectionMode={selectionMode}
           isSelected={selectedLorebookIds.has(lb.id)}
           onToggleSelect={() => toggleSelection(lb.id)}
-          draggable
+          draggable={!isMobileOverlay}
           isDragging={draggedLorebookId === lb.id}
           onDragStart={(event) => {
+            if (isMobileOverlay) return;
             const ids = getDraggedLorebookIds(lb.id);
             setDraggedLorebookId(lb.id);
             event.dataTransfer.effectAllowed = "move";
@@ -666,20 +692,24 @@ export function LorebooksPanel() {
             event.dataTransfer.setData("text/plain", lb.id);
           }}
           onDragEnd={() => setDraggedLorebookId(null)}
-          onTouchStart={(event) => startLorebookTouchDrag(event, lb.id)}
-          onTouchEnd={finishLorebookTouchDrag}
+          onTouchStart={(event) => {
+            startLorebookTouchDrag(event, lb.id, {
+              allowInteractiveTarget: true,
+              sourceElement: event.currentTarget.closest<HTMLElement>('[data-touch-drag-card="lorebook"]'),
+            });
+          }}
         />
       );
     },
     [
       deleteLorebook,
       draggedLorebookId,
-      finishLorebookTouchDrag,
       getCharacterNames,
       getDraggedLorebookIds,
       getPersonaNames,
       handleDuplicateLorebook,
       handlePickLorebookImage,
+      isMobileOverlay,
       openLorebookDetail,
       selectedLorebookIds,
       selectionMode,
@@ -747,7 +777,7 @@ export function LorebooksPanel() {
         <div className="relative">
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value as typeof sort)}
+            onChange={(e) => setSort(e.target.value as LorebookPanelSort)}
             className="mari-chrome-field mari-chrome-sort-field mari-accent-animated h-10 appearance-none py-0 pl-2.5 pr-7 text-[0.6875rem] md:h-9"
             title="Ordem de classificação"
           >
@@ -779,7 +809,44 @@ export function LorebooksPanel() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-1">
+      <div className="flex gap-1 md:hidden">
+        <label htmlFor="lorebook-category-filter" className="sr-only">
+          Lorebook category
+        </label>
+        <div className="relative min-w-0 flex-1">
+          <select
+            id="lorebook-category-filter"
+            value={activeCategory}
+            onChange={(event) => setActiveCategory(event.target.value as LorebookPanelCategory)}
+            className="mari-chrome-field h-10 w-full min-w-0 appearance-none truncate py-0 pl-3 pr-8 text-xs"
+            title="Lorebook category"
+          >
+            {CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            size="0.75rem"
+            className="mari-chrome-field-icon pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2"
+          />
+        </div>
+        <button
+          onClick={() => setTagsExpanded(!tagsExpanded)}
+          className={cn(
+            "mari-chrome-control mari-chrome-control--small shrink-0 whitespace-nowrap px-2 text-[0.6875rem]",
+            tagFilterActive && "mari-chrome-control--selected",
+          )}
+          title={tagsExpanded ? "Collapse tags" : "Expand tags"}
+        >
+          <Tag size="0.6875rem" />
+          Tags
+          {tagsExpanded ? <ChevronUp size="0.625rem" /> : <ChevronDown size="0.625rem" />}
+        </button>
+      </div>
+
+      <div className="hidden flex-wrap gap-1 md:flex">
         {PRIMARY_CATEGORIES.map((cat) => {
           const isActive = activeCategory === cat.id;
           return (
@@ -830,7 +897,7 @@ export function LorebooksPanel() {
                 type="button"
                 onClick={() => setActiveCategory(isActive ? "all" : cat.id)}
                 className={cn(
-                  "mari-chrome-control mari-chrome-control--compact cursor-pointer",
+                  "mari-chrome-control mari-chrome-control--compact hidden cursor-pointer md:inline-flex",
                   isActive && "mari-chrome-control--selected",
                 )}
               >
@@ -851,7 +918,7 @@ export function LorebooksPanel() {
                 }
               }}
               className={cn(
-                "mari-chrome-control mari-chrome-control--compact group/tag cursor-pointer",
+                "mari-chrome-control mari-chrome-control--compact group/tag cursor-pointer whitespace-nowrap",
                 activeTag === tag && "mari-chrome-control--selected",
               )}
             >
@@ -1021,45 +1088,49 @@ export function LorebooksPanel() {
 
       {/* Lorebook list */}
       {!isLoading && sorted.length > 0 && (
-        <div
-          data-lorebook-folder-root
-          onDragOver={(event) => {
-            if (draggedLorebookId) {
-              event.preventDefault();
-              event.dataTransfer.dropEffect = "move";
-            }
-          }}
-          onDrop={(event) => {
-            event.preventDefault();
-            const payload = event.dataTransfer.getData("application/x-marinara-lorebook-ids");
-            handleLorebookDrop(null, payload ? (JSON.parse(payload) as string[]) : undefined);
-          }}
-          className={cn(
-            "stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors",
-            draggedLorebookId && "ring-1 ring-amber-400/20",
+        <>
+          {draggedLorebookId && (
+            <div
+              data-lorebook-folder-root
+              onDragOver={(event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                const payload = event.dataTransfer.getData("application/x-marinara-lorebook-ids");
+                handleLorebookDrop(null, payload ? (JSON.parse(payload) as string[]) : undefined);
+              }}
+              className="rounded-xl border border-dashed border-amber-400/35 bg-amber-400/5 px-3 py-2 text-[0.625rem] text-amber-300"
+            >
+              Drop here to move out of folder
+            </div>
           )}
-        >
-          {activeCategory === "all" && grouped
-            ? // Grouped view
-              Array.from(grouped.entries()).map(([category, books]) => {
-                const catMeta = CATEGORIES.find((c) => c.id === category) ?? CATEGORIES[6];
-                return (
-                  <div key={category} className="mb-2">
-                    <div className="mb-1 flex items-center gap-1.5 px-1 text-[0.6875rem] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
-                      {catMeta.label}
-                      <span className="ml-auto text-[0.625rem] font-normal">{books.length}</span>
+
+          <div className="stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors">
+            {activeCategory === "all" && grouped
+              ? // Grouped view
+                Array.from(grouped.entries()).map(([category, books]) => {
+                  const catMeta = CATEGORIES.find((c) => c.id === category) ?? CATEGORIES[6];
+                  return (
+                    <div key={category} className="mb-2">
+                      <div className="mb-1 flex items-center gap-1.5 px-1 text-[0.6875rem] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
+                        {catMeta.label}
+                        <span className="ml-auto text-[0.625rem] font-normal">{books.length}</span>
+                      </div>
+                      {books.map((lb) => renderLorebookRow(lb))}
                     </div>
-                    {books.map((lb) => renderLorebookRow(lb))}
-                  </div>
-                );
-              })
-            : // Flat view
-              rootLorebooks.map((lb: Lorebook) => renderLorebookRow(lb))}
-        </div>
+                  );
+                })
+              : // Flat view
+                rootLorebooks.map((lb: Lorebook) => renderLorebookRow(lb))}
+          </div>
+        </>
       )}
 
       {selectionMode && (
         <SelectionActionBar
+          placement="panel"
           selectedCount={selectedLorebookIds.size}
           onExport={() => void handleExportSelected()}
           onDelete={handleDeleteSelected}
@@ -1086,7 +1157,6 @@ function LorebookRow({
   onDragStart,
   onDragEnd,
   onTouchStart,
-  onTouchEnd,
 }: {
   lorebook: Lorebook;
   characterName?: string;
@@ -1102,8 +1172,7 @@ function LorebookRow({
   isDragging?: boolean;
   onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
   onDragEnd?: () => void;
-  onTouchStart?: (event: TouchEvent<HTMLDivElement>) => void;
-  onTouchEnd?: (event: TouchEvent<HTMLDivElement>) => void;
+  onTouchStart?: (event: TouchEvent<HTMLButtonElement>) => void;
 }) {
   const gradient = CATEGORY_COLORS[lorebook.category] ?? CATEGORY_COLORS.uncategorized;
   const imageContent = lorebook.imagePath ? (
@@ -1118,19 +1187,18 @@ function LorebookRow({
 
   return (
     <div
-	      className={cn(
-	        "group relative flex cursor-pointer items-center gap-3 rounded-xl p-2.5 transition-all hover:bg-[var(--sidebar-accent)]",
-	        selectionMode &&
-	          isSelected &&
-	          "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
-	        isDragging && "opacity-50",
-	      )}
+      data-touch-drag-card="lorebook"
+      className={cn(
+        "group relative flex touch-pan-y cursor-pointer items-center gap-3 rounded-xl p-2.5 transition-all hover:bg-[var(--sidebar-accent)]",
+        selectionMode &&
+          isSelected &&
+          "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
+        isDragging && "opacity-50",
+      )}
       onClick={onClick}
       draggable={draggable}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
     >
       {selectionMode && (
         <button
@@ -1140,15 +1208,23 @@ function LorebookRow({
             onToggleSelect?.();
           }}
           className={cn(
-	            "flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors",
-	            isSelected
-	              ? "border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-button-bg-active)] text-[var(--marinara-chat-chrome-button-text-active)]"
-	              : "border-[var(--muted-foreground)]/40 bg-[var(--secondary)] text-transparent",
-	          )}
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors",
+            isSelected
+              ? "border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-button-bg-active)] text-[var(--marinara-chat-chrome-button-text-active)]"
+              : "border-[var(--muted-foreground)]/40 bg-[var(--secondary)] text-transparent",
+          )}
           aria-label={isSelected ? "Deselect lorebook" : "Select lorebook"}
         >
           <span className="text-[0.75rem]">✓</span>
         </button>
+      )}
+      {onTouchStart && (
+        <TouchDragHandle
+          label="Drag lorebook"
+          onTouchStart={(event) => {
+            onTouchStart(event);
+          }}
+        />
       )}
       {selectionMode ? (
         <div className={imageClasses}>{imageContent}</div>

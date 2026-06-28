@@ -45,8 +45,17 @@ import { confirmNonEmptyFolderDelete, showConfirmDialog } from "../../lib/app-di
 import { useUIStore, type UserStatus } from "../../stores/ui.store";
 import { cn, getAvatarCropStyle, type AvatarCropValue } from "../../lib/utils";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { usePresenceClock } from "../../hooks/use-presence-clock";
 import { toast } from "sonner";
-import type { Chat, ChatFolder, ChatMode } from "@marinara-engine/shared";
+import {
+  includesTextForMatch,
+  normalizeTextForMatch,
+  type Chat,
+  type ChatFolder,
+  type ChatMode,
+  type ConversationPresenceStatus,
+} from "@marinara-engine/shared";
+import { resolveLiveConversationStatus } from "../../lib/conversation-presence-status";
 import { Modal } from "../ui/Modal";
 import { Reorder, useDragControls } from "framer-motion";
 import { parseChatMetadata } from "../../lib/chat-display";
@@ -55,6 +64,64 @@ import { SelectionActionBar } from "../ui/SelectionActionBar";
 import { SmoothFolderContent } from "../ui/SmoothFolderContent";
 
 type ChatSortOption = "newest" | "oldest" | "name-asc" | "name-desc";
+
+const CONVERSATION_STATUS_PRIORITY: Record<ConversationPresenceStatus, number> = {
+  online: 0,
+  idle: 1,
+  offline: 2,
+  dnd: 3,
+};
+
+const CONVERSATION_STATUS_DOT_CLASS: Record<ConversationPresenceStatus, string> = {
+  online: "bg-green-500",
+  idle: "bg-yellow-500",
+  offline: "bg-gray-400",
+  dnd: "bg-red-500",
+};
+
+function asConversationStatus(value: unknown): ConversationPresenceStatus | undefined {
+  return value === "online" || value === "idle" || value === "dnd" || value === "offline" ? value : undefined;
+}
+
+function conversationStatusDotClass(status?: string) {
+  return CONVERSATION_STATUS_DOT_CLASS[asConversationStatus(status) ?? "online"];
+}
+
+function getConversationPresenceState(
+  chatMode: ChatMode,
+  chatMetadata: Chat["metadata"],
+  charIds: string[],
+  charLookup: Map<string, { name: string; conversationStatus?: string }>,
+  presenceNow: Date,
+): Map<string, ConversationPresenceStatus> {
+  if (chatMode !== "conversation") {
+    return new Map<string, ConversationPresenceStatus>();
+  }
+
+  const convoMeta = parseChatMetadata(chatMetadata);
+  const chatCharStatuses = convoMeta?.conversationCharacterStatuses as
+    | Record<string, { status?: unknown }>
+    | undefined;
+  const conversationStatuses: Array<{
+    id: string;
+    status: ConversationPresenceStatus;
+  }> = [];
+
+  for (const id of charIds) {
+    const base = charLookup.get(id);
+    if (!base) continue;
+
+    const live = resolveLiveConversationStatus(convoMeta, id, presenceNow);
+    const snapshot = chatCharStatuses?.[id];
+    conversationStatuses.push({
+      id,
+      status:
+        live?.status ?? asConversationStatus(snapshot?.status) ?? asConversationStatus(base.conversationStatus) ?? "online",
+    });
+  }
+
+  return new Map(conversationStatuses.map(({ id, status }) => [id, status] as const));
+}
 
 function getChatTags(chat: Pick<Chat, "metadata">): string[] {
   return Array.isArray(chat.metadata?.tags)
@@ -152,7 +219,10 @@ export function ChatSidebar() {
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
   const unreadCounts = useChatStore((s) => s.unreadCounts);
   const hydrateUnread = useChatStore((s) => s.hydrateUnread);
-  const { data: allCharacters } = useCharacters();
+  const { data: allCharacters } = useCharacters({ includeBuiltIn: true });
+  // One interval for the whole list: a 60s-cadence clock so schedule/override-derived
+  // status dots refresh when time alone changes them, without per-row timers.
+  const presenceNow = usePresenceClock();
   const hasAnyDetailOpen = useUIStore((s) => s.hasAnyDetailOpen);
   const editorDirty = useUIStore((s) => s.editorDirty);
   const closeAllDetails = useUIStore((s) => s.closeAllDetails);
@@ -284,7 +354,7 @@ export function ChatSidebar() {
   }, [activeTag, allTags]);
 
   const filtered = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = normalizeTextForMatch(searchQuery);
 
     return modeChats.filter((chat) => {
       const tags = getChatTags(chat);
@@ -296,9 +366,9 @@ export function ChatSidebar() {
         .filter(Boolean);
 
       return (
-        toSearchText(chat.name).toLowerCase().includes(query) ||
-        tags.some((tag) => tag.toLowerCase().includes(query)) ||
-        characterNames.some((name) => name.toLowerCase().includes(query))
+        includesTextForMatch(toSearchText(chat.name), query) ||
+        tags.some((tag) => includesTextForMatch(tag, query)) ||
+        characterNames.some((name) => includesTextForMatch(name, query))
       );
     });
   }, [modeChats, searchQuery, activeTag, charLookup]);
@@ -505,11 +575,13 @@ export function ChatSidebar() {
 
   const handleNewChat = useCallback(
     (mode: ChatMode) => {
+      if (createChat.isPending) return;
       const connectionRows = ((connections ?? []) as Array<{ id: string }>).filter((connection) => !!connection.id);
       if (connectionRows.length === 0) {
-        if (mode === "conversation" || mode === "roleplay") {
+        if (mode !== "visual_novel") {
           setPendingNewChatMode(mode);
         }
+        if (typeof window !== "undefined" && window.innerWidth < 768) setSidebarOpen(false);
         return;
       }
 
@@ -524,19 +596,24 @@ export function ChatSidebar() {
         ? (presets.find((p) => p.mode === presetMode && p.isActive && !p.isDefault) ?? null)
         : null;
       createChat.mutate(
-        { name: `New ${MODE_CONFIG[mode]?.label ?? mode}`, mode, characterIds: [] },
         {
-          onSuccess: async (chat) => {
+          name: `New ${MODE_CONFIG[mode]?.label ?? mode}`,
+          mode,
+          characterIds: [],
+          connectionId: starred?.settings.connectionId ?? undefined,
+          promptPresetId: starred?.settings.promptPresetId ?? undefined,
+        },
+        {
+          onSuccess: (chat) => {
             setActiveChatId(chat.id);
-            if (starred) {
-              try {
-                await applyChatPreset.mutateAsync({ presetId: starred.id, chatId: chat.id });
-              } catch {
-                /* non-fatal — chat still opens with system defaults */
-              }
-            }
+            if (typeof window !== "undefined" && window.innerWidth < 768) setSidebarOpen(false);
             useChatStore.getState().setShouldOpenSettings(true);
             useChatStore.getState().setShouldOpenWizard(true);
+            if (starred) {
+              void applyChatPreset.mutateAsync({ presetId: starred.id, chatId: chat.id }).catch(() => {
+                /* non-fatal — chat still opens with system defaults */
+              });
+            }
           },
         },
       );
@@ -546,6 +623,7 @@ export function ChatSidebar() {
       createChat,
       setActiveChatId,
       setPendingNewChatMode,
+      setSidebarOpen,
       hasAnyDetailOpen,
       closeAllDetails,
       chatPresetsData,
@@ -567,6 +645,7 @@ export function ChatSidebar() {
       try {
         const formData = new FormData();
         formData.append("file", file);
+        formData.append("mode", activeTab);
         const res = await fetch("/api/import/st-chat", { method: "POST", body: formData });
         const data = (await res.json().catch(() => ({}))) as {
           success?: boolean;
@@ -588,7 +667,7 @@ export function ChatSidebar() {
         setIsImportingChat(false);
       }
     },
-    [refetchChats, setActiveChatId],
+    [activeTab, refetchChats, setActiveChatId],
   );
 
   const activeModeConfig = MODE_CONFIG[activeTab] ?? MODE_CONFIG.conversation;
@@ -654,7 +733,7 @@ export function ChatSidebar() {
     [moveChatMut],
   );
 
-  const startTouchDrag = useCallback((chatId: string, event: React.PointerEvent<HTMLDivElement>) => {
+  const startTouchDrag = useCallback((chatId: string, event: React.PointerEvent<HTMLElement>) => {
     if (event.pointerType === "mouse") return;
     const drag = {
       chatId,
@@ -671,7 +750,7 @@ export function ChatSidebar() {
     event.currentTarget.setPointerCapture(event.pointerId);
   }, []);
 
-  const updateTouchDrag = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+  const updateTouchDrag = useCallback((event: React.PointerEvent<HTMLElement>) => {
     const drag = touchDragRef.current;
     if (!drag) return;
     drag.lastX = event.clientX;
@@ -680,7 +759,7 @@ export function ChatSidebar() {
   }, []);
 
   const finishTouchDrag = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
+    (event: React.PointerEvent<HTMLElement>) => {
       const drag = touchDragRef.current;
       if (!drag) return;
       if (drag.timer !== null) {
@@ -721,34 +800,39 @@ export function ChatSidebar() {
       return;
     }
     for (const id of selectedChatIds) {
-      deleteChat.mutate(id);
+      deleteChat.mutate({ id, force: true });
     }
     if (activeChatId && selectedChatIds.has(activeChatId)) setActiveChatId(null);
     exitMultiSelect();
   }, [selectedChatIds, deleteChat, activeChatId, setActiveChatId, exitMultiSelect]);
 
-  const handleBatchExport = useCallback(
-    async () => {
-      if (selectedChatIds.size === 0) return;
-      try {
-        await bulkExportChats.mutateAsync({
-          chatIds: [...selectedChatIds],
-          format: "jsonl",
-          scope: "selected",
-        });
-        exitMultiSelect();
-      } catch (err) {
-        toast.error(err instanceof Error ? `Export failed: ${err.message}` : "Export failed");
-      }
-    },
-    [selectedChatIds, bulkExportChats, exitMultiSelect],
-  );
+  const handleBatchExport = useCallback(async () => {
+    if (selectedChatIds.size === 0) return;
+    try {
+      await bulkExportChats.mutateAsync({
+        chatIds: [...selectedChatIds],
+        format: "jsonl",
+        scope: "selected",
+      });
+      exitMultiSelect();
+    } catch (err) {
+      toast.error(err instanceof Error ? `Export failed: ${err.message}` : "Export failed");
+    }
+  }, [selectedChatIds, bulkExportChats, exitMultiSelect]);
 
   // ── Chat row renderer (shared between unfiled + folder sections) ──
   const renderChatRow = ({ chat, branchCount }: (typeof displayChats)[number]) => {
     const cfg = MODE_CONFIG[chat.mode] ?? MODE_CONFIG.conversation;
     const isActive = activeChatId === chat.id || (chat.groupId != null && chat.groupId === activeGroupId);
     const isSelected = selectedChatIds.has(chat.id);
+    const charIds = normalizeChatCharacterIds((chat as { characterIds?: unknown }).characterIds);
+    const conversationStatusByCharacter = getConversationPresenceState(
+      chat.mode,
+      chat.metadata,
+      charIds,
+      charLookup,
+      presenceNow,
+    );
     return (
       <div
         role="button"
@@ -768,10 +852,6 @@ export function ChatSidebar() {
           setDraggedChatId(null);
           setIsRootDropTarget(false);
         }}
-        onPointerDown={(event) => startTouchDrag(chat.id, event)}
-        onPointerMove={updateTouchDrag}
-        onPointerUp={finishTouchDrag}
-        onPointerCancel={finishTouchDrag}
         onClick={async () => {
           if (suppressTouchDragClickRef.current) {
             suppressTouchDragClickRef.current = false;
@@ -801,7 +881,7 @@ export function ChatSidebar() {
           if (window.innerWidth < 768) setSidebarOpen(false);
         }}
         className={cn(
-          "group relative flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left transition-all duration-150",
+          "group relative flex w-full touch-pan-y items-center gap-2.5 rounded-lg px-3 py-2.5 text-left transition-all duration-150",
           multiSelectMode && isSelected
             ? "mari-chrome-accent-surface mari-accent-animated"
             : isActive
@@ -820,6 +900,22 @@ export function ChatSidebar() {
             )}
           </div>
         )}
+        <button
+          type="button"
+          aria-label="Drag chat"
+          title="Drag chat"
+          className="mari-chrome-accent-text-muted mari-accent-animated flex h-8 w-6 shrink-0 cursor-grab touch-none items-center justify-center rounded-md opacity-100 transition-all hover:bg-[var(--marinara-chat-chrome-highlight-bg)] hover:text-[var(--marinara-chat-chrome-button-text-hover)] active:cursor-grabbing active:scale-95 md:h-7 md:w-5 md:opacity-0 md:group-hover:opacity-100"
+          onClick={(event) => event.stopPropagation()}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            startTouchDrag(chat.id, event);
+          }}
+          onPointerMove={updateTouchDrag}
+          onPointerUp={finishTouchDrag}
+          onPointerCancel={finishTouchDrag}
+        >
+          <GripVertical size="0.8125rem" />
+        </button>
 
         {/* Active indicator */}
         {isActive && (
@@ -829,10 +925,14 @@ export function ChatSidebar() {
         {/* Chat avatar(s) or mode icon fallback — with unread badge overlay */}
         <div className="relative flex-shrink-0">
           {(() => {
-            const charIds = normalizeChatCharacterIds((chat as { characterIds?: unknown }).characterIds);
             const avatars = charIds
               .slice(0, 3)
-              .map((id) => charLookup.get(id))
+              .map((id) => {
+                const base = charLookup.get(id);
+                if (!base) return null;
+                const chatStatus = conversationStatusByCharacter.get(id);
+                return chatStatus ? { ...base, conversationStatus: chatStatus } : base;
+              })
               .filter(Boolean) as {
               name: string;
               avatarUrl: string | null;
@@ -843,30 +943,30 @@ export function ChatSidebar() {
             const isConvoMode = chat.mode === "conversation";
             const statusDot = (status?: string) => {
               if (!isConvoMode) return null;
-              const s = status ?? "online";
-              const color =
-                s === "online"
-                  ? "bg-green-500"
-                  : s === "idle"
-                    ? "bg-yellow-500"
-                    : s === "dnd"
-                      ? "bg-red-500"
-                      : "bg-gray-400";
               return (
                 <span
-                  className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-[0.1875rem] ring-[1.5px] ring-[var(--sidebar-background)] ${color}`}
+                  className={cn(
+                    "absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-[0.1875rem] ring-[1.5px] ring-[var(--sidebar-background)]",
+                  conversationStatusDotClass(status),
+                )}
                 />
               );
             };
-
+            const multiAvatarStatus = avatars.reduce<ConversationPresenceStatus | undefined>((worstStatus, avatar) => {
+              const nextStatus = asConversationStatus(avatar.conversationStatus) ?? "online";
+              if (!worstStatus) return nextStatus;
+              return CONVERSATION_STATUS_PRIORITY[nextStatus] > CONVERSATION_STATUS_PRIORITY[worstStatus]
+                ? nextStatus
+                : worstStatus;
+            }, undefined);
             if (avatars.length === 0) {
               return (
                 <div
                   className={cn(
                     "flex h-7 w-7 items-center justify-center rounded-lg text-xs transition-transform group-active:scale-90",
-                    isActive
-                      ? "mari-chrome-accent-tile mari-accent-animated shadow-sm"
-                      : "mari-chrome-accent-soft-tile mari-accent-animated",
+                    "mari-chat-mode-avatar",
+                    cfg.logoModeClass,
+                    isActive && "shadow-sm",
                   )}
                 >
                   {cfg.icon}
@@ -929,6 +1029,7 @@ export function ChatSidebar() {
                     </div>
                   ),
                 )}
+                {statusDot(multiAvatarStatus)}
               </div>
             );
           })()}
@@ -981,7 +1082,7 @@ export function ChatSidebar() {
                     tone: "destructive",
                   })
                 ) {
-                  deleteChat.mutate(chat.id);
+                  deleteChat.mutate({ id: chat.id, force: true });
                   if (activeChatId === chat.id) setActiveChatId(null);
                 }
               }
@@ -1065,6 +1166,7 @@ export function ChatSidebar() {
         />
         <button
           onClick={handleNewChatFromTab}
+          disabled={createChat.isPending}
           className={cn(
             "mari-chrome-control mari-chrome-control--primary mari-chat-mode-action flex-1 text-xs",
             activeModeConfig.logoModeClass,
@@ -1072,7 +1174,7 @@ export function ChatSidebar() {
           title={`New ${activeModeConfig.label}`}
           aria-label={`New ${activeModeConfig.label}`}
         >
-          <Plus size="0.8125rem" />
+          <Plus size="0.8125rem" className="mari-chrome-accent-icon mari-accent-animated" />
         </button>
         <button
           onClick={() => chatImportInputRef.current?.click()}
@@ -1275,13 +1377,15 @@ export function ChatSidebar() {
             </p>
             <button
               onClick={handleNewChatFromTab}
+              disabled={createChat.isPending}
               className={cn(
                 "mari-chrome-control mari-chrome-control--compact mari-chat-mode-action mt-1",
                 activeModeConfig.logoModeClass,
               )}
             >
+              <span className="mari-chrome-accent-icon mari-accent-animated">+</span>
               
-              + Novo {activeTab === "conversation" ? "Conversation" : activeTab === "game" ? "Game" : "Roleplay"}
+              Novo {activeTab === "conversation" ? "Conversation" : activeTab === "game" ? "Game" : "Roleplay"}
             </button>
           </div>
         )}
@@ -1375,7 +1479,7 @@ export function ChatSidebar() {
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => {
-                  deleteChat.mutate(deleteTarget.chatId);
+                  deleteChat.mutate({ id: deleteTarget.chatId, force: true });
                   if (activeChatId === deleteTarget.chatId) setActiveChatId(null);
                   setDeleteTarget(null);
                 }}
@@ -1388,12 +1492,12 @@ export function ChatSidebar() {
               <button
                 onClick={() => {
                   if (deleteTarget.groupId) {
-                    deleteChatGroup.mutate(deleteTarget.groupId);
+                    deleteChatGroup.mutate({ groupId: deleteTarget.groupId, force: true });
                     if (activeGroupId === deleteTarget.groupId) setActiveChatId(null);
                   }
                   setDeleteTarget(null);
                 }}
-                className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[var(--destructive)]/10 px-3 py-2.5 text-xs font-medium text-[var(--destructive)] ring-1 ring-[var(--destructive)]/20 transition-all hover:bg-[var(--destructive)]/20 active:scale-[0.98]"
+                className="mari-chrome-control mari-chrome-control--primary w-full text-xs"
               >
                 <Trash2 size="0.8125rem" />
                 
@@ -1403,7 +1507,6 @@ export function ChatSidebar() {
           </div>
         )}
       </Modal>
-
     </nav>
   );
 }
@@ -1487,7 +1590,8 @@ function FolderRow({
       }}
       className={cn(
         "flex flex-col rounded-lg transition-colors",
-        isDropTarget && "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
+        isDropTarget &&
+          "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
       )}
     >
       {/* Folder header */}

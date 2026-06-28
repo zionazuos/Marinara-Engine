@@ -1,13 +1,22 @@
-import { Suspense, lazy, type ComponentProps } from "react";
+import { Suspense, lazy, type ComponentProps, type CSSProperties } from "react";
 import type { SpriteSide } from "@marinara-engine/shared";
-import { ChevronUp, ChevronDown, Trash2 } from "lucide-react";
-import { PinnedImageOverlay } from "./PinnedImageOverlay";
+import { ChevronUp, ChevronDown, Loader2, Trash2 } from "lucide-react";
 import type { PeekPromptData } from "./chat-area.types";
+import type { LocalSpriteVisualSettings } from "./local-sprite-visual-settings";
 
-const ChatSettingsDrawer = lazy(async () => {
+const loadChatSettingsDrawer = async () => {
   const module = await import("./ChatSettingsDrawer");
   return { default: module.ChatSettingsDrawer };
-});
+};
+
+let chatSettingsDrawerLoadPromise: ReturnType<typeof loadChatSettingsDrawer> | null = null;
+
+export function preloadChatSettingsDrawer() {
+  chatSettingsDrawerLoadPromise ??= loadChatSettingsDrawer();
+  return chatSettingsDrawerLoadPromise;
+}
+
+const ChatSettingsDrawer = lazy(preloadChatSettingsDrawer);
 
 const ChatFilesDrawer = lazy(async () => {
   const module = await import("./ChatFilesDrawer");
@@ -31,12 +40,15 @@ const PeekPromptModal = lazy(async () => {
 
 type ChatData = ComponentProps<typeof ChatSettingsDrawer>["chat"];
 export type ChatFloatingPanelAnchor = { right: number; top: number } | null;
+export type ChatSettingsInitialSection = ComponentProps<typeof ChatSettingsDrawer>["initialSection"];
 
 type SharedSceneSettingsProps = {
   spriteArrangeMode: boolean;
   onToggleSpriteArrange: () => void;
   onResetSpritePlacements: () => void;
   onSpriteSideChange: (side: SpriteSide) => void;
+  spriteVisualSettings?: LocalSpriteVisualSettings;
+  onSpriteVisualSettingsChange?: (patch: Partial<LocalSpriteVisualSettings>) => void;
 };
 
 type DeleteDialogProps = {
@@ -182,11 +194,43 @@ function MultiSelectBar({
   );
 }
 
+function ChatSettingsLoadingFallback({ anchor }: { anchor: ChatFloatingPanelAnchor }) {
+  const anchoredOnMobile = !!anchor && typeof window !== "undefined" && window.innerWidth < 768;
+  const panelStyle: CSSProperties | undefined = anchor
+    ? anchoredOnMobile
+      ? {
+          bottom: "auto",
+          left: "auto",
+          right: `${anchor.right}px`,
+          top: `${anchor.top}px`,
+          width: `min(34rem, calc(100vw - ${anchor.right}px - 0.75rem))`,
+        }
+      : { right: `${anchor.right}px`, top: `${anchor.top}px` }
+    : undefined;
+
+  return (
+    <div
+      data-chat-floating-panel
+      className="fixed bottom-3 right-[calc(var(--mari-chat-ui-inset-right,0px)+0.75rem)] top-14 z-[70] flex w-[min(34rem,calc(100vw-var(--mari-chat-ui-inset-left,0px)-var(--mari-chat-ui-inset-right,0px)-1.5rem))] flex-col overflow-hidden rounded-xl border border-[var(--marinara-chat-chrome-panel-border)] bg-[var(--marinara-chat-chrome-panel-bg)] text-[var(--marinara-chat-chrome-panel-text)] shadow-2xl shadow-black/40 backdrop-blur-md max-md:inset-x-2 max-md:bottom-[calc(0.75rem+env(safe-area-inset-bottom))] max-md:top-[calc(3.5rem+env(safe-area-inset-top))] max-md:w-auto"
+      style={panelStyle}
+    >
+      <div className="flex shrink-0 items-center gap-2 border-b border-[var(--border)] px-4 py-3 text-sm font-semibold">
+        <Loader2 size="0.875rem" className="animate-spin text-[var(--primary)]" />
+        
+        Configurações do chat
+      </div>
+      <div className="flex min-h-32 items-center justify-center px-4 py-8 text-xs text-[var(--muted-foreground)]">
+        Loading settings...
+      </div>
+    </div>
+  );
+}
+
 type ChatCommonOverlaysProps = {
   chat: ChatData | null | undefined;
-  activeChatId: string;
   settingsOpen: boolean;
   settingsAnchor: ChatFloatingPanelAnchor;
+  settingsInitialSection?: ChatSettingsInitialSection;
   filesOpen: boolean;
   galleryOpen: boolean;
   galleryAnchor: ChatFloatingPanelAnchor;
@@ -219,9 +263,9 @@ type ChatCommonOverlaysProps = {
 
 export function ChatCommonOverlays({
   chat,
-  activeChatId,
   settingsOpen,
   settingsAnchor,
+  settingsInitialSection,
   filesOpen,
   galleryOpen,
   galleryAnchor,
@@ -252,20 +296,21 @@ export function ChatCommonOverlays({
 }: ChatCommonOverlaysProps) {
   return (
     <>
-      {chat && (
-        <Suspense fallback={null}>
-          {settingsOpen && (
-            <ChatSettingsDrawer
-              chat={chat}
-              open={settingsOpen}
-              onClose={onCloseSettings}
-              anchor={settingsAnchor}
-              spriteArrangeMode={sceneSettings.spriteArrangeMode}
-              onToggleSpriteArrange={sceneSettings.onToggleSpriteArrange}
-              onResetSpritePlacements={sceneSettings.onResetSpritePlacements}
-              onSpriteSideChange={sceneSettings.onSpriteSideChange}
-            />
-          )}
+      {chat && settingsOpen && (
+        <Suspense fallback={<ChatSettingsLoadingFallback anchor={settingsAnchor} />}>
+          <ChatSettingsDrawer
+            chat={chat}
+            open={settingsOpen}
+            onClose={onCloseSettings}
+            anchor={settingsAnchor}
+            initialSection={settingsInitialSection}
+            spriteArrangeMode={sceneSettings.spriteArrangeMode}
+            onToggleSpriteArrange={sceneSettings.onToggleSpriteArrange}
+            onResetSpritePlacements={sceneSettings.onResetSpritePlacements}
+            onSpriteSideChange={sceneSettings.onSpriteSideChange}
+            spriteVisualSettings={sceneSettings.spriteVisualSettings}
+            onSpriteVisualSettingsChange={sceneSettings.onSpriteVisualSettingsChange}
+          />
         </Suspense>
       )}
       {chat && (
@@ -289,7 +334,6 @@ export function ChatCommonOverlays({
       {chat && (
         <Suspense fallback={null}>{wizardOpen && <ChatSetupWizard chat={chat} onFinish={onWizardFinish} />}</Suspense>
       )}
-      <PinnedImageOverlay activeChatId={activeChatId} />
       <Suspense fallback={null}>
         {peekPromptData && <PeekPromptModal data={peekPromptData} onClose={onClosePeekPrompt} />}
       </Suspense>

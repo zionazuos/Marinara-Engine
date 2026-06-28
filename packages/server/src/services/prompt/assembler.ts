@@ -5,6 +5,7 @@
 // persona, and per-chat choice selections.
 // ──────────────────────────────────────────────
 import type { DB } from "../../db/connection.js";
+import { logger } from "../../lib/logger.js";
 import type {
   ChatMLMessage,
   PromptPreset,
@@ -17,7 +18,7 @@ import type {
   MacroContext,
   ResolveMacroOptions,
 } from "@marinara-engine/shared";
-import { resolveMacros } from "@marinara-engine/shared";
+import { DEFAULT_GENERATION_PARAMS, resolveMacros } from "@marinara-engine/shared";
 import { wrapContent, wrapGroup } from "./format-engine.js";
 import { expandMarker, type MarkerContext } from "./marker-expander.js";
 import { mergeAdjacentMessages, squashLeadingSystemMessages } from "./merger.js";
@@ -26,6 +27,7 @@ import type { LorebookScanResult } from "../lorebook/index.js";
 import {
   buildPromptMacroContext,
   collectCharacterDepthPromptEntries,
+  collectCharacterPostHistoryEntries,
   resolveMacrosWithVariableSnapshot,
 } from "./macro-context.js";
 
@@ -211,6 +213,14 @@ export interface AssemblerInput {
   groupScenarioOverrideText?: string | null;
   /** Per-generation agent data keyed by agent type. Used when an agent section must consume fresh output. */
   runtimeAgentData?: Record<string, string | RuntimeAgentData>;
+  /** Current generation type label for {{lastGenerationType}}. */
+  lastGenerationType?: string;
+  /** Human-readable idle duration for {{idle_duration}}. */
+  idleDuration?: string;
+  /** IANA timezone used by date/time macros. */
+  timeZone?: string;
+  /** Skip regular preset instructions that would conflict with user impersonation. */
+  impersonate?: boolean;
   /** Preserve character-scoped macros for a later known-speaker finalization pass. */
   deferCharacterMacros?: boolean;
 }
@@ -235,13 +245,25 @@ export interface AssemblerOutput {
   runtimeAgentTypesUsed?: string[];
 }
 
+function parsePresetParameters(raw: string): GenerationParameters {
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return { ...DEFAULT_GENERATION_PARAMS, ...(parsed as Partial<GenerationParameters>) };
+    }
+  } catch {
+    // Malformed legacy rows should not leave generation parameters undefined.
+  }
+  return { ...DEFAULT_GENERATION_PARAMS };
+}
+
 // ═══════════════════════════════════════════════
 //  Main Assembler
 // ═══════════════════════════════════════════════
 
 export async function assemblePrompt(input: AssemblerInput): Promise<AssemblerOutput> {
   const wrapFormat = (input.preset.wrapFormat || "xml") as WrapFormat;
-  const parameters = JSON.parse(input.preset.parameters) as GenerationParameters;
+  const parameters = parsePresetParameters(input.preset.parameters);
   const sectionOrder = JSON.parse(input.preset.sectionOrder) as string[];
   const groupOrder = JSON.parse(input.preset.groupOrder) as string[];
   const variableValues = JSON.parse(input.preset.variableValues) as Record<string, string>;
@@ -300,6 +322,9 @@ export async function assemblePrompt(input: AssemblerInput): Promise<AssemblerOu
     groupScenarioOverrideText: input.groupScenarioOverrideText,
     lastInput: [...input.chatMessages].reverse().find((message) => message.role === "user")?.content,
     chatId: input.chatId,
+    lastGenerationType: input.lastGenerationType,
+    idleDuration: input.idleDuration,
+    timeZone: input.timeZone,
   });
 
   // Resolve macros inside variable values themselves (e.g. {{user}} in a choice value)
@@ -350,6 +375,7 @@ export async function assemblePrompt(input: AssemblerInput): Promise<AssemblerOu
     const section = sectionMap.get(sectionId);
     if (!section) continue;
     if (section.enabled !== "true") continue;
+    if (input.impersonate === true && section.isMarker !== "true") continue;
 
     // Check if group is enabled
     if (section.groupId) {
@@ -367,18 +393,24 @@ export async function assemblePrompt(input: AssemblerInput): Promise<AssemblerOu
       }
     }
 
-    const resolved = await resolveSection(section, {
-      macroCtx,
-      markerCtx,
-      macroOptions: deferAllMacroOptions,
-      wrapFormat,
-      runtimeAgentData: input.runtimeAgentData ?? {},
-      runtimeAgentTypesUsed,
-    });
+    let resolved: ResolvedSection | null;
+    try {
+      resolved = await resolveSection(section, {
+        macroCtx,
+        markerCtx,
+        macroOptions: deferAllMacroOptions,
+        wrapFormat,
+        runtimeAgentData: input.runtimeAgentData ?? {},
+        runtimeAgentTypesUsed,
+      });
+    } catch (err) {
+      logger.warn(err, "[prompt] Skipping section %s after marker expansion failed", section.id);
+      continue;
+    }
 
     if (!resolved) continue;
 
-    if (section.injectionPosition === "depth" && section.injectionDepth > 0) {
+    if (!resolved.isChatHistory && section.injectionPosition === "depth" && section.injectionDepth >= 0) {
       depthSections.push(resolved);
     } else {
       orderedSections.push(resolved);
@@ -486,6 +518,16 @@ export async function assemblePrompt(input: AssemblerInput): Promise<AssemblerOu
     allDepthEntries.push(characterDepthEntries);
   }
 
+  const characterPostHistoryEntries = await collectCharacterPostHistoryEntries(
+    input.db,
+    input.characterIds,
+    macroCtx,
+    wrapFormat,
+  );
+  if (characterPostHistoryEntries.length > 0) {
+    allDepthEntries.push(characterPostHistoryEntries);
+  }
+
   const combinedDepthEntries = allDepthEntries.flat();
   if (combinedDepthEntries.length > 0) {
     const historyBounds = findHistoryBounds(finalMessages);
@@ -580,10 +622,14 @@ async function resolveSection(
   let runtimeAgentText = "";
   let runtimeAgentStartToken: string | undefined;
   let runtimeAgentEndToken: string | undefined;
+  let wrapperName = section.name;
 
   // Handle marker sections
   if (section.isMarker === "true" && section.markerConfig) {
     const markerConfig = JSON.parse(section.markerConfig) as MarkerConfig;
+    if (markerConfig.type === "chat_summary") {
+      wrapperName = "Chat Summary";
+    }
     const runtimeAgentType =
       markerConfig.type === "agent_data" && markerConfig.agentType ? markerConfig.agentType : null;
     const runtimeAgentData = runtimeAgentType !== null ? ctx.runtimeAgentData[runtimeAgentType] : undefined;
@@ -656,7 +702,7 @@ async function resolveSection(
   );
 
   // Auto-wrap in the preset's format
-  const wrapped = wrapContent(content, section.name, ctx.wrapFormat);
+  const wrapped = wrapContent(content, wrapperName, ctx.wrapFormat);
   const messageContent = shouldWrapRuntimeAgentSection
     ? `${runtimeAgentStartToken}${wrapped || content}${runtimeAgentEndToken}`
     : wrapped || content;
@@ -786,12 +832,9 @@ function enforceStrictRoles(messages: ChatMLMessage[]): ChatMLMessage[] {
     const msg = messages[idx]!;
 
     if (msg.role === "system") {
-      const leadingSystem = result[0];
-      if (leadingSystem?.role === "system") {
-        mergeInto(leadingSystem, msg);
-      } else {
-        result.unshift({ ...msg });
-      }
+      const prev = result[result.length - 1];
+      if (prev?.role === "system") mergeInto(prev, msg);
+      else result.push({ ...msg });
       continue;
     }
 

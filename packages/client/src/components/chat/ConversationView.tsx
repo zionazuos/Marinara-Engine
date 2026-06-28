@@ -13,31 +13,29 @@ import {
   useState,
   type MouseEvent as ReactMouseEvent,
 } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, ChevronUp, Settings2, Image as ImageIcon, ArrowRightLeft } from "lucide-react";
 import { ConversationMessage } from "./ConversationMessage";
 import { ConversationInput } from "./ConversationInput";
+import { UnoBoard } from "./UnoBoard";
+import { UnoSetup } from "./UnoSetup";
 import { SceneBanner, EndSceneBar } from "./SceneBanner";
 import { ChatBranchSelector } from "./ChatBranchSelector";
 import { ActiveLorebookEntriesButton } from "./ActiveLorebookEntriesButton";
-import {
-  CHAT_TOOLBAR_IDENTITY_PILL_SIZE_CLASS,
-  ChatToolbarButton,
-  ChatToolbarMenu,
-  getChatToolbarButtonClass,
-} from "./ChatToolbarControls";
+import { ChatToolbarButton, ChatToolbarMenu } from "./ChatToolbarControls";
+import { ConversationPresenceCard } from "./ConversationPresenceCard";
 import { TranscriptWindowControls } from "./TranscriptWindowControls";
+import { PinnedImageOverlay } from "./PinnedImageOverlay";
 import { useChatStore } from "../../stores/chat.store";
+import { useUnoGameStore } from "../../stores/uno-game.store";
 import { useUIStore } from "../../stores/ui.store";
-import { playNotificationPing } from "../../lib/notification-sound";
-import { getAvatarCropStyle, type AvatarCropValue } from "../../lib/utils";
+import { playConfiguredNotificationPing } from "../../lib/notification-sound";
+import { messageHasPendingPostProcessing } from "../../lib/chat-message-extra";
 import { getTranscriptRenderWindow, TRANSCRIPT_RENDER_WINDOW_STEP } from "../../lib/transcript-render-window";
-import { characterKeys } from "../../hooks/use-characters";
+import { useThrottledStreamBuffer } from "../../hooks/use-throttled-stream-buffer";
 import { useConversationCustomEmojis } from "../../hooks/use-conversation-custom-emojis";
 import { useConversationCustomStickers } from "../../hooks/use-conversation-custom-stickers";
-import { api } from "../../lib/api-client";
 import type { CharacterMap, MessageSelectionToggle, PersonaInfo } from "./chat-area.types";
-import type { Message } from "@marinara-engine/shared";
+import { normalizeTextForMatch, type Message } from "@marinara-engine/shared";
 
 const ConversationAutonomousEffects = lazy(async () => {
   const module = await import("./ConversationAutonomousEffects");
@@ -67,7 +65,7 @@ interface ConversationViewProps {
   onToggleHiddenFromAI: (messageId: string, current: boolean) => void;
   onPeekPrompt: () => void;
   lastAssistantMessageId: string | null;
-  onOpenSettings: (event?: ReactMouseEvent<HTMLElement>) => void;
+  onOpenSettings: (event?: ReactMouseEvent<HTMLElement>, options?: { initialSection?: "autonomous" | null }) => void;
   onOpenGallery: (event?: ReactMouseEvent<HTMLElement>) => void;
   onBranch?: (messageId: string) => void;
   multiSelectMode?: boolean;
@@ -110,7 +108,7 @@ function hasNamePrefixFormat(msg: Message, characterMap: CharacterMap, chatChara
   if (!msg.content) return false;
   const chatNames = new Set(
     chatCharacterIds
-      .map((id) => characterMap.get(id)?.name?.toLowerCase())
+      .map((id) => normalizeTextForMatch(characterMap.get(id)?.name))
       .filter((name): name is string => typeof name === "string" && name.length > 0),
   );
   if (!chatNames.size) return false;
@@ -119,7 +117,7 @@ function hasNamePrefixFormat(msg: Message, characterMap: CharacterMap, chatChara
     const colonIdx = line.indexOf(": ");
     if (colonIdx > 0) {
       const name = line.slice(0, colonIdx).trim();
-      if (chatNames.has(name.toLowerCase())) return true;
+      if (chatNames.has(normalizeTextForMatch(name))) return true;
     }
   }
   return false;
@@ -275,12 +273,14 @@ export function ConversationView({
   onConcludeScene,
   onAbandonScene,
 }: ConversationViewProps) {
-  const qc = useQueryClient();
   const streamingChatId = useChatStore((s) => s.streamingChatId);
   const isStreaming = useChatStore((s) => s.isStreaming) && streamingChatId === chatId;
+  const unoGameActive = useUnoGameStore((s) => s.current?.chatId === chatId && s.current?.status !== "finished");
+  const unoSetupOpen = useUnoGameStore((s) => s.setupChatId === chatId);
+  const closeUnoSetup = useUnoGameStore((s) => s.closeSetup);
   const isStreamCommitted = useChatStore((s) => s.committedStreamChatIds.has(chatId));
   const hasLiveStream = isStreaming && !isStreamCommitted;
-  const streamBuffer = useChatStore((s) => s.streamBuffer);
+  const streamBuffer = useThrottledStreamBuffer();
   const thinkingBuffer = useChatStore((s) => s.thinkingBuffer);
   const regenerateMessageId = useChatStore((s) => s.regenerateMessageId);
   const streamingCharacterId = useChatStore((s) => s.streamingCharacterId);
@@ -296,6 +296,31 @@ export function ConversationView({
     return "Character";
   }, [characterMap, characterNames, chatCharIds, streamingCharacterId, typingCharacterName]);
   const liveTypingVerb = liveTypingName.includes(",") || liveTypingName.includes(" & ") ? "are" : "is";
+  const delayedDisplayName = useMemo(() => {
+    if (!delayedCharacterInfo) return "";
+    const ids = delayedCharacterInfo.characterIds ?? [];
+    const namesFromIds = ids
+      .map((id) => characterMap.get(id)?.name)
+      .filter((name): name is string => typeof name === "string" && name.trim().length > 0);
+    if (namesFromIds.length > 0 && namesFromIds.length === ids.length) return namesFromIds.join(", ");
+
+    const namesFromEvent = (delayedCharacterInfo.characterNames ?? []).filter(
+      (name): name is string => typeof name === "string" && name.trim().length > 0,
+    );
+    const usefulEventNames = namesFromEvent.filter((name) => {
+      const normalized = normalizeTextForMatch(name);
+      return normalized !== "character" && normalized !== "characters";
+    });
+    if (usefulEventNames.length > 0) return usefulEventNames.join(", ");
+    if (namesFromIds.length > 0) return namesFromIds.join(", ");
+    const fallbackName = delayedCharacterInfo.name?.trim() ?? "";
+    const normalizedFallbackName = normalizeTextForMatch(fallbackName);
+    if (fallbackName && normalizedFallbackName !== "character" && normalizedFallbackName !== "characters") {
+      return fallbackName;
+    }
+    return "Character";
+  }, [characterMap, delayedCharacterInfo]);
+  const delayedDisplayVerb = delayedDisplayName.includes(",") || delayedDisplayName.includes(" & ") ? "are" : "is";
   // Single typer → tag the typing row so exclusive-mode card CSS can target it via
   // `[data-card-css="<id>"] .mari-typing-*`. Multiple/unknown typers stay untagged.
   const typingCardCssId = streamingCharacterId ?? (chatCharIds.length === 1 ? chatCharIds[0] : undefined);
@@ -326,25 +351,6 @@ export function ConversationView({
     (conversationMessageStyle === "bubble" || !!streamBuffer || !!thinkingBuffer);
   const showTypingIndicator =
     hasLiveStream && !delayedCharacterInfo && !streamBuffer && !thinkingBuffer && conversationMessageStyle !== "bubble";
-
-  // ── Periodic status refresh (every 60s) ──
-  // Keeps status dots in sync with the character's schedule regardless of autonomous messaging
-  useEffect(() => {
-    if (!chatId) return;
-    const refreshStatus = async () => {
-      // Skip while tab is hidden to avoid a burst of requests on return
-      if (document.hidden) return;
-      try {
-        await api.get(`/conversation/status/${chatId}`);
-        qc.invalidateQueries({ queryKey: characterKeys.list() });
-      } catch {
-        /* non-critical */
-      }
-    };
-    void refreshStatus();
-    const timer = setInterval(refreshStatus, 60_000);
-    return () => clearInterval(timer);
-  }, [chatId, qc]);
 
   // Per-scheme conversation gradient from settings.
   // When a scheme's values are still the defaults (user hasn't customized), use
@@ -712,6 +718,7 @@ export function ConversationView({
   // component remounts. This prevents sounds/stagger replaying when the user
   // navigates away and comes back to the same chat.
   const globalSeenKeysRef = useRef(globalSeenKeys);
+  const pendingPostProcessingKeysRef = useRef<Set<string>>(new Set());
   // Persist stagger timers in a ref so they survive effect re-runs caused by
   // query refetches arriving shortly after the initial message_saved upsert.
   const staggerTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>[]>>({});
@@ -723,6 +730,7 @@ export function ConversationView({
     initialLoadSettledRef.current = false;
     prevRenderedKeysRef.current = new Set();
     renderedMessageKeysRef.current = new Set();
+    pendingPostProcessingKeysRef.current = new Set();
     Object.values(staggerTimersRef.current).forEach((timers) => timers.forEach(clearTimeout));
     staggerTimersRef.current = {};
     setVisiblePartCounts({});
@@ -731,6 +739,9 @@ export function ConversationView({
   useLayoutEffect(() => {
     const messageItems = renderedItems.filter((item) => item.type === "message");
     const currentKeys = new Set(messageItems.map((item) => item.key));
+    const pendingPostProcessingKeys = new Set(
+      messageItems.filter((item) => messageHasPendingPostProcessing(item.msg)).map((item) => item.key),
+    );
     renderedMessageKeysRef.current = currentKeys;
     for (const key of Object.keys(staggerTimersRef.current)) {
       if (!currentKeys.has(key)) {
@@ -754,7 +765,10 @@ export function ConversationView({
       if (currentKeys.size > 0) {
         prevRenderedKeysRef.current = currentKeys;
         // Mark all current keys as globally seen so remount won't replay them
-        for (const k of currentKeys) globalSeenKeysRef.current.add(k);
+        for (const item of messageItems) {
+          if (!pendingPostProcessingKeys.has(item.key)) globalSeenKeysRef.current.add(item.key);
+        }
+        pendingPostProcessingKeysRef.current = pendingPostProcessingKeys;
         initialLoadSettledRef.current = true;
       }
       return;
@@ -780,12 +794,15 @@ export function ConversationView({
 
     for (const item of messageItems) {
       const key = item.key;
-      if (prevKeys.has(key) || seenGlobal.has(key)) continue;
+      const isPendingPostProcessing = pendingPostProcessingKeys.has(key);
+      if (isPendingPostProcessing) continue;
+      const wasPendingPostProcessing = pendingPostProcessingKeysRef.current.has(key);
+      if ((prevKeys.has(key) || seenGlobal.has(key)) && !wasPendingPostProcessing) continue;
 
       // Check if this message is fresh (created recently, meaning it was
       // generated while the user is actively in this chat)
       const ts = keyTimestampMap.get(key) ?? 0;
-      const isFresh = now - ts < FRESHNESS_MS;
+      const isFresh = wasPendingPostProcessing || now - ts < FRESHNESS_MS;
 
       if (!isFresh) {
         // Stale message from cache refetch — silently mark as seen, skip animation
@@ -800,12 +817,16 @@ export function ConversationView({
     }
 
     // Mark all current keys as globally seen
-    for (const k of currentKeys) seenGlobal.add(k);
+    for (const item of messageItems) {
+      if (!pendingPostProcessingKeys.has(item.key)) seenGlobal.add(item.key);
+    }
     prevRenderedKeysRef.current = currentKeys;
+    pendingPostProcessingKeysRef.current = pendingPostProcessingKeys;
 
     // Play notification for the first new message appearance
-    if (hasNewAssistantMessage && useUIStore.getState().convoNotificationSound) {
-      playNotificationPing();
+    if (hasNewAssistantMessage) {
+      const uiState = useUIStore.getState();
+      playConfiguredNotificationPing(uiState.convoNotificationSound, uiState.notificationSoundsOnlyWhenUnfocused);
     }
 
     if (newPartMessages.length === 0) return;
@@ -831,9 +852,8 @@ export function ConversationView({
             return;
           }
           setVisiblePartCounts((prev) => ({ ...prev, [key]: partIndex }));
-          if (useUIStore.getState().convoNotificationSound) {
-            playNotificationPing();
-          }
+          const uiState = useUIStore.getState();
+          playConfiguredNotificationPing(uiState.convoNotificationSound, uiState.notificationSoundsOnlyWhenUnfocused);
           staggerTimersRef.current[key] = (staggerTimersRef.current[key] ?? []).filter(
             (activeTimer) => activeTimer !== timer,
           );
@@ -874,115 +894,15 @@ export function ConversationView({
       {/* ── Messages scroll area ── */}
       <div ref={scrollRef} className="mari-messages-scroll flex-1 overflow-y-auto overflow-x-hidden">
         {/* Floating header — character info + action buttons */}
-        <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-2">
-          {/* Character identity pill */}
-          {(() => {
-            const chars = chatCharIds.map((id) => characterMap.get(id)).filter(Boolean) as Array<{
-              name: string;
-              avatarUrl: string | null;
-              avatarCrop?: AvatarCropValue | null;
-              conversationStatus?: "online" | "idle" | "dnd" | "offline";
-              conversationActivity?: string;
-            }>;
-            if (chars.length === 0) return <div />;
-
-            const statusColor = (s?: string) => {
-              const st = s ?? "online";
-              return st === "online"
-                ? "bg-green-500"
-                : st === "idle"
-                  ? "bg-yellow-500"
-                  : st === "dnd"
-                    ? "bg-red-500"
-                    : "bg-gray-400";
-            };
-            const identityPillClass = getChatToolbarButtonClass({
-              compact: true,
-              sizeClassName: CHAT_TOOLBAR_IDENTITY_PILL_SIZE_CLASS,
-              className:
-                "min-w-0 max-w-[min(20rem,calc(100vw-8rem))] justify-start gap-2 px-2.5 text-[var(--foreground)]/80 hover:text-[var(--foreground)]/90 max-md:max-w-[calc(100vw-5.75rem)]",
-            });
-            const avatarShellClass =
-              "relative block h-5 w-5 overflow-hidden rounded-full ring-1 ring-[var(--border)]/80 max-md:h-6 max-md:w-6";
-            const avatarFallbackClass =
-              "flex h-5 w-5 items-center justify-center rounded-full bg-[var(--foreground)]/10 text-[0.5rem] font-bold text-[var(--foreground)]/70 ring-1 ring-[var(--border)]/80 max-md:h-6 max-md:w-6 max-md:text-[0.5625rem]";
-
-            if (chars.length === 1) {
-              const c = chars[0]!;
-              return (
-                <div
-                  className={identityPillClass}
-                  title={c.conversationActivity ? `${c.name}: ${c.conversationActivity}` : c.name}
-                >
-                  <div className="relative flex-shrink-0">
-                    {c.avatarUrl ? (
-                      <span className={avatarShellClass}>
-                        <img
-                          src={c.avatarUrl}
-                          alt={c.name}
-                          className="h-full w-full object-cover"
-                          style={getAvatarCropStyle(c.avatarCrop)}
-                        />
-                      </span>
-                    ) : (
-                      <div className={avatarFallbackClass}>{c.name[0]}</div>
-                    )}
-                    <span
-                      className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full ring-[1.5px] ring-[var(--card)] ${statusColor(c.conversationStatus)}`}
-                    />
-                  </div>
-                  <div className="flex min-w-0 flex-col leading-tight">
-                    <span className="truncate text-[0.75rem] font-semibold text-[var(--foreground)]/90">{c.name}</span>
-                    {c.conversationActivity && (
-                      <span className="truncate text-[0.5625rem] text-[var(--foreground)]/50">
-                        {c.conversationActivity}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            }
-
-            // Multiple characters — show stacked avatars + names
-            return (
-              <div
-                className={identityPillClass}
-                title={chars
-                  .map((c) => (c.conversationActivity ? `${c.name}: ${c.conversationActivity}` : c.name))
-                  .join(", ")}
-              >
-                <div
-                  className="relative flex-shrink-0"
-                  style={{ width: `${Math.min(chars.length, 3) * 12 + 8}px`, height: 20 }}
-                >
-                  {chars.slice(0, 3).map((c, i) => (
-                    <div key={i} className="absolute top-0" style={{ left: i * 12 }}>
-                      <div className="relative">
-                        {c.avatarUrl ? (
-                          <span className={avatarShellClass}>
-                            <img
-                              src={c.avatarUrl}
-                              alt={c.name}
-                              className="h-full w-full object-cover"
-                              style={getAvatarCropStyle(c.avatarCrop)}
-                            />
-                          </span>
-                        ) : (
-                          <div className={avatarFallbackClass}>{c.name[0]}</div>
-                        )}
-                        <span
-                          className={`absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 rounded-full ring-[1px] ring-[var(--card)] ${statusColor(c.conversationStatus)}`}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <span className="min-w-0 truncate text-[0.75rem] font-semibold text-[var(--foreground)]/90">
-                  {chars.length <= 2 ? chars.map((c) => c.name).join(" & ") : `${chars[0]!.name} + ${chars.length - 1}`}
-                </span>
-              </div>
-            );
-          })()}
+        <div className="sticky top-0 z-30 flex items-center justify-between px-4 py-2">
+          <ConversationPresenceCard
+            chatId={chatId}
+            chatMeta={chatMeta}
+            chatCharIds={chatCharIds}
+            characterMap={characterMap}
+            messages={messages}
+            onOpenSettings={onOpenSettings}
+          />
 
           <ChatToolbarMenu
             className="flex-1"
@@ -1190,8 +1110,8 @@ export function ConversationView({
           <div className="flex items-center gap-2 px-4 py-1.5 text-[0.8125rem] text-[var(--text-secondary)]">
             <span className="italic">
               {delayedCharacterInfo.status === "dnd"
-                ? `${delayedCharacterInfo.name} ${delayedCharacterInfo.name.includes(",") ? "are" : "is"} busy — they'll respond when they're back`
-                : `${delayedCharacterInfo.name} ${delayedCharacterInfo.name.includes(",") ? "are" : "is"} away — they'll respond in a moment`}
+                ? `${delayedDisplayName} ${delayedDisplayVerb} busy — they'll respond when they're back`
+                : `${delayedDisplayName} ${delayedDisplayVerb} away — they'll respond in a moment`}
             </span>
           </div>
         )}
@@ -1223,13 +1143,14 @@ export function ConversationView({
           </div>
         )}
 
-        {/* Scene banner — inline at bottom of messages (origin variant only) */}
-        {sceneInfo?.variant === "origin" && (
+        {/* Scene banner — inline at bottom of messages (origin variant only); hidden during a turn-game */}
+        {sceneInfo?.variant === "origin" && !unoGameActive && (
           <SceneBanner variant="origin" sceneChatId={sceneInfo.sceneChatId} sceneChatName={sceneInfo.sceneChatName} />
         )}
 
         <div ref={messagesEndRef} className="h-1" />
       </div>
+      <PinnedImageOverlay activeChatId={chatId} />
 
       {/* ── Autonomous message toast notification ── */}
       {hasAutonomousMessaging && (
@@ -1254,6 +1175,14 @@ export function ConversationView({
         />
       )}
 
+      {/* ── Turn-game board (UNO, etc.) — self-hides when no game is active ── */}
+      <UnoBoard chatId={chatId} />
+      {/* Setup modal mounted once here (stable position) so it never double-renders.
+          Keyed by chatId so its internal selection/house-rule state resets on a
+          chat switch (matches ConversationInput below) — otherwise stale selected
+          ids would inflate botCount and could deal an empty botCharacterIds list. */}
+      <UnoSetup key={chatId} chatId={chatId} open={unoSetupOpen} onClose={closeUnoSetup} />
+
       {/* ── Input area ── */}
       <ConversationInput
         key={chatId}
@@ -1265,23 +1194,19 @@ export function ConversationView({
               ? (chatMeta.groupResponseOrder ?? "sequential")
               : undefined
         }
-        chatCharacters={
-          chatCharIds.length > 1
-            ? chatCharIds
-                .filter((id) => characterMap.has(id))
-                .map((id) => {
-                  const info = characterMap.get(id)!;
-                  return {
-                    id,
-                    name: info.name,
-                    avatarUrl: info.avatarUrl ?? null,
-                    avatarCrop: info.avatarCrop ?? null,
-                    conversationStatus: info.conversationStatus,
-                    conversationActivity: info.conversationActivity,
-                  };
-                })
-            : undefined
-        }
+        chatCharacters={chatCharIds
+          .filter((id) => characterMap.has(id))
+          .map((id) => {
+            const info = characterMap.get(id)!;
+            return {
+              id,
+              name: info.name,
+              avatarUrl: info.avatarUrl ?? null,
+              avatarCrop: info.avatarCrop ?? null,
+              conversationStatus: info.conversationStatus,
+              conversationActivity: info.conversationActivity,
+            };
+          })}
         onPeekPrompt={onPeekPrompt}
       />
     </div>

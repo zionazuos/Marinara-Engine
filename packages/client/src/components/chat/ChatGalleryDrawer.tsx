@@ -2,10 +2,12 @@
 // Chat: Gallery Drawer — per-chat image gallery
 // ──────────────────────────────────────────────
 import { Image, X } from "lucide-react";
-import type { CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { cn } from "../../lib/utils";
 import { ChatGallery } from "./ChatGallery";
 import {
+  ROLEPLAY_POPOVER_CLOSE_BUTTON,
+  ROLEPLAY_POPOVER_CLOSE_ICON_SIZE,
   ROLEPLAY_POPOVER_HEADER,
   ROLEPLAY_POPOVER_SCROLL_AREA,
   ROLEPLAY_POPOVER_SHELL,
@@ -23,6 +25,23 @@ interface ChatGalleryDrawerProps {
 }
 
 export function ChatGalleryDrawer({ chat, open, onClose, anchor, onIllustrate }: ChatGalleryDrawerProps) {
+  const panelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (panelRef.current?.contains(target)) return;
+      if (target instanceof Element && target.closest("[data-chat-floating-panel]")) return;
+      onClose();
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () => document.removeEventListener("pointerdown", handlePointerDown, true);
+  }, [onClose, open]);
+
   if (!open) return null;
   const panelStyle: CSSProperties | undefined = anchor
     ? { right: `${anchor.right}px`, top: `${anchor.top}px` }
@@ -30,14 +49,14 @@ export function ChatGalleryDrawer({ chat, open, onClose, anchor, onIllustrate }:
 
   return (
     <>
-      <div className="fixed inset-0 z-[65] bg-transparent" onClick={onClose} />
-
       {/* Floating panel */}
       <div
+        ref={panelRef}
+        data-chat-floating-panel
         className={cn(
           ROLEPLAY_POPOVER_SHELL,
-          "fixed bottom-3 z-[70] flex w-[min(44rem,calc(100vw-1.5rem))] flex-col overflow-hidden max-md:inset-x-2 max-md:bottom-[calc(0.75rem+env(safe-area-inset-bottom))] max-md:top-[calc(3.5rem+env(safe-area-inset-top))] max-md:w-auto",
-          anchor ? "" : "right-3 top-14",
+          "mari-chat-gallery-drawer fixed bottom-3 z-[70] flex w-[min(44rem,calc(100vw-var(--mari-chat-ui-inset-left,0px)-var(--mari-chat-ui-inset-right,0px)-1.5rem))] flex-col overflow-hidden max-md:inset-x-2 max-md:bottom-[calc(0.75rem+env(safe-area-inset-bottom))] max-md:top-[calc(3.5rem+env(safe-area-inset-top))] max-md:w-auto",
+          anchor ? "" : "right-[calc(var(--mari-chat-ui-inset-right,0px)+0.75rem)] top-14",
         )}
         style={panelStyle}
       >
@@ -52,9 +71,9 @@ export function ChatGalleryDrawer({ chat, open, onClose, anchor, onIllustrate }:
             type="button"
             onClick={onClose}
             aria-label="Close gallery"
-            className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)]"
+            className={ROLEPLAY_POPOVER_CLOSE_BUTTON}
           >
-            <X size="1rem" />
+            <X size={ROLEPLAY_POPOVER_CLOSE_ICON_SIZE} />
           </button>
         </div>
 

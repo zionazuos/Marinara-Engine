@@ -4,14 +4,25 @@
 import { create } from "zustand";
 import type { AvatarCropValue } from "../lib/utils";
 import { subscribeWithSelector } from "zustand/middleware";
-import type { Chat, ChatMode, Message } from "@marinara-engine/shared";
+import type { Chat, ChatMode, ConversationPresenceStatus, Message } from "@marinara-engine/shared";
 import { useAgentStore } from "./agent.store";
 import { useGameStateStore } from "./game-state.store";
 
 const STORAGE_KEY = "marinara-active-chat-id";
 const DRAFTS_KEY = "marinara-input-drafts";
+const NOTIFICATION_AUTODISMISS_MS = 8000;
 
 type NotificationAvatarCrop = AvatarCropValue | null;
+
+type DelayedCharacterStatus = ConversationPresenceStatus;
+
+export type DelayedCharacterInfo = {
+  name: string;
+  status: DelayedCharacterStatus;
+  characterIds?: string[];
+  characterNames?: string[];
+  characterStatuses?: Record<string, DelayedCharacterStatus>;
+};
 
 /** Read drafts from localStorage so typed input survives reloads, tab closes, and app restarts. */
 function loadDrafts(): Map<string, string> {
@@ -39,6 +50,42 @@ function saveDrafts(m: Map<string, string>) {
   } catch {
     /* ignore */
   }
+}
+
+function abortGenerationForChat(chatId: string, controller?: AbortController) {
+  controller?.abort();
+  fetch("/api/generate/abort", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chatId }),
+  }).catch(() => {});
+}
+
+const notificationAutoDismissTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+function clearNotificationTimer(chatId: string) {
+  const timer = notificationAutoDismissTimers.get(chatId);
+  if (!timer) return;
+  clearTimeout(timer);
+  notificationAutoDismissTimers.delete(chatId);
+}
+
+function clearAllNotificationTimers() {
+  for (const timer of notificationAutoDismissTimers.values()) {
+    clearTimeout(timer);
+  }
+  notificationAutoDismissTimers.clear();
+}
+
+function scheduleNotificationAutoDismiss(chatId: string, getState: () => ChatState) {
+  clearNotificationTimer(chatId);
+  notificationAutoDismissTimers.set(
+    chatId,
+    setTimeout(() => {
+      clearNotificationTimer(chatId);
+      getState().autoDismissNotification(chatId);
+    }, NOTIFICATION_AUTODISMISS_MS),
+  );
 }
 
 interface ChatState {
@@ -81,11 +128,11 @@ interface ChatState {
   /** Human-readable label for the current server-side generation phase (e.g. "Running agents..."). */
   generationPhase: string | null;
   /** Character name + status shown during DND/idle delay (before generation starts). */
-  delayedCharacterInfo: { name: string; status: string } | null;
+  delayedCharacterInfo: DelayedCharacterInfo | null;
   /** Per-chat typing state so switching chats restores the correct indicator. */
   perChatTyping: Map<string, string>;
   /** Per-chat delayed state so switching chats restores the correct indicator. */
-  perChatDelayed: Map<string, { name: string; status: string }>;
+  perChatDelayed: Map<string, DelayedCharacterInfo>;
   swipeIndex: Map<string, number>; // messageId → active swipe index
   /** When true, ChatArea should open the settings drawer on next render. */
   shouldOpenSettings: boolean;
@@ -127,7 +174,7 @@ interface ChatState {
   setStreamCommitted: (chatId: string, committed: boolean) => void;
   setMariPhase: (chatId: string, phase: "thinking" | "updating" | "idle") => void;
   setAbortController: (chatId: string, controller: AbortController | null) => void;
-  stopGeneration: () => void;
+  stopGeneration: (chatId?: string) => void;
   appendStreamBuffer: (text: string, chatId?: string) => void;
   setStreamBuffer: (text: string, chatId?: string) => void;
   clearStreamBuffer: (chatId?: string) => void;
@@ -142,9 +189,9 @@ interface ChatState {
   clearResponseQueue: (chatId: string) => void;
   setTypingCharacterName: (name: string | null) => void;
   setGenerationPhase: (phase: string | null) => void;
-  setDelayedCharacterInfo: (info: { name: string; status: string } | null) => void;
+  setDelayedCharacterInfo: (info: DelayedCharacterInfo | null) => void;
   setPerChatTyping: (chatId: string, name: string | null) => void;
-  setPerChatDelayed: (chatId: string, info: { name: string; status: string } | null) => void;
+  setPerChatDelayed: (chatId: string, info: DelayedCharacterInfo | null) => void;
   clearPerChatState: (chatId: string) => void;
   setSwipeIndex: (messageId: string, index: number) => void;
   setShouldOpenSettings: (v: boolean) => void;
@@ -172,7 +219,9 @@ interface ChatState {
     avatarUrl: string | null,
     avatarCrop?: NotificationAvatarCrop,
   ) => void;
+  autoDismissNotification: (chatId: string) => void;
   dismissNotification: (chatId: string) => void;
+  dismissNotifications: (chatIds: string[]) => void;
   requestGotoMessage: (chatId: string, messageNumber: number) => void;
   clearGotoRequest: () => void;
   reset: () => void;
@@ -231,7 +280,10 @@ export const useChatStore = create<ChatState>()(
           const m = hasUnread ? new Map(state.unreadCounts) : state.unreadCounts;
           if (hasUnread) m.delete(id);
           const n = hasNotif ? new Map(state.chatNotifications) : state.chatNotifications;
-          if (hasNotif) n.delete(id);
+          if (hasNotif) {
+            clearNotificationTimer(id);
+            n.delete(id);
+          }
           const d = hasDismissed ? new Set(state.dismissedNotifications) : state.dismissedNotifications;
           if (hasDismissed) d.delete(id);
           return { unreadCounts: m, chatNotifications: n, dismissedNotifications: d };
@@ -333,18 +385,17 @@ export const useChatStore = create<ChatState>()(
         else m.delete(chatId);
         return { abortControllers: m };
       }),
-    stopGeneration: () => {
-      const { streamingChatId, abortControllers } = useChatStore.getState();
-      if (streamingChatId) {
-        const ctrl = abortControllers.get(streamingChatId);
-        if (ctrl) ctrl.abort();
-        // Explicitly tell the server to abort — the SSE close event may not
-        // fire reliably, so this ensures the backend (e.g. KoboldCPP) stops.
-        fetch("/api/generate/abort", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chatId: streamingChatId }),
-        }).catch(() => {});
+    stopGeneration: (chatId) => {
+      const { activeChatId, streamingChatId, abortControllers } = useChatStore.getState();
+      const targetIds = chatId
+        ? [chatId]
+        : activeChatId && abortControllers.has(activeChatId)
+          ? [activeChatId]
+          : streamingChatId
+            ? [streamingChatId]
+            : [...abortControllers.keys()];
+      for (const targetChatId of new Set(targetIds)) {
+        abortGenerationForChat(targetChatId, abortControllers.get(targetChatId));
       }
     },
     appendStreamBuffer: (text, chatId) =>
@@ -462,14 +513,29 @@ export const useChatStore = create<ChatState>()(
         return { responseQueues: queues };
       }),
 
-    setTypingCharacterName: (name) => set({ typingCharacterName: name, delayedCharacterInfo: null }),
+    setTypingCharacterName: (name) =>
+      set((state) => {
+        if (state.typingCharacterName === name && state.delayedCharacterInfo === null) return state;
+        return { typingCharacterName: name, delayedCharacterInfo: null };
+      }),
 
-    setGenerationPhase: (phase) => set({ generationPhase: phase }),
+    setGenerationPhase: (phase) =>
+      set((state) => {
+        if (state.generationPhase === phase) return state;
+        return { generationPhase: phase };
+      }),
 
-    setDelayedCharacterInfo: (info) => set({ delayedCharacterInfo: info, typingCharacterName: null }),
+    setDelayedCharacterInfo: (info) =>
+      set((state) => {
+        if (state.delayedCharacterInfo === info && state.typingCharacterName === null) return state;
+        return { delayedCharacterInfo: info, typingCharacterName: null };
+      }),
 
     setPerChatTyping: (chatId: string, name: string | null) =>
       set((state) => {
+        const currentTyping = state.perChatTyping.get(chatId) ?? null;
+        if (name === null && currentTyping === null) return state;
+        if (name !== null && currentTyping === name && !state.perChatDelayed.has(chatId)) return state;
         const m = new Map(state.perChatTyping);
         if (name) m.set(chatId, name);
         else m.delete(chatId);
@@ -478,8 +544,11 @@ export const useChatStore = create<ChatState>()(
         return { perChatTyping: m, perChatDelayed: d };
       }),
 
-    setPerChatDelayed: (chatId: string, info: { name: string; status: string } | null) =>
+    setPerChatDelayed: (chatId: string, info: DelayedCharacterInfo | null) =>
       set((state) => {
+        const currentDelayed = state.perChatDelayed.get(chatId) ?? null;
+        if (info === null && currentDelayed === null) return state;
+        if (info !== null && currentDelayed === info && !state.perChatTyping.has(chatId)) return state;
         const d = new Map(state.perChatDelayed);
         if (info) d.set(chatId, info);
         else d.delete(chatId);
@@ -570,6 +639,7 @@ export const useChatStore = create<ChatState>()(
           }
           for (const chatId of Array.from(chatNotifications.keys())) {
             if (!known.has(chatId) || !serverChatIds.has(chatId)) {
+              clearNotificationTimer(chatId);
               chatNotifications.delete(chatId);
             }
           }
@@ -587,8 +657,14 @@ export const useChatStore = create<ChatState>()(
     addNotification: (chatId, characterName, avatarUrl, avatarCrop) =>
       set((state) => {
         // Don't add if this chat is currently active or was dismissed
-        if (state.activeChatId === chatId) return state;
-        if (state.dismissedNotifications.has(chatId)) return state;
+        if (state.activeChatId === chatId) {
+          clearNotificationTimer(chatId);
+          return state;
+        }
+        if (state.dismissedNotifications.has(chatId)) {
+          clearNotificationTimer(chatId);
+          return state;
+        }
         const m = new Map(state.chatNotifications);
         const existing = m.get(chatId);
         m.set(chatId, {
@@ -598,14 +674,36 @@ export const useChatStore = create<ChatState>()(
           avatarCrop: avatarCrop ?? existing?.avatarCrop ?? null,
           count: (existing?.count ?? 0) + 1,
         });
+        scheduleNotificationAutoDismiss(chatId, get);
+        return { chatNotifications: m };
+      }),
+    autoDismissNotification: (chatId) =>
+      set((state) => {
+        clearNotificationTimer(chatId);
+        if (!state.chatNotifications.has(chatId)) return state;
+        const m = new Map(state.chatNotifications);
+        m.delete(chatId);
         return { chatNotifications: m };
       }),
     dismissNotification: (chatId) =>
       set((state) => {
+        clearNotificationTimer(chatId);
         const m = new Map(state.chatNotifications);
         m.delete(chatId);
         const d = new Set(state.dismissedNotifications);
         d.add(chatId);
+        return { chatNotifications: m, dismissedNotifications: d };
+      }),
+    dismissNotifications: (chatIds) =>
+      set((state) => {
+        if (chatIds.length === 0) return state;
+        const m = new Map(state.chatNotifications);
+        const d = new Set(state.dismissedNotifications);
+        for (const chatId of chatIds) {
+          clearNotificationTimer(chatId);
+          m.delete(chatId);
+          d.add(chatId);
+        }
         return { chatNotifications: m, dismissedNotifications: d };
       }),
 
@@ -627,6 +725,11 @@ export const useChatStore = create<ChatState>()(
       }),
 
     reset: () => {
+      const { abortControllers } = useChatStore.getState();
+      for (const [chatId, controller] of abortControllers) {
+        abortGenerationForChat(chatId, controller);
+      }
+      clearAllNotificationTimers();
       set({
         activeChatId: null,
         activeChat: null,

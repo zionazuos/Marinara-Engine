@@ -10,7 +10,6 @@ import {
   type Dispatch,
   type ReactNode,
   type SetStateAction,
-  type TouchEvent,
 } from "react";
 import { toast } from "sonner";
 import { usePresets, useDeletePreset, useDuplicatePreset, useSetDefaultPreset } from "../../hooks/use-presets";
@@ -33,7 +32,7 @@ import {
   type CustomToolRow,
 } from "../../hooks/use-custom-tools";
 import { useChatStore } from "../../stores/chat.store";
-import { useUIStore } from "../../stores/ui.store";
+import { useUIStore, type ResourcePanelSort } from "../../stores/ui.store";
 import { api } from "../../lib/api-client";
 import { confirmNonEmptyFolderDelete, showConfirmDialog } from "../../lib/app-dialogs";
 import { ChoiceSelectionModal } from "../presets/ChoiceSelectionModal";
@@ -46,13 +45,12 @@ import {
   Check,
   Copy,
   Search,
+  ArrowUpDown,
   Code2,
   Hash,
   Star,
   Regex,
   GripVertical,
-  ToggleLeft,
-  ToggleRight,
   Pencil,
   ChevronDown,
   ChevronRight,
@@ -61,8 +59,18 @@ import {
   Upload,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { sortBasicPanelItems } from "../../lib/panel-sort";
 import { downloadJsonFile } from "../../lib/download-json";
-import { createFolderEntry, getFolderImportEntries, getFolderManifestConfig } from "@marinara-engine/shared";
+import { downloadZipFile } from "../../lib/download-zip";
+import { getFolderImportEntries } from "@marinara-engine/shared";
+import {
+  createCustomToolFolderPackageFiles,
+  importCustomToolEntries,
+  serializeCustomToolForTransfer,
+} from "../../lib/custom-tool-transfer";
+import { collectFolderPackageEntries, type FolderPackageImportEntry } from "../../lib/folder-package-transfer";
+import { isZipFile, readTextFilesFromZip } from "../../lib/read-zip-text";
+import { SettingsSwitch } from "./settings/SettingControls";
 import {
   getNextUnnamedLibraryFolderName,
   useCreateLibraryFolder,
@@ -72,7 +80,10 @@ import {
   useUpdateLibraryFolder,
 } from "../../hooks/use-library-folders";
 import { handleFolderRenameKeyDown, useFolderRenameGesture } from "../../hooks/use-folder-rename-gesture";
+import { useTouchFolderDrag } from "../../hooks/use-touch-folder-drag";
 import { SmoothFolderContent } from "../ui/SmoothFolderContent";
+import { TouchDragHandle } from "../ui/TouchDragHandle";
+import { getTouchReorderDropIndex } from "../../lib/touch-reorder";
 
 type PresetRow = {
   id: string;
@@ -82,6 +93,8 @@ type PresetRow = {
   isDefault?: string | boolean;
   author?: string;
   sectionOrder?: string | string[];
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -118,19 +131,6 @@ function parseNullableNumber(value: unknown): number | null {
     return Number.isFinite(parsed) ? parsed : null;
   }
   return null;
-}
-
-function parseToolParametersSchema(value: unknown): JsonRecord {
-  if (isJsonRecord(value)) return value;
-  if (typeof value === "string" && value.trim()) {
-    try {
-      const parsed = JSON.parse(value);
-      return isJsonRecord(parsed) ? parsed : {};
-    } catch {
-      return {};
-    }
-  }
-  return {};
 }
 
 function getImportEntries(parsed: unknown, envelopeKeys: string[]) {
@@ -191,54 +191,6 @@ function normalizeRegexImportEntry(entry: unknown) {
   };
 }
 
-function serializeCustomTool(tool: CustomToolRow) {
-  return {
-    name: tool.name,
-    description: tool.description,
-    parametersSchema: parseToolParametersSchema(tool.parametersSchema),
-    executionType: tool.executionType,
-    webhookUrl: tool.webhookUrl,
-    staticResult: tool.staticResult,
-    scriptBody: tool.scriptBody,
-    includeHiddenContext: parseBooleanValue(tool.includeHiddenContext),
-    enabled: parseBooleanValue(tool.enabled),
-  };
-}
-
-function normalizeCustomToolImportEntry(entry: unknown) {
-  const source = getFolderManifestConfig(entry);
-  if (!isJsonRecord(source)) return null;
-  const name = typeof source.name === "string" ? source.name.trim() : "";
-  const description = typeof source.description === "string" ? source.description.trim() : "";
-  if (!name || !description) return null;
-  const executionType =
-    source.executionType === "webhook" || source.executionType === "script" || source.executionType === "static"
-      ? source.executionType
-      : "static";
-
-  return {
-    name,
-    description,
-    parametersSchema: parseToolParametersSchema(source.parametersSchema ?? source.parameters),
-    executionType,
-    webhookUrl: executionType === "webhook" && typeof source.webhookUrl === "string" ? source.webhookUrl : null,
-    staticResult: executionType === "static" && typeof source.staticResult === "string" ? source.staticResult : null,
-    scriptBody: executionType === "script" && typeof source.scriptBody === "string" ? source.scriptBody : null,
-    includeHiddenContext: parseBooleanValue(source.includeHiddenContext, false),
-    enabled: parseBooleanValue(source.enabled),
-  };
-}
-
-function serializeCustomToolFolderEntry(tool: CustomToolRow) {
-  return createFolderEntry({
-    folderName: "Function Calls",
-    itemName: tool.name,
-    itemKind: "marinara.function",
-    config: serializeCustomTool(tool),
-    fallbackName: "function",
-  });
-}
-
 export function PresetsPanel() {
   const { data: presets, isLoading } = usePresets();
   const { data: regexScripts } = useRegexScripts();
@@ -263,6 +215,8 @@ export function PresetsPanel() {
   const openPresetDetail = useUIStore((s) => s.openPresetDetail);
   const openRegexDetail = useUIStore((s) => s.openRegexDetail);
   const openToolDetail = useUIStore((s) => s.openToolDetail);
+  const sort = useUIStore((s) => s.presetPanelSort);
+  const setSort = useUIStore((s) => s.setPresetPanelSort);
   const activeChat = useChatStore((s) => s.activeChat);
   const updateChat = useUpdateChat();
   const updateMetadata = useUpdateChatMetadata();
@@ -281,7 +235,6 @@ export function PresetsPanel() {
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [editFolderName, setEditFolderName] = useState("");
   const [draggedPresetId, setDraggedPresetId] = useState<string | null>(null);
-  const presetTouchDragRef = useRef<{ id: string; timer: number | null; active: boolean } | null>(null);
   const suppressPresetClickRef = useRef(false);
   const handleFolderRenameGesture = useFolderRenameGesture();
 
@@ -299,9 +252,19 @@ export function PresetsPanel() {
         (p.author ?? "").toLowerCase().includes(q),
     );
   }, [presets, search]);
+  const sortedPresets = useMemo(
+    () =>
+      sortBasicPanelItems(
+        filteredPresets,
+        sort,
+        (preset) => preset.name,
+        (preset) => preset.createdAt || preset.updatedAt,
+      ),
+    [filteredPresets, sort],
+  );
   const presetSearchActive = search.trim().length > 0;
 
-  const presetById = useMemo(() => new Map(filteredPresets.map((preset) => [preset.id, preset])), [filteredPresets]);
+  const presetById = useMemo(() => new Map(sortedPresets.map((preset) => [preset.id, preset])), [sortedPresets]);
 
   const folderedPresetIds = useMemo(() => {
     const ids = new Set<string>();
@@ -312,8 +275,8 @@ export function PresetsPanel() {
   }, [presetFolders]);
 
   const rootPresets = useMemo(
-    () => filteredPresets.filter((preset) => !folderedPresetIds.has(preset.id)),
-    [filteredPresets, folderedPresetIds],
+    () => sortedPresets.filter((preset) => !folderedPresetIds.has(preset.id)),
+    [sortedPresets, folderedPresetIds],
   );
 
   // Presets shows GLOBAL regex scripts only. Character-scoped scripts (non-empty
@@ -465,15 +428,9 @@ export function PresetsPanel() {
       return;
     }
 
-    downloadJsonFile(
-      {
-        kind: "marinara.function-folder",
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        folderName: "Function Calls",
-        functions: customToolRows.map(serializeCustomToolFolderEntry),
-      },
-      "marinara-functions.json",
+    downloadZipFile(
+      createCustomToolFolderPackageFiles(customToolRows.map(serializeCustomToolForTransfer)),
+      "marinara-functions.zip",
     );
     toast.success(`Exported ${customToolRows.length} function${customToolRows.length === 1 ? "" : "s"}`);
   }, [customToolRows]);
@@ -486,23 +443,22 @@ export function PresetsPanel() {
       if (!file) return;
 
       try {
-        const text = await file.text();
-        const parsed = JSON.parse(text);
-        const entries = getImportEntries(parsed, ["functions", "customTools", "tools"]);
+        const entries: FolderPackageImportEntry[] = isZipFile(file)
+          ? collectFolderPackageEntries(await readTextFilesFromZip(file), {
+              rootFilenames: ["marinara-functions.json"],
+              collectionKeys: ["functions", "customTools", "tools"],
+            })
+          : getImportEntries(JSON.parse(await file.text()), ["functions", "customTools", "tools"]).map(
+              (raw): FolderPackageImportEntry => ({
+                raw,
+                path: file.name,
+                basePath: "",
+                resolveTextFile: () => null,
+              }),
+            );
         if (entries.length === 0) throw new Error("No functions found in file");
 
-        let imported = 0;
-        const failed: string[] = [];
-        for (const entry of entries) {
-          const normalized = normalizeCustomToolImportEntry(entry);
-          if (!normalized) continue;
-          try {
-            await createCustomTool.mutateAsync(normalized);
-            imported++;
-          } catch (error) {
-            failed.push(error instanceof Error ? error.message : `Failed to import ${normalized.name}`);
-          }
-        }
+        const { imported, failed } = await importCustomToolEntries(entries, createCustomTool);
 
         if (imported === 0 && failed.length === 0) {
           throw new Error("No valid functions found in file");
@@ -523,21 +479,32 @@ export function PresetsPanel() {
     [createCustomTool],
   );
 
-  const handleRegexDrop = useCallback(
-    (targetId: string) => {
-      if (!draggedRegexId || draggedRegexId === targetId) return;
+  const handleRegexReorderToIndex = useCallback(
+    (sourceId: string, targetIdx: number) => {
       const nextIds = sortedRegexScripts.map((script) => script.id);
-      const from = nextIds.indexOf(draggedRegexId);
-      const to = nextIds.indexOf(targetId);
-      if (from < 0 || to < 0) return;
+      const from = nextIds.indexOf(sourceId);
+      if (from < 0 || targetIdx < 0 || targetIdx > nextIds.length) return;
+      let insertAt = targetIdx;
+      if (from < insertAt) insertAt--;
+      if (from === insertAt) return;
       const [moved] = nextIds.splice(from, 1);
       if (!moved) return;
-      nextIds.splice(to, 0, moved);
+      nextIds.splice(insertAt, 0, moved);
       reorderRegexScripts.mutate(nextIds);
       setDraggedRegexId(null);
       setRegexDragReadyId(null);
     },
-    [draggedRegexId, reorderRegexScripts, sortedRegexScripts],
+    [reorderRegexScripts, sortedRegexScripts],
+  );
+
+  const handleRegexDrop = useCallback(
+    (targetId: string) => {
+      if (!draggedRegexId || draggedRegexId === targetId) return;
+      const targetIdx = sortedRegexScripts.findIndex((script) => script.id === targetId);
+      if (targetIdx < 0) return;
+      handleRegexReorderToIndex(draggedRegexId, targetIdx);
+    },
+    [draggedRegexId, handleRegexReorderToIndex, sortedRegexScripts],
   );
 
   const handleDeleteSelected = useCallback(async () => {
@@ -615,40 +582,15 @@ export function PresetsPanel() {
     [draggedPresetId, movePresetsToFolder],
   );
 
-  const startPresetTouchDrag = useCallback((event: TouchEvent, presetId: string) => {
-    const timer = window.setTimeout(() => {
-      presetTouchDragRef.current = { id: presetId, timer: null, active: true };
-      suppressPresetClickRef.current = true;
-      setDraggedPresetId(presetId);
-    }, 450);
-    presetTouchDragRef.current = { id: presetId, timer, active: false };
-    event.currentTarget.addEventListener(
-      "touchcancel",
-      () => {
-        const current = presetTouchDragRef.current;
-        if (current?.timer) window.clearTimeout(current.timer);
-        presetTouchDragRef.current = null;
-        setDraggedPresetId(null);
-      },
-      { once: true },
-    );
-  }, []);
-
   const finishPresetTouchDrag = useCallback(
-    (event: TouchEvent) => {
-      const current = presetTouchDragRef.current;
-      if (!current) return;
-      if (current.timer) window.clearTimeout(current.timer);
-      presetTouchDragRef.current = null;
-      if (!current.active) return;
-      const touch = event.changedTouches[0];
-      const target = touch ? document.elementFromPoint(touch.clientX, touch.clientY) : null;
+    (presetId: string, x: number, y: number) => {
+      const target = document.elementFromPoint(x, y);
       const folderElement = target?.closest("[data-preset-folder-id]") as HTMLElement | null;
       const rootElement = target?.closest("[data-preset-folder-root]") as HTMLElement | null;
       if (folderElement?.dataset.presetFolderId) {
-        movePresetsToFolder(getDraggedPresetIds(current.id), folderElement.dataset.presetFolderId);
+        movePresetsToFolder(getDraggedPresetIds(presetId), folderElement.dataset.presetFolderId);
       } else if (rootElement) {
-        movePresetsToFolder(getDraggedPresetIds(current.id), null);
+        movePresetsToFolder(getDraggedPresetIds(presetId), null);
       }
       setDraggedPresetId(null);
       window.setTimeout(() => {
@@ -657,6 +599,26 @@ export function PresetsPanel() {
     },
     [getDraggedPresetIds, movePresetsToFolder],
   );
+
+  const cancelPresetTouchDrag = useCallback((_presetId: string, wasActive: boolean) => {
+    setDraggedPresetId(null);
+    if (wasActive) {
+      window.setTimeout(() => {
+        suppressPresetClickRef.current = false;
+      }, 0);
+    } else {
+      suppressPresetClickRef.current = false;
+    }
+  }, []);
+
+  const { startTouchDrag: startPresetTouchDrag } = useTouchFolderDrag({
+    onActivate: (presetId) => {
+      suppressPresetClickRef.current = true;
+      setDraggedPresetId(presetId);
+    },
+    onDrop: finishPresetTouchDrag,
+    onCancel: cancelPresetTouchDrag,
+  });
 
   const renderPresetRow = useCallback(
     (preset: PresetRow) => {
@@ -669,8 +631,9 @@ export function PresetsPanel() {
       return (
         <div
           key={preset.id}
+          data-touch-drag-card="preset"
           className={cn(
-            "group relative flex cursor-pointer items-center gap-3 rounded-xl p-2.5 transition-all hover:bg-[var(--sidebar-accent)]",
+            "group relative flex touch-pan-y cursor-pointer items-center gap-3 rounded-xl p-2.5 transition-all hover:bg-[var(--sidebar-accent)]",
             selectionMode &&
               isBulkSelected &&
               "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
@@ -687,9 +650,16 @@ export function PresetsPanel() {
             event.dataTransfer.setData("text/plain", preset.id);
           }}
           onDragEnd={() => setDraggedPresetId(null)}
-          onTouchStart={(event) => startPresetTouchDrag(event, preset.id)}
-          onTouchEnd={finishPresetTouchDrag}
         >
+          <TouchDragHandle
+            label="Drag preset"
+            onTouchStart={(event) => {
+              startPresetTouchDrag(event, preset.id, {
+                allowInteractiveTarget: true,
+                sourceElement: event.currentTarget.closest<HTMLElement>('[data-touch-drag-card="preset"]'),
+              });
+            }}
+          />
           <div
             className="flex min-w-0 flex-1 items-center gap-3"
             onClick={() => {
@@ -816,7 +786,6 @@ export function PresetsPanel() {
       deletePreset,
       draggedPresetId,
       duplicatePreset,
-      finishPresetTouchDrag,
       getDraggedPresetIds,
       getSectionCount,
       openPresetDetail,
@@ -868,19 +837,39 @@ export function PresetsPanel() {
         </button>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search
-          size="0.8125rem"
-          className="mari-chrome-field-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-        />
-        <input
-          type="text"
-          placeholder="Buscar presets…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="mari-chrome-field h-10 w-full py-0 pl-8 pr-3 text-xs md:h-9"
-        />
+      {/* Search + Sort */}
+      <div className="flex gap-1.5">
+        <div className="relative flex-1">
+          <Search
+            size="0.8125rem"
+            className="mari-chrome-field-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+          />
+          <input
+            type="text"
+            placeholder="Buscar presets…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="mari-chrome-field h-10 w-full py-0 pl-8 pr-3 text-xs md:h-9"
+          />
+        </div>
+        <div className="relative">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as ResourcePanelSort)}
+            className="mari-chrome-field mari-chrome-sort-field mari-accent-animated h-10 appearance-none py-0 pl-2.5 pr-7 text-[0.6875rem] md:h-9"
+            title="Ordem de classificação"
+            aria-label="Sort presets"
+          >
+            <option value="name-asc">A-Z</option>
+            <option value="name-desc">Z-A</option>
+            <option value="newest">Mais recentes</option>
+            <option value="oldest">Mais antigos</option>
+          </select>
+          <ArrowUpDown
+            size="0.625rem"
+            className="mari-chrome-field-icon mari-chrome-sort-icon mari-accent-animated pointer-events-none absolute right-2 top-1/2 -translate-y-1/2"
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-0.5">
@@ -901,9 +890,12 @@ export function PresetsPanel() {
         <div className="flex flex-col gap-0.5">
           {presetFolders.map((folder) => {
             const isEditing = editingFolderId === folder.id;
-            const folderItems = folder.itemIds
-              .map((id) => presetById.get(id))
-              .filter((item): item is PresetRow => Boolean(item));
+            const folderItems = sortBasicPanelItems(
+              folder.itemIds.map((id) => presetById.get(id)).filter((item): item is PresetRow => Boolean(item)),
+              sort,
+              (preset) => preset.name,
+              (preset) => preset.createdAt || preset.updatedAt,
+            );
             if (presetSearchActive && folderItems.length === 0) return null;
             const isExpanded = (presetSearchActive && folderItems.length > 0) || expandedFolderId === folder.id;
             return (
@@ -1050,24 +1042,25 @@ export function PresetsPanel() {
         )}
 
         {/* Preset list */}
-        <div
-          data-preset-folder-root
-          onDragOver={(event) => {
-            if (draggedPresetId) {
+        {draggedPresetId && (
+          <div
+            data-preset-folder-root
+            onDragOver={(event) => {
               event.preventDefault();
               event.dataTransfer.dropEffect = "move";
-            }
-          }}
-          onDrop={(event) => {
-            event.preventDefault();
-            const payload = event.dataTransfer.getData("application/x-marinara-preset-ids");
-            handlePresetDrop(null, payload ? (JSON.parse(payload) as string[]) : undefined);
-          }}
-          className={cn(
-            "stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors",
-            draggedPresetId && "ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
-          )}
-        >
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              const payload = event.dataTransfer.getData("application/x-marinara-preset-ids");
+              handlePresetDrop(null, payload ? (JSON.parse(payload) as string[]) : undefined);
+            }}
+            className="rounded-xl border border-dashed border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-highlight-bg)] px-3 py-2 text-[0.625rem] text-[var(--marinara-chat-chrome-button-text-active)]"
+          >
+            Drop here to move out of folder
+          </div>
+        )}
+
+        <div className="stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors">
           {rootPresets.map((preset) => renderPresetRow(preset))}
         </div>
 
@@ -1092,6 +1085,7 @@ export function PresetsPanel() {
         setDraggedRegexId={setDraggedRegexId}
         setRegexDragReadyId={setRegexDragReadyId}
         handleRegexDrop={handleRegexDrop}
+        handleRegexReorderToIndex={handleRegexReorderToIndex}
         openRegexDetail={openRegexDetail}
         updateRegex={updateRegex}
         deleteRegex={deleteRegex}
@@ -1112,6 +1106,7 @@ export function PresetsPanel() {
 
       {selectionMode && (
         <SelectionActionBar
+          placement="panel"
           selectedCount={selectedPresetIds.size}
           onExport={() => void handleExportSelected()}
           onDelete={handleDeleteSelected}
@@ -1149,6 +1144,7 @@ function RegexSection({
   setDraggedRegexId,
   setRegexDragReadyId,
   handleRegexDrop,
+  handleRegexReorderToIndex,
   openRegexDetail,
   updateRegex,
   deleteRegex,
@@ -1164,10 +1160,35 @@ function RegexSection({
   setDraggedRegexId: Dispatch<SetStateAction<string | null>>;
   setRegexDragReadyId: Dispatch<SetStateAction<string | null>>;
   handleRegexDrop: (targetId: string) => void;
+  handleRegexReorderToIndex: (sourceId: string, targetIdx: number) => void;
   openRegexDetail: (id: string) => void;
   updateRegex: ReturnType<typeof useUpdateRegexScript>;
   deleteRegex: ReturnType<typeof useDeleteRegexScript>;
 }) {
+  const { startTouchDrag: startRegexTouchDrag } = useTouchFolderDrag({
+    onActivate: (scriptId) => {
+      setDraggedRegexId(scriptId);
+      setRegexDragReadyId(scriptId);
+    },
+    onDrop: (scriptId, x, y) => {
+      const targetIdx = getTouchReorderDropIndex({
+        x,
+        y,
+        itemSelector: '[data-touch-reorder-item="preset-regex"]',
+        rootSelector: "[data-preset-regex-root]",
+        itemCount: sortedRegexScripts.length,
+      });
+      setDraggedRegexId(null);
+      setRegexDragReadyId(null);
+      if (targetIdx === null) return;
+      handleRegexReorderToIndex(scriptId, targetIdx);
+    },
+    onCancel: () => {
+      setDraggedRegexId(null);
+      setRegexDragReadyId(null);
+    },
+  });
+
   return (
     <PanelSection
       title="Regexes"
@@ -1212,120 +1233,140 @@ function RegexSection({
       {sortedRegexScripts.length === 0 ? (
         <p className="px-1 py-2 text-[0.625rem] text-[var(--muted-foreground)]">No regexes yet</p>
       ) : (
-        sortedRegexScripts.map((script) => {
-          const placements = (() => {
-            try {
-              return JSON.parse(script.placement) as string[];
-            } catch {
-              return [];
-            }
-          })();
-          const enabled = script.enabled === "true";
-          return (
-            <div
-              key={script.id}
-              className={cn(
-                "flex items-start gap-2.5 rounded-xl p-2 transition-colors hover:bg-[var(--sidebar-accent)]",
-                !enabled && "opacity-50",
-                draggedRegexId === script.id && "opacity-40",
-              )}
-              draggable={regexDragReadyId === script.id}
-              onDragStart={(event) => {
-                setDraggedRegexId(script.id);
-                event.dataTransfer.effectAllowed = "move";
-                event.dataTransfer.setData("text/plain", script.id);
-              }}
-              onDragOver={(event) => {
-                if (draggedRegexId && draggedRegexId !== script.id) {
-                  event.preventDefault();
-                  event.dataTransfer.dropEffect = "move";
-                }
-              }}
-              onDrop={(event) => {
-                event.preventDefault();
-                handleRegexDrop(script.id);
-              }}
-              onDragEnd={() => {
-                setDraggedRegexId(null);
-                setRegexDragReadyId(null);
-              }}
-            >
-              <button
-                className="mari-chrome-accent-text-muted mari-accent-animated mt-0.5 shrink-0 cursor-grab rounded p-0.5 transition-colors hover:bg-[var(--marinara-chat-chrome-highlight-bg)] hover:text-[var(--marinara-chat-chrome-button-text-hover)] active:cursor-grabbing"
-                title="Arraste para reordenar"
-                onClick={(event) => event.stopPropagation()}
-                onMouseDown={(event) => {
-                  event.stopPropagation();
-                  setRegexDragReadyId(script.id);
+        <div data-preset-regex-root className="flex flex-col gap-0.5">
+          {sortedRegexScripts.map((script, index) => {
+            const placements = (() => {
+              try {
+                return JSON.parse(script.placement) as string[];
+              } catch {
+                return [];
+              }
+            })();
+            const enabled = script.enabled === "true";
+            return (
+              <div
+                key={script.id}
+                data-touch-reorder-item="preset-regex"
+                data-touch-reorder-index={index}
+                className={cn(
+                  "flex flex-wrap items-start gap-2 rounded-xl p-2 transition-colors hover:bg-[var(--sidebar-accent)]",
+                  !enabled && "opacity-50",
+                  draggedRegexId === script.id && "opacity-40",
+                )}
+                draggable={regexDragReadyId === script.id}
+                onDragStart={(event) => {
+                  setDraggedRegexId(script.id);
+                  event.dataTransfer.effectAllowed = "move";
+                  event.dataTransfer.setData("text/plain", script.id);
                 }}
-                onMouseUp={(event) => {
-                  event.stopPropagation();
+                onDragOver={(event) => {
+                  if (draggedRegexId && draggedRegexId !== script.id) {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = "move";
+                  }
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  handleRegexDrop(script.id);
+                }}
+                onDragEnd={() => {
+                  setDraggedRegexId(null);
                   setRegexDragReadyId(null);
                 }}
               >
-                <GripVertical size="0.8125rem" />
-              </button>
-              <Regex size="0.875rem" className="mt-0.5 shrink-0 text-[var(--marinara-chat-chrome-button-text)]" />
-              <button className="min-w-0 flex-1 text-left" onClick={() => openRegexDetail(script.id)}>
-                <div className="text-xs font-medium">{script.name}</div>
-                <div className="mt-0.5 flex items-center gap-1">
-                  {placements.map((placement) => (
-                    <span
-                      key={placement}
-                      className="rounded bg-[var(--secondary)] px-1 py-0.5 text-[0.5rem] text-[var(--muted-foreground)]"
-                    >
-                      {placement === "ai_output" ? "AI" : "User"}
+                <button
+                  className="mari-chrome-accent-text-muted mari-accent-animated mt-0.5 shrink-0 cursor-grab rounded p-0.5 transition-colors hover:bg-[var(--marinara-chat-chrome-highlight-bg)] hover:text-[var(--marinara-chat-chrome-button-text-hover)] active:cursor-grabbing"
+                  title="Arraste para reordenar"
+                  onClick={(event) => event.stopPropagation()}
+                  onMouseDown={(event) => {
+                    event.stopPropagation();
+                    setRegexDragReadyId(script.id);
+                  }}
+                  onMouseUp={(event) => {
+                    event.stopPropagation();
+                    setRegexDragReadyId(null);
+                  }}
+                  onTouchStart={(event) => {
+                    event.stopPropagation();
+                    startRegexTouchDrag(event, script.id, {
+                      allowInteractiveTarget: true,
+                      sourceElement: event.currentTarget.closest<HTMLElement>(
+                        '[data-touch-reorder-item="preset-regex"]',
+                      ),
+                    });
+                  }}
+                >
+                  <GripVertical size="0.8125rem" />
+                </button>
+                <Regex size="0.875rem" className="mt-0.5 shrink-0 text-[var(--marinara-chat-chrome-button-text)]" />
+                <button
+                  className="min-w-0 flex-1 basis-[min(100%,10rem)] text-left"
+                  onClick={() => openRegexDetail(script.id)}
+                >
+                  <div className="text-xs font-medium">{script.name}</div>
+                  <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-1">
+                    {placements.map((placement) => (
+                      <span
+                        key={placement}
+                        className="rounded bg-[var(--secondary)] px-1 py-0.5 text-[0.5rem] text-[var(--muted-foreground)]"
+                      >
+                        {placement === "ai_output" ? "AI" : "User"}
+                      </span>
+                    ))}
+                    <span className="min-w-0 max-w-full truncate font-mono text-[0.5625rem] text-[var(--muted-foreground)]">
+                      /{script.findRegex}/{script.flags}
                     </span>
-                  ))}
-                  <span className="max-w-[6.25rem] truncate font-mono text-[0.5625rem] text-[var(--muted-foreground)]">
-                    /{script.findRegex}/{script.flags}
-                  </span>
+                  </div>
+                </button>
+                <div className="ml-auto flex shrink-0 items-center gap-1">
+                  <div
+                    className="shrink-0"
+                    title={enabled ? "Disable regex" : "Enable regex"}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                    }}
+                  >
+                    <SettingsSwitch
+                      ariaLabel={enabled ? "Disable regex" : "Enable regex"}
+                      checked={enabled}
+                      onChange={(checked) => updateRegex.mutate({ id: script.id, enabled: checked })}
+                      className="p-0 hover:bg-transparent"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="mari-chrome-control mari-chrome-control--small shrink-0 p-1"
+                    title="Edit regex"
+                    aria-label="Edit regex"
+                    onClick={() => openRegexDetail(script.id)}
+                  >
+                    <Pencil size="0.8125rem" />
+                  </button>
+                  <button
+                    type="button"
+                    className="mari-chrome-control mari-chrome-control--small mari-chrome-control--danger shrink-0 p-1"
+                    title="Delete regex"
+                    aria-label="Delete regex"
+                    onClick={async () => {
+                      if (
+                        await showConfirmDialog({
+                          title: "Delete Regex",
+                          message: `Delete "${script.name}"?`,
+                          confirmLabel: "Delete",
+                          tone: "destructive",
+                        })
+                      ) {
+                        deleteRegex.mutate(script.id);
+                      }
+                    }}
+                  >
+                    <Trash2 size="0.8125rem" className="text-[var(--destructive)]" />
+                  </button>
                 </div>
-              </button>
-              <button
-                type="button"
-                className="mari-chrome-control mari-chrome-control--small mt-0.5 shrink-0 p-1"
-                title={enabled ? "Disable regex" : "Enable regex"}
-                aria-label={enabled ? "Disable regex" : "Enable regex"}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  updateRegex.mutate({ id: script.id, enabled: !enabled });
-                }}
-              >
-                {enabled ? <ToggleRight size="0.875rem" /> : <ToggleLeft size="0.875rem" />}
-              </button>
-              <button
-                type="button"
-                className="mari-chrome-control mari-chrome-control--small mt-0.5 shrink-0 p-1"
-                title="Edit regex"
-                aria-label="Edit regex"
-                onClick={() => openRegexDetail(script.id)}
-              >
-                <Pencil size="0.8125rem" />
-              </button>
-              <button
-                type="button"
-                className="mari-chrome-control mari-chrome-control--small mari-chrome-control--danger mt-0.5 shrink-0 p-1"
-                title="Delete regex"
-                aria-label="Delete regex"
-                onClick={async () => {
-                  if (
-                    await showConfirmDialog({
-                      title: "Delete Regex",
-                      message: `Delete "${script.name}"?`,
-                      confirmLabel: "Delete",
-                      tone: "destructive",
-                    })
-                  ) {
-                    deleteRegex.mutate(script.id);
-                  }
-                }}
-              >
-                <Trash2 size="0.8125rem" className="text-[var(--destructive)]" />
-              </button>
-            </div>
-          );
-        })
+              </div>
+            );
+          })}
+        </div>
       )}
     </PanelSection>
   );
@@ -1371,10 +1412,15 @@ function FunctionsSection({
           </button>
           <label
             className="mari-chrome-control mari-chrome-control--small cursor-pointer p-1.5"
-            title="Import functions from JSON"
-            aria-label="Import functions from JSON"
+            title="Import functions from ZIP or JSON"
+            aria-label="Import functions from ZIP or JSON"
           >
-            <input type="file" accept="application/json,.json" className="hidden" onChange={handleImportFunctions} />
+            <input
+              type="file"
+              accept="application/json,application/zip,.json,.zip"
+              className="hidden"
+              onChange={handleImportFunctions}
+            />
             <Download size="0.8125rem" />
           </label>
           <button
@@ -1382,8 +1428,8 @@ function FunctionsSection({
             onClick={handleExportFunctions}
             disabled={customToolRows.length === 0}
             className="mari-chrome-control mari-chrome-control--small p-1.5"
-            title="Export functions to JSON"
-            aria-label="Export functions to JSON"
+            title="Export functions to ZIP"
+            aria-label="Export functions to ZIP"
           >
             <Upload size="0.8125rem" />
           </button>
@@ -1408,14 +1454,17 @@ function FunctionsSection({
             <div
               key={tool.id}
               className={cn(
-                "flex items-start gap-2.5 rounded-xl p-2 transition-colors hover:bg-[var(--sidebar-accent)]",
+                "flex flex-wrap items-start gap-2 rounded-xl p-2 transition-colors hover:bg-[var(--sidebar-accent)]",
                 !enabled && "opacity-50",
               )}
             >
               <Wrench size="0.875rem" className="mt-0.5 shrink-0 text-[var(--marinara-chat-chrome-button-text)]" />
-              <button className="min-w-0 flex-1 text-left" onClick={() => openToolDetail(tool.id)}>
+              <button
+                className="min-w-0 flex-1 basis-[min(100%,10rem)] text-left"
+                onClick={() => openToolDetail(tool.id)}
+              >
                 <div className="truncate font-mono text-xs font-medium">{tool.name}</div>
-                <div className="mt-0.5 flex min-w-0 items-center gap-1">
+                <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-1">
                   <span className="rounded bg-[var(--secondary)] px-1 py-0.5 text-[0.5rem] text-[var(--muted-foreground)]">
                     {formatFunctionExecutionType(tool.executionType)}
                   </span>
@@ -1432,47 +1481,51 @@ function FunctionsSection({
                   {tool.description || "No description"}
                 </div>
               </button>
-              <button
-                type="button"
-                className="mari-chrome-control mari-chrome-control--small mt-0.5 shrink-0 p-1"
-                title={enabled ? "Disable function" : "Enable function"}
-                aria-label={enabled ? "Disable function" : "Enable function"}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  updateCustomTool.mutate({ id: tool.id, enabled: !enabled });
-                }}
-              >
-                {enabled ? <ToggleRight size="0.875rem" /> : <ToggleLeft size="0.875rem" />}
-              </button>
-              <button
-                type="button"
-                className="mari-chrome-control mari-chrome-control--small mt-0.5 shrink-0 p-1"
-                title="Edit function"
-                aria-label="Edit function"
-                onClick={() => openToolDetail(tool.id)}
-              >
-                <Pencil size="0.8125rem" />
-              </button>
-              <button
-                type="button"
-                className="mari-chrome-control mari-chrome-control--small mari-chrome-control--danger mt-0.5 shrink-0 p-1"
-                title="Delete function"
-                aria-label="Delete function"
-                onClick={async () => {
-                  if (
-                    await showConfirmDialog({
-                      title: "Delete Function",
-                      message: `Delete "${tool.name}"?`,
-                      confirmLabel: "Delete",
-                      tone: "destructive",
-                    })
-                  ) {
-                    deleteCustomTool.mutate(tool.id);
-                  }
-                }}
-              >
-                <Trash2 size="0.8125rem" className="text-[var(--destructive)]" />
-              </button>
+              <div className="ml-auto flex shrink-0 items-center gap-1">
+                <div
+                  className="shrink-0"
+                  title={enabled ? "Disable function" : "Enable function"}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                  }}
+                >
+                  <SettingsSwitch
+                    ariaLabel={enabled ? "Disable function" : "Enable function"}
+                    checked={enabled}
+                    onChange={(checked) => updateCustomTool.mutate({ id: tool.id, enabled: checked })}
+                    className="p-0 hover:bg-transparent"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="mari-chrome-control mari-chrome-control--small shrink-0 p-1"
+                  title="Edit function"
+                  aria-label="Edit function"
+                  onClick={() => openToolDetail(tool.id)}
+                >
+                  <Pencil size="0.8125rem" />
+                </button>
+                <button
+                  type="button"
+                  className="mari-chrome-control mari-chrome-control--small mari-chrome-control--danger shrink-0 p-1"
+                  title="Delete function"
+                  aria-label="Delete function"
+                  onClick={async () => {
+                    if (
+                      await showConfirmDialog({
+                        title: "Delete Function",
+                        message: `Delete "${tool.name}"?`,
+                        confirmLabel: "Delete",
+                        tone: "destructive",
+                      })
+                    ) {
+                      deleteCustomTool.mutate(tool.id);
+                    }
+                  }}
+                >
+                  <Trash2 size="0.8125rem" className="text-[var(--destructive)]" />
+                </button>
+              </div>
             </div>
           );
         })

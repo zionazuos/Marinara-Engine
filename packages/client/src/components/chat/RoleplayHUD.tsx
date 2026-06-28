@@ -4,7 +4,7 @@
 // a compact preview and expandable editable popover.
 // Supports top (horizontal) and left/right (vertical) layout.
 // ──────────────────────────────────────────────
-import { Suspense, lazy, useState, useEffect, useRef, useCallback, useMemo, useLayoutEffect } from "react";
+import { Suspense, lazy, useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import {
   MapPin,
@@ -55,14 +55,16 @@ import type {
   Message,
 } from "@marinara-engine/shared";
 import {
-  inventoryTrackerLockPrefix,
-  removeTrackerArrayItemLocks,
+  inventoryItemTrackerLockPrefix,
+  normalizeTrackerFieldLocksForState,
+  removeTrackerFieldLockPrefix,
   toggleTrackerFieldLock,
 } from "@marinara-engine/shared";
 import type { HudPosition, TrackerTemperatureUnit } from "../../stores/ui.store";
 
 const ACTIONS_DROPDOWN_WIDTH_PX = 288;
 const EMPTY_INVENTORY: InventoryItem[] = [];
+const EMPTY_AGENT_TYPE_SET = new Set<string>();
 
 interface RoleplayHUDProps {
   chatId: string;
@@ -125,16 +127,7 @@ export function RoleplayHUD({
   const { patchField, patchPlayerStats } = useGameStatePatcher(chatId, "roleplay-hud");
 
   const { data: agentConfigs } = useAgentConfigs();
-  const globalEnabledAgentTypes = useMemo(() => {
-    const set = new Set<string>();
-    if (agentConfigs) {
-      for (const a of agentConfigs as Array<{ type: string; enabled: string }>) {
-        if (a.enabled === "true") set.add(a.type);
-      }
-    }
-    return set;
-  }, [agentConfigs]);
-  const enabledAgentTypes = enabledAgentTypesProp ?? globalEnabledAgentTypes;
+  const enabledAgentTypes = enabledAgentTypesProp ?? EMPTY_AGENT_TYPE_SET;
 
   const thoughtBubbles = useAgentStore((s) => s.thoughtBubbles);
   const isAgentProcessing = useAgentStore((s) => s.isProcessing);
@@ -151,7 +144,7 @@ export function RoleplayHUD({
   const showInjectionsTab = useUIStore((s) => s.debugMode);
 
   const isTrackerBusy = isAgentProcessing || isStreaming || gameStateRefreshing;
-  const showHudTrackerWidgets = !gameStateRefreshing && !(trackerPanelEnabled && trackerPanelHideHudWidgets);
+  const showHudTrackerWidgets = !(trackerPanelEnabled && trackerPanelHideHudWidgets);
 
   useEffect(() => {
     if (!chatId) return;
@@ -224,7 +217,7 @@ export function RoleplayHUD({
   const inventory = playerStats?.inventory ?? EMPTY_INVENTORY;
   const activeQuests = playerStats?.activeQuests ?? [];
   const customTrackerFields = playerStats?.customTrackerFields ?? [];
-  const fieldLocks = gameState?.fieldLocks ?? null;
+  const fieldLocks = gameState ? normalizeTrackerFieldLocksForState(gameState.fieldLocks, gameState) : null;
   const updateFieldLocks = useTrackerFieldLockUpdater({ chatId, fieldLocks, patchField });
   const updateInventoryItems = useCallback(
     (items: InventoryItem[]) => patchPlayerStats("inventory", items),
@@ -233,7 +226,7 @@ export function RoleplayHUD({
   const removeInventoryItem = useCallback(
     (index: number) => {
       updateInventoryItems(inventory.filter((_, itemIndex) => itemIndex !== index));
-      updateFieldLocks((locks) => removeTrackerArrayItemLocks(locks, inventoryTrackerLockPrefix(), index));
+      updateFieldLocks((locks) => removeTrackerFieldLockPrefix(locks, inventoryItemTrackerLockPrefix(inventory[index]!, index)));
     },
     [inventory, updateFieldLocks, updateInventoryItems],
   );

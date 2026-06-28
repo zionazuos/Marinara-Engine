@@ -36,7 +36,7 @@ export const markerConfigSchema = z.object({
 
 export const generationParametersSchema = z.object({
   temperature: z.number().min(0).max(2).default(1),
-  topP: z.number().gt(0).max(1).default(1),
+  topP: z.number().min(0).max(1).default(1),
   topK: z.number().int().min(0).default(0),
   minP: z.number().min(0).max(1).default(0),
   maxTokens: z.number().int().min(1).default(4096),
@@ -57,6 +57,18 @@ export const generationParametersSchema = z.object({
     .max(20)
     .default([]),
   customParameters: z.record(z.unknown()).default({}),
+  enabledParameters: z
+    .object({
+      temperature: z.boolean().optional(),
+      maxTokens: z.boolean().optional(),
+      topP: z.boolean().optional(),
+      topK: z.boolean().optional(),
+      frequencyPenalty: z.boolean().optional(),
+      presencePenalty: z.boolean().optional(),
+      reasoningEffort: z.boolean().optional(),
+      verbosity: z.boolean().optional(),
+    })
+    .optional(),
   squashSystemMessages: z.boolean().default(true),
   showThoughts: z.boolean().default(true),
   useMaxContext: z.boolean().default(false),
@@ -137,6 +149,8 @@ export const updatePromptGroupSchema = z.object({
 export const createPromptPresetSchema = z.object({
   name: z.string().min(1).max(200),
   description: z.string().default(""),
+  conversationPrompt: z.string().default(""),
+  gamePrompt: z.string().default(""),
   variableGroups: z.array(promptVariableGroupSchema).default([]),
   variableValues: z.record(z.string()).default({}),
   parameters: generationParametersSchema.default({}),
@@ -148,6 +162,8 @@ export const createPromptPresetSchema = z.object({
 export const updatePromptPresetSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   description: z.string().optional(),
+  conversationPrompt: z.string().optional(),
+  gamePrompt: z.string().optional(),
   sectionOrder: z.array(z.string()).optional(),
   groupOrder: z.array(z.string()).optional(),
   variableGroups: z.array(promptVariableGroupSchema).optional(),

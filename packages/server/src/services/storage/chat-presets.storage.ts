@@ -7,6 +7,7 @@ import { eq, and, ne, asc } from "drizzle-orm";
 import type { DB } from "../../db/connection.js";
 import { chats, chatPresets } from "../../db/schema/index.js";
 import { newId, now } from "../../utils/id-generator.js";
+import { withChatMetadataPatchQueue } from "./chats.storage.js";
 import {
   CHAT_PRESET_EXCLUDED_METADATA_KEYS,
   isRetiredBuiltInAgentId,
@@ -103,7 +104,7 @@ export function sanitizePresetSettings(
   if (!input) return {};
   const out: ChatPresetSettings = {};
   if ("connectionId" in input) out.connectionId = input.connectionId ?? null;
-  if (mode !== "conversation" && "promptPresetId" in input) out.promptPresetId = input.promptPresetId ?? null;
+  if ("promptPresetId" in input) out.promptPresetId = input.promptPresetId ?? null;
   if (input.metadata) out.metadata = sanitizePresetMetadata(input.metadata as Record<string, unknown>);
   return out;
 }
@@ -258,58 +259,69 @@ export function createChatPresetsStorage(db: DB) {
      * specify. Selecting the Default preset therefore resets the chat's
      * preset-controlled settings to their system defaults.
      */
-    async applyToChat(presetId: string, chatId: string) {
-      const preset = await storage.getById(presetId);
-      if (!preset) return null;
-      const rows = await db.select().from(chats).where(eq(chats.id, chatId));
-      const chatRow = rows[0];
-      if (!chatRow) return null;
+    async applyToChat(presetId: string, chatId: string, options: { connectionId?: string | null } = {}) {
+      return withChatMetadataPatchQueue(chatId, async () => {
+        const preset = await storage.getById(presetId);
+        if (!preset) return null;
+        const rows = await db.select().from(chats).where(eq(chats.id, chatId));
+        const chatRow = rows[0];
+        if (!chatRow) return null;
 
-      const currentMetadata: Record<string, unknown> = (() => {
-        try {
-          return chatRow.metadata ? JSON.parse(chatRow.metadata) : {};
-        } catch {
-          return {};
+        const currentMetadata: Record<string, unknown> = (() => {
+          try {
+            return chatRow.metadata ? JSON.parse(chatRow.metadata) : {};
+          } catch {
+            return {};
+          }
+        })();
+
+        const presetMetadata = (preset.settings.metadata ?? {}) as Record<string, unknown>;
+
+        // Preserve only chat-specific (non-preset) metadata keys.
+        const preserved: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(currentMetadata)) {
+          if (isPresetExcludedMetadataKey(key)) preserved[key] = value;
         }
-      })();
+        if (!Object.prototype.hasOwnProperty.call(presetMetadata, "activeAgentIds")) {
+          preserved.activeAgentIds = sanitizePresetAgentIds(currentMetadata.activeAgentIds);
+        }
+        if (!Object.prototype.hasOwnProperty.call(presetMetadata, "agentOverrides")) {
+          preserved.agentOverrides = sanitizePresetAgentMap(currentMetadata.agentOverrides);
+        }
+        if (!Object.prototype.hasOwnProperty.call(presetMetadata, "agentPromptTemplateIds")) {
+          preserved.agentPromptTemplateIds = sanitizePresetAgentMap(currentMetadata.agentPromptTemplateIds);
+        }
 
-      // Preserve only chat-specific (non-preset) metadata keys.
-      const preserved: Record<string, unknown> = {};
-      for (const [key, value] of Object.entries(currentMetadata)) {
-        if (isPresetExcludedMetadataKey(key)) preserved[key] = value;
-      }
+        const baseDefaults: Record<string, unknown> = {
+          summary: null,
+          tags: [],
+          enableAgents: true,
+          activeToolIds: [],
+        };
 
-      const baseDefaults: Record<string, unknown> = {
-        summary: null,
-        tags: [],
-        enableAgents: true,
-        agentOverrides: {},
-        activeAgentIds: [],
-        activeToolIds: [],
-      };
+        const newMetadata: Record<string, unknown> = {
+          ...baseDefaults,
+          ...presetMetadata,
+          ...preserved,
+          appliedChatPresetId: preset.id,
+        };
+        const nextConnectionId =
+          options.connectionId !== undefined ? options.connectionId : (preset.settings.connectionId ?? null);
 
-      const presetMetadata = (preset.settings.metadata ?? {}) as Record<string, unknown>;
+        const ts = now();
+        await db
+          .update(chats)
+          .set({
+            connectionId: nextConnectionId,
+            promptPresetId: preset.settings.promptPresetId ?? null,
+            metadata: JSON.stringify(newMetadata),
+            updatedAt: ts,
+          })
+          .where(eq(chats.id, chatId));
 
-      const newMetadata: Record<string, unknown> = {
-        ...baseDefaults,
-        ...presetMetadata,
-        ...preserved,
-        appliedChatPresetId: preset.id,
-      };
-
-      const ts = now();
-      await db
-        .update(chats)
-        .set({
-          connectionId: preset.settings.connectionId ?? null,
-          promptPresetId: chatRow.mode === "conversation" ? null : (preset.settings.promptPresetId ?? null),
-          metadata: JSON.stringify(newMetadata),
-          updatedAt: ts,
-        })
-        .where(eq(chats.id, chatId));
-
-      const updatedRows = await db.select().from(chats).where(eq(chats.id, chatId));
-      return updatedRows[0] ?? null;
+        const updatedRows = await db.select().from(chats).where(eq(chats.id, chatId));
+        return updatedRows[0] ?? null;
+      });
     },
 
     /** Ensure a "Default" preset exists for every chat mode and exactly one preset is active per mode. */

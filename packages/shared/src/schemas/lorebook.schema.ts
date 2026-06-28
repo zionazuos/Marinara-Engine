@@ -13,7 +13,7 @@ export const lorebookScopeSchema = z.object({
   chatIds: z.array(z.string()).default([]),
 });
 
-export const selectiveLogicSchema = z.enum(["and", "or", "not"]);
+export const selectiveLogicSchema = z.enum(["and", "and_all", "or", "not", "not_all"]);
 
 export const lorebookFilterModeSchema = z.enum(["any", "include", "exclude"]);
 
@@ -79,7 +79,7 @@ export const createLorebookSchema = z.object({
     .default(LIMITS.LOREBOOK_ENTRY_LIMIT_DEFAULT),
   recursiveScanning: z.boolean().default(false),
   maxRecursionDepth: z.number().int().min(1).max(10).default(3),
-  excludeFromVectorization: z.boolean().default(false),
+  excludeFromVectorization: z.boolean().default(true),
   characterId: z.string().nullable().default(null),
   characterIds: z.array(z.string()).default([]),
   personaId: z.string().nullable().default(null),
@@ -188,7 +188,9 @@ export const createLorebookEntrySchema = z.object({
   groupWeight: z.number().nullable().default(null),
   /** Optional folder this entry belongs to. Null/omitted = root level. */
   folderId: z.string().nullable().default(null),
-  preventRecursion: z.boolean().default(false),
+  preventRecursion: z.boolean().default(true),
+  excludeRecursion: z.boolean().default(false),
+  delayUntilRecursion: z.boolean().default(false),
   locked: z.boolean().default(false),
   tag: z.string().default(""),
   relationships: z.record(z.string()).default({}),
@@ -232,6 +234,8 @@ export const updateLorebookEntrySchema = z.object({
   groupWeight: z.number().nullable().optional(),
   folderId: z.string().nullable().optional(),
   preventRecursion: z.boolean().optional(),
+  excludeRecursion: z.boolean().optional(),
+  delayUntilRecursion: z.boolean().optional(),
   locked: z.boolean().optional(),
   tag: z.string().optional(),
   relationships: z.record(z.string()).optional(),

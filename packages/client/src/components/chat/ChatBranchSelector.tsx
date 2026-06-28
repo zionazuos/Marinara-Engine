@@ -2,7 +2,6 @@ import { createPortal } from "react-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import {
   Check,
-  ChevronDown,
   Download,
   FileText,
   GitBranch,
@@ -11,6 +10,7 @@ import {
   Pencil,
   Trash2,
   Upload,
+  X,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -23,11 +23,18 @@ import {
   useUpdateChatMetadata,
 } from "../../hooks/use-chats";
 import { showConfirmDialog, showPromptDialog } from "../../lib/app-dialogs";
+import { CHAT_FLOATING_UI_DISMISS_EVENT } from "../../lib/chat-floating-ui-events";
 import { getChatDisplayName } from "../../lib/chat-display";
 import { useChatStore } from "../../stores/chat.store";
 import { cn } from "../../lib/utils";
-import { getChatToolbarButtonClass } from "./ChatToolbarControls";
 import {
+  CHAT_TOOLBAR_OVERFLOW_MENU_SELECTOR,
+  announceChatToolbarAction,
+  getChatToolbarButtonClass,
+} from "./ChatToolbarControls";
+import {
+  ROLEPLAY_POPOVER_CLOSE_BUTTON,
+  ROLEPLAY_POPOVER_CLOSE_ICON_SIZE,
   ROLEPLAY_POPOVER_SCROLL_AREA,
   ROLEPLAY_POPOVER_SHELL,
   ROLEPLAY_POPOVER_SUBTITLE,
@@ -47,15 +54,16 @@ interface ChatBranchSelectorProps {
   variant?: "conversation" | "roleplay";
   compact?: boolean;
   className?: string;
+  onOpen?: () => void;
 }
 
 export function ChatBranchSelector({
   activeChatId,
   activeChatName,
   groupId,
-  variant = "conversation",
   compact = false,
   className,
+  onOpen,
 }: ChatBranchSelectorProps) {
   const { data: groupChats, isLoading } = useChatGroup(groupId ?? null);
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
@@ -97,7 +105,6 @@ export function ChatBranchSelector({
     ];
   }, [activeChatId, activeChatName, branches]);
 
-  const currentBranch = branches.find((chat) => chat.id === activeChatId);
   const branchCount = isLoading ? branches.length : displayBranches.length;
 
   const handleImportChat = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -156,28 +163,34 @@ export function ChatBranchSelector({
     ) {
       return;
     }
-    const nextActiveChatId =
-      branchId === activeChatId ? displayBranches.find((branch) => branch.id !== branchId)?.id : null;
+    const deletingActiveBranch = branchId === activeChatId;
+    const nextActiveChatId = deletingActiveBranch
+      ? (displayBranches.find((branch) => branch.id !== branchId)?.id ?? null)
+      : null;
     try {
-      await deleteChat.mutateAsync({ id: branchId, groupId: groupId ?? null });
-      if (nextActiveChatId) setActiveChatId(nextActiveChatId);
+      await deleteChat.mutateAsync({ id: branchId, groupId: groupId ?? null, force: true });
+      if (deletingActiveBranch) setActiveChatId(nextActiveChatId);
     } catch (err) {
       toast.error(err instanceof Error ? `Delete failed: ${err.message}` : "Delete failed.");
     }
   };
 
   useLayoutEffect(() => {
-    if (!open || !buttonRef.current) return;
-    const rect = buttonRef.current.getBoundingClientRect();
+    const button = buttonRef.current;
+    if (!open || !button) return;
+    const rect = button.getBoundingClientRect();
     const viewportPadding = 12;
     const isMobile = window.innerWidth < 768;
+    const overflowMenu = button.closest<HTMLElement>(CHAT_TOOLBAR_OVERFLOW_MENU_SELECTOR);
+    const menuRect = overflowMenu?.getBoundingClientRect();
+    const rightEdge = isMobile && menuRect ? menuRect.left - viewportPadding : rect.right;
     const width = isMobile
-      ? Math.min(360, window.innerWidth - viewportPadding * 2)
+      ? Math.min(360, window.innerWidth - viewportPadding * 2, Math.max(160, rightEdge - viewportPadding))
       : Math.max(rect.width, 360);
     const maxLeft = Math.max(viewportPadding, window.innerWidth - width - viewportPadding);
     setPosition({
-      top: rect.bottom + (isMobile ? 0 : 8),
-      left: Math.max(viewportPadding, Math.min(rect.right - width, maxLeft)),
+      top: isMobile && menuRect ? menuRect.top : rect.bottom + (isMobile ? 0 : 8),
+      left: Math.max(viewportPadding, Math.min(rightEdge - width, maxLeft)),
       width,
     });
   }, [displayBranches.length, open]);
@@ -215,21 +228,16 @@ export function ChatBranchSelector({
     };
   }, [open]);
 
-  if (!activeChatId) return null;
-  if (variant !== "roleplay" && (!groupId || (!isLoading && branches.length <= 1))) return null;
+  useEffect(() => {
+    if (!open) return;
+    const handleDismiss = () => setOpen(false);
+    window.addEventListener(CHAT_FLOATING_UI_DISMISS_EVENT, handleDismiss);
+    return () => window.removeEventListener(CHAT_FLOATING_UI_DISMISS_EVENT, handleDismiss);
+  }, [open]);
 
-  const branchLabel = currentBranch?.name ?? activeChatName ?? "Current branch";
-  const roleplayMinimal = variant === "roleplay" && !compact;
-  const branchButtonSizeClassName = compact
-    ? "relative h-8 w-8"
-    : roleplayMinimal
-      ? "h-8 min-w-14"
-      : "max-w-[min(15rem,calc(100vw-9rem))]";
-  const branchButtonContentClassName = compact
-    ? undefined
-    : roleplayMinimal
-      ? "justify-start gap-1.5 px-2 py-1 text-left"
-      : "justify-start gap-2 px-2.5 py-1.5 text-left";
+  if (!activeChatId) return null;
+
+  const branchButtonSizeClassName = "relative h-8 w-8";
   const badgeClassName = "bg-[var(--marinara-chat-chrome-highlight-bg)] text-[var(--marinara-chat-chrome-panel-muted)]";
 
   return (
@@ -238,49 +246,30 @@ export function ChatBranchSelector({
         ref={buttonRef}
         type="button"
         onClick={(event) => {
+          announceChatToolbarAction();
           if (compact) event.stopPropagation();
-          setOpen((value) => !value);
+          const nextOpen = !open;
+          if (nextOpen) onOpen?.();
+          setOpen(nextOpen);
         }}
         aria-label={isLoading ? "Switch branch" : `Switch branch (${branchCount} branches)`}
         className={getChatToolbarButtonClass({
-          className: cn(branchButtonContentClassName, className),
-          compact,
+          className,
+          compact: true,
           open,
           sizeClassName: branchButtonSizeClassName,
         })}
         title="Trocar ramificação"
       >
         <GitBranch size="0.8125rem" className="shrink-0" />
-        {compact ? (
-          <span
-            className={cn(
-              "absolute -right-1 -top-1 flex min-w-4 justify-center rounded-full px-1 text-[0.5625rem] font-semibold leading-4",
-              badgeClassName,
-            )}
-          >
-            {isLoading ? <Loader2 size="0.5625rem" className="mt-0.5 animate-spin" /> : branchCount}
-          </span>
-        ) : roleplayMinimal ? (
-          <>
-            <span
-              className={cn(
-                "shrink-0 rounded-full px-1.5 py-0.5 text-[0.625rem] font-medium tabular-nums",
-                badgeClassName,
-              )}
-            >
-              {isLoading ? <Loader2 size="0.6875rem" className="animate-spin" /> : branchCount}
-            </span>
-            <ChevronDown size="0.75rem" className={cn("shrink-0 transition-transform", open && "rotate-180")} />
-          </>
-        ) : (
-          <>
-            <span className="min-w-0 flex-1 truncate text-[0.75rem] font-medium">{branchLabel}</span>
-            <span className={cn("shrink-0 rounded-full px-1.5 py-0.5 text-[0.625rem] font-medium", badgeClassName)}>
-              {isLoading ? <Loader2 size="0.6875rem" className="animate-spin" /> : branchCount}
-            </span>
-            <ChevronDown size="0.75rem" className={cn("shrink-0 transition-transform", open && "rotate-180")} />
-          </>
-        )}
+        <span
+          className={cn(
+            "absolute -right-1 -top-1 flex min-w-4 justify-center rounded-full px-1 text-[0.5625rem] font-semibold leading-4",
+            badgeClassName,
+          )}
+        >
+          {isLoading ? <Loader2 size="0.5625rem" className="mt-0.5 animate-spin" /> : branchCount}
+        </span>
       </button>
 
       {open &&
@@ -292,12 +281,26 @@ export function ChatBranchSelector({
             style={{ top: position.top, left: position.left, width: position.width }}
           >
             <div className="border-b border-[var(--border)] px-3 py-2">
-              <div className={ROLEPLAY_POPOVER_TITLE}>
-                <GitBranch size="0.75rem" className="shrink-0 text-[var(--muted-foreground)]" />
-                
-                Ramificações do chat
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className={ROLEPLAY_POPOVER_TITLE}>
+                    <GitBranch size="0.75rem" className="shrink-0 text-[var(--muted-foreground)]" />
+                    
+                    Ramificações do chat
+                  </div>
+                  <div className={ROLEPLAY_POPOVER_SUBTITLE}>
+                    Switch, import, export, or clean up this chat's branches.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close chat branches"
+                  className={ROLEPLAY_POPOVER_CLOSE_BUTTON}
+                >
+                  <X size={ROLEPLAY_POPOVER_CLOSE_ICON_SIZE} />
+                </button>
               </div>
-              <div className={ROLEPLAY_POPOVER_SUBTITLE}>Switch, import, export, or clean up this chat's branches.</div>
             </div>
 
             <div className="border-b border-[var(--border)] p-2">
@@ -379,33 +382,27 @@ export function ChatBranchSelector({
                       </div>
                     </button>
 
-                    {isActive && (
-                      <span className="shrink-0 rounded-full bg-[var(--foreground)]/10 px-2 py-0.5 text-[0.625rem] font-medium text-[var(--foreground)]/75">
-                        
-                        Ativo
-                      </span>
-                    )}
-                    {!isActive && (
-                      <div className="flex shrink-0 items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => void handleRenameBranch(branch)}
-                          className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
-                          title="Renomear ramificação"
-                        >
-                          <Pencil size="0.75rem" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void handleDeleteBranch(branch.id)}
-                          disabled={deleteChat.isPending}
-                          className="rounded-lg p-1.5 text-[var(--destructive)] transition-colors hover:bg-[var(--destructive)]/15 disabled:opacity-50"
-                          title="Excluir ramificação"
-                        >
-                          <Trash2 size="0.75rem" />
-                        </button>
-                      </div>
-                    )}
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => void handleRenameBranch(branch)}
+                        className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
+                        title="Renomear ramificação"
+                        aria-label={`Rename ${getChatDisplayName(branch)}`}
+                      >
+                        <Pencil size="0.75rem" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleDeleteBranch(branch.id)}
+                        disabled={deleteChat.isPending}
+                        className="rounded-lg p-1.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:opacity-50"
+                        title="Excluir ramificação"
+                        aria-label={`Delete ${getChatDisplayName(branch)}`}
+                      >
+                        <Trash2 size="0.75rem" />
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -425,12 +422,12 @@ export function ChatBranchSelector({
                     ) {
                       return;
                     }
-                    deleteChatGroup.mutate(groupId);
+                    deleteChatGroup.mutate({ groupId, force: true });
                     setActiveChatId(null);
                     setOpen(false);
                   }}
                   disabled={deleteChatGroup.isPending}
-                  className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[var(--destructive)]/10 px-3 py-2 text-[0.6875rem] font-medium text-[var(--destructive)] ring-1 ring-[var(--destructive)]/20 transition-colors hover:bg-[var(--destructive)]/20 disabled:opacity-50"
+                  className="mari-chrome-control mari-chrome-control--primary w-full px-3 py-2 text-[0.6875rem] disabled:opacity-50"
                 >
                   <Trash2 size="0.75rem" />
                   

@@ -1,9 +1,11 @@
 // ──────────────────────────────────────────────
 // Panel: API Connections (polished, with folders)
 // ──────────────────────────────────────────────
-import { useState, useEffect, useMemo, useCallback, useRef, type ChangeEvent } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, type ChangeEvent, type TouchEvent } from "react";
 import { Reorder, useDragControls } from "framer-motion";
+import { useQueryClient } from "@tanstack/react-query";
 import {
+  connectionKeys,
   useConnections,
   useDuplicateConnection,
   useDeleteConnection,
@@ -19,9 +21,10 @@ import {
   useMoveConnection,
 } from "../../hooks/use-connection-folders";
 import { handleFolderRenameKeyDown, useFolderRenameGesture } from "../../hooks/use-folder-rename-gesture";
+import { useTouchFolderDrag } from "../../hooks/use-touch-folder-drag";
 import { useAgentConfigs, useCreateAgent, useUpdateAgent } from "../../hooks/use-agents";
 import { useChatStore } from "../../stores/chat.store";
-import { useUIStore } from "../../stores/ui.store";
+import { useUIStore, type ResourcePanelSort } from "../../stores/ui.store";
 import { useSidecarStore } from "../../stores/sidecar.store";
 import {
   BUILT_IN_AGENTS,
@@ -37,6 +40,7 @@ import {
   Check,
   Download,
   Search,
+  ArrowUpDown,
   Shuffle,
   ExternalLink,
   X,
@@ -53,6 +57,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { sortBasicPanelItems } from "../../lib/panel-sort";
 import { downloadJsonFile, sanitizeExportFilenamePart } from "../../lib/download-json";
 import { downloadZipFile } from "../../lib/download-zip";
 import {
@@ -65,6 +70,7 @@ import { TTSConfigCard } from "./settings/TTSConfigCard";
 import { SettingsSwitch } from "./settings/SettingControls";
 import { SelectionActionBar } from "../ui/SelectionActionBar";
 import { SmoothFolderContent } from "../ui/SmoothFolderContent";
+import { TouchDragHandle } from "../ui/TouchDragHandle";
 
 /** Provider color pair for connection icons. Kept as one blue family by design. */
 const CONNECTION_ICON_COLORS = {
@@ -381,6 +387,8 @@ type ConnectionRowData = {
   maxParallelJobs?: number;
   claudeFastMode?: boolean | string;
   folderId?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 function connectionMatchesSearch(conn: ConnectionRowData, query: string) {
@@ -409,6 +417,7 @@ function formatDefaultConnectionOption(connection: ConnectionRowData, fallbackMo
 function DefaultAgentConnectionCard({ connectionsList }: { connectionsList: ConnectionRowData[] }) {
   const openConnectionDetail = useUIStore((s) => s.openConnectionDetail);
   const updateConnection = useUpdateConnection();
+  const qc = useQueryClient();
   const agentConnections = useMemo(
     () => connectionsList.filter((conn) => conn.provider !== "image_generation"),
     [connectionsList],
@@ -430,6 +439,10 @@ function DefaultAgentConnectionCard({ connectionsList }: { connectionsList: Conn
       return;
     }
     updateConnection.mutate({ id: nextConnectionId, defaultForAgents: true });
+  };
+  const openFreshConnectionDetail = (id: string) => {
+    qc.removeQueries({ queryKey: connectionKeys.detail(id) });
+    openConnectionDetail(id);
   };
 
   return (
@@ -458,7 +471,7 @@ function DefaultAgentConnectionCard({ connectionsList }: { connectionsList: Conn
         {defaultConnection && (
           <button
             type="button"
-            onClick={() => openConnectionDetail(defaultConnection.id)}
+            onClick={() => openFreshConnectionDetail(defaultConnection.id)}
             className="mari-chrome-control mari-chrome-control--small p-1.5"
             title="Open default agent connection"
           >
@@ -473,6 +486,7 @@ function DefaultAgentConnectionCard({ connectionsList }: { connectionsList: Conn
 function DefaultIllustratorConnectionCard({ connectionsList }: { connectionsList: ConnectionRowData[] }) {
   const openConnectionDetail = useUIStore((s) => s.openConnectionDetail);
   const updateConnection = useUpdateConnection();
+  const qc = useQueryClient();
   const illustratorConnections = useMemo(
     () => connectionsList.filter((conn) => conn.provider === "image_generation"),
     [connectionsList],
@@ -494,6 +508,10 @@ function DefaultIllustratorConnectionCard({ connectionsList }: { connectionsList
       return;
     }
     updateConnection.mutate({ id: nextConnectionId, defaultForAgents: true });
+  };
+  const openFreshConnectionDetail = (id: string) => {
+    qc.removeQueries({ queryKey: connectionKeys.detail(id) });
+    openConnectionDetail(id);
   };
 
   return (
@@ -524,7 +542,7 @@ function DefaultIllustratorConnectionCard({ connectionsList }: { connectionsList
         {defaultConnection && (
           <button
             type="button"
-            onClick={() => openConnectionDetail(defaultConnection.id)}
+            onClick={() => openFreshConnectionDetail(defaultConnection.id)}
             className="mari-chrome-control mari-chrome-control--small p-1.5"
             title="Open default Illustrator connection"
           >
@@ -545,6 +563,8 @@ function ConnectionRow({
   isDragging,
   onDragStart,
   onDragEnd,
+  onTouchStart,
+  suppressClickRef,
   onImagePick,
 }: {
   conn: ConnectionRowData;
@@ -555,6 +575,8 @@ function ConnectionRow({
   isDragging: boolean;
   onDragStart: (event: React.DragEvent<HTMLDivElement>) => void;
   onDragEnd: () => void;
+  onTouchStart?: (event: TouchEvent<HTMLButtonElement>) => void;
+  suppressClickRef?: { current: boolean };
   onImagePick: () => void;
 }) {
   const duplicateConnection = useDuplicateConnection();
@@ -576,27 +598,40 @@ function ConnectionRow({
 
   return (
     <div
-      onClick={onClickRow}
+      data-touch-drag-card="connection"
+      onClick={() => {
+        if (suppressClickRef?.current) return;
+        onClickRow();
+      }}
       draggable
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       className={cn(
-        "group relative flex cursor-pointer items-center gap-3 rounded-xl p-2.5 transition-all hover:bg-[var(--sidebar-accent)]",
+        "group relative flex touch-pan-y cursor-pointer items-center gap-3 rounded-xl p-2.5 transition-all hover:bg-[var(--sidebar-accent)]",
         isSelected && `ring-1 ${colors.ring} bg-[var(--sidebar-accent)]/50`,
         selectionMode && isBulkSelected && "ring-1 ring-[var(--border)] bg-[var(--sidebar-accent)]/70",
         isDragging && "opacity-50",
       )}
     >
+      {onTouchStart && (
+        <TouchDragHandle
+          label="Drag connection"
+          onTouchStart={(event) => {
+            onTouchStart(event);
+          }}
+        />
+      )}
       <button
         type="button"
         onClick={(event) => {
           event.stopPropagation();
+          if (suppressClickRef?.current) return;
           onImagePick();
         }}
-	        className={cn(
-	          iconClasses,
-	          "transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--marinara-chat-chrome-focus-ring)]",
-	        )}
+        className={cn(
+          iconClasses,
+          "transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--marinara-chat-chrome-focus-ring)]",
+        )}
         title={conn.imagePath ? "Replace connection picture" : "Upload connection picture"}
         aria-label={conn.imagePath ? "Replace connection picture" : "Upload connection picture"}
       >
@@ -717,6 +752,7 @@ function ConnectionFolderRow({
 
   return (
     <Reorder.Item
+      data-connection-folder-id={folder.id}
       value={folder.id}
       layout="position"
       dragListener={false}
@@ -856,6 +892,8 @@ export function ConnectionsPanel() {
   const openModal = useUIStore((s) => s.openModal);
   const linkApiBannerDismissed = useUIStore((s) => s.linkApiBannerDismissed);
   const dismissLinkApiBanner = useUIStore((s) => s.dismissLinkApiBanner);
+  const sort = useUIStore((s) => s.connectionPanelSort);
+  const setSort = useUIStore((s) => s.setConnectionPanelSort);
 
   // Folder hooks
   const { data: folders } = useConnectionFolders();
@@ -872,12 +910,23 @@ export function ConnectionsPanel() {
   const [exportingSelected, setExportingSelected] = useState(false);
   const connectionImageInputRef = useRef<HTMLInputElement>(null);
   const imageTargetConnectionIdRef = useRef<string | null>(null);
+  const suppressConnectionClickRef = useRef(false);
 
   const connectionsList = useMemo(() => (connections as ConnectionRowData[] | undefined) ?? [], [connections]);
   const filteredConnections = useMemo(() => {
     const query = search.trim().toLowerCase();
     return connectionsList.filter((connection) => connectionMatchesSearch(connection, query));
   }, [connectionsList, search]);
+  const sortedConnections = useMemo(
+    () =>
+      sortBasicPanelItems(
+        filteredConnections,
+        sort,
+        (connection) => connection.name,
+        (connection) => connection.createdAt || connection.updatedAt,
+      ),
+    [filteredConnections, sort],
+  );
   const searchActive = search.trim().length > 0;
 
   // Sorted folder list + local order for optimistic drag-to-reorder
@@ -895,7 +944,7 @@ export function ConnectionsPanel() {
   const { unfiledConnections, folderConnectionsMap } = useMemo(() => {
     const unfiled: ConnectionRowData[] = [];
     const map = new Map<string, ConnectionRowData[]>();
-    for (const c of filteredConnections) {
+    for (const c of sortedConnections) {
       const fid = c.folderId ?? null;
       if (fid && sortedFolders.some((f) => f.id === fid)) {
         const arr = map.get(fid) ?? [];
@@ -906,7 +955,7 @@ export function ConnectionsPanel() {
       }
     }
     return { unfiledConnections: unfiled, folderConnectionsMap: map };
-  }, [filteredConnections, sortedFolders]);
+  }, [sortedConnections, sortedFolders]);
 
   const handleCreateFolder = () => {
     createFolderMut.mutate({ name: getNextUnnamedFolderName(sortedFolders) });
@@ -961,13 +1010,51 @@ export function ConnectionsPanel() {
     setSelectedConnectionIds(new Set());
   }, []);
 
-  const handleDropConnectionsToFolder = (connectionIds: string[], folderId: string | null) => {
+  const handleDropConnectionsToFolder = useCallback((connectionIds: string[], folderId: string | null) => {
     const ids = Array.from(new Set(connectionIds.filter(Boolean)));
     for (const connectionId of ids) {
       moveConnectionMut.mutate({ connectionId, folderId });
     }
     setDraggedConnectionId(null);
-  };
+  }, [moveConnectionMut]);
+
+  const finishConnectionTouchDrag = useCallback(
+    (connectionId: string, x: number, y: number) => {
+      const target = document.elementFromPoint(x, y);
+      const folderElement = target?.closest("[data-connection-folder-id]") as HTMLElement | null;
+      const rootElement = target?.closest("[data-connection-folder-root]") as HTMLElement | null;
+      const folderId = folderElement?.dataset.connectionFolderId ?? null;
+      if (folderId || rootElement) {
+        handleDropConnectionsToFolder(getDraggedConnectionIds(connectionId), folderId);
+      } else {
+        setDraggedConnectionId(null);
+      }
+      window.setTimeout(() => {
+        suppressConnectionClickRef.current = false;
+      }, 0);
+    },
+    [getDraggedConnectionIds, handleDropConnectionsToFolder],
+  );
+
+  const cancelConnectionTouchDrag = useCallback((_connectionId: string, wasActive: boolean) => {
+    setDraggedConnectionId(null);
+    if (wasActive) {
+      window.setTimeout(() => {
+        suppressConnectionClickRef.current = false;
+      }, 0);
+    } else {
+      suppressConnectionClickRef.current = false;
+    }
+  }, []);
+
+  const { startTouchDrag: startConnectionTouchDrag } = useTouchFolderDrag({
+    onActivate: (connectionId) => {
+      suppressConnectionClickRef.current = true;
+      setDraggedConnectionId(connectionId);
+    },
+    onDrop: finishConnectionTouchDrag,
+    onCancel: cancelConnectionTouchDrag,
+  });
 
   const handlePickConnectionImage = useCallback((connectionId: string) => {
     imageTargetConnectionIdRef.current = connectionId;
@@ -1105,6 +1192,13 @@ export function ConnectionsPanel() {
           event.dataTransfer.setData("text/plain", conn.id);
         }}
         onDragEnd={() => setDraggedConnectionId(null)}
+        onTouchStart={(event) => {
+          startConnectionTouchDrag(event, conn.id, {
+            allowInteractiveTarget: true,
+            sourceElement: event.currentTarget.closest<HTMLElement>('[data-touch-drag-card="connection"]'),
+          });
+        }}
+        suppressClickRef={suppressConnectionClickRef}
         onImagePick={() => handlePickConnectionImage(conn.id)}
       />
     );
@@ -1155,19 +1249,39 @@ export function ConnectionsPanel() {
         </button>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search
-          size="0.8125rem"
-          className="mari-chrome-field-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-        />
-        <input
-          type="text"
-          placeholder="Search connections..."
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          className="mari-chrome-field h-10 w-full py-0 pl-8 pr-3 text-xs md:h-9"
-        />
+      {/* Search + Sort */}
+      <div className="flex gap-1.5">
+        <div className="relative flex-1">
+          <Search
+            size="0.8125rem"
+            className="mari-chrome-field-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+          />
+          <input
+            type="text"
+            placeholder="Search connections..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="mari-chrome-field h-10 w-full py-0 pl-8 pr-3 text-xs md:h-9"
+          />
+        </div>
+        <div className="relative">
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value as ResourcePanelSort)}
+            className="mari-chrome-field mari-chrome-sort-field mari-accent-animated h-10 appearance-none py-0 pl-2.5 pr-7 text-[0.6875rem] md:h-9"
+            title="Ordem de classificação"
+            aria-label="Sort connections"
+          >
+            <option value="name-asc">A-Z</option>
+            <option value="name-desc">Z-A</option>
+            <option value="newest">Mais recentes</option>
+            <option value="oldest">Mais antigos</option>
+          </select>
+          <ArrowUpDown
+            size="0.625rem"
+            className="mari-chrome-field-icon mari-chrome-sort-icon mari-accent-animated pointer-events-none absolute right-2 top-1/2 -translate-y-1/2"
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-0.5">
@@ -1294,27 +1408,32 @@ export function ConnectionsPanel() {
       )}
 
       {/* Unfiled connections */}
-      <div
-        onDragOver={(event) => {
-          if (draggedConnectionId) {
+      {draggedConnectionId && (
+        <div
+          data-connection-folder-root
+          onDragOver={(event) => {
             event.preventDefault();
             event.dataTransfer.dropEffect = "move";
-          }
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          const payload = event.dataTransfer.getData("application/x-marinara-connection-ids");
-          const fallbackId =
-            event.dataTransfer.getData("application/x-marinara-connection-id") ||
-            event.dataTransfer.getData("text/plain") ||
-            draggedConnectionId;
-          handleDropConnectionsToFolder(payload ? (JSON.parse(payload) as string[]) : fallbackId ? [fallbackId] : [], null);
-        }}
-        className={cn(
-          "stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors",
-          draggedConnectionId && "ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
-        )}
-      >
+          }}
+          onDrop={(event) => {
+            event.preventDefault();
+            const payload = event.dataTransfer.getData("application/x-marinara-connection-ids");
+            const fallbackId =
+              event.dataTransfer.getData("application/x-marinara-connection-id") ||
+              event.dataTransfer.getData("text/plain") ||
+              draggedConnectionId;
+            handleDropConnectionsToFolder(
+              payload ? (JSON.parse(payload) as string[]) : fallbackId ? [fallbackId] : [],
+              null,
+            );
+          }}
+          className="rounded-xl border border-dashed border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-highlight-bg)] px-3 py-2 text-[0.625rem] text-[var(--marinara-chat-chrome-button-text-active)]"
+        >
+          Drop here to move out of folder
+        </div>
+      )}
+
+      <div className="stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors">
         {unfiledConnections.map(renderConnectionRow)}
       </div>
 
@@ -1327,6 +1446,7 @@ export function ConnectionsPanel() {
 
       {selectionMode && (
         <SelectionActionBar
+          placement="panel"
           selectedCount={selectedConnectionIds.size}
           onExport={() => void handleExportSelected()}
           onDelete={handleDeleteSelected}

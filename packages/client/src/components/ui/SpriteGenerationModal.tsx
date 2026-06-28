@@ -12,6 +12,7 @@ import { useSpriteCapabilities } from "../../hooks/use-characters";
 import { useUIStore } from "../../stores/ui.store";
 import { api } from "../../lib/api-client";
 import { ImagePromptReviewModal, type ImagePromptOverride, type ImagePromptReviewItem } from "./ImagePromptReviewModal";
+import { normalizeSpriteExpressionLabel } from "@marinara-engine/shared";
 
 // ── Types ──
 
@@ -115,6 +116,17 @@ class SpritePromptReviewCancelledError extends Error {
 
 function isSpritePromptReviewCancelled(error: unknown): error is SpritePromptReviewCancelledError {
   return error instanceof SpritePromptReviewCancelledError;
+}
+
+class SpriteGenerationAbortedError extends Error {
+  constructor() {
+    super("Sprite generation cancelled");
+    this.name = "SpriteGenerationAbortedError";
+  }
+}
+
+function isSpriteGenerationAborted(error: unknown): error is SpriteGenerationAbortedError {
+  return error instanceof SpriteGenerationAbortedError;
 }
 
 // ── Constants ──
@@ -363,27 +375,44 @@ function getGenerationErrorMessage(err: unknown): string {
 }
 
 function isAbortError(err: unknown): boolean {
-  return err instanceof DOMException && err.name === "AbortError";
+  return (
+    (err instanceof DOMException && err.name === "AbortError") ||
+    (!!err && typeof err === "object" && "name" in err && err.name === "AbortError")
+  );
 }
 
 function isDefaultImageConnection(connection: ImageConnectionOption): boolean {
   return connection.defaultForAgents === true || connection.defaultForAgents === "true";
 }
 
-async function postSpriteGenerationRequest<T>(body: unknown): Promise<T> {
+async function postSpriteGenerationRequest<T>(body: unknown, signal?: AbortSignal): Promise<T> {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), SPRITE_GENERATION_REQUEST_TIMEOUT_MS);
+  let timedOut = false;
+  const abortFromParent = () => controller.abort(signal?.reason);
+  if (signal?.aborted) {
+    controller.abort(signal.reason);
+  } else {
+    signal?.addEventListener("abort", abortFromParent, { once: true });
+  }
+  const timeout = window.setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, SPRITE_GENERATION_REQUEST_TIMEOUT_MS);
 
   try {
     return await api.post<T>("/sprites/generate-sheet", body, { signal: controller.signal });
   } catch (err) {
     if (isAbortError(err)) {
+      if (!timedOut && signal?.aborted) {
+        throw new SpriteGenerationAbortedError();
+      }
       throw new Error(
         "Sprite generation timed out after about 5 minutes. The image provider may still be busy; try again or use a faster image connection.",
       );
     }
     throw err;
   } finally {
+    signal?.removeEventListener("abort", abortFromParent);
     window.clearTimeout(timeout);
   }
 }
@@ -493,11 +522,7 @@ function buildSliceBoundaries(
 }
 
 function normalizeSpriteLabel(raw: string): string {
-  return raw
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]/g, "_")
-    .replace(/^full_/, "");
+  return normalizeSpriteExpressionLabel(raw);
 }
 
 function getMatchedFullBodyGrid(count: number): { cols: number; rows: number } {
@@ -564,6 +589,11 @@ export function SpriteGenerationModal({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const promptReviewResolveRef = useRef<((overrides: ImagePromptOverride[] | null) => void) | null>(null);
+  const generationControllerRef = useRef<AbortController | null>(null);
+  const generationRunIdRef = useRef(0);
+  const framePreviewRequestRef = useRef(0);
+  const wasOpenRef = useRef(false);
+  const previousEntityIdRef = useRef(entityId);
   const reviewImagePromptsBeforeSend = useUIStore((s) => s.reviewImagePromptsBeforeSend);
 
   // Connections
@@ -669,8 +699,18 @@ export function SpriteGenerationModal({
     resolve?.(overrides);
   }, []);
 
+  const abortActiveGeneration = useCallback(() => {
+    generationRunIdRef.current += 1;
+    generationControllerRef.current?.abort();
+    generationControllerRef.current = null;
+    closePromptReview(null);
+  }, [closePromptReview]);
+
   useEffect(() => {
     return () => {
+      generationRunIdRef.current += 1;
+      generationControllerRef.current?.abort();
+      generationControllerRef.current = null;
       const resolve = promptReviewResolveRef.current;
       promptReviewResolveRef.current = null;
       resolve?.(null);
@@ -678,7 +718,34 @@ export function SpriteGenerationModal({
   }, []);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      if (wasOpenRef.current) {
+        abortActiveGeneration();
+        setStep(0);
+        setGeneratedSheet(null);
+        setGeneratedSheets([]);
+        setCells([]);
+        setFailedMatchedBatch(null);
+        setGenerationProgress(null);
+        setCleanupApplying(false);
+        setCleanupApplied(false);
+        setSliceAdjustments(DEFAULT_SLICE_ADJUSTMENTS);
+        setSliceApplying(false);
+        setActiveFrameIndex(null);
+        setFrameAdjustments(DEFAULT_SPRITE_FRAME_ADJUSTMENTS);
+        setFramePreviewUrl(null);
+        setFrameApplying(false);
+        setSaving(false);
+        setError(null);
+        setPromptReviewSubmitting(false);
+      }
+      wasOpenRef.current = false;
+      return;
+    }
+
+    if (wasOpenRef.current) return;
+    wasOpenRef.current = true;
+    previousEntityIdRef.current = entityId;
     setSpriteType(initialSpriteType);
     setPreset(DEFAULT_SPRITE_PRESET);
     setSelectedExpressions(
@@ -689,10 +756,32 @@ export function SpriteGenerationModal({
     setMatchExistingExpressions(false);
     setNativeTransparentPng(false);
     setNoBackground(false);
-  }, [open, initialSpriteType]);
+    setAppearance(defaultAppearance ?? "");
+    setReferenceImages([]);
+    setUseCurrentAvatarReference(!!defaultAvatarUrl);
+    setStep(0);
+    setGeneratedSheet(null);
+    setGeneratedSheets([]);
+    setCells([]);
+    setFailedMatchedBatch(null);
+    setGenerationProgress(null);
+    setCleanupApplying(false);
+    setCleanupApplied(false);
+    setSliceAdjustments(DEFAULT_SLICE_ADJUSTMENTS);
+    setSliceApplying(false);
+    setActiveFrameIndex(null);
+    setFrameAdjustments(DEFAULT_SPRITE_FRAME_ADJUSTMENTS);
+    setFramePreviewUrl(null);
+    setFrameApplying(false);
+    setSaving(false);
+    setError(null);
+  }, [abortActiveGeneration, defaultAppearance, defaultAvatarUrl, entityId, initialSpriteType, open]);
 
-  // Reset reference image & appearance when the target character changes
+  // Reset reference image & appearance only when the target character/persona changes.
   useEffect(() => {
+    if (previousEntityIdRef.current === entityId) return;
+    previousEntityIdRef.current = entityId;
+    abortActiveGeneration();
     setAppearance(defaultAppearance ?? "");
     setReferenceImages([]);
     setUseCurrentAvatarReference(!!defaultAvatarUrl);
@@ -710,7 +799,7 @@ export function SpriteGenerationModal({
     setNativeTransparentPng(false);
     setNoBackground(false);
     setError(null);
-  }, [entityId, defaultAvatarUrl, defaultAppearance]);
+  }, [abortActiveGeneration, defaultAppearance, defaultAvatarUrl, entityId]);
 
   useEffect(() => {
     if (activeFrameIndex !== null && activeFrameIndex >= cells.length) {
@@ -726,17 +815,26 @@ export function SpriteGenerationModal({
       return;
     }
 
+    const requestId = framePreviewRequestRef.current + 1;
+    framePreviewRequestRef.current = requestId;
     let cancelled = false;
-    cropSpriteDataUrl(activeFrameCell.dataUrl, frameAdjustments)
-      .then((preview) => {
-        if (!cancelled) setFramePreviewUrl(preview);
-      })
-      .catch(() => {
-        if (!cancelled) setFramePreviewUrl(activeFrameCell.dataUrl);
+    let rafId: number | null = null;
+    const timeoutId = window.setTimeout(() => {
+      rafId = window.requestAnimationFrame(() => {
+        cropSpriteDataUrl(activeFrameCell.dataUrl, frameAdjustments)
+          .then((preview) => {
+            if (!cancelled && framePreviewRequestRef.current === requestId) setFramePreviewUrl(preview);
+          })
+          .catch(() => {
+            if (!cancelled && framePreviewRequestRef.current === requestId) setFramePreviewUrl(activeFrameCell.dataUrl);
+          });
       });
+    }, 90);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timeoutId);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
     };
   }, [activeFrameCell, frameAdjustments]);
 
@@ -792,6 +890,8 @@ export function SpriteGenerationModal({
   const requestGeneratedSheet = useCallback(
     async (expressions: string[], grid: SpriteGrid, matchedFullBodyMode: boolean): Promise<GenerateSheetResult> => {
       if (!effectiveConnectionId) throw new Error("Image generation connection is required");
+      const signal = generationControllerRef.current?.signal;
+      if (signal?.aborted) throw new SpriteGenerationAbortedError();
 
       const payload = {
         connectionId: effectiveConnectionId,
@@ -808,23 +908,27 @@ export function SpriteGenerationModal({
       };
 
       if (reviewImagePromptsBeforeSend) {
-        const preview = await api.post<GenerateSheetPreviewResult>("/sprites/generate-sheet/preview", payload);
+        const preview = await api.post<GenerateSheetPreviewResult>("/sprites/generate-sheet/preview", payload, {
+          signal,
+        });
+        if (signal?.aborted) throw new SpriteGenerationAbortedError();
         if (preview.items.length > 0) {
           const overrides = await openPromptReview(preview.items);
           if (!overrides) throw new SpritePromptReviewCancelledError();
+          if (signal?.aborted) throw new SpriteGenerationAbortedError();
           setPromptReviewSubmitting(true);
           try {
             return await postSpriteGenerationRequest<GenerateSheetResult>({
               ...payload,
               promptOverrides: overrides,
-            });
+            }, signal);
           } finally {
             setPromptReviewSubmitting(false);
           }
         }
       }
 
-      return postSpriteGenerationRequest<GenerateSheetResult>(payload);
+      return postSpriteGenerationRequest<GenerateSheetResult>(payload, signal);
     },
     [
       appearance,
@@ -845,6 +949,7 @@ export function SpriteGenerationModal({
       let lastError = "Image generation failed";
 
       for (let attempt = 0; attempt < 2; attempt += 1) {
+        if (generationControllerRef.current?.signal.aborted) throw new SpriteGenerationAbortedError();
         setGenerationProgress(
           `Batch ${batchIndex + 1} of ${totalBatches}${attempt === 1 ? " (retrying once)" : ""}: ${batchExpressions
             .map((expr) => expr.replace(/_/g, " "))
@@ -861,6 +966,7 @@ export function SpriteGenerationModal({
           }
           return createGeneratedSpritesFromResult(result, grid, `Batch ${batchIndex + 1}`);
         } catch (err) {
+          if (isSpriteGenerationAborted(err)) throw err;
           lastError = getGenerationErrorMessage(err);
         }
       }
@@ -888,15 +994,25 @@ export function SpriteGenerationModal({
       setFailedMatchedBatch(null);
 
       for (let batchIndex = startIndex; batchIndex < batches.length; batchIndex += 1) {
+        if (generationControllerRef.current?.signal.aborted) {
+          setGenerationProgress(null);
+          setStep(0);
+          return;
+        }
         const batchExpressions = batches[batchIndex] ?? [];
         if (batchExpressions.length === 0) continue;
 
         try {
           const generated = await generateMatchedFullBodyBatch(batchExpressions, batchIndex, batches.length);
+          if (generationControllerRef.current?.signal.aborted) {
+            setGenerationProgress(null);
+            setStep(0);
+            return;
+          }
           nextCells = [...nextCells, ...generated.cells];
           if (generated.sheet) nextSheets = [...nextSheets, generated.sheet];
         } catch (err) {
-          if (isSpritePromptReviewCancelled(err)) {
+          if (isSpritePromptReviewCancelled(err) || isSpriteGenerationAborted(err)) {
             setStep(0);
             setError(null);
             setGenerationProgress(null);
@@ -936,6 +1052,12 @@ export function SpriteGenerationModal({
   const handleGenerate = useCallback(async () => {
     if (spriteGenerationUnavailable || !effectiveConnectionId || cappedSelectedExpressions.length === 0) return;
 
+    generationControllerRef.current?.abort();
+    const controller = new AbortController();
+    generationControllerRef.current = controller;
+    const runId = generationRunIdRef.current + 1;
+    generationRunIdRef.current = runId;
+
     setStep(1);
     setError(null);
     setGeneratedSheet(null);
@@ -949,18 +1071,19 @@ export function SpriteGenerationModal({
     setFramePreviewUrl(null);
     setSliceAdjustments(createDefaultSliceAdjustments(sliceAdjustmentGrid));
 
-    if (fullBodyExpressionMode) {
-      await runMatchedFullBodyBatches({
-        batches: matchedFullBodyBatches,
-        startIndex: 0,
-        initialCells: [],
-        initialSheets: [],
-      });
-      return;
-    }
-
     try {
+      if (fullBodyExpressionMode) {
+        await runMatchedFullBodyBatches({
+          batches: matchedFullBodyBatches,
+          startIndex: 0,
+          initialCells: [],
+          initialSheets: [],
+        });
+        return;
+      }
+
       const result = await requestGeneratedSheet(cappedSelectedExpressions, generationGrid, false);
+      if (controller.signal.aborted) throw new SpriteGenerationAbortedError();
       const generated = createGeneratedSpritesFromResult(result, generationGrid, "Generated sheet");
 
       setGeneratedSheet(generated.sheet?.dataUrl ?? null);
@@ -980,13 +1103,17 @@ export function SpriteGenerationModal({
       }
       setError(warnings.length > 0 ? warnings.join(" ") : null);
     } catch (err) {
-      if (isSpritePromptReviewCancelled(err)) {
+      if (isSpritePromptReviewCancelled(err) || isSpriteGenerationAborted(err)) {
         setError(null);
         setStep(0);
         return;
       }
       setError(getGenerationErrorMessage(err));
       setStep(0);
+    } finally {
+      if (generationRunIdRef.current === runId && generationControllerRef.current === controller) {
+        generationControllerRef.current = null;
+      }
     }
   }, [
     spriteGenerationUnavailable,
@@ -1005,6 +1132,12 @@ export function SpriteGenerationModal({
   const handleRetryFailedMatchedBatch = useCallback(async () => {
     if (!failedMatchedBatch || spriteGenerationUnavailable || !effectiveConnectionId) return;
 
+    generationControllerRef.current?.abort();
+    const controller = new AbortController();
+    generationControllerRef.current = controller;
+    const runId = generationRunIdRef.current + 1;
+    generationRunIdRef.current = runId;
+
     setStep(1);
     setError(null);
     setActiveFrameIndex(null);
@@ -1017,12 +1150,18 @@ export function SpriteGenerationModal({
       ...failedMatchedBatch.remainingBatches,
     ];
 
-    await runMatchedFullBodyBatches({
-      batches: retryBatches,
-      startIndex: failedMatchedBatch.batchIndex,
-      initialCells: cells,
-      initialSheets: generatedSheets,
-    });
+    try {
+      await runMatchedFullBodyBatches({
+        batches: retryBatches,
+        startIndex: failedMatchedBatch.batchIndex,
+        initialCells: cells,
+        initialSheets: generatedSheets,
+      });
+    } finally {
+      if (generationRunIdRef.current === runId && generationControllerRef.current === controller) {
+        generationControllerRef.current = null;
+      }
+    }
   }, [
     cells,
     effectiveConnectionId,
@@ -1032,6 +1171,14 @@ export function SpriteGenerationModal({
     runMatchedFullBodyBatches,
     spriteGenerationUnavailable,
   ]);
+
+  const handleCancelGeneration = useCallback(() => {
+    abortActiveGeneration();
+    setGenerationProgress(null);
+    setPromptReviewSubmitting(false);
+    setStep(0);
+    setError(null);
+  }, [abortActiveGeneration]);
 
   const handleApplyCleanup = useCallback(async () => {
     if (!noBackground || cells.length === 0) return;
@@ -1257,18 +1404,12 @@ export function SpriteGenerationModal({
   }, []);
 
   const handleCellRename = useCallback((idx: number, name: string) => {
+    setCells((prev) => prev.map((c, i) => (i === idx ? { ...c, expression: name } : c)));
+  }, []);
+
+  const handleCellRenameBlur = useCallback((idx: number) => {
     setCells((prev) =>
-      prev.map((c, i) =>
-        i === idx
-          ? {
-              ...c,
-              expression: name
-                .trim()
-                .toLowerCase()
-                .replace(/[^a-z0-9_-]/g, "_"),
-            }
-          : c,
-      ),
+      prev.map((c, i) => (i === idx ? { ...c, expression: normalizeSpriteLabel(c.expression) } : c)),
     );
   }, []);
 
@@ -1276,27 +1417,77 @@ export function SpriteGenerationModal({
     const toSave = cells.filter((c) => c.selected && c.expression);
     if (toSave.length === 0) return;
 
+    const saveTargets = toSave.map((cell) => {
+      const cleaned = normalizeSpriteLabel(cell.expression);
+      const expression =
+        spriteType === "full-body" ? (cleaned.startsWith("full_") ? cleaned : `full_${cleaned}`) : cleaned;
+      return { cell, expression };
+    });
+    if (saveTargets.some(({ expression }) => !expression || expression === "full_")) {
+      setError("Each selected sprite needs a valid expression label before saving.");
+      return;
+    }
+    const counts = new Map<string, number>();
+    for (const { expression } of saveTargets) {
+      counts.set(expression, (counts.get(expression) ?? 0) + 1);
+    }
+    const duplicateExpressions = [...counts.entries()]
+      .filter(([, count]) => count > 1)
+      .map(([expression]) => expression);
+    if (duplicateExpressions.length > 0) {
+      setError(
+        `Each selected sprite needs a unique expression label. Duplicate: ${duplicateExpressions
+          .map((expression) => expression.replace(/^full_/, "").replace(/_/g, " "))
+          .join(", ")}.`,
+      );
+      return;
+    }
+
     setSaving(true);
     setError(null);
 
     try {
-      for (const cell of toSave) {
-        const cleaned = cell.expression
-          .trim()
-          .toLowerCase()
-          .replace(/[^a-z0-9_-]/g, "_");
-        const expression =
-          spriteType === "full-body"
-            ? cleaned.startsWith("full_")
-              ? cleaned
-              : `full_${cleaned}`
-            : cleaned.replace(/^full_/, "");
-        await api.post(`/sprites/${entityId}`, {
-          expression,
-          image: cell.dataUrl,
+      const results = await Promise.allSettled(
+        saveTargets.map(({ cell, expression }) =>
+          api.post(`/sprites/${entityId}`, {
+            expression,
+            image: cell.dataUrl,
+          }),
+        ),
+      );
+      const failed = results
+        .map((result, index) => ({ result, target: saveTargets[index]! }))
+        .filter((entry): entry is { result: PromiseRejectedResult; target: (typeof saveTargets)[number] } => {
+          return entry.result.status === "rejected";
         });
+      const saved = saveTargets.filter((_, index) => results[index]?.status === "fulfilled");
+
+      if (saved.length > 0) {
+        onSpritesGenerated?.();
       }
-      onSpritesGenerated?.();
+
+      if (failed.length > 0) {
+        const savedExpressions = new Set(saved.map((target) => target.expression));
+        setCells((prev) =>
+          prev.map((cell) => {
+            const cleaned = normalizeSpriteLabel(cell.expression);
+            const expression =
+              spriteType === "full-body" ? (cleaned.startsWith("full_") ? cleaned : `full_${cleaned}`) : cleaned;
+            return savedExpressions.has(expression) ? { ...cell, selected: false } : cell;
+          }),
+        );
+        setError(
+          `Saved ${saved.length} sprite${saved.length === 1 ? "" : "s"}, failed ${failed.length}: ${failed
+            .slice(0, 3)
+            .map(({ target, result }) => {
+              const message = result.reason instanceof Error ? result.reason.message : "Save failed";
+              return `${target.expression.replace(/^full_/, "").replace(/_/g, " ")} (${message})`;
+            })
+            .join("; ")}${failed.length > 3 ? "; ..." : ""}`,
+        );
+        return;
+      }
+
       onClose();
       // Reset for next use
       setStep(0);
@@ -1328,13 +1519,21 @@ export function SpriteGenerationModal({
     setError(null);
   }, [handleCloseCellFrame]);
 
+  const handleClose = useCallback(() => {
+    abortActiveGeneration();
+    setSaving(false);
+    setPromptReviewSubmitting(false);
+    handleReset();
+    onClose();
+  }, [abortActiveGeneration, handleReset, onClose]);
+
   const selectedCount = cells.filter((c) => c.selected).length;
 
   // ── Render ──
 
   return (
     <>
-      <Modal open={open} onClose={onClose} title="Gerar sprites" width="max-w-2xl">
+      <Modal open={open} onClose={handleClose} title="Gerar sprites" width="max-w-2xl">
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleReferenceUpload} />
 
         {/* Step 0: Configuration */}
@@ -1692,7 +1891,7 @@ export function SpriteGenerationModal({
             {/* Generate Button */}
             <div className="flex items-center justify-between border-t border-[var(--border)]/30 pt-4">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:text-[var(--foreground)] hover:bg-[var(--secondary)]"
               >
                 
@@ -1751,6 +1950,14 @@ export function SpriteGenerationModal({
                     : "This may take 30–60 seconds depending on the provider."}
               </p>
             </div>
+            <button
+              type="button"
+              onClick={handleCancelGeneration}
+              className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
+            >
+              
+              Cancelar
+            </button>
           </div>
         )}
 
@@ -2129,6 +2336,7 @@ export function SpriteGenerationModal({
                         <input
                           value={cell.expression}
                           onChange={(e) => handleCellRename(i, e.target.value)}
+                          onBlur={() => handleCellRenameBlur(i)}
                           className="w-full rounded bg-[var(--secondary)]/70 px-2 py-1 text-center text-[0.625rem] text-[var(--muted-foreground)] outline-none focus:text-[var(--foreground)] focus:ring-1 focus:ring-[var(--primary)]/40"
                           aria-label={`Sprite filename for ${cell.expression}`}
                         />

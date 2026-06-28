@@ -16,6 +16,7 @@ import {
   useRef,
   type DragEvent as ReactDragEvent,
   type ReactNode,
+  type TouchEvent as ReactTouchEvent,
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -26,6 +27,7 @@ import {
   useLorebookEntries,
   useCreateLorebookEntry,
   useDeleteLorebook,
+  useDeleteLorebookEntry,
   useReorderLorebookEntries,
   useLorebookFolders,
   useCreateLorebookFolder,
@@ -37,6 +39,7 @@ import {
 } from "../../hooks/use-lorebooks";
 import { useCharacters, usePersonas } from "../../hooks/use-characters";
 import { useConnections } from "../../hooks/use-connections";
+import { useTouchFolderDrag } from "../../hooks/use-touch-folder-drag";
 import { showConfirmDialog } from "../../lib/app-dialogs";
 import { useUIStore } from "../../stores/ui.store";
 import { useChatStore } from "../../stores/chat.store";
@@ -50,13 +53,12 @@ import {
   Trash2,
   Search,
   Settings2,
-  ToggleLeft,
-  ToggleRight,
   AlertTriangle,
   ChevronDown,
   Globe,
   Users,
   UserRound,
+  Drama,
   X,
   ArrowUpDown,
   Hash,
@@ -73,10 +75,12 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { HelpTooltip } from "../ui/HelpTooltip";
+import { SettingsSwitch } from "../panels/settings/SettingControls";
 import { api } from "../../lib/api-client";
 import {
   LOCAL_SIDECAR_CONNECTION_ID,
   LIMITS,
+  includesTextForMatch,
   testPrimaryKeys,
   testSecondaryKeys,
   buildFolderForest,
@@ -98,6 +102,12 @@ import { EditorTabRail } from "../ui/EditorTabRail";
 // state is independent across books.
 // ──────────────────────────────────────────────
 const FOLDER_COLLAPSE_KEY_PREFIX = "lorebook-folder-collapsed:";
+const LOREBOOK_VECTORIZE_CONNECTION_STORAGE_KEY = "marinara:lorebook-vectorize-connection-id";
+
+function closestElementFromPoint(x: number, y: number, selector: string) {
+  const element = document.elementFromPoint(x, y);
+  return element instanceof Element ? element.closest<HTMLElement>(selector) : null;
+}
 
 function readCollapsedFolderIds(lorebookId: string | null): Set<string> {
   if (!lorebookId || typeof window === "undefined") return new Set();
@@ -187,7 +197,7 @@ function LinkedResourcePicker({
   const availableItems = items.filter(
     (item) =>
       !selectedIds.includes(item.id) &&
-      [item.name, item.description ?? ""].some((value) => value.toLowerCase().includes(search.toLowerCase())),
+      [item.name, item.description ?? ""].some((value) => includesTextForMatch(value, search)),
   );
 
   return (
@@ -203,9 +213,9 @@ function LinkedResourcePicker({
           {selectedItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center gap-2.5 rounded-lg bg-[var(--primary)]/10 px-3 py-2 ring-1 ring-[var(--primary)]/30"
+              className="mari-editor-panel mari-editor-panel--soft flex items-center gap-2.5 px-3 py-2"
             >
-              <span className="text-[var(--primary)]">{icon}</span>
+              <span className="mari-chrome-accent-icon mari-accent-animated">{icon}</span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-xs">{item.name}</span>
                 {item.description && (
@@ -229,20 +239,20 @@ function LinkedResourcePicker({
       {!isOpen ? (
         <button
           onClick={onOpen}
-          className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--border)] px-3 py-2 text-xs text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)]/40 hover:text-[var(--primary)]"
+          className="mari-editor-empty mt-2 flex w-full items-center justify-center gap-1.5 px-3 py-2 text-xs text-[var(--marinara-editor-muted)] transition-colors hover:border-[var(--marinara-editor-border-strong)] hover:text-[var(--marinara-editor-text)]"
         >
           <Plus size="0.75rem" /> {addLabel}
         </button>
       ) : (
-        <div className="mt-2 overflow-hidden rounded-lg bg-[var(--card)] ring-1 ring-[var(--border)]">
-          <div className="flex items-center gap-2 border-b border-[var(--border)] px-3 py-2">
+        <div className="mari-editor-panel mt-2 overflow-hidden">
+          <div className="flex items-center gap-2 border-b border-[var(--marinara-editor-divider)] px-3 py-2">
             <Search size="0.75rem" className="text-[var(--muted-foreground)]" />
             <input
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder={searchPlaceholder}
               autoFocus
-              className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--muted-foreground)]"
+              className="flex-1 bg-transparent text-xs outline-none placeholder:text-[var(--marinara-editor-muted)]"
             />
             <button
               onClick={onClose}
@@ -256,9 +266,9 @@ function LinkedResourcePicker({
               <button
                 key={item.id}
                 onClick={() => onAdd(item.id)}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left transition-all hover:bg-[var(--accent)]"
+                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left transition-all hover:bg-[var(--marinara-editor-control-bg-hover)]"
               >
-                <span className="text-[var(--muted-foreground)]">{icon}</span>
+                <span className="mari-chrome-accent-icon mari-accent-animated">{icon}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-xs">{item.name}</span>
                   {item.description && (
@@ -291,7 +301,7 @@ type TabId = (typeof TABS)[number]["id"];
 const CATEGORY_OPTIONS: Array<{ value: LorebookCategory; label: string; icon: typeof Globe }> = [
   { value: "world", label: "World", icon: Globe },
   { value: "character", label: "Character", icon: Users },
-  { value: "npc", label: "NPC", icon: UserRound },
+  { value: "npc", label: "NPC", icon: Drama },
   { value: "spellbook", label: "Spellbook", icon: Wand2 },
   { value: "uncategorized", label: "Uncategorized", icon: BookOpen },
 ];
@@ -321,6 +331,7 @@ export function LorebookEditor() {
   const updateLorebook = useUpdateLorebook();
   const deleteLorebook = useDeleteLorebook();
   const createEntry = useCreateLorebookEntry();
+  const deleteEntry = useDeleteLorebookEntry();
   const updateEntry = useUpdateLorebookEntry();
   const reorderEntries = useReorderLorebookEntries();
   const createFolder = useCreateLorebookFolder();
@@ -551,12 +562,11 @@ export function LorebookEditor() {
   const filteredEntries = useMemo(() => {
     let result = entries;
     if (entrySearch) {
-      const q = entrySearch.toLowerCase();
       result = result.filter(
         (e) =>
-          e.name.toLowerCase().includes(q) ||
-          e.keys.some((k) => k.toLowerCase().includes(q)) ||
-          e.content.toLowerCase().includes(q),
+          includesTextForMatch(e.name, entrySearch) ||
+          e.keys.some((key) => includesTextForMatch(key, entrySearch)) ||
+          includesTextForMatch(e.content, entrySearch),
       );
     }
     switch (entrySort) {
@@ -727,6 +737,41 @@ export function LorebookEditor() {
       transferTargetLorebooks,
     ],
   );
+
+  const handleDeleteSelectedEntries = useCallback(async () => {
+    if (!lorebookId || selectedEntryIds.size === 0) return;
+    const selectedIds = Array.from(selectedEntryIds);
+    const count = selectedIds.length;
+
+    if (
+      !(await showConfirmDialog({
+        title: "Delete Lorebook Entries",
+        message: `Delete ${count} selected ${count === 1 ? "entry" : "entries"}? This cannot be undone.`,
+        confirmLabel: "Delete",
+        tone: "destructive",
+      }))
+    ) {
+      return;
+    }
+
+    const results = await Promise.allSettled(
+      selectedIds.map((entryId) => deleteEntry.mutateAsync({ lorebookId, entryId })),
+    );
+    const failedIds = selectedIds.filter((_, index) => results[index]?.status === "rejected");
+    const deletedCount = selectedIds.length - failedIds.length;
+
+    if (deletedCount > 0) {
+      toast.success(`Deleted ${deletedCount} ${deletedCount === 1 ? "entry" : "entries"}.`);
+    }
+
+    if (failedIds.length > 0) {
+      setSelectedEntryIds(new Set(failedIds));
+      toast.error(`Failed to delete ${failedIds.length} ${failedIds.length === 1 ? "entry" : "entries"}.`);
+      return;
+    }
+
+    exitEntrySelectionMode();
+  }, [deleteEntry, exitEntrySelectionMode, lorebookId, selectedEntryIds]);
 
   // Toggle the inline drawer for an entry. Single-expand keeps the page
   // tidy; users can collapse the open one and click another to jump.
@@ -1040,6 +1085,193 @@ export function LorebookEditor() {
     ],
   );
 
+  const locateEntryForTouchDrag = useCallback(
+    (entryId: string): { containerId: string | null; index: number } | null => {
+      for (const [containerId, containerEntries] of entriesByContainer) {
+        const index = containerEntries.findIndex((entry) => entry.id === entryId);
+        if (index >= 0) return { containerId, index };
+      }
+      return null;
+    },
+    [entriesByContainer],
+  );
+
+  const commitTouchEntryDrop = useCallback(
+    (entryId: string, x: number, y: number) => {
+      const source = locateEntryForTouchDrag(entryId);
+      resetEntryDragState();
+      if (!lorebookId || !canReorderEntries || !source) return;
+
+      let targetContainer: string | null | undefined;
+      let targetIdx: number | null = null;
+      const entryRow = closestElementFromPoint(x, y, "[data-lorebook-entry-row-id]");
+      const targetEntryId = entryRow?.dataset.lorebookEntryRowId;
+
+      if (targetEntryId) {
+        const target = locateEntryForTouchDrag(targetEntryId);
+        if (!target) return;
+        const rect = entryRow.getBoundingClientRect();
+        targetContainer = target.containerId;
+        targetIdx = y < rect.top + rect.height / 2 ? target.index : target.index + 1;
+      } else {
+        const folderRow = closestElementFromPoint(x, y, "[data-lorebook-folder-row-id]");
+        const folderBody = closestElementFromPoint(x, y, "[data-lorebook-folder-body-id]");
+        const rootEntries = closestElementFromPoint(x, y, "[data-lorebook-entry-root]");
+
+        if (folderRow?.dataset.lorebookFolderRowId) {
+          targetContainer = folderRow.dataset.lorebookFolderRowId;
+          targetIdx = 0;
+        } else if (folderBody?.dataset.lorebookFolderBodyId) {
+          targetContainer = folderBody.dataset.lorebookFolderBodyId;
+          targetIdx = entriesByContainer.get(targetContainer)?.length ?? 0;
+        } else if (rootEntries) {
+          targetContainer = null;
+          targetIdx = entriesByContainer.get(null)?.length ?? 0;
+        }
+      }
+
+      if (targetContainer === undefined || targetIdx === null) return;
+
+      const sourceList = (entriesByContainer.get(source.containerId) ?? []).slice();
+      const moved = sourceList[source.index];
+      if (!moved) return;
+
+      if (source.containerId === targetContainer) {
+        let insertAt = targetIdx;
+        if (source.index < insertAt) insertAt--;
+        if (source.index === insertAt) return;
+        const ids = sourceList.map((entry) => entry.id);
+        ids.splice(source.index, 1);
+        ids.splice(insertAt, 0, moved.id);
+        reorderEntries.mutate({ lorebookId, entryIds: ids, folderId: source.containerId });
+        return;
+      }
+
+      updateEntry.mutate({ lorebookId, entryId: moved.id, folderId: targetContainer });
+    },
+    [
+      canReorderEntries,
+      entriesByContainer,
+      locateEntryForTouchDrag,
+      lorebookId,
+      reorderEntries,
+      resetEntryDragState,
+      updateEntry,
+    ],
+  );
+
+  const cancelTouchEntryDrag = useCallback(
+    (_entryId: string, _wasActive: boolean) => {
+      resetEntryDragState();
+    },
+    [resetEntryDragState],
+  );
+
+  const { startTouchDrag: startEntryTouchDrag } = useTouchFolderDrag({
+    onActivate: (entryId) => {
+      const source = locateEntryForTouchDrag(entryId);
+      if (!source || !canReorderEntries) return;
+      setDraggingEntryIdx(source.index);
+      setEntryDragReadyIdx(source.index);
+      setDragSourceContainer(source.containerId);
+    },
+    onDrop: commitTouchEntryDrop,
+    onCancel: cancelTouchEntryDrag,
+  });
+
+  const handleEntryDragHandleTouchStart = useCallback(
+    (entryId: string, e: ReactTouchEvent<HTMLButtonElement>, sourceElement: HTMLDivElement | null) => {
+      if (!canReorderEntries) return;
+      startEntryTouchDrag(e, entryId, { allowInteractiveTarget: true, sourceElement });
+    },
+    [canReorderEntries, startEntryTouchDrag],
+  );
+
+  const commitTouchFolderDrop = useCallback(
+    (folderId: string, x: number, y: number) => {
+      const sourceIdx = folders.findIndex((folder) => folder.id === folderId);
+      resetFolderDragState();
+      if (!lorebookId || !canReorderFolders || sourceIdx < 0) return;
+      const dragged = folders[sourceIdx];
+      if (!dragged) return;
+
+      const folderRow = closestElementFromPoint(x, y, "[data-lorebook-folder-row-id]");
+      const targetFolderId = folderRow?.dataset.lorebookFolderRowId;
+      if (targetFolderId === dragged.id) return;
+      if (targetFolderId) {
+        const targetIdx = folders.findIndex((folder) => folder.id === targetFolderId);
+        const target = folders[targetIdx];
+        if (!target) return;
+
+        const rect = folderRow.getBoundingClientRect();
+        const offset = rect.height > 0 ? (y - rect.top) / rect.height : 0.5;
+        const canNest = dragged.parentFolderId !== target.id && canReparentFolder(folders, dragged.id, target.id).ok;
+        if (canNest && offset > 0.3 && offset < 0.7) {
+          updateFolder.mutate({ lorebookId, folderId: dragged.id, parentFolderId: target.id });
+          return;
+        }
+
+        let insertAt = y < rect.top + rect.height / 2 ? targetIdx : targetIdx + 1;
+        if (sourceIdx < insertAt) insertAt--;
+        if (sourceIdx === insertAt) return;
+        const ids = folders.map((folder) => folder.id);
+        const [moved] = ids.splice(sourceIdx, 1);
+        if (!moved) return;
+        ids.splice(insertAt, 0, moved);
+        reorderFolders.mutate({ lorebookId, folderIds: ids });
+        return;
+      }
+
+      const folderBody = closestElementFromPoint(x, y, "[data-lorebook-folder-body-id]");
+      const bodyTargetId = folderBody?.dataset.lorebookFolderBodyId;
+      if (bodyTargetId && bodyTargetId !== dragged.id) {
+        if (dragged.parentFolderId === bodyTargetId) {
+          updateFolder.mutate({ lorebookId, folderId: dragged.id, parentFolderId: null });
+          return;
+        }
+        if (canReparentFolder(folders, dragged.id, bodyTargetId).ok) {
+          updateFolder.mutate({ lorebookId, folderId: dragged.id, parentFolderId: bodyTargetId });
+        }
+        return;
+      }
+
+      if (
+        dragged.parentFolderId != null &&
+        (closestElementFromPoint(x, y, "[data-lorebook-folder-root]") ||
+          closestElementFromPoint(x, y, "[data-lorebook-entry-root]"))
+      ) {
+        updateFolder.mutate({ lorebookId, folderId: dragged.id, parentFolderId: null });
+      }
+    },
+    [canReorderFolders, folders, lorebookId, reorderFolders, resetFolderDragState, updateFolder],
+  );
+
+  const cancelTouchFolderDrag = useCallback(
+    (_folderId: string, _wasActive: boolean) => {
+      resetFolderDragState();
+    },
+    [resetFolderDragState],
+  );
+
+  const { startTouchDrag: startFolderTouchDrag } = useTouchFolderDrag({
+    onActivate: (folderId) => {
+      const idx = folders.findIndex((folder) => folder.id === folderId);
+      if (idx < 0 || !canReorderFolders) return;
+      setDraggingFolderIdx(idx);
+      setFolderDragReadyIdx(idx);
+    },
+    onDrop: commitTouchFolderDrop,
+    onCancel: cancelTouchFolderDrag,
+  });
+
+  const handleFolderDragHandleTouchStart = useCallback(
+    (folderId: string, e: ReactTouchEvent<HTMLButtonElement>, sourceElement: HTMLDivElement | null) => {
+      if (!canReorderFolders) return;
+      startFolderTouchDrag(e, folderId, { allowInteractiveTarget: true, sourceElement });
+    },
+    [canReorderFolders, startFolderTouchDrag],
+  );
+
   // The folder list's own padding/gaps are the un-nest drop zone: dropping a
   // nested folder there lifts it back to the top level.
   const handleFolderRootDragOver = useCallback(
@@ -1112,6 +1344,7 @@ export function LorebookEditor() {
       name: "New Entry",
       content: "",
       keys: [],
+      preventRecursion: true,
     });
     if (result && typeof result === "object" && "id" in result) {
       // Auto-expand the new entry's drawer so the user can fill it in.
@@ -1194,7 +1427,9 @@ export function LorebookEditor() {
       draggingFolderIdx !== fIdx;
     return (
       <div key={folder.id} className="space-y-1">
-        {showFolderDropBefore && <div className="mx-2 mb-1 h-0.5 rounded-full bg-amber-400" />}
+        {showFolderDropBefore && (
+          <div className="mari-chrome-accent-progress mari-accent-animated mx-2 mb-1 h-0.5 rounded-full" />
+        )}
         <LorebookFolderRow
           folder={folder}
           lorebookId={lorebookId}
@@ -1210,6 +1445,7 @@ export function LorebookEditor() {
             if (canReorderFolders) setFolderDragReadyIdx(fIdx);
           }}
           onDragHandleMouseUp={() => setFolderDragReadyIdx(null)}
+          onDragHandleTouchStart={(e, sourceElement) => handleFolderDragHandleTouchStart(folder.id, e, sourceElement)}
           onDragStart={(e) => handleFolderDragStart(fIdx, folder.id, e)}
           onDragOver={(e) => {
             e.stopPropagation();
@@ -1228,9 +1464,12 @@ export function LorebookEditor() {
         />
         {!isCollapsed && (
           <div
+            data-lorebook-folder-body-id={folder.id}
             className={cn(
               "ml-2 space-y-1.5 border-l pl-2 transition-colors sm:ml-3 sm:pl-2.5",
-              isEntryDropTarget || isFolderNestTarget ? "border-amber-400 bg-amber-400/5" : "border-[var(--border)]",
+              isEntryDropTarget || isFolderNestTarget
+                ? "border-[var(--marinara-editor-border-strong)] bg-[var(--marinara-editor-control-bg-hover)]"
+                : "border-[var(--border)]",
             )}
             onDragOver={(e) => {
               if (draggingEntryIdx !== null) handleFolderBodyDragOver(folder.id, e);
@@ -1265,7 +1504,9 @@ export function LorebookEditor() {
                 draggingEntryIdx !== eIdx;
               return (
                 <div key={entry.id}>
-                  {showDropBefore && <div className="mx-2 mb-1 h-0.5 rounded-full bg-amber-400" />}
+                  {showDropBefore && (
+                    <div className="mari-chrome-accent-progress mari-accent-animated mx-2 mb-1 h-0.5 rounded-full" />
+                  )}
                   <LorebookEntryRow
                     entry={entry}
                     lorebookId={lorebookId}
@@ -1284,6 +1525,9 @@ export function LorebookEditor() {
                       }
                     }}
                     onDragHandleMouseUp={() => setEntryDragReadyIdx(null)}
+                    onDragHandleTouchStart={(e, sourceElement) =>
+                      handleEntryDragHandleTouchStart(entry.id, e, sourceElement)
+                    }
                     onDragStart={(e) => handleEntryDragStart(folder.id, eIdx, entry.id, e)}
                     onDragOver={(e) => {
                       // A folder dragged over an entry is really being dragged over the
@@ -1306,21 +1550,25 @@ export function LorebookEditor() {
                     onToggleSelected={() => toggleEntrySelection(entry.id)}
                     previewMatch={previewMatches.get(entry.id)}
                   />
-                  {showDropAfter && <div className="mx-2 mt-1 h-0.5 rounded-full bg-amber-400" />}
+                  {showDropAfter && (
+                    <div className="mari-chrome-accent-progress mari-accent-animated mx-2 mt-1 h-0.5 rounded-full" />
+                  )}
                 </div>
               );
             })}
             {childFolders.map((child) => renderFolder(child))}
           </div>
         )}
-        {showFolderDropAfter && <div className="mx-2 mt-1 h-0.5 rounded-full bg-amber-400" />}
+        {showFolderDropAfter && (
+          <div className="mari-chrome-accent-progress mari-accent-animated mx-2 mt-1 h-0.5 rounded-full" />
+        )}
       </div>
     );
   };
 
   // ── Main editor ──
   return (
-    <div className="mari-editor-shell flex flex-1 flex-col overflow-hidden">
+    <div className="mari-editor-shell mari-editor-legacy-bridge flex flex-1 flex-col overflow-hidden">
       <ExportFormatDialog
         open={exportDialogOpen}
         title="Exportar lorebook"
@@ -1335,12 +1583,12 @@ export function LorebookEditor() {
 
       {/* Unsaved warning banner */}
       {showUnsavedWarning && (
-        <div className="flex items-center gap-3 bg-amber-500/10 px-4 py-2.5 text-xs">
-          <AlertTriangle size="0.875rem" className="text-amber-400" />
-          <span className="flex-1 text-amber-200">Você tem alterações não salvas</span>
+        <div className="flex items-center gap-3 bg-[var(--warning)]/10 px-4 py-2.5 text-xs">
+          <AlertTriangle size="0.875rem" className="text-[var(--warning)]" />
+          <span className="flex-1 text-[var(--warning)]">Você tem alterações não salvas</span>
           <button
             onClick={() => setShowUnsavedWarning(false)}
-            className="rounded-lg px-3 py-1 text-[0.6875rem] font-medium text-amber-300 ring-1 ring-amber-400/30 transition-colors hover:bg-amber-400/10"
+            className="mari-editor-action mari-editor-action--compact px-3 py-1 text-[0.6875rem]"
           >
             
             Continuar editando
@@ -1362,7 +1610,7 @@ export function LorebookEditor() {
               setShowUnsavedWarning(false);
               closeDetail();
             }}
-            className="rounded-lg bg-amber-500 px-3 py-1 text-[0.6875rem] font-medium text-white transition-colors hover:bg-amber-600"
+            className="mari-editor-action mari-editor-action--primary mari-editor-action--compact px-3 py-1 text-[0.6875rem]"
           >
             
             Salvar e fechar
@@ -1432,9 +1680,9 @@ export function LorebookEditor() {
         <div className="mari-editor-content @max-5xl:p-4">
           <div className="mari-editor-content-inner mari-editor-content-inner--wide">
             {activeTab === "overview" && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Name */}
-                <div>
+                <div className="mari-editor-panel p-3">
                   <label className="mb-1.5 block text-xs font-medium">Nome</label>
                   <input
                     value={formName}
@@ -1442,12 +1690,12 @@ export function LorebookEditor() {
                       setFormName(e.target.value);
                       markLorebookDirty();
                     }}
-                    className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                    className="mari-editor-field w-full px-3 py-2.5 text-sm"
                   />
                 </div>
 
                 {/* Description */}
-                <div>
+                <div className="mari-editor-panel p-3">
                   <label className="mb-1.5 block text-xs font-medium">Descrição</label>
                   <ExpandableTextarea
                     value={formDescription}
@@ -1461,23 +1709,20 @@ export function LorebookEditor() {
                 </div>
 
                 {/* Tags */}
-                <div>
+                <div className="mari-editor-panel p-3">
                   <label className="mb-1.5 flex items-center gap-1 text-xs font-medium">
                     <Tag size="0.75rem" /> Tags
                   </label>
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     {formTags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="flex items-center gap-1 rounded-lg bg-amber-400/15 px-2 py-1 text-[0.6875rem] font-medium text-amber-400"
-                      >
+                      <span key={tag} className="mari-editor-chip mari-editor-chip--accent px-2 py-1 text-[0.6875rem]">
                         {tag}
                         <button
                           onClick={() => {
                             setFormTags(formTags.filter((t) => t !== tag));
                             markLorebookDirty();
                           }}
-                          className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-amber-400/20"
+                          className="ml-0.5 rounded-full p-0.5 text-[var(--marinara-editor-muted)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
                         >
                           <X size="0.625rem" />
                         </button>
@@ -1495,21 +1740,42 @@ export function LorebookEditor() {
                         }
                       }}
                       placeholder="Adicionar tag…"
-                      className="flex-1 rounded-xl bg-[var(--secondary)] px-3 py-2 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                      className="mari-editor-field flex-1 px-3 py-2 text-xs"
                     />
-                    <button
-                      onClick={handleAddTags}
-                      className="rounded-xl bg-[var(--secondary)] px-3 py-2 text-xs font-medium ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)]"
-                    >
+                    <button onClick={handleAddTags} className="mari-editor-action px-3 py-2">
                       <Plus size="0.75rem" />
                     </button>
                   </div>
                 </div>
 
                 {/* Category */}
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium">Categoria</label>
-                  <div className="flex gap-2">
+                <div className="mari-editor-panel p-3">
+                  <label htmlFor="lorebook-editor-category" className="mb-1.5 block text-xs font-medium">
+                    
+                    Categoria
+                  </label>
+                  <div className="relative md:hidden">
+                    <select
+                      id="lorebook-editor-category"
+                      value={formCategory}
+                      onChange={(event) => {
+                        setFormCategory(event.target.value as LorebookCategory);
+                        markLorebookDirty();
+                      }}
+                      className="mari-editor-field h-10 w-full min-w-0 appearance-none truncate px-3 py-0 pr-9 text-xs"
+                    >
+                      {CATEGORY_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size="0.75rem"
+                      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[var(--marinara-editor-muted)]"
+                    />
+                  </div>
+                  <div className="hidden gap-2 md:flex">
                     {CATEGORY_OPTIONS.map((opt) => {
                       const Icon = opt.icon;
                       return (
@@ -1522,8 +1788,8 @@ export function LorebookEditor() {
                           className={cn(
                             "flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all",
                             formCategory === opt.value
-                              ? "bg-amber-400/15 text-amber-400 ring-1 ring-amber-400/30"
-                              : "bg-[var(--secondary)] text-[var(--muted-foreground)] ring-1 ring-[var(--border)] hover:bg-[var(--accent)]",
+                              ? "mari-chrome-accent-surface mari-accent-animated"
+                              : "mari-editor-action text-[var(--marinara-editor-muted)]",
                           )}
                         >
                           <Icon size="0.8125rem" />
@@ -1535,7 +1801,7 @@ export function LorebookEditor() {
                 </div>
 
                 {!formIsGlobal && (
-                  <div className="rounded-xl bg-[var(--secondary)]/60 p-4 ring-1 ring-[var(--border)]">
+                  <div className="mari-editor-panel p-4">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {/* Character Link */}
                       <LinkedResourcePicker
@@ -1602,7 +1868,7 @@ export function LorebookEditor() {
 
                 {/* Status cards */}
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <div className="flex min-h-[4.75rem] items-center justify-between rounded-xl bg-[var(--secondary)] px-4 py-3 ring-1 ring-[var(--border)]">
+                  <div className="mari-editor-panel flex min-h-[4.75rem] items-center justify-between px-4 py-3">
                     <div>
                       <p className="text-xs font-medium">Ativado</p>
                       <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
@@ -1610,23 +1876,19 @@ export function LorebookEditor() {
                         Quando desligado, as entradas deste lorebook não serão ativadas
                       </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setFormEnabled(!formEnabled);
+                    <SettingsSwitch
+                      ariaLabel={formEnabled ? "Disable lorebook" : "Enable lorebook"}
+                      checked={formEnabled}
+                      onChange={(checked) => {
+                        setFormEnabled(checked);
                         markLorebookDirty();
                       }}
-                      className="transition-colors"
-                    >
-                      {formEnabled ? (
-                        <ToggleRight size="1.75rem" className="text-amber-400" />
-                      ) : (
-                        <ToggleLeft size="1.75rem" className="text-[var(--muted-foreground)]" />
-                      )}
-                    </button>
+                      className="p-0 hover:bg-transparent"
+                    />
                   </div>
 
                   {scopeSummary && (
-                    <div className="flex h-[10.25rem] items-start overflow-hidden rounded-xl bg-[var(--secondary)] px-4 py-3 ring-1 ring-[var(--border)] md:row-span-2">
+                    <div className="mari-editor-panel flex h-[10.25rem] items-start overflow-hidden px-4 py-3 md:row-span-2">
                       <div className="min-w-0 overflow-hidden">
                         <p className="text-xs font-medium mb-1">Vinculado a:</p>
                         {"text" in scopeSummary ? (
@@ -1661,7 +1923,7 @@ export function LorebookEditor() {
                     </div>
                   )}
 
-                  <div className="flex min-h-[4.75rem] items-center justify-between rounded-xl bg-[var(--secondary)] px-4 py-3 ring-1 ring-[var(--border)]">
+                  <div className="mari-editor-panel flex min-h-[4.75rem] items-center justify-between px-4 py-3">
                     <div>
                       <p className="text-xs font-medium">Global</p>
                       <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
@@ -1669,24 +1931,20 @@ export function LorebookEditor() {
                         Ativo em todo chat quando este lorebook está ativado
                       </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setFormIsGlobal(!formIsGlobal);
+                    <SettingsSwitch
+                      ariaLabel={formIsGlobal ? "Disable global lorebook" : "Enable global lorebook"}
+                      checked={formIsGlobal}
+                      onChange={(checked) => {
+                        setFormIsGlobal(checked);
                         markLorebookDirty();
                       }}
-                      className="transition-colors"
-                    >
-                      {formIsGlobal ? (
-                        <ToggleRight size="1.75rem" className="text-amber-400" />
-                      ) : (
-                        <ToggleLeft size="1.75rem" className="text-[var(--muted-foreground)]" />
-                      )}
-                    </button>
+                      className="p-0 hover:bg-transparent"
+                    />
                   </div>
                 </div>
 
                 {/* Scan settings */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                   <div>
                     <label className="mb-1.5 flex items-center gap-1 text-xs font-medium">
                       
@@ -1701,7 +1959,7 @@ export function LorebookEditor() {
                         markLorebookDirty();
                       }}
                       min={0}
-                      className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                      className="mari-editor-field h-10 w-full px-3 py-2.5 text-sm"
                     />
                   </div>
                   <div>
@@ -1718,7 +1976,7 @@ export function LorebookEditor() {
                         markLorebookDirty();
                       }}
                       min={0}
-                      className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                      className="mari-editor-field h-10 w-full px-3 py-2.5 text-sm"
                     />
                   </div>
                   <div>
@@ -1742,68 +2000,68 @@ export function LorebookEditor() {
                       }}
                       min={LIMITS.LOREBOOK_ENTRY_LIMIT_MIN}
                       max={LIMITS.LOREBOOK_ENTRY_LIMIT_MAX}
-                      className="w-full rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                      className="mari-editor-field h-10 w-full px-3 py-2.5 text-sm"
                     />
                   </div>
-                  <div className="flex items-end gap-2">
-                    <div className="flex items-center justify-between rounded-xl bg-[var(--secondary)] px-3 py-2.5 ring-1 ring-[var(--border)]">
-                      <span className="mr-2 text-xs">Recursivo</span>
-                      <button
-                        onClick={() => {
-                          setFormRecursive(!formRecursive);
-                          markLorebookDirty();
-                        }}
-                      >
-                        {formRecursive ? (
-                          <ToggleRight size="1.375rem" className="text-amber-400" />
-                        ) : (
-                          <ToggleLeft size="1.375rem" className="text-[var(--muted-foreground)]" />
-                        )}
-                      </button>
-                    </div>
-                    {formRecursive && (
-                      <div>
-                        <label className="mb-1.5 flex items-center gap-1 text-xs font-medium">
-                          
-                          Profundidade máx{" "}
-                          <HelpTooltip text="Maximum number of recursive passes. Each pass scans activated entry content for additional keyword matches. Higher values find more connections but use more processing." />
-                        </label>
-                        <input
-                          type="number"
-                          value={formMaxRecursionDepth}
-                          onChange={(e) => {
-                            setFormMaxRecursionDepth(Math.max(1, Math.min(10, parseInt(e.target.value) || 3)));
-                            markLorebookDirty();
-                          }}
-                          min={1}
-                          max={10}
-                          className="w-20 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-end">
-                    <div className="flex w-full items-center justify-between rounded-xl bg-[var(--secondary)] px-3 py-2.5 ring-1 ring-[var(--border)]">
+                  <div className="flex min-w-0 flex-col justify-end">
+                    <div className="mari-editor-panel flex h-10 w-full items-center justify-between px-3 py-2.5">
                       <span className="mr-2 inline-flex items-center gap-1 text-xs">
                         
-                        Sem vetor
-                        <HelpTooltip text="Skip semantic embeddings for every entry in this lorebook. Keyword matching still works." />
+                        Recursivo
+                        <HelpTooltip text="When on, activated entry content is scanned for additional keyword matches during extra recursive passes. Use it when lore should chain into related lore." />
                       </span>
-                      <button
-                        onClick={() => {
-                          setFormExcludeFromVectorization(!formExcludeFromVectorization);
+                      <SettingsSwitch
+                        ariaLabel={formRecursive ? "Disable recursive scanning" : "Enable recursive scanning"}
+                        checked={formRecursive}
+                        onChange={(checked) => {
+                          setFormRecursive(checked);
                           markLorebookDirty();
                         }}
-                      >
-                        {formExcludeFromVectorization ? (
-                          <ToggleRight size="1.375rem" className="text-amber-400" />
-                        ) : (
-                          <ToggleLeft size="1.375rem" className="text-[var(--muted-foreground)]" />
-                        )}
-                      </button>
+                        className="p-0 hover:bg-transparent"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex min-w-0 flex-col justify-end">
+                    <div className="mari-editor-panel flex h-10 w-full items-center justify-between px-3 py-2.5">
+                      <span className="mr-2 inline-flex items-center gap-1 text-xs">
+                        Vectors
+                        <HelpTooltip text="When on, entries in this lorebook may use semantic embeddings. When off, keyword matching still works and vectorization skips this lorebook." />
+                      </span>
+                      <SettingsSwitch
+                        ariaLabel={
+                          formExcludeFromVectorization ? "Enable lorebook vectors" : "Disable lorebook vectors"
+                        }
+                        checked={!formExcludeFromVectorization}
+                        onChange={(checked) => {
+                          setFormExcludeFromVectorization(!checked);
+                          markLorebookDirty();
+                        }}
+                        className="p-0 hover:bg-transparent"
+                      />
                     </div>
                   </div>
                 </div>
+
+                {formRecursive && (
+                  <div className="max-w-[12rem]">
+                    <label className="mb-1.5 flex items-center gap-1 text-xs font-medium">
+                      
+                      Profundidade máx{" "}
+                      <HelpTooltip text="Maximum number of recursive passes. Each pass scans activated entry content for additional keyword matches. Higher values find more connections but use more processing." />
+                    </label>
+                    <input
+                      type="number"
+                      value={formMaxRecursionDepth}
+                      onChange={(e) => {
+                        setFormMaxRecursionDepth(Math.max(1, Math.min(10, parseInt(e.target.value) || 3)));
+                        markLorebookDirty();
+                      }}
+                      min={1}
+                      max={10}
+                      className="mari-editor-field h-10 w-full px-3 py-2.5 text-sm"
+                    />
+                  </div>
+                )}
 
                 {/* Vectorize (Embeddings) */}
                 <VectorizeSection
@@ -1820,14 +2078,14 @@ export function LorebookEditor() {
                     Paste sample chat text or a paragraph and the editor
                     highlights which entries would activate. Honors keyword
                     matching rules only — see previewMatches memo for scope. */}
-                <div className="rounded-xl bg-[var(--secondary)]/60 ring-1 ring-[var(--border)]">
+                <div className="mari-editor-panel overflow-hidden">
                   <button
                     type="button"
                     onClick={() => setKeywordPreviewOpen((open) => !open)}
                     className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-xs font-medium transition-colors hover:bg-[var(--accent)]/30"
                     aria-expanded={keywordPreviewOpen}
                   >
-                    <FlaskConical size="0.8125rem" className="shrink-0 text-amber-400" />
+                    <FlaskConical size="0.8125rem" className="mari-chrome-accent-icon mari-accent-animated shrink-0" />
                     <span className="flex-1">Teste de palavra-chave</span>
                     {previewActive && (
                       <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[0.625rem] font-medium text-emerald-300 ring-1 ring-emerald-400/25">
@@ -1843,7 +2101,7 @@ export function LorebookEditor() {
                     />
                   </button>
                   {keywordPreviewOpen && (
-                    <div className="space-y-2 border-t border-[var(--border)] px-3 py-3">
+                    <div className="space-y-2 border-t border-[var(--marinara-editor-divider)] px-3 py-3">
                       <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
                         Paste sample chat text and entries whose keys would trigger get an emerald accent and a
                         &quot;Would activate&quot; chip. Constant entries are flagged separately because they activate
@@ -1856,7 +2114,7 @@ export function LorebookEditor() {
                           onChange={(e) => setKeywordPreviewText(e.target.value)}
                           placeholder="Cole um parágrafo ou mensagens de exemplo aqui…"
                           rows={4}
-                          className="w-full resize-y rounded-xl bg-[var(--background)] px-3 py-2 pr-8 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                          className="mari-editor-field w-full resize-y px-3 py-2 pr-8 text-xs"
                         />
                         {keywordPreviewText && (
                           <button
@@ -1887,7 +2145,7 @@ export function LorebookEditor() {
                     gracefully on narrow viewports. Search keeps a 12rem
                     (~192px) flex-basis so it stays usable; the buttons tile
                     onto the next row instead of being clipped at ~400px. */}
-                <div className="flex flex-wrap items-stretch gap-2">
+                <div className="mari-editor-toolbar flex flex-wrap items-stretch gap-2 p-2">
                   <div className="relative min-w-0 flex-[1_1_12rem]">
                     <Search
                       size="0.8125rem"
@@ -1898,7 +2156,7 @@ export function LorebookEditor() {
                       placeholder="Buscar entradas…"
                       value={entrySearch}
                       onChange={(e) => setEntrySearch(e.target.value)}
-                      className="w-full rounded-xl bg-[var(--secondary)] py-2.5 pl-8 pr-3 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                      className="mari-editor-field w-full py-2.5 pl-8 pr-3 text-xs"
                     />
                   </div>
                   <div className="relative shrink-0">
@@ -1909,7 +2167,7 @@ export function LorebookEditor() {
                     <select
                       value={entrySort}
                       onChange={(e) => setEntrySort(e.target.value as EntrySortKey)}
-                      className="h-full appearance-none rounded-xl bg-[var(--secondary)] py-2.5 pl-8 pr-6 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                      className="mari-editor-field h-full appearance-none py-2.5 pl-8 pr-6 text-xs"
                     >
                       {SORT_OPTIONS.map((opt) => (
                         <option key={opt.value} value={opt.value}>
@@ -1924,10 +2182,9 @@ export function LorebookEditor() {
                       else setEntrySelectionMode(true);
                     }}
                     className={cn(
-                      "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-medium ring-1 transition-colors",
-                      entrySelectionMode
-                        ? "bg-amber-400/15 text-amber-400 ring-amber-400/30"
-                        : "bg-[var(--secondary)] ring-[var(--border)] hover:bg-[var(--accent)]",
+                      "mari-editor-action flex shrink-0 items-center gap-1.5 px-3 py-2.5 text-xs",
+                      entrySelectionMode &&
+                        "border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-highlight-bg)] text-[var(--marinara-chat-chrome-button-text-active)]",
                     )}
                     title="Selecione entradas para copiar ou mover"
                   >
@@ -1937,7 +2194,7 @@ export function LorebookEditor() {
                   </button>
                   <button
                     onClick={handleAddFolder}
-                    className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-xs font-medium ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)]"
+                    className="mari-editor-action flex shrink-0 items-center gap-1.5 px-3 py-2.5 text-xs"
                     title="Crie uma nova pasta para agrupar entradas"
                   >
                     <FolderPlus size="0.8125rem" />
@@ -1955,14 +2212,14 @@ export function LorebookEditor() {
                 </div>
 
                 {entrySelectionMode && (
-                  <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--secondary)]/60 px-3 py-2">
+                  <div className="mari-editor-toolbar flex flex-wrap items-center gap-2 px-3 py-2">
                     <span className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
                       {selectedEntryIds.size}  selecionado(s)
                     </span>
                     <button
                       onClick={() => setSelectedEntryIds(new Set(visibleEntryIds))}
                       disabled={visibleEntryIds.length === 0}
-                      className="rounded-lg px-2.5 py-1 text-[0.625rem] font-medium text-amber-400 transition-colors hover:bg-[var(--accent)] disabled:opacity-40"
+                      className="mari-editor-action mari-editor-action--compact px-2.5 py-1 text-[0.625rem] disabled:opacity-40"
                     >
                       
                       Selecionar tudo
@@ -1979,7 +2236,7 @@ export function LorebookEditor() {
                       value={entryTransferTargetId}
                       onChange={(e) => setEntryTransferTargetId(e.target.value)}
                       disabled={transferTargetLorebooks.length === 0}
-                      className="min-h-8 min-w-[12rem] flex-1 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:opacity-50"
+                      className="mari-editor-field min-h-8 min-w-[12rem] flex-1 px-2.5 py-1.5 text-xs disabled:opacity-50"
                     >
                       {transferTargetLorebooks.length === 0 ? (
                         <option value="">Crie outro lorebook primeiro</option>
@@ -1993,8 +2250,13 @@ export function LorebookEditor() {
                     </select>
                     <button
                       onClick={() => void handleTransferEntries("copy")}
-                      disabled={selectedEntryIds.size === 0 || !entryTransferTargetId || transferEntries.isPending}
-                      className="inline-flex items-center gap-1 rounded-lg bg-amber-500 px-2.5 py-1.5 text-[0.625rem] font-medium text-white transition-all hover:opacity-90 disabled:opacity-40"
+                      disabled={
+                        selectedEntryIds.size === 0 ||
+                        !entryTransferTargetId ||
+                        transferEntries.isPending ||
+                        deleteEntry.isPending
+                      }
+                      className="mari-editor-action mari-editor-action--primary mari-editor-action--compact inline-flex items-center gap-1 px-2.5 py-1.5 text-[0.625rem] disabled:opacity-40"
                     >
                       {transferEntries.isPending ? (
                         <Loader2 size="0.6875rem" className="animate-spin" />
@@ -2006,7 +2268,12 @@ export function LorebookEditor() {
                     </button>
                     <button
                       onClick={() => void handleTransferEntries("move")}
-                      disabled={selectedEntryIds.size === 0 || !entryTransferTargetId || transferEntries.isPending}
+                      disabled={
+                        selectedEntryIds.size === 0 ||
+                        !entryTransferTargetId ||
+                        transferEntries.isPending ||
+                        deleteEntry.isPending
+                      }
                       className="inline-flex items-center gap-1 rounded-lg bg-[var(--destructive)]/12 px-2.5 py-1.5 text-[0.625rem] font-medium text-[var(--destructive)] transition-all hover:bg-[var(--destructive)]/20 disabled:opacity-40"
                     >
                       {transferEntries.isPending ? (
@@ -2016,6 +2283,19 @@ export function LorebookEditor() {
                       )}
                       
                       Mover
+                    </button>
+                    <button
+                      onClick={() => void handleDeleteSelectedEntries()}
+                      disabled={selectedEntryIds.size === 0 || transferEntries.isPending || deleteEntry.isPending}
+                      className="mari-editor-action mari-editor-action--danger mari-editor-action--compact inline-flex items-center gap-1 px-2.5 py-1.5 text-[0.625rem] disabled:opacity-40"
+                    >
+                      {deleteEntry.isPending ? (
+                        <Loader2 size="0.6875rem" className="animate-spin" />
+                      ) : (
+                        <Trash2 size="0.6875rem" />
+                      )}
+                      
+                      Excluir
                     </button>
                     <button
                       onClick={exitEntrySelectionMode}
@@ -2054,7 +2334,7 @@ export function LorebookEditor() {
 
                 {/* Empty state */}
                 {entries.length === 0 && folders.length === 0 && (
-                  <div className="flex flex-col items-center gap-2 py-8 text-center">
+                  <div className="mari-editor-empty flex flex-col items-center gap-2 py-8 text-center">
                     <FileText size="1.5rem" className="text-[var(--muted-foreground)]" />
                     <p className="text-xs text-[var(--muted-foreground)]">Nenhuma entrada ainda — adicione uma para começar</p>
                   </div>
@@ -2072,9 +2352,11 @@ export function LorebookEditor() {
                       // Chrome and made sub-folders impossible to pick up. So the target is
                       // always present and only its highlight changes.
                       <div
+                        data-lorebook-folder-root
                         className={cn(
                           "space-y-1.5 rounded-lg py-1 transition-colors",
-                          folderRootDropActive && "bg-amber-400/5 ring-1 ring-amber-400/40",
+                          folderRootDropActive &&
+                            "bg-[var(--marinara-editor-control-bg-hover)] ring-1 ring-[var(--marinara-editor-border-strong)]",
                         )}
                         onDragOver={(e) => {
                           if (draggingFolderIdx !== null) handleFolderRootDragOver(e);
@@ -2088,49 +2370,47 @@ export function LorebookEditor() {
                       </div>
                     )}
 
-                    {/* Root entries (entries with no folder).
-                        Always rendered when grouping is active so it acts as
-                        a permanent drop target — otherwise a user with all
-                        entries inside folders has no place to drop a folder
-                        entry to bring it back to root. */}
+                    {(draggingFolderIdx !== null || (draggingEntryIdx !== null && dragSourceContainer !== null)) && (
+                      <div
+                        data-lorebook-entry-root
+                        className="rounded-xl border border-dashed border-[var(--marinara-editor-border-strong)] bg-[var(--marinara-editor-control-bg-hover)] px-3 py-2 text-center text-[0.625rem] italic text-[var(--marinara-editor-accent)]"
+                        onDragOver={(e) => {
+                          if (draggingFolderIdx !== null) handleFolderRootDragOver(e);
+                          else handleRootListDragOver(e);
+                        }}
+                        onDrop={(e) => {
+                          if (draggingFolderIdx !== null) commitFolderDrop(e);
+                          else commitEntryDrop(e);
+                        }}
+                      >
+                        {draggingFolderIdx !== null
+                          ? "Drop here to move the folder to the top level"
+                          : "Drop here to move out of the folder"}
+                      </div>
+                    )}
+
+                    {/* Root entries (entries with no folder). The root drop strip above
+                        handles cross-folder moves; this list only handles root-level
+                        entry reordering so it does not swallow the rows below. */}
                     <div
                       ref={entryListRef}
                       className={cn(
                         "space-y-1.5",
-                        // Highlight while an entry from another container, or a nested
-                        // folder being un-nested, is dragged toward this root zone.
-                        ((draggingEntryIdx !== null && dragSourceContainer !== null && dropTargetContainer === null) ||
-                          (draggingFolderIdx !== null && folderRootDropActive)) &&
-                          "rounded-xl ring-1 ring-amber-400/40 bg-amber-400/5 transition-colors",
+                        draggingEntryIdx !== null &&
+                          dragSourceContainer === null &&
+                          dropTargetContainer === null &&
+                          "rounded-xl bg-[var(--marinara-editor-control-bg-hover)] ring-1 ring-[var(--marinara-editor-border-strong)] transition-colors",
                       )}
                       onDragOver={(e) => {
-                        // Dragging a folder down into the root-entries area un-nests it to
-                        // the top level (the root entries already live there).
-                        if (draggingFolderIdx !== null) handleFolderRootDragOver(e);
-                        else handleRootListDragOver(e);
+                        if (draggingEntryIdx !== null && dragSourceContainer === null) handleRootListDragOver(e);
                       }}
                       onDrop={(e) => {
-                        if (draggingFolderIdx !== null) commitFolderDrop(e);
-                        else commitEntryDrop(e);
+                        if (draggingEntryIdx !== null && dragSourceContainer === null) commitEntryDrop(e);
                       }}
                     >
                       {(entriesByContainer.get(null) ?? []).length === 0 && (
-                        <p
-                          className={cn(
-                            "py-3 text-center text-[0.625rem] italic text-[var(--muted-foreground)] transition-opacity",
-                            // Only call out the empty-root zone while the user
-                            // is actively dragging an entry from a folder; in
-                            // the steady state it would just be visual noise.
-                            draggingFolderIdx !== null || (draggingEntryIdx !== null && dragSourceContainer !== null)
-                              ? "opacity-100"
-                              : "opacity-50",
-                          )}
-                        >
-                          {draggingFolderIdx !== null
-                            ? "Drop here to move the folder to the top level"
-                            : draggingEntryIdx !== null && dragSourceContainer !== null
-                              ? "Drop here to move out of the folder"
-                              : "No entries at the root level"}
+                        <p className="py-3 text-center text-[0.625rem] italic text-[var(--muted-foreground)] opacity-50">
+                          No entries at the root level
                         </p>
                       )}
                       {(entriesByContainer.get(null) ?? []).map((entry, idx) => {
@@ -2155,7 +2435,9 @@ export function LorebookEditor() {
                           draggingEntryIdx !== idx;
                         return (
                           <div key={entry.id}>
-                            {showDropBefore && <div className="mx-2 mb-1 h-0.5 rounded-full bg-amber-400" />}
+                            {showDropBefore && (
+                              <div className="mari-chrome-accent-progress mari-accent-animated mx-2 mb-1 h-0.5 rounded-full" />
+                            )}
                             <LorebookEntryRow
                               entry={entry}
                               lorebookId={lorebookId}
@@ -2174,6 +2456,9 @@ export function LorebookEditor() {
                                 }
                               }}
                               onDragHandleMouseUp={() => setEntryDragReadyIdx(null)}
+                              onDragHandleTouchStart={(e, sourceElement) =>
+                                handleEntryDragHandleTouchStart(entry.id, e, sourceElement)
+                              }
                               onDragStart={(e) => handleEntryDragStart(null, idx, entry.id, e)}
                               onDragOver={(e) => {
                                 // Let folder drags fall through to the root list (un-nest).
@@ -2192,7 +2477,9 @@ export function LorebookEditor() {
                               onToggleSelected={() => toggleEntrySelection(entry.id)}
                               previewMatch={previewMatches.get(entry.id)}
                             />
-                            {showDropAfter && <div className="mx-2 mt-1 h-0.5 rounded-full bg-amber-400" />}
+                            {showDropAfter && (
+                              <div className="mari-chrome-accent-progress mari-accent-animated mx-2 mt-1 h-0.5 rounded-full" />
+                            )}
                           </div>
                         );
                       })}
@@ -2233,7 +2520,7 @@ export function LorebookEditor() {
 
                 {/* Search-with-no-matches */}
                 {lorebookId && !showFolderGrouping && filteredEntries.length === 0 && entries.length > 0 && (
-                  <div className="flex flex-col items-center gap-2 py-8 text-center">
+                  <div className="mari-editor-empty flex flex-col items-center gap-2 py-8 text-center">
                     <FileText size="1.5rem" className="text-[var(--muted-foreground)]" />
                     <p className="text-xs text-[var(--muted-foreground)]">Nenhuma entrada corresponde à sua busca</p>
                   </div>
@@ -2285,6 +2572,7 @@ function VectorizeSection({
   );
   const [selectedConnectionId, setSelectedConnectionId] = useState<string>("");
   const [vectorizing, setVectorizing] = useState(false);
+  const [clearingVectors, setClearingVectors] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
   const excludedCount = excludeFromVectorization
     ? entries.length
@@ -2296,6 +2584,9 @@ function VectorizeSection({
   const vectorizedCount = vectorizableEntries.filter(
     (entry) => Array.isArray(entry.embedding) && entry.embedding.length > 0,
   ).length;
+  const storedVectorCount = entries.filter(
+    (entry) => Array.isArray(entry.embedding) && entry.embedding.length > 0,
+  ).length;
   const missingCount = Math.max(0, vectorizableEntryCount - vectorizedCount);
   const allVectorized = vectorizableEntryCount > 0 && missingCount === 0;
 
@@ -2304,6 +2595,40 @@ function VectorizeSection({
       void fetchSidecarStatus();
     }
   }, [fetchSidecarStatus]);
+
+  useEffect(() => {
+    if (selectedConnectionId && !embeddingConnections.some((connection) => connection.id === selectedConnectionId)) {
+      setSelectedConnectionId("");
+      try {
+        window.localStorage.removeItem(LOREBOOK_VECTORIZE_CONNECTION_STORAGE_KEY);
+      } catch {
+        // localStorage is optional; the picker still works for this session.
+      }
+      return;
+    }
+    if (selectedConnectionId || embeddingConnections.length === 0) return;
+    try {
+      const storedConnectionId = window.localStorage.getItem(LOREBOOK_VECTORIZE_CONNECTION_STORAGE_KEY);
+      if (storedConnectionId && embeddingConnections.some((connection) => connection.id === storedConnectionId)) {
+        setSelectedConnectionId(storedConnectionId);
+      }
+    } catch {
+      // localStorage is optional; the picker still works for this session.
+    }
+  }, [embeddingConnections, selectedConnectionId]);
+
+  const handleConnectionChange = (nextConnectionId: string) => {
+    setSelectedConnectionId(nextConnectionId);
+    try {
+      if (nextConnectionId) {
+        window.localStorage.setItem(LOREBOOK_VECTORIZE_CONNECTION_STORAGE_KEY, nextConnectionId);
+      } else {
+        window.localStorage.removeItem(LOREBOOK_VECTORIZE_CONNECTION_STORAGE_KEY);
+      }
+    } catch {
+      // localStorage is optional; keep the in-memory selection.
+    }
+  };
 
   const handleVectorize = async () => {
     if (!selectedConnectionId) return;
@@ -2331,8 +2656,35 @@ function VectorizeSection({
     }
   };
 
+  const handleClearVectors = async () => {
+    if (storedVectorCount === 0 || clearingVectors) return;
+    const confirmed = await showConfirmDialog({
+      title: "Delete Stored Vectors",
+      message: `Delete ${storedVectorCount} stored embedding vector${storedVectorCount === 1 ? "" : "s"} from this lorebook? Keyword matching and entries will remain unchanged.`,
+      confirmLabel: "Delete vectors",
+      cancelLabel: "Cancel",
+      tone: "destructive",
+    });
+    if (!confirmed) return;
+
+    setClearingVectors(true);
+    setResult(null);
+    try {
+      const data = (await api.delete(`/lorebooks/${lorebookId}/vectors`)) as { cleared: number; total?: number };
+      await queryClient.invalidateQueries({ queryKey: lorebookKeys.entries(lorebookId) });
+      setResult({
+        success: true,
+        message: `Deleted ${data.cleared} stored vector${data.cleared === 1 ? "" : "s"}`,
+      });
+    } catch (err) {
+      setResult({ success: false, message: err instanceof Error ? err.message : "Failed to delete vectors" });
+    } finally {
+      setClearingVectors(false);
+    }
+  };
+
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--secondary)]/30 p-4 space-y-3">
+    <div className="mari-editor-panel space-y-3 p-4">
       <div className="flex items-center gap-2">
         <Sparkles size="0.875rem" className="mari-chrome-accent-icon mari-accent-animated" />
         <h4 className="text-xs font-semibold">Semantic Search (Embeddings)</h4>
@@ -2356,8 +2708,7 @@ function VectorizeSection({
       </div>
       {excludeFromVectorization ? (
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-          
-          A busca semântica está desativada pela opção No Vector no nível do lorebook.
+          Semantic search is disabled by the lorebook-level Vectors toggle.
         </p>
       ) : embeddingConnections.length === 0 ? (
         <p className="text-[0.625rem] text-[var(--muted-foreground)]">
@@ -2369,8 +2720,8 @@ function VectorizeSection({
           <div className="flex items-center gap-2">
             <select
               value={selectedConnectionId}
-              onChange={(e) => setSelectedConnectionId(e.target.value)}
-              className="flex-1 rounded-lg bg-[var(--secondary)] px-2.5 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+              onChange={(e) => handleConnectionChange(e.target.value)}
+              className="mari-editor-field flex-1 px-2.5 py-1.5 text-xs"
             >
               <option value="">Sem busca semântica</option>
               {embeddingConnections.map((c) => (
@@ -2393,7 +2744,22 @@ function VectorizeSection({
                     ? `Re-vectorize ${vectorizableEntryCount} entries`
                     : `Vectorize ${missingCount} missing`}
             </button>
+            <button
+              onClick={handleClearVectors}
+              disabled={clearingVectors || vectorizing || storedVectorCount === 0}
+              className="flex items-center gap-1.5 rounded-xl bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 ring-1 ring-red-500/20 transition-all hover:bg-red-500/15 active:scale-[0.98] disabled:opacity-50"
+              title="Delete all stored vectors for this lorebook"
+            >
+              {clearingVectors ? <Loader2 size="0.75rem" className="animate-spin" /> : <Trash2 size="0.75rem" />}
+              Delete vectors
+            </button>
           </div>
+          {storedVectorCount > 0 && (
+            <p className="text-[0.625rem] text-[var(--muted-foreground)]">
+              {storedVectorCount} stored vector{storedVectorCount === 1 ? "" : "s"} can be deleted without changing
+              lorebook text.
+            </p>
+          )}
           {!selectedConnectionId && (
             <p className="text-[0.625rem] text-[var(--muted-foreground)]">
               

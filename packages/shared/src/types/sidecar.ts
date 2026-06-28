@@ -15,6 +15,10 @@ export type SidecarQuantization = "q8_0" | "q4_k_m";
 /** Runtime backend used by the built-in local model. */
 export type SidecarBackend = "llama_cpp" | "mlx";
 
+/** llama.cpp embedding pooling modes accepted by llama-server. */
+export const SIDECAR_EMBEDDING_POOLING_TYPES = ["none", "mean", "cls", "last", "rank"] as const;
+export type SidecarEmbeddingPooling = (typeof SIDECAR_EMBEDDING_POOLING_TYPES)[number];
+
 /** Which runtime target Marinara should prepare for llama.cpp-based local inference. */
 export const SIDECAR_RUNTIME_PREFERENCES = ["auto", "nvidia", "amd", "intel", "vulkan", "cpu", "system"] as const;
 export type SidecarRuntimePreference = (typeof SIDECAR_RUNTIME_PREFERENCES)[number];
@@ -78,6 +82,10 @@ export interface SidecarConfig {
   gpuLayers: number;
   /** Start llama.cpp with Jinja chat templates so OpenAI-compatible native tool calls can work. */
   enableNativeToolCalls: boolean;
+  /** llama.cpp pooling mode for the OpenAI-compatible embeddings endpoint. */
+  embeddingPooling: SidecarEmbeddingPooling;
+  /** llama.cpp physical batch size for embeddings and prompt processing. */
+  embeddingBatchSize: number;
   /** Which runtime target to install for llama.cpp-based local inference. */
   runtimePreference: SidecarRuntimePreference;
 }
@@ -257,6 +265,8 @@ export interface SidecarModelInfo {
   filename: string;
   /** Approximate file size in bytes. */
   sizeBytes: number;
+  /** Exact downloadable file size in bytes, when known. Used for validation only. */
+  downloadSizeBytes?: number;
   /** Approximate RAM needed at runtime. */
   ramBytes: number;
   /** HuggingFace download URL when the preset downloads a local file directly. */
@@ -290,7 +300,9 @@ export const SIDECAR_DEFAULT_CONFIG: SidecarConfig = {
   topP: 0.95,
   topK: 64,
   gpuLayers: -1,
-  enableNativeToolCalls: false,
+  enableNativeToolCalls: true,
+  embeddingPooling: "none",
+  embeddingBatchSize: 512,
   runtimePreference: "auto",
 };
 
@@ -309,6 +321,7 @@ export const SIDECAR_MODELS: SidecarModelInfo[] = [
     label: "Gemma 4 E2B — Q8 (Best Quality)",
     filename: "gemma-4-E2B-it-Q8_0.gguf",
     sizeBytes: 5_400_000_000,
+    downloadSizeBytes: 5_048_350_848,
     ramBytes: 5_800_000_000,
     downloadUrl: "https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q8_0.gguf",
   },
@@ -318,6 +331,7 @@ export const SIDECAR_MODELS: SidecarModelInfo[] = [
     label: "Gemma 4 E2B — Q4_K_M (Smaller, Faster)",
     filename: "gemma-4-E2B-it-Q4_K_M.gguf",
     sizeBytes: 3_200_000_000,
+    downloadSizeBytes: 3_106_736_256,
     ramBytes: 3_600_000_000,
     downloadUrl: "https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_K_M.gguf",
   },

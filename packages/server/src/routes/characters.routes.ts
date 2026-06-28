@@ -315,8 +315,9 @@ export async function charactersRoutes(app: FastifyInstance) {
 
   // ── Characters ──
 
-  app.get("/", async () => {
+  app.get<{ Querystring: { includeBuiltIn?: string } }>("/", async (req) => {
     const characters = await storage.list();
+    if (req.query.includeBuiltIn === "true") return characters;
     return characters.filter((character) => character.id !== PROFESSOR_MARI_ID);
   });
 
@@ -753,8 +754,16 @@ export async function charactersRoutes(app: FastifyInstance) {
         try {
           const avatarBuffer = await readFile(avatarFile);
           const imageInfo = isAllowedImageBuffer(avatarBuffer, extname(filename));
-          pngBuffer = imageInfo?.mimeType === "image/png" ? avatarBuffer : createMinimalPng();
-        } catch {
+          if (imageInfo?.mimeType === "image/png") {
+            pngBuffer = avatarBuffer;
+          } else if (imageInfo) {
+            const sharp = (await import("sharp")).default;
+            pngBuffer = await sharp(avatarBuffer).png().toBuffer();
+          } else {
+            pngBuffer = createMinimalPng();
+          }
+        } catch (err) {
+          logger.warn(err, "Failed to prepare avatar PNG for character card export");
           pngBuffer = createMinimalPng();
         }
       } else {

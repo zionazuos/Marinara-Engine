@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────
 // Chat: Conversation Input — Discord-style
 // ──────────────────────────────────────────────
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo, type FormEvent } from "react";
 import {
   Send,
   Smile,
@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { useChatStore } from "../../stores/chat.store";
 import { useUIStore } from "../../stores/ui.store";
+import { useUnoGameStore } from "../../stores/uno-game.store";
 import { useGenerate } from "../../hooks/use-generate";
 import { useApplyRegex } from "../../hooks/use-apply-regex";
 import { useCreateMessage, useDeleteMessage, useUpdateMessageExtra, useChat, chatKeys } from "../../hooks/use-chats";
@@ -54,7 +55,14 @@ import { SpeechToTextButton } from "../ui/SpeechToTextButton";
 import { SlashCommandFeedback } from "./SlashCommandFeedback";
 import { QuickReplyMenu, type QuickReplyAction } from "./QuickReplyMenu";
 import { getChatInputShellClass } from "./chat-input-styles";
-import { buildGuidedGenerationInstructionMessage, formatTextQuotes, type Message } from "@marinara-engine/shared";
+import {
+  buildGuidedGenerationInstructionMessage,
+  formatTextQuotes,
+  includesTextForMatch,
+  normalizeTextForMatch,
+  startsWithTextForMatch,
+  type Message,
+} from "@marinara-engine/shared";
 
 interface Attachment {
   type: string;
@@ -77,9 +85,140 @@ const TEXT_ATTACHMENT_EXTENSIONS = new Set([
 const PDF_ATTACHMENT_MIME_TYPE = "application/pdf";
 
 const CONVERSATION_HIDDEN_SLASH_COMMANDS = new Set(["impersonate", "impersonate_prompt"]);
+const QUOTE_INPUT_TRIGGER_RE = /["'\u2018\u2019\u201a\u201b\u201c\u201d\u201e\u201f]/;
+
+type ConversationSlashCompletion = {
+  key: string;
+  label: string;
+  description?: string;
+  insertValue: string;
+  cursor: number;
+  kind: "command" | "status" | "character";
+};
+
+const CONVERSATION_STATUS_COMPLETIONS = [
+  { value: "online", description: "Set a character to online" },
+  { value: "idle", description: "Set a character to away" },
+  { value: "dnd", description: "Set a character to busy" },
+  { value: "offline", description: "Set a character to offline" },
+  { value: "clear", description: "Clear a manual status override" },
+] as const;
 
 function isConversationHiddenSlashCommand(command: SlashCommand): boolean {
   return CONVERSATION_HIDDEN_SLASH_COMMANDS.has(command.name);
+}
+
+function shouldFormatQuoteInput(event: FormEvent<HTMLTextAreaElement> | undefined, value: string): boolean {
+  const inputEvent = event?.nativeEvent as InputEvent | undefined;
+  const inputType = typeof inputEvent?.inputType === "string" ? inputEvent.inputType : "";
+  if (inputType.startsWith("delete")) return false;
+  return QUOTE_INPUT_TRIGGER_RE.test(value);
+}
+
+function quoteSlashArgument(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (!/[\s"\\]/u.test(trimmed)) return trimmed;
+  return `"${trimmed.replace(/["\\]/g, "\\$&")}"`;
+}
+
+function buildSlashCommandPrefill(
+  command: SlashCommand,
+  characters?: Array<{ id: string; name: string }>,
+): { value: string; cursor: number } {
+  if (command.name === "status") {
+    const firstCharacter = characters?.[0]?.name;
+    const value = firstCharacter ? `/status online ${quoteSlashArgument(firstCharacter)}` : "/status online ";
+    const cursor = value.length;
+    return { value, cursor };
+  }
+
+  const value = `/${command.name} `;
+  return { value, cursor: value.length };
+}
+
+function stripLeadingQuote(value: string): string {
+  if (value.startsWith('"') || value.startsWith("'") || value.startsWith("\u201c") || value.startsWith("\u2018")) {
+    return value.slice(1);
+  }
+  return value;
+}
+
+function buildConversationSlashCompletions(
+  input: string,
+  characters: Array<{ id: string; name: string }> | undefined,
+): ConversationSlashCompletion[] {
+  if (!input.startsWith("/")) return [];
+
+  const lowerInput = normalizeTextForMatch(input);
+  if (lowerInput.startsWith("/status")) {
+    const rest = input.slice("/status".length);
+    if (rest.length === 0 || /^\s+$/.test(rest)) {
+      return CONVERSATION_STATUS_COMPLETIONS.map((status) => ({
+        key: `status:${status.value}`,
+        label: status.value,
+        description: status.description,
+        insertValue: `/status ${status.value} `,
+        cursor: `/status ${status.value} `.length,
+        kind: "status",
+      }));
+    }
+
+    if (!/^\s/.test(rest)) return [];
+
+    const trimmedRest = rest.trimStart();
+    const firstSpace = trimmedRest.indexOf(" ");
+    const action = normalizeTextForMatch(firstSpace === -1 ? trimmedRest : trimmedRest.slice(0, firstSpace));
+
+    if (firstSpace === -1) {
+      return CONVERSATION_STATUS_COMPLETIONS.filter((status) => status.value.startsWith(action)).map((status) => ({
+        key: `status:${status.value}`,
+        label: status.value,
+        description: status.description,
+        insertValue: `/status ${status.value} `,
+        cursor: `/status ${status.value} `.length,
+        kind: "status",
+      }));
+    }
+
+    if (!CONVERSATION_STATUS_COMPLETIONS.some((status) => status.value === action)) return [];
+
+    const rawNameQuery = trimmedRest.slice(firstSpace + 1);
+    const nameQuery = normalizeTextForMatch(stripLeadingQuote(rawNameQuery));
+    return (characters ?? [])
+      .filter((character) => {
+        if (!nameQuery) return true;
+        return startsWithTextForMatch(character.name, nameQuery) || includesTextForMatch(character.name, nameQuery);
+      })
+      .map((character) => {
+        const insertValue = `/status ${action} ${quoteSlashArgument(character.name)}`;
+        return {
+          key: `character:${action}:${character.id}`,
+          label: character.name,
+          description: `Set ${character.name} to ${action}`,
+          insertValue,
+          cursor: insertValue.length,
+          kind: "character" as const,
+        };
+      });
+  }
+
+  return getSlashCompletions(input)
+    .filter((command) => !isConversationHiddenSlashCommand(command))
+    .map((command) => {
+      const { value, cursor } = buildSlashCommandPrefill(command, characters);
+      return {
+        key: `command:${command.name}`,
+        label: `/${command.name}`,
+        description:
+          command.name === "status"
+            ? `${command.description}. Use online, idle, dnd, offline, or clear, then a character name.`
+            : command.description,
+        insertValue: value,
+        cursor,
+        kind: "command" as const,
+      };
+    });
 }
 
 function getFileExtension(fileName: string): string {
@@ -146,7 +285,7 @@ export function ConversationInput({
   onPeekPrompt,
 }: ConversationInputProps) {
   const [hasInput, setHasInput] = useState(false);
-  const [completions, setCompletions] = useState<SlashCommand[]>([]);
+  const [completions, setCompletions] = useState<ConversationSlashCompletion[]>([]);
   const [selectedCompletion, setSelectedCompletion] = useState(0);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -181,6 +320,8 @@ export function ConversationInput({
   const inputBarRef = useRef<HTMLDivElement>(null);
   const attachmentsRef = useRef<Attachment[]>([]);
   const pendingAttachmentDraftsRef = useRef<Map<string, Attachment[]>>(new Map());
+  const currentInputFrameRef = useRef<number | null>(null);
+  const pendingCurrentInputRef = useRef("");
   const activeChatId = useChatStore((s) => s.activeChatId);
   const { data: activeChat } = useChat(activeChatId);
   const chatName = activeChat?.name;
@@ -243,10 +384,20 @@ export function ConversationInput({
     });
   }, [activeChatId, qc]);
   const messagesData = qc.getQueryData<InfiniteData<Message[]>>(chatKeys.messages(activeChatId ?? ""));
-  const lastMessageRole = useMemo(() => {
+  const lastMessage = useMemo(() => {
     const firstPage = messagesData?.pages?.[0];
-    return firstPage?.[firstPage.length - 1]?.role ?? null;
+    return firstPage?.[firstPage.length - 1] ?? null;
   }, [messagesData]);
+  const latestAssistantMessage = useMemo(() => {
+    for (const page of messagesData?.pages ?? []) {
+      for (let i = page.length - 1; i >= 0; i--) {
+        const message = page[i];
+        if (message?.role === "assistant") return message;
+      }
+    }
+    return null;
+  }, [messagesData]);
+  const lastMessageRole = lastMessage?.role ?? null;
   const canRetry = !isStreaming && groupResponseOrder !== "manual" && lastMessageRole === "user";
   const canSubmit = hasInput || attachments.length > 0 || canRetry;
   const showRetrySendState = canRetry && !hasInput && attachments.length === 0;
@@ -254,8 +405,29 @@ export function ConversationInput({
 
   const syncInputState = useCallback(
     (value: string) => {
-      setHasInput(value.trim().length > 0);
-      setCurrentInput(value);
+      const nextHasInput = value.trim().length > 0;
+      setHasInput((current) => (current === nextHasInput ? current : nextHasInput));
+      pendingCurrentInputRef.current = value;
+      if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
+        setCurrentInput(value);
+        return;
+      }
+      if (currentInputFrameRef.current !== null) return;
+      currentInputFrameRef.current = window.requestAnimationFrame(() => {
+        currentInputFrameRef.current = null;
+        setCurrentInput(pendingCurrentInputRef.current);
+      });
+    },
+    [setCurrentInput],
+  );
+
+  useEffect(
+    () => () => {
+      if (currentInputFrameRef.current !== null) {
+        window.cancelAnimationFrame(currentInputFrameRef.current);
+        currentInputFrameRef.current = null;
+        setCurrentInput(pendingCurrentInputRef.current);
+      }
     },
     [setCurrentInput],
   );
@@ -506,8 +678,8 @@ export function ConversationInput({
       for (const name of sorted) {
         // Match @Name (case-insensitive) — name may contain spaces
         const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const re = new RegExp(`@${escaped}\\b`, "gi");
-        if (re.test(text) && !mentioned.some((m) => m.toLowerCase() === name.toLowerCase())) {
+        const re = new RegExp(`@${escaped}(?=$|[\\s\\p{P}\\p{S}])`, "giu");
+        if (re.test(text) && !mentioned.some((m) => normalizeTextForMatch(m) === normalizeTextForMatch(name))) {
           mentioned.push(name);
         }
       }
@@ -651,6 +823,9 @@ export function ConversationInput({
         createMessage: (data) => createMessage.mutate(data),
         invalidate: () => qc.invalidateQueries({ queryKey: chatKeys.all }),
         characterNames: activeCharacterNames,
+        characters: activeChatCharacters?.map((character) => ({ id: character.id, name: character.name })),
+        latestAssistantMessageId: latestAssistantMessage?.id ?? null,
+        lastMessageRole,
       };
       const submittedDraft = textareaRef.current?.value ?? "";
       const submittedHeight = textareaRef.current?.style.height ?? "auto";
@@ -699,6 +874,16 @@ export function ConversationInput({
         toast.error(msg);
       }
       return;
+    }
+
+    // Natural-language launcher: "let's play uno" opens the game setup. The message
+    // still sends normally, so the characters can react to the suggestion too.
+    {
+      const activeUno = useUnoGameStore.getState().current;
+      const unoActive = !!activeUno && activeUno.chatId === activeChatId && activeUno.status !== "finished";
+      if (!unoActive && /\b(?:play|start)\b[^.!?\n]{0,16}\buno\b/i.test(raw)) {
+        useUnoGameStore.getState().openSetup(activeChatId);
+      }
     }
 
     const activeChat = useChatStore.getState().activeChat;
@@ -763,6 +948,8 @@ export function ConversationInput({
     });
   }, [
     activeChatId,
+    activeChatCharacters,
+    lastMessageRole,
     attachments,
     canRetry,
     isReadingAttachments,
@@ -777,6 +964,7 @@ export function ConversationInput({
     completions,
     _mentionQuery,
     mentionCompletions,
+    latestAssistantMessage,
     groupResponseOrder,
     qc,
     syncInputState,
@@ -808,6 +996,9 @@ export function ConversationInput({
         createMessage: (data) => createMessage.mutate(data),
         invalidate: () => qc.invalidateQueries({ queryKey: chatKeys.all }),
         characterNames: activeCharacterNames,
+        characters: activeChatCharacters?.map((character) => ({ id: character.id, name: character.name })),
+        latestAssistantMessageId: latestAssistantMessage?.id ?? null,
+        lastMessageRole,
       };
 
       const previousDraft = textareaRef.current?.value ?? "";
@@ -861,13 +1052,16 @@ export function ConversationInput({
     },
     [
       activeChatId,
+      activeChatCharacters,
       activeCharacterNames,
+      lastMessageRole,
       clearInputDraft,
       completions,
       _mentionQuery,
       mentionCompletions,
       createMessage,
       generate,
+      latestAssistantMessage,
       qc,
       setInputDraft,
       syncInputState,
@@ -1137,11 +1331,12 @@ export function ConversationInput({
         }
         if (e.key === "Tab" || e.key === "Enter") {
           e.preventDefault();
-          const cmd = completions[selectedCompletion];
-          if (cmd && textareaRef.current) {
-            textareaRef.current.value = `/${cmd.name} `;
-            syncInputState(textareaRef.current.value);
-            if (activeChatId) setInputDraft(activeChatId, textareaRef.current.value);
+          const completion = completions[selectedCompletion];
+          if (completion && textareaRef.current) {
+            textareaRef.current.value = completion.insertValue;
+            textareaRef.current.setSelectionRange(completion.cursor, completion.cursor);
+            syncInputState(completion.insertValue);
+            if (activeChatId) setInputDraft(activeChatId, completion.insertValue);
             setCompletions([]);
           }
           return;
@@ -1175,10 +1370,10 @@ export function ConversationInput({
     ],
   );
 
-  const handleInput = useCallback(() => {
+  const handleInput = useCallback((event: FormEvent<HTMLTextAreaElement>) => {
     const el = textareaRef.current;
     if (!el) return;
-    const formatted = applyTextareaQuoteFormat(el, quoteFormat);
+    const formatted = shouldFormatQuoteInput(event, el.value) ? applyTextareaQuoteFormat(el, quoteFormat) : el.value;
     // Debounced resize to reduce layout reflows during fast typing
     if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
     resizeTimerRef.current = setTimeout(() => {
@@ -1203,34 +1398,35 @@ export function ConversationInput({
 
     // Slash completions
     if (formatted.startsWith("/")) {
-      const results = getSlashCompletions(formatted).filter((command) => !isConversationHiddenSlashCommand(command));
+      const results = buildConversationSlashCompletions(formatted, activeChatCharacters);
       setCompletions(results);
       setSelectedCompletion(0);
     } else {
-      setCompletions([]);
+      setCompletions((current) => (current.length > 0 ? [] : current));
     }
 
     // @mention detection — look backwards from cursor for an @ trigger
     const cursor = el.selectionStart;
     const textBefore = formatted.slice(0, cursor);
     // Find the last @ that isn't preceded by a word character
-    const atMatch = textBefore.match(/(?:^|[^a-zA-Z0-9])@([a-zA-Z0-9 ]*)$/);
+    const atMatch = textBefore.match(/(^|[^\p{L}\p{N}_])@([^\n@]*)$/u);
     if (atMatch && activeCharacterNames.length > 0) {
-      const query = atMatch[1]!.toLowerCase();
-      const startPos = cursor - atMatch[1]!.length - 1; // position of the @
-      const matches = activeCharacterNames.filter((n) => n.toLowerCase().startsWith(query));
+      const queryText = atMatch[2] ?? "";
+      const query = normalizeTextForMatch(queryText);
+      const startPos = (atMatch.index ?? textBefore.length - atMatch[0].length) + (atMatch[1]?.length ?? 0);
+      const matches = activeCharacterNames.filter((name) => startsWithTextForMatch(name, query));
       if (matches.length > 0) {
         setMentionQuery(query);
         setMentionCompletions(matches);
         setSelectedMention(0);
         setMentionStartPos(startPos);
       } else {
-        setMentionQuery(null);
-        setMentionCompletions([]);
+        setMentionQuery((current) => (current === null ? current : null));
+        setMentionCompletions((current) => (current.length > 0 ? [] : current));
       }
     } else {
-      setMentionQuery(null);
-      setMentionCompletions([]);
+      setMentionQuery((current) => (current === null ? current : null));
+      setMentionCompletions((current) => (current.length > 0 ? [] : current));
     }
 
     // :emoji: detection — a `:partial` at a word boundary, just before the cursor
@@ -1246,12 +1442,21 @@ export function ConversationInput({
         setSelectedEmojiCompletion(0);
         setEmojiStartPos(cursor - eq.length - 1);
       } else {
-        setEmojiCompletions([]);
+        setEmojiCompletions((current) => (current.length > 0 ? [] : current));
       }
     } else {
-      setEmojiCompletions([]);
+      setEmojiCompletions((current) => (current.length > 0 ? [] : current));
     }
-  }, [activeChatId, activeCharacterNames, customEmojiList, clearInputDraft, quoteFormat, setInputDraft, syncInputState]);
+  }, [
+    activeChatId,
+    activeCharacterNames,
+    activeChatCharacters,
+    customEmojiList,
+    clearInputDraft,
+    quoteFormat,
+    setInputDraft,
+    syncInputState,
+  ]);
 
   useEffect(() => {
     if (hasInput && feedback) setFeedback(null);
@@ -1503,13 +1708,14 @@ export function ConversationInput({
         <div className="absolute bottom-full left-3 right-3 z-40 mb-1 max-h-[min(18rem,45dvh)] overflow-y-auto rounded-lg border border-foreground/10 bg-[var(--card)] shadow-lg [-webkit-overflow-scrolling:touch]">
           {completions.map((cmd, i) => (
             <button
-              key={cmd.name}
+              key={cmd.key}
               onMouseDown={(e) => {
                 e.preventDefault();
                 if (textareaRef.current) {
-                  textareaRef.current.value = `/${cmd.name} `;
-                  syncInputState(textareaRef.current.value);
-                  if (activeChatId) setInputDraft(activeChatId, textareaRef.current.value);
+                  textareaRef.current.value = cmd.insertValue;
+                  textareaRef.current.setSelectionRange(cmd.cursor, cmd.cursor);
+                  syncInputState(cmd.insertValue);
+                  if (activeChatId) setInputDraft(activeChatId, cmd.insertValue);
                   setCompletions([]);
                   textareaRef.current.focus();
                 }
@@ -1519,7 +1725,14 @@ export function ConversationInput({
                 i === selectedCompletion ? "bg-foreground/10 text-foreground" : "hover:bg-foreground/10",
               )}
             >
-              <span className="shrink-0 whitespace-nowrap font-mono text-xs">/{cmd.name}</span>
+              <span
+                className={cn(
+                  "shrink-0 whitespace-nowrap text-xs",
+                  cmd.kind === "character" ? "font-medium" : "font-mono",
+                )}
+              >
+                {cmd.label}
+              </span>
               {cmd.description && (
                 <span className="min-w-0 flex-1 text-[0.6875rem] leading-snug text-foreground/45 [overflow-wrap:anywhere]">
                   {cmd.description}
@@ -1613,12 +1826,7 @@ export function ConversationInput({
               <GifPicker embedded open onClose={() => setMobilePickerOpen(false)} onSelect={handleGifSelect} />
             )}
             {mobilePickerTab === "stickers" && (
-              <StickerPicker
-                embedded
-                open
-                onClose={() => setMobilePickerOpen(false)}
-                onSelect={handleStickerSelect}
-              />
+              <StickerPicker embedded open onClose={() => setMobilePickerOpen(false)} onSelect={handleStickerSelect} />
             )}
           </div>
         </div>
@@ -1905,7 +2113,11 @@ export function ConversationInput({
           )}
 
           <button
-            onClick={isActuallyGenerating ? () => useChatStore.getState().stopGeneration() : handleSend}
+            onClick={
+              isActuallyGenerating
+                ? () => useChatStore.getState().stopGeneration(activeChatId ?? undefined)
+                : handleSend
+            }
             disabled={!isActuallyGenerating && (isReadingAttachments || !activeChatId || !canSubmit)}
             aria-label={sendButtonTitle}
             className={cn(

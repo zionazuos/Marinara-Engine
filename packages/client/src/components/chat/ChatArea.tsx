@@ -13,7 +13,7 @@ import {
   type CSSProperties,
   type MouseEvent as ReactMouseEvent,
 } from "react";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { useQueries, useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import {
   useChatMessages,
   useChatMessageCount,
@@ -25,15 +25,18 @@ import {
   useUpdateMessageExtra,
   usePeekPrompt,
   useSetActiveSwipe,
+  useTouchChat,
   useUpdateChatMetadata,
   useBranchChat,
   useChats,
+  chatKeys,
 } from "../../hooks/use-chats";
 
 import { useChatStore } from "../../stores/chat.store";
 import { useGenerate } from "../../hooks/use-generate";
 import { characterKeys, spriteKeys, useCharacters, usePersonas, type SpriteInfo } from "../../hooks/use-characters";
 import { usePageActivity } from "../../hooks/use-page-activity";
+import { usePresenceClock } from "../../hooks/use-presence-clock";
 import { api, ApiError } from "../../lib/api-client";
 import { getChatDisplayName, getConnectedChatDisplayName, parseChatMetadata } from "../../lib/chat-display";
 import { getChatCharacterIds } from "../../lib/chat-macros";
@@ -48,11 +51,13 @@ import { Check, HelpCircle, List, X } from "lucide-react";
 import {
   APP_VERSION,
   BUILT_IN_AGENTS,
+  PROFESSOR_MARI_ID,
   buildGuidedGenerationInstructionMessage,
   type AchievementEvent,
   type SpritePlacement,
   type SpriteSide,
 } from "@marinara-engine/shared";
+import { resolveLiveConversationStatus } from "../../lib/conversation-presence-status";
 import { useUIStore } from "../../stores/ui.store";
 import { useAgentStore } from "../../stores/agent.store";
 import { cn, parseAvatarCropJson } from "../../lib/utils";
@@ -66,7 +71,14 @@ import { useTTSConfig } from "../../hooks/use-tts";
 import { achievementKeys, trackAchievementEvent } from "../../hooks/use-achievements";
 import { buildTTSVoiceRequests, normalizeTTSCharacterName, withTTSVoiceRequestCacheKeys } from "../../lib/tts-dialogue";
 import { CHAT_SCROLL_TO_BOTTOM_EVENT, type ChatScrollToBottomDetail } from "../../lib/chat-scroll-events";
+import { CHAT_FLOATING_UI_DISMISS_EVENT } from "../../lib/chat-floating-ui-events";
+import { CHAT_TOOLBAR_ACTION_EVENT, readChatToolbarFloatingPanelAnchor } from "./ChatToolbarControls";
 import { mirrorSpritePlacements, normalizeSpritePlacements } from "./sprite-placement";
+import {
+  loadLocalSpriteVisualSettings,
+  saveLocalSpriteVisualSettings,
+  type LocalSpriteVisualSettings,
+} from "./local-sprite-visual-settings";
 import {
   SPRITE_DISPLAY_OPACITY_MAX,
   SPRITE_DISPLAY_OPACITY_MIN,
@@ -86,7 +98,7 @@ import { HomeCreditsModal } from "./HomeCreditsModal";
 import { HomeProfessorMariChat } from "./HomeProfessorMariChat";
 import { HomeAchievements } from "./HomeAchievements";
 import { NewChatConnectionGate } from "./NewChatConnectionGate";
-import { ChatCommonOverlays } from "./ChatCommonOverlays";
+import { ChatCommonOverlays, preloadChatSettingsDrawer, type ChatSettingsInitialSection } from "./ChatCommonOverlays";
 import { CreatorNotesCssInjector, type CardCssMode } from "./CreatorNotesCssInjector";
 import type { ChatModeFilter } from "../../lib/card-css";
 
@@ -96,6 +108,73 @@ const BUILT_IN_AGENT_ID_SET = new Set(BUILT_IN_AGENTS.map((agent) => agent.id));
 const BUILT_IN_TRACKER_AGENT_ID_SET = new Set(
   BUILT_IN_AGENTS.filter((agent) => agent.category === "tracker" && !agent.libraryHidden).map((agent) => agent.id),
 );
+
+function compareMessagesByCursor(left: MessageWithSwipes, right: MessageWithSwipes): number {
+  const createdAtCompare = left.createdAt.localeCompare(right.createdAt);
+  if (createdAtCompare !== 0) return createdAtCompare;
+  const leftRowid = typeof left.rowid === "number" ? left.rowid : 0;
+  const rightRowid = typeof right.rowid === "number" ? right.rowid : 0;
+  if (leftRowid !== rightRowid) return leftRowid - rightRowid;
+  return left.id.localeCompare(right.id);
+}
+
+function getPageNewestMessage(page: MessageWithSwipes[]): MessageWithSwipes | null {
+  return page[page.length - 1] ?? null;
+}
+
+function getNewestLoadedMessagePageIndex(pages: MessageWithSwipes[][] | undefined): number {
+  if (!pages?.length) return -1;
+  let newestIndex = 0;
+  for (let index = 1; index < pages.length; index += 1) {
+    const newest = getPageNewestMessage(pages[newestIndex] ?? []);
+    const candidate = getPageNewestMessage(pages[index] ?? []);
+    if (!newest || (candidate && compareMessagesByCursor(candidate, newest) > 0)) {
+      newestIndex = index;
+    }
+  }
+  return newestIndex;
+}
+
+function sortLoadedMessagePagesChronologically(pages: MessageWithSwipes[][]): MessageWithSwipes[][] {
+  return [...pages].sort((left, right) => {
+    const leftNewest = getPageNewestMessage(left);
+    const rightNewest = getPageNewestMessage(right);
+    if (!leftNewest && !rightNewest) return 0;
+    if (!leftNewest) return -1;
+    if (!rightNewest) return 1;
+    return compareMessagesByCursor(leftNewest, rightNewest);
+  });
+}
+
+function flattenLoadedMessagePages(
+  pages: MessageWithSwipes[][] | undefined,
+  pageSize: number,
+): MessageWithSwipes[] | undefined {
+  if (!pages) return undefined;
+  const newestPageIndex = getNewestLoadedMessagePageIndex(pages);
+  const newestPage = newestPageIndex >= 0 ? pages[newestPageIndex] : undefined;
+  if (pageSize > 0 && pages.length === 1 && newestPage && newestPage.length > pageSize) {
+    return newestPage.slice(-pageSize);
+  }
+  return sortLoadedMessagePagesChronologically(pages).flat();
+}
+
+function getNewestLoadedMessagePageLength(pages: MessageWithSwipes[][] | undefined): number {
+  const newestPageIndex = getNewestLoadedMessagePageIndex(pages);
+  return newestPageIndex >= 0 ? (pages?.[newestPageIndex]?.length ?? 0) : 0;
+}
+
+function trimNewestLoadedMessagePage(
+  data: InfiniteData<MessageWithSwipes[]> | undefined,
+  pageSize: number,
+): InfiniteData<MessageWithSwipes[]> | undefined {
+  const newestPageIndex = getNewestLoadedMessagePageIndex(data?.pages);
+  const newestPage = newestPageIndex >= 0 ? data?.pages[newestPageIndex] : undefined;
+  if (!data || !newestPage || newestPage.length <= pageSize) return data;
+  const pages = [...data.pages];
+  pages[newestPageIndex] = newestPage.slice(-pageSize);
+  return { ...data, pages };
+}
 
 const normalizeSpriteDisplayValue = (value: unknown, fallback: number, min: number, max: number): number => {
   const numeric = typeof value === "number" ? value : Number(value);
@@ -137,6 +216,10 @@ function getPersonaSnapshotName(extra: Record<string, unknown>): string | null {
 function resolveExpressionAvatarSpriteUrl(sprites: SpriteInfo[] | undefined, expression: string): string | null {
   const expressionSprites = (sprites ?? []).filter((sprite) => !sprite.expression.toLowerCase().startsWith("full_"));
   return resolveSpriteExpression(expressionSprites, expression)?.url ?? null;
+}
+
+function suppressBuiltInProfessorMariForMode(mode: string | undefined): boolean {
+  return mode === "game" || mode === "roleplay" || mode === "visual_novel";
 }
 
 const INTUITIVE_SWIPE_MIN_DISTANCE = 56;
@@ -217,6 +300,7 @@ const GameSurface = lazy(async () => {
 });
 
 type FloatingPanelAnchor = { right: number; top: number } | null;
+type OpenSettingsOptions = { initialSection?: ChatSettingsInitialSection };
 
 type HomeGlistenStar = {
   id: number;
@@ -240,7 +324,7 @@ function HomeStarfield() {
         id: nextStarIdRef.current,
         x: 5 + Math.random() * 90,
         y: 6 + Math.random() * 86,
-        size: 3 + Math.random() * 3.5,
+        size: 2 + Math.random() * 5.5,
         duration,
       };
       nextStarIdRef.current += 1;
@@ -311,6 +395,7 @@ export function ChatArea() {
   // skip the entry animation to avoid a visible flash on refetch.
   const hasAnimatedRef = useRef(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsInitialSection, setSettingsInitialSection] = useState<ChatSettingsInitialSection>(null);
   const [filesOpen, setFilesOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [settingsAnchor, setSettingsAnchor] = useState<FloatingPanelAnchor>(null);
@@ -320,7 +405,20 @@ export function ChatArea() {
   const [agentInjectionReview, setAgentInjectionReview] = useState<AgentInjectionReviewRequest | null>(null);
   const [agentInjectionDrafts, setAgentInjectionDrafts] = useState<Record<string, string>>({});
   const [creditsOpen, setCreditsOpen] = useState(false);
+  const [homeProfessorChatOpen, setHomeProfessorChatOpen] = useState(false);
+  const [homeProfessorChatActive, setHomeProfessorChatActive] = useState(false);
+  const homeProfessorChatOpenRef = useRef(false);
   const queryClient = useQueryClient();
+  useEffect(() => {
+    homeProfessorChatOpenRef.current = homeProfessorChatOpen;
+  }, [homeProfessorChatOpen]);
+  const handleHomeProfessorChatOpenChange = useCallback((open: boolean) => {
+    if (open) setHomeProfessorChatActive(true);
+    setHomeProfessorChatOpen(open);
+  }, []);
+  const handleHomeProfessorChatExitComplete = useCallback(() => {
+    if (!homeProfessorChatOpenRef.current) setHomeProfessorChatActive(false);
+  }, []);
   const trackHomeFooterAchievement = useCallback(
     (event: AchievementEvent) => {
       void trackAchievementEvent(event, { keepalive: true })
@@ -345,22 +443,24 @@ export function ChatArea() {
     [activeChatId, allChats],
   );
   const readFloatingPanelAnchor = useCallback((event?: ReactMouseEvent<HTMLElement>): FloatingPanelAnchor => {
-    if (!event || typeof window === "undefined" || window.innerWidth < 768) return null;
-    const rect = event.currentTarget.getBoundingClientRect();
-    return {
-      right: Math.max(12, Math.round(window.innerWidth - rect.right)),
-      top: Math.max(56, Math.round(rect.bottom + 8)),
-    };
+    return readChatToolbarFloatingPanelAnchor(event?.currentTarget ?? null);
   }, []);
   const handleOpenSettingsPanel = useCallback(
-    (event?: ReactMouseEvent<HTMLElement>) => {
+    (event?: ReactMouseEvent<HTMLElement>, options?: OpenSettingsOptions) => {
+      void preloadChatSettingsDrawer();
+      setGalleryOpen(false);
+      setGalleryAnchor(null);
       setSettingsAnchor(readFloatingPanelAnchor(event));
+      setSettingsInitialSection(options?.initialSection ?? null);
       setSettingsOpen(true);
     },
     [readFloatingPanelAnchor],
   );
   const handleOpenGalleryPanel = useCallback(
     (event?: ReactMouseEvent<HTMLElement>) => {
+      setSettingsOpen(false);
+      setSettingsAnchor(null);
+      setSettingsInitialSection(null);
       setGalleryAnchor(readFloatingPanelAnchor(event));
       setGalleryOpen(true);
     },
@@ -369,36 +469,67 @@ export function ChatArea() {
   const handleCloseSettingsPanel = useCallback(() => {
     setSettingsOpen(false);
     setSettingsAnchor(null);
+    setSettingsInitialSection(null);
   }, []);
   const handleCloseGalleryPanel = useCallback(() => {
     setGalleryOpen(false);
     setGalleryAnchor(null);
   }, []);
+
+  useEffect(() => {
+    if (activeChatId) setHomeProfessorChatOpen(false);
+  }, [activeChatId]);
+  const closeFloatingChatDrawers = useCallback(() => {
+    setSettingsOpen(false);
+    setSettingsAnchor(null);
+    setSettingsInitialSection(null);
+    setFilesOpen(false);
+    setGalleryOpen(false);
+    setGalleryAnchor(null);
+    setPeekPromptData(null);
+    setDeleteDialogMessageId(null);
+  }, []);
+  useEffect(() => {
+    window.addEventListener(CHAT_TOOLBAR_ACTION_EVENT, closeFloatingChatDrawers);
+    window.addEventListener(CHAT_FLOATING_UI_DISMISS_EVENT, closeFloatingChatDrawers);
+    return () => {
+      window.removeEventListener(CHAT_TOOLBAR_ACTION_EVENT, closeFloatingChatDrawers);
+      window.removeEventListener(CHAT_FLOATING_UI_DISMISS_EVENT, closeFloatingChatDrawers);
+    };
+  }, [closeFloatingChatDrawers]);
   const chat = chatDetail ?? null;
-  // Game mode loads ALL messages (no pagination) so the in-game log
-  // shows the full session history instead of only the latest page.
-  const isGameChat = (chat as unknown as { mode?: string })?.mode === "game";
-  const messagePageSize = isGameChat ? 0 : messagesPerPage;
+  const rawMode = (chat as unknown as { mode?: string })?.mode;
+  // Remember the last known chat mode so that a transient `undefined` from
+  // React Query (cache invalidation, Suspense remount, concurrent batching)
+  // doesn't reset the layout from roleplay to conversation mid-session.
+  const lastModeRef = useRef<string>("conversation");
+  if (rawMode) lastModeRef.current = rawMode;
+  const chatMode = rawMode ?? lastModeRef.current;
+  const isRoleplay = chatMode === "roleplay" || chatMode === "visual_novel";
+  const suppressBuiltInProfessorMari = suppressBuiltInProfessorMariForMode(chatMode);
+  const isGameChat = chatMode === "game";
+  const messagePageSize = messagesPerPage;
   const {
     data: msgData,
     isLoading,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    refetch: refetchMessages,
   } = useChatMessages(activeChatId, messagePageSize, !!chat);
   const messages = useMemo<MessageWithSwipes[] | undefined>(
-    () => (msgData ? [...msgData.pages].reverse().flat() : undefined),
-    [msgData],
+    () => flattenLoadedMessagePages(msgData?.pages, messagePageSize),
+    [messagePageSize, msgData?.pages],
   );
+  const newestMessagePageLength = getNewestLoadedMessagePageLength(msgData?.pages);
+  useEffect(() => {
+    if (!activeChatId || messagePageSize <= 0 || newestMessagePageLength <= messagePageSize) return;
+    queryClient.setQueryData<InfiniteData<MessageWithSwipes[]>>(chatKeys.messages(activeChatId), (old) => {
+      return trimNewestLoadedMessagePage(old, messagePageSize);
+    });
+  }, [activeChatId, messagePageSize, newestMessagePageLength, queryClient]);
   const { data: messageCountData } = useChatMessageCount(activeChatId);
   const totalMessageCount = messageCountData?.count ?? messages?.length ?? 0;
   const loadedMessageCount = messages?.length ?? 0;
-  useEffect(() => {
-    if (!isGameChat || loadedMessageCount <= 0) return;
-    if (totalMessageCount <= loadedMessageCount) return;
-    void refetchMessages();
-  }, [isGameChat, loadedMessageCount, refetchMessages, totalMessageCount]);
   const messageOffset = messages ? totalMessageCount - messages.length : 0;
   const messageIdByOrderIndex = useMemo(() => {
     const map = new Map<number, string>();
@@ -416,7 +547,7 @@ export function ChatArea() {
     });
     return map;
   }, [messageOffset, messages]);
-  const { data: allCharacters } = useCharacters();
+  const { data: allCharacters } = useCharacters({ includeBuiltIn: true });
   const { data: allPersonas } = usePersonas();
   const deleteMessage = useDeleteMessage(activeChatId);
   const deleteMessages = useDeleteMessages(activeChatId);
@@ -425,6 +556,7 @@ export function ChatArea() {
   const updateMessageExtra = useUpdateMessageExtra(activeChatId);
   const peekPrompt = usePeekPrompt();
   const branchChat = useBranchChat();
+  const touchChat = useTouchChat();
   const { generate, retryAgents } = useGenerate();
   const setActiveSwipe = useSetActiveSwipe(activeChatId);
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
@@ -442,6 +574,17 @@ export function ChatArea() {
     if (listedActiveChat) return;
     setActiveChatId(null);
   }, [activeChatId, allChats, listedActiveChat, setActiveChatId]);
+
+  const touchedActiveChatRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!chat?.id) {
+      touchedActiveChatRef.current = null;
+      return;
+    }
+    if (touchedActiveChatRef.current === chat.id) return;
+    touchedActiveChatRef.current = chat.id;
+    touchChat.mutate(chat.id);
+  }, [chat?.id, touchChat]);
 
   const currentGameSessionChatId = useMemo(() => resolveCurrentGameSessionChatId(chat, allChats), [allChats, chat]);
 
@@ -507,6 +650,10 @@ export function ChatArea() {
     })),
   });
 
+  // A 60s-cadence clock so schedule/override-derived presence refreshes when time
+  // alone changes the effective status (mirrors the presence pill's refetch).
+  const presenceNow = usePresenceClock();
+
   // Build character lookup map. Cold launches can render chat detail before the
   // full library list has produced every active character, so merge exact
   // per-chat character fetches as a rescue path.
@@ -516,13 +663,96 @@ export function ChatArea() {
       const char = query.data;
       if (char?.id) map.set(char.id, toCharacterMapValue(char));
     }
+    const convoMeta = parseChatMetadata(chat?.metadata);
+    const archivedSnapshots = convoMeta.archivedCharacterSnapshots as Record<string, unknown> | undefined;
+    if (archivedSnapshots && typeof archivedSnapshots === "object" && !Array.isArray(archivedSnapshots)) {
+      for (const [id, value] of Object.entries(archivedSnapshots)) {
+        if (!value || typeof value !== "object" || Array.isArray(value)) continue;
+        if (map.has(id)) continue;
+        const snapshot = value as CharacterMapValue;
+        if (typeof snapshot.name !== "string") continue;
+        map.set(id, {
+          name: snapshot.name,
+          description: snapshot.description ?? "",
+          personality: snapshot.personality ?? "",
+          backstory: snapshot.backstory ?? "",
+          appearance: snapshot.appearance ?? "",
+          scenario: snapshot.scenario ?? "",
+          example: snapshot.example ?? "",
+          avatarUrl: snapshot.avatarUrl ?? null,
+          avatarCrop: snapshot.avatarCrop ?? null,
+          nameColor: snapshot.nameColor,
+          dialogueColor: snapshot.dialogueColor,
+          boxColor: snapshot.boxColor,
+        });
+      }
+    }
+    // Overlay per-chat presence status so status dots reflect this chat, not the last chat to
+    // generate. Prefer the live override/schedule-derived status (matching the presence pill, via
+    // the shared resolver) over the generation-time snapshot, which only refreshes on generation.
+    const chatStatuses = convoMeta.conversationCharacterStatuses as
+      | Record<string, { status?: string; activity?: string }>
+      | undefined;
+    const presenceIds = new Set<string>([
+      ...Object.keys(chatStatuses ?? {}),
+      ...Object.keys((convoMeta.conversationStatusOverrides as Record<string, unknown> | undefined) ?? {}),
+      ...Object.keys((convoMeta.characterSchedules as Record<string, unknown> | undefined) ?? {}),
+    ]);
+    for (const id of presenceIds) {
+      const existing = map.get(id);
+      if (!existing) continue;
+      const live = resolveLiveConversationStatus(convoMeta, id, presenceNow);
+      if (live) {
+        map.set(id, { ...existing, conversationStatus: live.status, conversationActivity: live.activity });
+        continue;
+      }
+      const info = chatStatuses?.[id];
+      if (info?.status) {
+        map.set(id, {
+          ...existing,
+          conversationStatus: info.status as any,
+          conversationActivity: info.activity ?? existing.conversationActivity,
+        });
+      }
+    }
     return map;
-  }, [baseCharacterMap, missingCharacterQueries]);
+  }, [baseCharacterMap, missingCharacterQueries, chat?.metadata, presenceNow]);
 
   const characterNames = useMemo(
     () => chatCharIds.map((id) => characterMap.get(id)?.name).filter((n): n is string => !!n),
     [characterMap, chatCharIds],
   );
+
+  const gameCharacters = useMemo(() => {
+    if (!allCharacters) return [];
+    return (
+      allCharacters as Array<{ id: string; data: string; comment?: string | null; avatarPath: string | null }>
+    ).flatMap((c) => {
+      if (c.id === PROFESSOR_MARI_ID) return [];
+      try {
+        const parsed = typeof c.data === "string" ? JSON.parse(c.data) : c.data;
+        const display = parseCharacterDisplayData(c);
+        return [
+          {
+            id: c.id,
+            name: display.name,
+            comment: display.comment,
+            avatarUrl: c.avatarPath ?? undefined,
+            avatarCrop: parsed.extensions?.avatarCrop || null,
+            nameColor: parsed.extensions?.nameColor || undefined,
+            dialogueColor: parsed.extensions?.dialogueColor || undefined,
+            description: parsed.description ?? "",
+            personality: parsed.personality ?? "",
+            backstory: parsed.extensions?.backstory ?? "",
+            appearance: parsed.extensions?.appearance ?? "",
+            tags: parsed.tags ?? [],
+          },
+        ];
+      } catch {
+        return [{ id: c.id, name: "Unknown" }];
+      }
+    });
+  }, [allCharacters]);
 
   // Active persona info (for user message styling: name, avatar, colors)
   const personaInfo = useMemo(() => {
@@ -566,18 +796,13 @@ export function ChatArea() {
     };
   }, [allPersonas, chat]);
 
-  // Remember the last known chat mode so that a transient `undefined` from
-  // React Query (cache invalidation, Suspense remount, concurrent batching)
-  // doesn't reset the layout from roleplay to conversation mid-session.
-  const lastModeRef = useRef<string>("conversation");
-  const rawMode = (chat as unknown as { mode?: string })?.mode;
-  if (rawMode) lastModeRef.current = rawMode;
-  const chatMode = rawMode ?? lastModeRef.current;
-  const isRoleplay = chatMode === "roleplay" || chatMode === "visual_novel";
   const { startEncounter } = useEncounter();
   const { concludeScene, abandonScene, forkScene, isForking } = useScene();
   const encounterActive = useEncounterStore((s) => s.active || s.showConfigModal);
   const roleplaySpriteScale = useUIStore((s) => s.roleplaySpriteScale);
+  const [localSpriteVisualSettings, setLocalSpriteVisualSettings] = useState<LocalSpriteVisualSettings>(() =>
+    loadLocalSpriteVisualSettings(chat?.id),
+  );
 
   // Sprite sidebar settings from chat metadata
   const chatMeta = useMemo(() => {
@@ -585,6 +810,18 @@ export function ChatArea() {
     const raw = (chat as unknown as { metadata?: string | Record<string, unknown> }).metadata;
     return parseChatMetadata(raw);
   }, [chat]);
+
+  useEffect(() => {
+    setLocalSpriteVisualSettings(loadLocalSpriteVisualSettings(chat?.id));
+  }, [chat?.id]);
+
+  const patchLocalSpriteVisualSettings = useCallback(
+    (patch: Partial<LocalSpriteVisualSettings>) => {
+      if (!chat?.id) return;
+      setLocalSpriteVisualSettings((previous) => saveLocalSpriteVisualSettings(chat.id, patch, previous));
+    },
+    [chat?.id],
+  );
   const spriteCharacterIds = useMemo<string[]>(
     () =>
       Array.isArray(chatMeta.spriteCharacterIds)
@@ -596,7 +833,8 @@ export function ChatArea() {
     () => normalizeSpriteDisplayModes(chatMeta.spriteDisplayModes),
     [chatMeta.spriteDisplayModes],
   );
-  const spritePosition: SpriteSide = chatMeta.spritePosition === "right" ? "right" : "left";
+  const metadataSpritePosition: SpriteSide = chatMeta.spritePosition === "right" ? "right" : "left";
+  const spritePosition: SpriteSide = localSpriteVisualSettings.spritePosition ?? metadataSpritePosition;
   const spriteScale = normalizeSpriteDisplayValue(
     chatMeta.spriteScale,
     roleplaySpriteScale,
@@ -604,13 +842,13 @@ export function ChatArea() {
     SPRITE_DISPLAY_SCALE_MAX,
   );
   const expressionSpriteScale = normalizeSpriteDisplayValue(
-    chatMeta.expressionSpriteScale,
+    localSpriteVisualSettings.expressionSpriteScale ?? chatMeta.expressionSpriteScale,
     spriteScale,
     SPRITE_DISPLAY_SCALE_MIN,
     SPRITE_DISPLAY_SCALE_MAX,
   );
   const fullBodySpriteScale = normalizeSpriteDisplayValue(
-    chatMeta.fullBodySpriteScale,
+    localSpriteVisualSettings.fullBodySpriteScale ?? chatMeta.fullBodySpriteScale,
     spriteScale,
     SPRITE_DISPLAY_SCALE_MIN,
     SPRITE_DISPLAY_SCALE_MAX,
@@ -622,21 +860,22 @@ export function ChatArea() {
     SPRITE_DISPLAY_OPACITY_MAX,
   );
   const expressionSpriteOpacity = normalizeSpriteDisplayValue(
-    chatMeta.expressionSpriteOpacity,
+    localSpriteVisualSettings.expressionSpriteOpacity ?? chatMeta.expressionSpriteOpacity,
     spriteOpacity,
     SPRITE_DISPLAY_OPACITY_MIN,
     SPRITE_DISPLAY_OPACITY_MAX,
   );
   const fullBodySpriteOpacity = normalizeSpriteDisplayValue(
-    chatMeta.fullBodySpriteOpacity,
+    localSpriteVisualSettings.fullBodySpriteOpacity ?? chatMeta.fullBodySpriteOpacity,
     spriteOpacity,
     SPRITE_DISPLAY_OPACITY_MIN,
     SPRITE_DISPLAY_OPACITY_MAX,
   );
-  const spritePlacements = useMemo(
-    () => normalizeSpritePlacements(chatMeta.spritePlacements),
-    [chatMeta.spritePlacements],
-  );
+  const hasLocalSpritePlacements = Object.prototype.hasOwnProperty.call(localSpriteVisualSettings, "spritePlacements");
+  const spritePlacementsSource = hasLocalSpritePlacements
+    ? localSpriteVisualSettings.spritePlacements
+    : chatMeta.spritePlacements;
+  const spritePlacements = useMemo(() => normalizeSpritePlacements(spritePlacementsSource), [spritePlacementsSource]);
   const hasCustomSpritePlacements = Object.keys(spritePlacements).length > 0;
   // Prefer per-swipe expressions from the last assistant message's extra (survives swipe switching),
   // falling back to chat-level metadata for backward compatibility.
@@ -683,6 +922,7 @@ export function ChatArea() {
       provider: chatMeta.translationProvider ?? "google",
       targetLanguage: chatMeta.translationTargetLang ?? "en",
       connectionId: chatMeta.translationConnectionId,
+      systemPrompt: typeof chatMeta.translationPrompt === "string" ? chatMeta.translationPrompt : undefined,
       deeplApiKey: chatMeta.translationDeeplApiKey,
       deeplxUrl: chatMeta.translationDeeplxUrl,
     });
@@ -691,6 +931,7 @@ export function ChatArea() {
     chatMeta.translationProvider,
     chatMeta.translationTargetLang,
     chatMeta.translationConnectionId,
+    chatMeta.translationPrompt,
     chatMeta.translationDeeplApiKey,
     chatMeta.translationDeeplxUrl,
   ]);
@@ -850,18 +1091,18 @@ export function ChatArea() {
       pendingSpritePlacements.current = { ...pendingSpritePlacements.current, [placementKey]: placement };
       if (spritePlacementSaveTimer.current) clearTimeout(spritePlacementSaveTimer.current);
       spritePlacementSaveTimer.current = setTimeout(() => {
-        updateMeta.mutate({ id: chat.id, spritePlacements: pendingSpritePlacements.current });
+        patchLocalSpriteVisualSettings({ spritePlacements: pendingSpritePlacements.current });
       }, 250);
     },
-    [chat?.id, updateMeta],
+    [chat?.id, patchLocalSpriteVisualSettings],
   );
 
   const handleResetSpritePlacements = useCallback(() => {
     if (!chat?.id) return;
     pendingSpritePlacements.current = {};
     if (spritePlacementSaveTimer.current) clearTimeout(spritePlacementSaveTimer.current);
-    updateMeta.mutate({ id: chat.id, spritePlacements: {} });
-  }, [chat?.id, updateMeta]);
+    patchLocalSpriteVisualSettings({ spritePlacements: {} });
+  }, [chat?.id, patchLocalSpriteVisualSettings]);
 
   const handleSetSpritePosition = useCallback(
     (nextSide: SpriteSide) => {
@@ -869,16 +1110,15 @@ export function ChatArea() {
       const nextPlacements = hasCustomSpritePlacements ? mirrorSpritePlacements(spritePlacements) : spritePlacements;
       pendingSpritePlacements.current = nextPlacements;
       if (spritePlacementSaveTimer.current) clearTimeout(spritePlacementSaveTimer.current);
-      updateMeta.mutate({
-        id: chat.id,
+      patchLocalSpriteVisualSettings({
         spritePosition: nextSide,
         spritePlacements: nextPlacements,
       });
     },
-    [chat?.id, hasCustomSpritePlacements, spritePlacements, spritePosition, updateMeta],
+    [chat?.id, hasCustomSpritePlacements, patchLocalSpriteVisualSettings, spritePlacements, spritePosition],
   );
 
-  // Set of enabled agent type IDs (respects both global enableAgents toggle and per-chat agent list)
+  // Set of active agent type IDs for this chat.
   const enabledAgentTypes = useMemo(() => {
     const set = new Set<string>();
     if (!chatMeta.enableAgents) return set;
@@ -890,24 +1130,46 @@ export function ChatArea() {
 
   const combatAgentEnabled = enabledAgentTypes.has("combat");
   const expressionAgentEnabled = enabledAgentTypes.has("expression");
+  const expressionAvatarsPreferenceEnabled =
+    (localSpriteVisualSettings.expressionAvatarsEnabled ?? chatMeta.expressionAvatarsEnabled) === true;
   const expressionAvatarsEnabled =
     isRoleplay &&
-    chatMeta.expressionAvatarsEnabled === true &&
+    expressionAvatarsPreferenceEnabled &&
     expressionAgentEnabled &&
     (chatCharIds.length > 0 || !!personaInfo?.id);
+  const effectiveSpriteVisualSettings = useMemo<LocalSpriteVisualSettings>(
+    () => ({
+      spritePosition,
+      spritePlacements,
+      expressionSpriteScale,
+      fullBodySpriteScale,
+      expressionSpriteOpacity,
+      fullBodySpriteOpacity,
+      expressionAvatarsEnabled: expressionAvatarsPreferenceEnabled,
+    }),
+    [
+      expressionAvatarsPreferenceEnabled,
+      expressionSpriteOpacity,
+      expressionSpriteScale,
+      fullBodySpriteOpacity,
+      fullBodySpriteScale,
+      spritePlacements,
+      spritePosition,
+    ],
+  );
   // Expression Avatars reuse expression sprites as message portraits, so suppress the duplicate overlay layer.
   const visibleSpriteDisplayModes = useMemo(
     () => (expressionAvatarsEnabled ? spriteDisplayModes.filter((mode) => mode !== "expressions") : spriteDisplayModes),
     [expressionAvatarsEnabled, spriteDisplayModes],
   );
   const expressionAvatarCharacterIds = useMemo(() => {
-    const allowedIds = new Set(chatCharIds);
+    const allowedIds = new Set(chatCharIds.filter((id) => !(suppressBuiltInProfessorMari && id === PROFESSOR_MARI_ID)));
     if (personaInfo?.id) allowedIds.add(personaInfo.id);
     const configuredIds =
       spriteCharacterIds.length > 0 ? spriteCharacterIds.filter((id) => allowedIds.has(id)) : Array.from(allowedIds);
     if (personaInfo?.id) configuredIds.push(personaInfo.id);
     return Array.from(new Set(configuredIds.filter((id) => typeof id === "string" && id.trim())));
-  }, [chatCharIds, personaInfo?.id, spriteCharacterIds]);
+  }, [chatCharIds, personaInfo?.id, spriteCharacterIds, suppressBuiltInProfessorMari]);
   const expressionAvatarSpriteQueries = useQueries({
     queries: expressionAvatarCharacterIds.map((characterId) => ({
       queryKey: spriteKeys.list(characterId),
@@ -1260,12 +1522,20 @@ export function ChatArea() {
 
   const handleBranch = useCallback(
     (messageId: string) => {
-      if (!activeChatId) return;
+      if (!activeChatId || branchChat.isPending) return;
+      const branchToastId = toast.loading("Creating branch...");
       branchChat.mutate(
         { chatId: activeChatId, upToMessageId: messageId },
         {
           onSuccess: (newChat) => {
             if (newChat) useChatStore.getState().setActiveChatId(newChat.id);
+            toast.success("Branch created.");
+          },
+          onError: (error) => {
+            toast.error(error instanceof Error ? `Branch failed: ${error.message}` : "Branch failed.");
+          },
+          onSettled: () => {
+            toast.dismiss(branchToastId);
           },
         },
       );
@@ -1868,151 +2138,181 @@ export function ChatArea() {
         <HomeCreditsModal open={creditsOpen} onClose={() => setCreditsOpen(false)} />
         <div
           data-component="ChatArea.EmptyState"
-          className="mari-app-background-paint mari-chrome-token-scope relative isolate flex flex-1 flex-col items-center overflow-y-auto p-1.5 sm:p-3 lg:p-3"
+          className={cn(
+            "mari-app-background-paint mari-chrome-token-scope relative isolate flex flex-1 flex-col items-center",
+            homeProfessorChatActive ? "overflow-hidden p-0 sm:p-3 lg:p-3" : "overflow-y-auto p-1.5 sm:p-3 lg:p-3",
+          )}
         >
-          {showEmptyStateEffects && <HomeStarfield />}
-          <div className="relative z-[1] flex w-full max-w-3xl flex-col items-center gap-1.5 py-0 sm:gap-2 lg:pt-0 lg:pb-2">
-            {/* Central hero */}
-            <div className="relative">
-              <div
-                className={cn(
-                  "flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl shadow-xl shadow-orange-500/20 sm:h-16 sm:w-16",
-                  showEmptyStateEffects && "animate-pulse-ring bunny-glow",
-                )}
-              >
-                <img
-                  src={showEmptyStateEffects ? "/logo-splash.gif" : "/logo.png"}
-                  alt="Marinara Engine"
-                  width={80}
-                  height={80}
-                  decoding="async"
-                  className={cn(
-                    "h-full w-full",
-                    showEmptyStateEffects ? "object-cover" : "object-contain p-1.5 sm:p-2",
-                  )}
-                />
-              </div>
-            </div>
+          {showEmptyStateEffects && !homeProfessorChatActive && <HomeStarfield />}
+          <div
+            className={cn(
+              "relative z-[1] flex w-full flex-col items-center",
+              homeProfessorChatActive
+                ? "min-h-0 flex-1 max-w-none gap-0 py-0"
+                : "max-w-5xl gap-1.5 py-0 sm:gap-2 lg:pt-0 lg:pb-2",
+            )}
+          >
+            {!homeProfessorChatActive && (
+              <>
+                {/* Central hero */}
+                <div className="relative">
+                  <div
+                    className={cn(
+                      "flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl shadow-xl shadow-orange-500/20 sm:h-16 sm:w-16",
+                      showEmptyStateEffects && "animate-pulse-ring bunny-glow",
+                    )}
+                  >
+                    <img
+                      src={showEmptyStateEffects ? "/logo-splash.gif" : "/logo.png"}
+                      alt="Marinara Engine"
+                      width={80}
+                      height={80}
+                      decoding="async"
+                      className={cn(
+                        "h-full w-full",
+                        showEmptyStateEffects ? "object-cover" : "object-contain p-1.5 sm:p-2",
+                      )}
+                    />
+                  </div>
+                </div>
 
-            <div className="text-center">
-              <h3
-                className={cn(
-                  "mari-logo-gradient-text text-base font-bold sm:text-xl",
-                  isPageActive && "mari-logo-gradient-text--active",
-                )}
-              >
-                Marinara Engine
-              </h3>
-              <p className="mari-chrome-text-muted mt-0.5 text-[0.625rem] tracking-wide opacity-65">
-                v{APP_VERSION}
-              </p>
-            </div>
+                <div className="text-center">
+                  <h3
+                    className={cn(
+                      "mari-logo-gradient-text text-base font-bold sm:text-xl",
+                      isPageActive && "mari-logo-gradient-text--active",
+                    )}
+                  >
+                    Marinara Engine
+                  </h3>
+                  <p className="mari-chrome-text-muted mt-0.5 text-[0.625rem] tracking-wide opacity-65">
+                    v{APP_VERSION}
+                  </p>
+                </div>
 
-            {/* Recent Chats */}
-            <RecentChats />
-
-            <div className="flex w-full max-w-3xl flex-col">
-              <HomeProfessorMariChat pageActive={isPageActive} attachedFooter />
-              <HomeAchievements attached />
-            </div>
+                {/* Recent Chats */}
+                <RecentChats />
+              </>
+            )}
 
             <div
               className={cn(
-                "w-48 [--retro-divider-margin:0]",
-                showEmptyStateEffects ? "retro-divider" : "h-px rounded-[1px] bg-[var(--border)]/40",
+                "flex w-full flex-col",
+                homeProfessorChatActive ? "min-h-0 flex-1 max-w-none" : "max-w-5xl",
               )}
-            />
-
-            {/* Footer */}
-            <div className="flex w-full max-w-2xl flex-col items-center gap-1">
-              <div className="mari-chrome-text-muted flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-center text-[0.625rem] leading-tight sm:text-xs">
-                <span>
-                  
-                  Criado por{" "}
-                  <a
-                    href="https://spicymarinara.github.io/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mari-chrome-text underline decoration-[var(--marinara-chat-chrome-panel-muted)]/30 transition-colors hover:text-[var(--marinara-chat-chrome-button-text-hover)] hover:decoration-[var(--marinara-chat-chrome-button-border-hover)]"
-                  >
-                    Marinara
-                  </a>
-                </span>
-                <span>
-                  
-                  Em parceria com{" "}
-                  <a
-                    href="https://linkapi.ai/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mari-chrome-text underline decoration-[var(--marinara-chat-chrome-panel-muted)]/30 transition-colors hover:text-[var(--marinara-chat-chrome-button-text-hover)] hover:decoration-[var(--marinara-chat-chrome-button-border-hover)]"
-                  >
-                    LinkAPI
-                  </a>
-                </span>
-                <span>
-                  
-                  Arte e logo por{" "}
-                  <a
-                    href="https://huntercolliex.carrd.co/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mari-chrome-text underline decoration-[var(--marinara-chat-chrome-panel-muted)]/30 transition-colors hover:text-[var(--marinara-chat-chrome-button-text-hover)] hover:decoration-[var(--marinara-chat-chrome-button-border-hover)]"
-                  >
-                    HunterCollieX
-                  </a>
-                </span>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2">
-                <a
-                  href="https://discord.com/invite/KdAkTg94ME"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackHomeFooterAchievement("discord_clicked")}
-                  className="mari-chrome-control mari-chrome-control--small text-xs"
-                >
-                  <svg width="0.875rem" height="0.875rem" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.947 2.418-2.157 2.418z" />
-                  </svg>
-                  Discord
-                </a>
-                <a
-                  href="https://ko-fi.com/marinara_spaghetti"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackHomeFooterAchievement("kofi_clicked")}
-                  className="mari-chrome-control mari-chrome-control--small text-xs"
-                >
-                  <svg width="0.875rem" height="0.875rem" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                  
-                  Suporte
-                </a>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCreditsOpen(true);
-                    trackHomeFooterAchievement("credits_viewed");
-                  }}
-                  className="mari-chrome-control mari-chrome-control--small text-xs"
-                >
-                  <List size="0.875rem" />
-                  Credits
-                </button>
-              </div>
-
-              {/* Restart tutorial */}
-              <button
-                onClick={() => useUIStore.getState().setHasCompletedOnboarding(false)}
-                className="mari-chrome-control mari-chrome-control--small text-xs"
-                title="Repetir tutorial"
-              >
-                <HelpCircle size="0.875rem" />
-                
-                Repetir tutorial
-              </button>
+            >
+              <HomeProfessorMariChat
+                pageActive={isPageActive}
+                attachedFooter={!homeProfessorChatActive}
+                chatWindowOpen={homeProfessorChatOpen}
+                launchHidden={homeProfessorChatActive}
+                onChatWindowOpenChange={handleHomeProfessorChatOpenChange}
+                onChatWindowExitComplete={handleHomeProfessorChatExitComplete}
+              />
+              {!homeProfessorChatActive && <HomeAchievements attached />}
             </div>
+
+            {!homeProfessorChatActive && (
+              <>
+                <div
+                  className={cn(
+                    "w-48 [--retro-divider-margin:0]",
+                    showEmptyStateEffects ? "retro-divider" : "h-px rounded-[1px] bg-[var(--border)]/40",
+                  )}
+                />
+
+                {/* Footer */}
+                <div className="flex w-full max-w-2xl flex-col items-center gap-1">
+                  <div className="mari-chrome-text-muted flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-center text-[0.625rem] leading-tight sm:text-xs">
+                    <span>
+                      
+                      Criado por{" "}
+                      <a
+                        href="https://spicymarinara.github.io/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mari-chrome-text underline decoration-[var(--marinara-chat-chrome-panel-muted)]/30 transition-colors hover:text-[var(--marinara-chat-chrome-button-text-hover)] hover:decoration-[var(--marinara-chat-chrome-button-border-hover)]"
+                      >
+                        Marinara
+                      </a>
+                    </span>
+                    <span>
+                      
+                      Em parceria com{" "}
+                      <a
+                        href="https://linkapi.ai/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mari-chrome-text underline decoration-[var(--marinara-chat-chrome-panel-muted)]/30 transition-colors hover:text-[var(--marinara-chat-chrome-button-text-hover)] hover:decoration-[var(--marinara-chat-chrome-button-border-hover)]"
+                      >
+                        LinkAPI
+                      </a>
+                    </span>
+                    <span>
+                      
+                      Arte e logo por{" "}
+                      <a
+                        href="https://huntercolliex.carrd.co/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mari-chrome-text underline decoration-[var(--marinara-chat-chrome-panel-muted)]/30 transition-colors hover:text-[var(--marinara-chat-chrome-button-text-hover)] hover:decoration-[var(--marinara-chat-chrome-button-border-hover)]"
+                      >
+                        HunterCollieX
+                      </a>
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <a
+                      href="https://discord.com/invite/KdAkTg94ME"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackHomeFooterAchievement("discord_clicked")}
+                      className="mari-chrome-control mari-chrome-control--small text-xs"
+                    >
+                      <svg width="0.875rem" height="0.875rem" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.947 2.418-2.157 2.418z" />
+                      </svg>
+                      Discord
+                    </a>
+                    <a
+                      href="https://ko-fi.com/marinara_spaghetti"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackHomeFooterAchievement("kofi_clicked")}
+                      className="mari-chrome-control mari-chrome-control--small text-xs"
+                    >
+                      <svg width="0.875rem" height="0.875rem" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                      </svg>
+                      
+                      Suporte
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCreditsOpen(true);
+                        trackHomeFooterAchievement("credits_viewed");
+                      }}
+                      className="mari-chrome-control mari-chrome-control--small text-xs"
+                    >
+                      <List size="0.875rem" />
+                      Credits
+                    </button>
+                  </div>
+
+                  {/* Restart tutorial */}
+                  <button
+                    onClick={() => useUIStore.getState().setHasCompletedOnboarding(false)}
+                    className="mari-chrome-control mari-chrome-control--small text-xs"
+                    title="Repetir tutorial"
+                  >
+                    <HelpCircle size="0.875rem" />
+                    
+                    Repetir tutorial
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
         {pendingNewChatMode && (
@@ -2080,33 +2380,6 @@ export function ChatArea() {
   if (chatMode === "game") {
     if (!chat) return surfaceFallback;
 
-    const gameCharacters = allCharacters
-      ? (allCharacters as Array<{ id: string; data: string; comment?: string | null; avatarPath: string | null }>).map(
-          (c) => {
-            try {
-              const parsed = typeof c.data === "string" ? JSON.parse(c.data) : c.data;
-              const display = parseCharacterDisplayData(c);
-              return {
-                id: c.id,
-                name: display.name,
-                comment: display.comment,
-                avatarUrl: c.avatarPath ?? undefined,
-                avatarCrop: parsed.extensions?.avatarCrop || null,
-                nameColor: parsed.extensions?.nameColor || undefined,
-                dialogueColor: parsed.extensions?.dialogueColor || undefined,
-                description: parsed.description ?? "",
-                personality: parsed.personality ?? "",
-                backstory: parsed.extensions?.backstory ?? "",
-                appearance: parsed.extensions?.appearance ?? "",
-                tags: parsed.tags ?? [],
-              };
-            } catch {
-              return { id: c.id, name: "Unknown" };
-            }
-          },
-        )
-      : [];
-
     return (
       <Suspense fallback={surfaceFallback}>
         <>
@@ -2123,6 +2396,7 @@ export function ChatArea() {
             personaInfo={personaInfo}
             chatBackground={chatBackground}
             onOpenSettings={handleOpenSettingsPanel}
+            onCloseSettings={handleCloseSettingsPanel}
             onDeleteMessage={handleDelete}
             multiSelectMode={multiSelectMode}
             selectedMessageIds={selectedMessageIds}
@@ -2130,7 +2404,6 @@ export function ChatArea() {
 
           <ChatCommonOverlays
             chat={chat}
-            activeChatId={activeChatId}
             settingsOpen={settingsOpen}
             settingsAnchor={settingsAnchor}
             filesOpen={filesOpen}
@@ -2149,13 +2422,13 @@ export function ChatArea() {
               onToggleSpriteArrange: () => setSpriteArrangeMode((prev) => !prev),
               onResetSpritePlacements: handleResetSpritePlacements,
               onSpriteSideChange: handleSetSpritePosition,
+              spriteVisualSettings: effectiveSpriteVisualSettings,
+              onSpriteVisualSettingsChange: patchLocalSpriteVisualSettings,
             }}
             onCloseSettings={handleCloseSettingsPanel}
             onCloseFiles={() => setFilesOpen(false)}
             onCloseGallery={handleCloseGalleryPanel}
-            onIllustrate={() => {
-              void retryAgents(activeChatId, ["illustrator"]);
-            }}
+            onIllustrate={() => retryAgents(activeChatId, ["illustrator"])}
             onWizardFinish={() => {
               setWizardOpen(false);
               handleOpenSettingsPanel();
@@ -2203,6 +2476,7 @@ export function ChatArea() {
             sceneInfo={conversationSceneInfo}
             settingsOpen={settingsOpen}
             settingsAnchor={settingsAnchor}
+            settingsInitialSection={settingsInitialSection}
             galleryOpen={galleryOpen}
             galleryAnchor={galleryAnchor}
             wizardOpen={wizardOpen}
@@ -2313,6 +2587,7 @@ export function ChatArea() {
           lastAssistantMessageId={lastAssistantMessageId}
           settingsOpen={settingsOpen}
           settingsAnchor={settingsAnchor}
+          settingsInitialSection={settingsInitialSection}
           filesOpen={filesOpen}
           galleryOpen={galleryOpen}
           galleryAnchor={galleryAnchor}
@@ -2352,9 +2627,7 @@ export function ChatArea() {
           onCloseSettings={handleCloseSettingsPanel}
           onCloseFiles={() => setFilesOpen(false)}
           onCloseGallery={handleCloseGalleryPanel}
-          onIllustrate={() => {
-            void retryAgents(activeChatId, ["illustrator"]);
-          }}
+          onIllustrate={() => retryAgents(activeChatId, ["illustrator"])}
           onWizardFinish={() => {
             setWizardOpen(false);
             handleOpenSettingsPanel();
@@ -2363,6 +2636,8 @@ export function ChatArea() {
           onResetSpritePlacements={handleResetSpritePlacements}
           onSpriteSideChange={handleSetSpritePosition}
           onToggleSpriteArrange={() => setSpriteArrangeMode((prev) => !prev)}
+          spriteVisualSettings={effectiveSpriteVisualSettings}
+          onSpriteVisualSettingsChange={patchLocalSpriteVisualSettings}
           onExpressionChange={handleExpressionChange}
           onSpritePlacementChange={handleSpritePlacementChange}
           onFinishSpritePlacement={() => setSpriteArrangeMode(false)}

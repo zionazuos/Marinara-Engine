@@ -27,6 +27,7 @@ import { logger } from "../../../lib/logger.js";
 import { isClaudeSubscriptionResumeEnabled } from "../../../config/runtime-config.js";
 import {
   assembleEntries,
+  buildAssistantPrefillContinuationPrompt,
   currentToSdkUserMessage,
   SDK_VERSION,
   splitHistoryForResume,
@@ -169,8 +170,14 @@ function extractSystemPrompt(messages: ChatMessage[]): string | undefined {
 function renderTranscript(messages: ChatMessage[]): { systemPrompt: string | undefined; prompt: string } {
   const systemBlocks: string[] = [];
   const turns: string[] = [];
+  const nonSystemMessages = messages.filter((message) => message.role !== "system");
+  const trailingAssistant =
+    nonSystemMessages.length > 0 && nonSystemMessages[nonSystemMessages.length - 1]!.role === "assistant"
+      ? nonSystemMessages[nonSystemMessages.length - 1]!
+      : null;
 
   for (const message of messages) {
+    if (message === trailingAssistant) continue;
     const text = message.content?.trim();
     if (!text) continue;
     if (message.role === "system") {
@@ -179,6 +186,10 @@ function renderTranscript(messages: ChatMessage[]): { systemPrompt: string | und
     }
     const label = message.role === "user" ? "User" : "Assistant";
     turns.push(`${label}: ${text}`);
+  }
+
+  if (trailingAssistant) {
+    turns.push(`User: ${buildAssistantPrefillContinuationPrompt(trailingAssistant.content ?? "")}`);
   }
 
   // Claude Agent SDK requires a non-empty prompt; if the caller only supplied
@@ -232,6 +243,12 @@ function selectPromptPath(messages: ChatMessage[], model: string): PromptSelecti
 function buildResumeSelection(messages: ChatMessage[], model: string): PromptSelection {
   const split = splitHistoryForResume(messages);
   const systemPrompt = extractSystemPrompt(messages);
+  if (split.shape === "trailing-assistant-continue") {
+    logger.warn(
+      "[claude-subscription] assistant prefill routed through synthetic continuation prompt because SDK prompts are user-only (prefillChars=%d)",
+      split.assistantPrefillLength ?? 0,
+    );
+  }
 
   if (split.history.length === 0) {
     // Resuming an empty transcript makes the SDK throw "No conversation found
@@ -322,7 +339,7 @@ export class ClaudeSubscriptionProvider extends BaseLLMProvider {
 
   async *chat(messages: ChatMessage[], options: ChatOptions): AsyncGenerator<string, LLMUsage | void, unknown> {
     const suppressModelParameters = this.shouldSuppressModelParameters(options);
-    const configuredMaxTokens = suppressModelParameters ? undefined : (options.maxTokens ?? 4096);
+    const configuredMaxTokens = this.applyMaxTokensCap(options.maxTokens ?? 4096);
     const contextFit = this.fitMessagesToContext(messages, { ...options, maxTokens: configuredMaxTokens });
     this.logContextTrim(contextFit, options.model);
 
@@ -642,7 +659,7 @@ export class ClaudeSubscriptionProvider extends BaseLLMProvider {
    * Embeddings are not exposed by the Claude Agent SDK. Surface a clear error
    * so callers can route embedding work to a separate connection.
    */
-  override async embed(_texts: string[], _model: string): Promise<number[][]> {
+  override async embed(_texts: string[], _model: string, _signal?: AbortSignal): Promise<number[][]> {
     throw new Error(
       "The Claude (Subscription) provider does not support embeddings. Configure a separate embedding connection (OpenAI, Google, or local).",
     );

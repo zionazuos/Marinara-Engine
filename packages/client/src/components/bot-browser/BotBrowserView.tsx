@@ -3,7 +3,8 @@
 // Multi-provider: ChubAI, JannyAI, CharacterTavern, Pygmalion, Wyvern
 // With login modals for Pygmalion & CharacterTavern NSFW, PNG download for all providers
 // ──────────────────────────────────────────────
-import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { useState, useCallback, useEffect, useLayoutEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import {
   Search,
   Star,
@@ -48,6 +49,16 @@ const TAG_IMPORT_OPTIONS: Array<{ value: TagImportMode; label: string; descripti
   { value: "none", label: "No tags", description: "Skip source tags." },
   { value: "existing", label: "Existing only", description: "Keep tags already in Marinara." },
 ];
+
+const SOURCE_MENU_MIN_WIDTH = 180;
+const SOURCE_MENU_MARGIN = 8;
+
+function encodeProxyPath(path: unknown): string {
+  return String(path ?? "")
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+}
 
 interface BrowseCard {
   id: string;
@@ -185,11 +196,15 @@ function attachEmbeddedLorebookToCharacterJson(raw: Record<string, unknown>, emb
 }
 
 function optionalString(value: unknown): string | undefined {
-  return typeof value === "string" ? value : undefined;
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
 }
 
-function optionalStringArray(value: unknown): string[] {
-  return Array.isArray(value) ? value.map(String) : [];
+function optionalStringArray(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const values = value.map((item) => String(item).trim()).filter((item) => item.length > 0);
+  return values.length > 0 ? values : undefined;
 }
 
 function optionalRecord(value: unknown): Record<string, unknown> | undefined {
@@ -370,7 +385,7 @@ const chubProvider: ProviderConfig = {
   extraToggles: [],
   nsfwAvailable: true,
   nsfwMode: "free",
-  getAvatarUrl: (card) => `/api/bot-browser/chub/avatar/${card.id}`,
+  getAvatarUrl: (card) => `/api/bot-browser/chub/avatar/${encodeProxyPath(card.id)}`,
   getExternalUrl: (card) => `https://chub.ai/characters/${card.id}`,
   search: async (p) => {
     const preset = CHUB_SORT_PRESETS.find((pr) => pr.value === p.sort) ?? CHUB_SORT_PRESETS[0];
@@ -408,7 +423,7 @@ const chubProvider: ProviderConfig = {
         creator: (n.fullPath || "").split("/")[0] || "",
         tagline: n.tagline || "",
         tags: n.topics || [],
-        avatarUrl: `/api/bot-browser/chub/avatar/${n.fullPath}`,
+        avatarUrl: `/api/bot-browser/chub/avatar/${encodeProxyPath(n.fullPath)}`,
         stat1: n.starCount || 0,
         stat1Label: "Downloads",
         stat1Icon: "download" as const,
@@ -475,7 +490,7 @@ const jannyProvider: ProviderConfig = {
   extraToggles: [{ key: "showLowQuality", label: "Show Low Quality", icon: "🚫" }],
   nsfwAvailable: true,
   nsfwMode: "free",
-  getAvatarUrl: (card) => `/api/bot-browser/janny/avatar/${(card._raw as any)?.avatar || ""}`,
+  getAvatarUrl: (card) => `/api/bot-browser/janny/avatar/${encodeProxyPath((card._raw as any)?.avatar || "")}`,
   getExternalUrl: (card) => {
     const raw = card._raw as any;
     const slug = card.name
@@ -616,7 +631,7 @@ const jannyProvider: ProviderConfig = {
         creator: h.creatorUsername || "",
         tagline: (h.description || "").replace(/<[^>]*>/g, "").slice(0, 200),
         tags: jannyTagNames(h.tagIds),
-        avatarUrl: h.avatar ? `/api/bot-browser/janny/avatar/${h.avatar}` : "",
+        avatarUrl: h.avatar ? `/api/bot-browser/janny/avatar/${encodeProxyPath(h.avatar)}` : "",
         stat1: h.totalToken || 0,
         stat1Label: "Tokens",
         stat1Icon: "hash" as const,
@@ -690,17 +705,69 @@ const jannyProvider: ProviderConfig = {
     }
 
     const detailFromCharacter = (char: Record<string, unknown> | null | undefined): CardDetail | null => {
-      if (!char || !(char.personality || char.firstMessage)) return null;
+      if (!char) return null;
+      const definition =
+        char.definition && typeof char.definition === "object" && !Array.isArray(char.definition)
+          ? (char.definition as Record<string, unknown>)
+          : {};
+      const pickString = (...values: unknown[]) => values.find((value): value is string => typeof value === "string" && value.trim().length > 0)?.trim();
+      const description = pickString(
+        char.personality,
+        char.description,
+        char.definition_character_description,
+        definition.description,
+        definition.personality,
+      );
+      const personality = pickString(
+        char.tavern_personality,
+        char.definition_personality,
+        char.definition,
+        definition.tavern_personality,
+        definition.personality,
+      );
+      const scenario = pickString(char.scenario, char.definition_scenario, definition.scenario);
+      const firstMessage = pickString(
+        char.firstMessage,
+        char.first_message,
+        char.first_mes,
+        char.definition_first_message,
+        definition.firstMessage,
+        definition.first_message,
+        definition.first_mes,
+      );
+      const exampleDialogs = pickString(
+        char.exampleDialogs,
+        char.example_dialogs,
+        char.mes_example,
+        char.definition_example_messages,
+        definition.exampleDialogs,
+        definition.example_dialogs,
+        definition.mes_example,
+      );
+      const creatorNotes = pickString(char.creatorNotes, char.creator_notes, char.creatorNote, char.description_html)
+        ?.replace(/<[^>]*>/g, "")
+        .trim();
+      if (!(description || personality || scenario || firstMessage || exampleDialogs || creatorNotes)) return null;
       return {
-        description: (char.personality as string) || undefined,
-        scenario: (char.scenario as string) || undefined,
-        firstMessage: (char.firstMessage as string) || undefined,
-        exampleDialogs: (char.exampleDialogs as string) || undefined,
-        creatorNotes: char.description
-          ? typeof char.description === "string"
-            ? char.description.replace(/<[^>]*>/g, "").trim()
-            : undefined
-          : undefined,
+        description,
+        personality: personality && personality !== description ? personality : undefined,
+        scenario,
+        firstMessage,
+        exampleDialogs,
+        alternateGreetings: optionalStringArray(
+          char.alternateGreetings ?? char.alternate_greetings ?? definition.alternateGreetings ?? definition.alternate_greetings,
+        ),
+        creatorNotes: creatorNotes && creatorNotes !== description ? creatorNotes : undefined,
+        systemPrompt: optionalString(char.systemPrompt ?? char.system_prompt ?? definition.systemPrompt ?? definition.system_prompt),
+        postHistoryInstructions: optionalString(
+          char.postHistoryInstructions ??
+            char.post_history_instructions ??
+            definition.postHistoryInstructions ??
+            definition.post_history_instructions,
+        ),
+        characterVersion: optionalString(
+          char.characterVersion ?? char.character_version ?? definition.characterVersion ?? definition.character_version,
+        ),
       };
     };
 
@@ -774,7 +841,7 @@ const chartavernProvider: ProviderConfig = {
   extraToggles: [{ key: "isOC", label: "Original Character", icon: "⭐" }],
   nsfwAvailable: false,
   nsfwMode: "login",
-  getAvatarUrl: (card) => `/api/bot-browser/chartavern/avatar/${card.id}`,
+  getAvatarUrl: (card) => `/api/bot-browser/chartavern/avatar/${encodeProxyPath(card.id)}`,
   getExternalUrl: (card) => `https://character-tavern.com/character/${card.id}`,
   search: async (p) => {
     const params = new URLSearchParams({
@@ -801,7 +868,7 @@ const chartavernProvider: ProviderConfig = {
         creator: h.author || (h.path || "").split("/")[0] || "",
         tagline: h.tagline || "",
         tags: Array.isArray(h.tags) ? h.tags : [],
-        avatarUrl: h.path ? `/api/bot-browser/chartavern/avatar/${h.path}` : "",
+        avatarUrl: h.path ? `/api/bot-browser/chartavern/avatar/${encodeProxyPath(h.path)}` : "",
         stat1: h.downloads || 0,
         stat1Label: "Downloads",
         stat1Icon: "download" as const,
@@ -869,7 +936,7 @@ const pygmalionProvider: ProviderConfig = {
     const av = raw?.avatarUrl;
     if (!av) return "";
     if (av.startsWith("http")) return `/api/bot-browser/pygmalion/avatar/${encodeURIComponent(av)}`;
-    return `/api/bot-browser/pygmalion/avatar/${av}`;
+    return `/api/bot-browser/pygmalion/avatar/${encodeProxyPath(av)}`;
   },
   getExternalUrl: (card) => `https://pygmalion.chat/character/${card.id}`,
   search: async (p) => {
@@ -896,7 +963,7 @@ const pygmalionProvider: ProviderConfig = {
         if (av) {
           avatarProxyUrl = av.startsWith("http")
             ? `/api/bot-browser/pygmalion/avatar/${encodeURIComponent(av)}`
-            : `/api/bot-browser/pygmalion/avatar/${av}`;
+            : `/api/bot-browser/pygmalion/avatar/${encodeProxyPath(av)}`;
         }
         return {
           id: c.id || "",
@@ -934,6 +1001,16 @@ const pygmalionProvider: ProviderConfig = {
       firstMessage: p.greeting || undefined,
       exampleDialogs: p.mesExample || undefined,
       creatorNotes: p.characterNotes || undefined,
+      systemPrompt: optionalString(p.systemPrompt ?? p.system_prompt ?? char.systemPrompt ?? char.system_prompt),
+      postHistoryInstructions: optionalString(
+        p.postHistoryInstructions ??
+          p.post_history_instructions ??
+          char.postHistoryInstructions ??
+          char.post_history_instructions,
+      ),
+      characterVersion: optionalString(
+        p.characterVersion ?? p.character_version ?? char.characterVersion ?? char.character_version,
+      ),
       alternateGreetings: Array.isArray(p.alternateGreetings) ? p.alternateGreetings.filter(Boolean) : [],
     };
   },
@@ -973,7 +1050,7 @@ const wyvernProvider: ProviderConfig = {
     const src = raw?.avatar_url || raw?.avatar;
     if (!src) return "";
     if (src.startsWith("http")) return `/api/bot-browser/wyvern/avatar/${encodeURIComponent(src)}`;
-    return `/api/bot-browser/wyvern/avatar/${src}/public`;
+    return `/api/bot-browser/wyvern/avatar/${encodeProxyPath(src)}/public`;
   },
   getExternalUrl: (card) => `https://app.wyvern.chat/characters/${card.id}`,
   search: async (p) => {
@@ -1002,7 +1079,7 @@ const wyvernProvider: ProviderConfig = {
         if (src) {
           avatarProxyUrl = src.startsWith("http")
             ? `/api/bot-browser/wyvern/avatar/${encodeURIComponent(src)}`
-            : `/api/bot-browser/wyvern/avatar/${src}/public`;
+            : `/api/bot-browser/wyvern/avatar/${encodeProxyPath(src)}/public`;
         }
         return {
           id: c.id || "",
@@ -1040,6 +1117,9 @@ const wyvernProvider: ProviderConfig = {
       firstMessage: c.first_mes || undefined,
       exampleDialogs: c.mes_example || undefined,
       creatorNotes: c.creator_notes || undefined,
+      systemPrompt: optionalString(c.systemPrompt ?? c.system_prompt),
+      postHistoryInstructions: optionalString(c.postHistoryInstructions ?? c.post_history_instructions),
+      characterVersion: optionalString(c.characterVersion ?? c.character_version),
       alternateGreetings: Array.isArray(c.alternate_greetings) ? c.alternate_greetings.filter(Boolean) : [],
       hasLorebook: !!(c.lorebooks?.length > 0),
     };
@@ -1124,7 +1204,7 @@ const datacatProvider: ProviderConfig = {
     const av = raw?.avatar || "";
     if (!av) return "";
     if (av.startsWith("http")) return `/api/bot-browser/datacat/avatar/${encodeURIComponent(av)}`;
-    return `/api/bot-browser/datacat/avatar/${av}`;
+    return `/api/bot-browser/datacat/avatar/${encodeProxyPath(av)}`;
   },
   getExternalUrl: (card) => {
     const raw = card._raw as any;
@@ -1204,7 +1284,7 @@ const datacatProvider: ProviderConfig = {
         const avatarProxyUrl = av
           ? av.startsWith("http")
             ? `/api/bot-browser/datacat/avatar/${encodeURIComponent(av)}`
-            : `/api/bot-browser/datacat/avatar/${av}`
+            : `/api/bot-browser/datacat/avatar/${encodeProxyPath(av)}`
           : "";
         const charId = c.characterId || c.character_id || c.id || "";
         return {
@@ -1248,6 +1328,9 @@ const datacatProvider: ProviderConfig = {
             firstMessage: d.first_mes || undefined,
             exampleDialogs: d.mes_example || undefined,
             creatorNotes: d.creator_notes || undefined,
+            systemPrompt: optionalString(d.systemPrompt ?? d.system_prompt),
+            postHistoryInstructions: optionalString(d.postHistoryInstructions ?? d.post_history_instructions),
+            characterVersion: optionalString(d.characterVersion ?? d.character_version),
             alternateGreetings: Array.isArray(d.alternate_greetings) ? d.alternate_greetings.filter(Boolean) : [],
           };
         }
@@ -1268,6 +1351,9 @@ const datacatProvider: ProviderConfig = {
         scenario: c.scenario || undefined,
         firstMessage: c.first_message || undefined,
         creatorNotes: plainDesc || undefined,
+        systemPrompt: optionalString(c.systemPrompt ?? c.system_prompt),
+        postHistoryInstructions: optionalString(c.postHistoryInstructions ?? c.post_history_instructions),
+        characterVersion: optionalString(c.characterVersion ?? c.character_version),
       };
     } catch {
       return null;
@@ -1299,11 +1385,58 @@ function getProvider(id: string): ProviderConfig {
 
 export function BotBrowserView() {
   const qc = useQueryClient();
+  const botBrowserOpen = useUIStore((s) => s.botBrowserOpen);
   const closeBotBrowser = useUIStore((s) => s.closeBotBrowser);
 
   const [sourceId, setSourceId] = useState("chub");
   const [sourceOpen, setSourceOpen] = useState(false);
+  const sourceButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [sourceMenuPosition, setSourceMenuPosition] = useState<{
+    left: number;
+    top: number;
+    maxHeight: number;
+  } | null>(null);
   const provider = useMemo(() => getProvider(sourceId), [sourceId]);
+
+  const updateSourceMenuPosition = useCallback(() => {
+    const button = sourceButtonRef.current;
+    if (!button) {
+      setSourceMenuPosition(null);
+      return;
+    }
+
+    const rect = button.getBoundingClientRect();
+    const width = Math.max(SOURCE_MENU_MIN_WIDTH, rect.width);
+    const left = Math.min(
+      Math.max(SOURCE_MENU_MARGIN, rect.left),
+      Math.max(SOURCE_MENU_MARGIN, window.innerWidth - width - SOURCE_MENU_MARGIN),
+    );
+    const top = rect.bottom + 4;
+    setSourceMenuPosition({
+      left,
+      top,
+      maxHeight: Math.max(96, window.innerHeight - top - SOURCE_MENU_MARGIN),
+    });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!sourceOpen) {
+      setSourceMenuPosition(null);
+      return;
+    }
+
+    updateSourceMenuPosition();
+    window.addEventListener("resize", updateSourceMenuPosition);
+    window.addEventListener("scroll", updateSourceMenuPosition, true);
+    return () => {
+      window.removeEventListener("resize", updateSourceMenuPosition);
+      window.removeEventListener("scroll", updateSourceMenuPosition, true);
+    };
+  }, [sourceOpen, updateSourceMenuPosition]);
+
+  useEffect(() => {
+    if (!botBrowserOpen) setSourceOpen(false);
+  }, [botBrowserOpen]);
 
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState(provider.defaultSort);
@@ -1339,6 +1472,10 @@ export function BotBrowserView() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [importing, setImporting] = useState(false);
   const [tagImportMode, setTagImportMode] = useState<TagImportMode>("all");
+  const mainScrollRef = useRef<HTMLDivElement | null>(null);
+  const resultsScrollTopRef = useRef(0);
+  const restoreResultsScrollRef = useRef(false);
+  const openDetailScrollRef = useRef(false);
 
   // ── Auth state ──
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -1512,7 +1649,29 @@ export function BotBrowserView() {
     };
   }, [doSearch, query]);
 
+  useLayoutEffect(() => {
+    const scrollContainer = mainScrollRef.current;
+    if (!scrollContainer) return;
+
+    if (selectedCard && openDetailScrollRef.current) {
+      openDetailScrollRef.current = false;
+      scrollContainer.scrollTop = 0;
+      return;
+    }
+
+    if (!selectedCard && restoreResultsScrollRef.current) {
+      restoreResultsScrollRef.current = false;
+      const savedTop = resultsScrollTopRef.current;
+      scrollContainer.scrollTop = savedTop;
+      requestAnimationFrame(() => {
+        scrollContainer.scrollTop = savedTop;
+      });
+    }
+  }, [selectedCard]);
+
   const openDetail = async (card: BrowseCard) => {
+    resultsScrollTopRef.current = mainScrollRef.current?.scrollTop ?? 0;
+    openDetailScrollRef.current = true;
     setSelectedCard(card);
     setDetail(null);
     setDetailLoading(true);
@@ -1521,6 +1680,7 @@ export function BotBrowserView() {
       setDetail(d);
     } catch {
       toast.error("Falha ao carregar os detalhes do personagem");
+      restoreResultsScrollRef.current = true;
       setSelectedCard(null);
     } finally {
       setDetailLoading(false);
@@ -1589,6 +1749,9 @@ export function BotBrowserView() {
           first_mes: cardDetail?.firstMessage || "",
           mes_example: cardDetail?.exampleDialogs || "",
           creator_notes: cardDetail?.creatorNotes || "",
+          system_prompt: cardDetail?.systemPrompt || "",
+          post_history_instructions: cardDetail?.postHistoryInstructions || "",
+          character_version: cardDetail?.characterVersion || "",
           tags: card.tags,
           creator: card.creator,
           alternate_greetings: cardDetail?.alternateGreetings || [],
@@ -1798,6 +1961,7 @@ export function BotBrowserView() {
         <h2 className="mari-chrome-text-strong text-sm font-semibold">Navegador</h2>
         <div className="relative ml-2">
           <button
+            ref={sourceButtonRef}
             onClick={() => setSourceOpen((v) => !v)}
             className="mari-chrome-control mari-chrome-control--small px-3 py-1.5 text-xs"
           >
@@ -1805,8 +1969,18 @@ export function BotBrowserView() {
             <span>{provider.name}</span>
             <ChevronDown size="0.625rem" className={cn("transition-transform", sourceOpen && "rotate-180")} />
           </button>
-          {sourceOpen && (
-            <div className="mari-chrome-selection-bar absolute left-0 top-full z-50 mt-1 min-w-[180px] overflow-hidden shadow-xl">
+        </div>
+        {sourceOpen &&
+          sourceMenuPosition &&
+          createPortal(
+            <div
+              className="mari-chrome-token-scope mari-chrome-selection-bar mari-chrome-selection-bar--opaque fixed z-[9999] min-w-[180px] overflow-y-auto shadow-xl"
+              style={{
+                left: sourceMenuPosition.left,
+                top: sourceMenuPosition.top,
+                maxHeight: sourceMenuPosition.maxHeight,
+              }}
+            >
               {ALL_PROVIDERS.map((p) => (
                 <button
                   key={p.id}
@@ -1823,9 +1997,9 @@ export function BotBrowserView() {
                   {p.id === sourceId && <span className="ml-auto text-[0.6rem]">✓</span>}
                 </button>
               ))}
-            </div>
+            </div>,
+            document.body,
           )}
-        </div>
         {/* Auth indicator for login providers */}
         {sourceId === "pygmalion" && pygLoggedIn && (
           <span className="ml-auto flex items-center gap-1 text-[0.65rem] text-emerald-400">
@@ -1973,7 +2147,7 @@ export function BotBrowserView() {
         )}
 
         {/* ═══ Main area ═══ */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div ref={mainScrollRef} className="flex-1 overflow-y-auto p-4">
           {selectedCard ? (
             <DetailView
               card={selectedCard}
@@ -1982,6 +2156,7 @@ export function BotBrowserView() {
               importing={importing}
               provider={provider}
               onBack={() => {
+                restoreResultsScrollRef.current = true;
                 setSelectedCard(null);
                 setDetail(null);
               }}
@@ -2746,6 +2921,9 @@ function DetailView({
         first_mes: d?.firstMessage || "",
         mes_example: d?.exampleDialogs || "",
         creator_notes: d?.creatorNotes || "",
+        system_prompt: d?.systemPrompt || "",
+        post_history_instructions: d?.postHistoryInstructions || "",
+        character_version: d?.characterVersion || "",
         tags: card.tags || [],
         creator: card.creator || "",
         alternate_greetings: d?.alternateGreetings || [],
@@ -3002,11 +3180,11 @@ async function buildCharacterCardPng(avatarUrl: string, charData: Record<string,
       first_mes: charData.first_mes || "",
       mes_example: charData.mes_example || "",
       creator_notes: charData.creator_notes || "",
-      system_prompt: "",
-      post_history_instructions: "",
+      system_prompt: charData.system_prompt || "",
+      post_history_instructions: charData.post_history_instructions || "",
       tags: charData.tags || [],
       creator: charData.creator || "",
-      character_version: "",
+      character_version: charData.character_version || "",
       alternate_greetings: charData.alternate_greetings || [],
       extensions: charData.extensions || {},
     },

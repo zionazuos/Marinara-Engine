@@ -83,12 +83,14 @@ import { ExportFormatDialog, type ExportFormatChoice } from "../ui/ExportFormatD
 import { Modal } from "../ui/Modal";
 import { EditorTabRail } from "../ui/EditorTabRail";
 import { EditorSectionAnchor, EditorSectionJumps } from "../ui/EditorSectionJumps";
-import type {
-  CharacterData,
-  PersonaCardSnapshot,
-  PersonaCardVersion,
-  RPGStatsConfig,
-  TrackerCardColorConfig,
+import { SettingsSwitch } from "../panels/settings/SettingControls";
+import {
+  normalizeSpriteExpressionLabel,
+  type CharacterData,
+  type PersonaCardSnapshot,
+  type PersonaCardVersion,
+  type RPGStatsConfig,
+  type TrackerCardColorConfig,
 } from "@marinara-engine/shared";
 import { useQuoteFormatter } from "../../hooks/use-quote-formatter";
 import { LorebookAssignmentSection } from "../lorebooks/LorebookAssignmentSection";
@@ -811,7 +813,7 @@ export function PersonaEditor() {
   );
 
   return (
-    <div className="mari-editor-shell flex flex-1 flex-col overflow-hidden">
+    <div className="mari-editor-shell mari-editor-legacy-bridge flex flex-1 flex-col overflow-hidden">
       <ExportFormatDialog
         open={exportDialogOpen}
         title="Exportar persona"
@@ -848,7 +850,10 @@ export function PersonaEditor() {
 
           {/* Avatar */}
           <div
-            className="mari-editor-avatar-tile group relative"
+            className={cn(
+              "mari-editor-avatar-tile group relative",
+              !avatarPreview && "mari-avatar-placeholder mari-avatar-placeholder--persona",
+            )}
             onClick={() => fileInputRef.current?.click()}
           >
             {avatarPreview ? (
@@ -1079,15 +1084,7 @@ function PersonaSpritesTab({
     spriteCapabilities?.backgroundRemover?.reason ?? "Local backgroundremover is not installed.";
 
   const normalizeExpressionForCategory = (raw: string) => {
-    const cleaned = raw
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9_-]/g, "_");
-    if (!cleaned) return "";
-    if (category === "full-body") {
-      return cleaned.startsWith("full_") ? cleaned : `full_${cleaned}`;
-    }
-    return cleaned.replace(/^full_/, "");
+    return normalizeSpriteExpressionLabel(raw, { fullBody: category === "full-body" });
   };
 
   const displayExpression = useCallback(
@@ -1999,22 +1996,15 @@ function PersonaStatsTab({
         helpText={PERSONA_STATS_HELP}
       />
 
-      {/* Enable toggle */}
-      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
-        <input
-          type="checkbox"
-          checked={parsed.enabled}
-          onChange={(e) => save({ ...parsed, enabled: e.target.checked })}
-          className="h-4 w-4 rounded accent-[var(--primary)]"
-        />
-        <div>
-          <p className="text-sm font-medium">Ativar atributos da persona</p>
-          <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-            
-            Rastreado pelo agente Persona Stats. Os atributos aparecem no HUD e são ajustados com base nos eventos da narrativa.
-          </p>
-        </div>
-      </label>
+      <SettingsSwitch
+        label={<span className="font-medium">Ativar atributos da persona</span>}
+        description="Rastreado pelo agente Persona Stats. Os atributos aparecem no HUD e são ajustados com base nos eventos da narrativa."
+        checked={parsed.enabled}
+        onChange={(checked) => save({ ...parsed, enabled: checked })}
+        labelPosition="start"
+        className="justify-between rounded-xl border border-[var(--border)] bg-[var(--card)] p-4"
+        labelClassName="text-sm"
+      />
 
       {parsed.enabled && (
         <>
@@ -2081,21 +2071,15 @@ function PersonaStatsTab({
           helpText={PERSONA_RPG_ATTRIBUTES_HELP}
         />
 
-        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
-          <input
-            type="checkbox"
-            checked={rpgStats.enabled}
-            onChange={(e) => updateRpg({ enabled: e.target.checked })}
-            className="h-4 w-4 rounded accent-[var(--primary)]"
-          />
-          <div>
-            <p className="text-sm font-medium">Ativar atributos de RPG</p>
-            <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-              
-              Os atributos são injetados no prompt e rastreados via Persona Stats no estado do jogo.
-            </p>
-          </div>
-        </label>
+        <SettingsSwitch
+          label={<span className="font-medium">Ativar atributos de RPG</span>}
+          description="Os atributos são injetados no prompt e rastreados via Persona Stats no estado do jogo."
+          checked={rpgStats.enabled}
+          onChange={(checked) => updateRpg({ enabled: checked })}
+          labelPosition="start"
+          className="justify-between rounded-xl border border-[var(--border)] bg-[var(--card)] p-4"
+          labelClassName="text-sm"
+        />
 
         {rpgStats.enabled && (
           <>
@@ -2289,7 +2273,7 @@ function PersonaMetadataTab({
             <button
               type="button"
               onClick={removeAllTags}
-              className="rounded-lg px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
+              className="mari-chrome-control mari-chrome-control--compact mari-chrome-control--danger"
             >
               
               Remover tudo
@@ -2300,14 +2284,15 @@ function PersonaMetadataTab({
           {formData.tags.map((tag) => (
             <span
               key={tag}
-              className="flex items-center gap-1 rounded-full bg-[var(--primary)]/10 px-2.5 py-1 text-[0.6875rem] font-medium text-[var(--primary)]"
+              className="mari-chrome-control mari-chrome-control--compact group/tag"
             >
               <Tag size="0.625rem" />
               {tag}
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
-                className="ml-0.5 rounded-full transition-colors hover:text-[var(--destructive)]"
+                className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-[var(--destructive)]/20 hover:text-[var(--destructive)]"
+                title={`Remove tag "${tag}"`}
               >
                 <X size="0.625rem" />
               </button>
@@ -2330,7 +2315,7 @@ function PersonaMetadataTab({
           <button
             type="button"
             onClick={addTag}
-            className="rounded-xl bg-[var(--primary)]/15 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/25"
+            className="mari-chrome-control mari-chrome-control--compact mari-chrome-control--selected px-3 py-1.5"
           >
             
             Adicionar
@@ -2724,26 +2709,23 @@ function DescriptionTab({
   setDirty: (v: boolean) => void;
 }) {
   return (
-    <div className="space-y-6">
-      {/* Main description */}
-      <div>
-        <SectionHeader
-          title="Descrição"
-          subtitle="Sua descrição geral. Isto é enviado em todo prompt para a IA saber quem você é."
-          helpText={PERSONA_DESCRIPTION_HELP}
-        />
-        <MacroTextarea
-          value={formData.description}
-          onChange={(value) => updateField("description", value)}
-          placeholder="Descreva quem você é, seu papel na história e seus traços principais…"
-          rows={12}
-          title="Descrição"
-          className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-[var(--muted-foreground)]/40 focus:border-emerald-400/40 focus:ring-1 focus:ring-emerald-400/20"
-        />
-        <p className="mt-1.5 text-right text-[0.625rem] text-[var(--muted-foreground)]">
-          {formData.description.length} characters
-        </p>
-      </div>
+    <div className="mari-editor-panel space-y-3 p-3">
+      <SectionHeader
+        title="Descrição"
+        subtitle="Sua descrição geral. Isto é enviado em todo prompt para a IA saber quem você é."
+        helpText={PERSONA_DESCRIPTION_HELP}
+      />
+      <MacroTextarea
+        value={formData.description}
+        onChange={(value) => updateField("description", value)}
+        placeholder="Descreva quem você é, seu papel na história e seus traços principais…"
+        rows={12}
+        title="Descrição"
+        className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-[var(--muted-foreground)]/40 focus:border-emerald-400/40 focus:ring-1 focus:ring-emerald-400/20"
+      />
+      <p className="mt-1.5 text-right text-[0.625rem] text-[var(--muted-foreground)]">
+        {formData.description.length} characters
+      </p>
     </div>
   );
 }
@@ -2788,7 +2770,7 @@ function TextareaTab({
   rows?: number;
 }) {
   return (
-    <div>
+    <div className="mari-editor-panel space-y-3 p-3">
       <SectionHeader title={title} subtitle={subtitle} helpText={helpText} />
       <MacroTextarea
         value={value}

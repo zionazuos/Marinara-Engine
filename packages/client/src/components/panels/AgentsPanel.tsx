@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────
 // Panel: Agents
 // ──────────────────────────────────────────────
-import { useCallback, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import {
   Sparkles,
   Copy,
@@ -17,9 +17,11 @@ import {
   Download,
   Check,
   FolderPlus,
+  FolderOpen,
+  ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useUIStore } from "../../stores/ui.store";
+import { useUIStore, type ResourcePanelSort } from "../../stores/ui.store";
 import {
   useAgentConfigs,
   useCreateAgent,
@@ -27,10 +29,10 @@ import {
   useUploadAgentImage,
   type AgentConfigRow,
 } from "../../hooks/use-agents";
+import { useCreateCustomTool, useCustomTools, type CustomToolRow } from "../../hooks/use-custom-tools";
 import {
   BUILT_IN_AGENTS,
   DEFAULT_AGENT_TOOLS,
-  createFolderEntry,
   getDefaultBuiltInAgentSettings,
   getFolderImportEntries,
   getFolderManifestConfig,
@@ -42,10 +44,24 @@ import {
 } from "@marinara-engine/shared";
 import { confirmNonEmptyFolderDelete, showConfirmDialog } from "../../lib/app-dialogs";
 import { cn } from "../../lib/utils";
-import { downloadJsonFile } from "../../lib/download-json";
+import { sortBasicPanelItems } from "../../lib/panel-sort";
 import { downloadZipFile } from "../../lib/download-zip";
-import { sanitizeAgentSettingsForTransfer } from "../../lib/agent-transfer";
-import { isZipFile, readTextFileFromZip } from "../../lib/read-zip-text";
+import {
+  createAgentFolderPackageFilename,
+  createAgentFolderPackageFiles,
+  sanitizeAgentSettingsForTransfer,
+  type AgentTransferConfig,
+} from "../../lib/agent-transfer";
+import {
+  importCustomToolEntries,
+  serializeCustomToolForTransfer,
+} from "../../lib/custom-tool-transfer";
+import {
+  collectFolderPackageEntries,
+  readTextFilesFromFileList,
+  type FolderPackageImportEntry,
+} from "../../lib/folder-package-transfer";
+import { isZipFile, readTextFilesFromZip } from "../../lib/read-zip-text";
 import { SelectionActionBar } from "../ui/SelectionActionBar";
 import {
   getNextUnnamedLibraryFolderName,
@@ -68,12 +84,6 @@ function isJsonRecord(value: unknown): value is JsonRecord {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
-function parseBooleanValue(value: unknown, fallback = true) {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "string") return value === "true" || value === "1";
-  return fallback;
-}
-
 function parseAgentSettings(value: unknown): JsonRecord {
   if (isJsonRecord(value)) return value;
   if (typeof value === "string" && value.trim()) {
@@ -91,7 +101,7 @@ function getAgentImportEntries(parsed: unknown) {
   return getFolderImportEntries(parsed, ["agents"]);
 }
 
-function serializeAgentConfig(agent: AgentConfigRow) {
+function serializeAgentConfig(agent: AgentConfigRow): AgentTransferConfig {
   const settings = sanitizeAgentSettingsForTransfer(parseAgentSettings(agent.settings));
   if (typeof settings.author !== "string" || !settings.author.trim()) {
     settings.author = "Unknown";
@@ -102,7 +112,7 @@ function serializeAgentConfig(agent: AgentConfigRow) {
     name: agent.name,
     description: agent.description,
     phase: normalizeAgentPhaseForType(agent.type, agent.phase),
-    enabled: parseBooleanValue(agent.enabled),
+    enabled: true,
     connectionId: null,
     imagePath: null,
     promptTemplate: agent.promptTemplate,
@@ -111,14 +121,29 @@ function serializeAgentConfig(agent: AgentConfigRow) {
   };
 }
 
-function serializeAgentFolderEntry(agent: AgentConfigRow) {
-  return createFolderEntry({
-    folderName: "Agents",
-    itemName: agent.type,
-    itemKind: "marinara.agent",
-    config: serializeAgentConfig(agent),
-    fallbackName: "custom-agent",
-  });
+function useTouchSafeAgentDragMode() {
+  const readTouchSafeMode = useCallback(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(max-width: 767px)").matches;
+  }, []);
+  const [touchSafeMode, setTouchSafeMode] = useState(readTouchSafeMode);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+    const mobileViewportQuery = window.matchMedia("(max-width: 767px)");
+    const update = () => setTouchSafeMode(readTouchSafeMode());
+
+    update();
+    coarsePointerQuery.addEventListener("change", update);
+    mobileViewportQuery.addEventListener("change", update);
+    return () => {
+      coarsePointerQuery.removeEventListener("change", update);
+      mobileViewportQuery.removeEventListener("change", update);
+    };
+  }, [readTouchSafeMode]);
+
+  return touchSafeMode;
 }
 
 function createBuiltInAgentConfigRow(
@@ -135,7 +160,7 @@ function createBuiltInAgentConfigRow(
     name: agent.name,
     description: config?.description ?? agent.description,
     phase: normalizeAgentPhaseForType(agent.id, config?.phase ?? agent.phase),
-    enabled: config?.enabled ?? String(agent.enabledByDefault),
+    enabled: "true",
     connectionId: config?.connectionId ?? null,
     imagePath: config?.imagePath ?? null,
     promptTemplate: config?.promptTemplate ?? "",
@@ -161,7 +186,7 @@ function createDuplicateAgentInput(agent: AgentConfigRow) {
     name: `${getAgentLibraryDisplayName(agent)} (Copy)`,
     description: agent.description,
     phase: normalizeAgentPhaseForType(agent.type, agent.phase),
-    enabled: parseBooleanValue(agent.enabled),
+    enabled: true,
     connectionId: agent.connectionId,
     imagePath: agent.imagePath,
     promptTemplate: agent.promptTemplate,
@@ -170,7 +195,7 @@ function createDuplicateAgentInput(agent: AgentConfigRow) {
   };
 }
 
-function normalizeAgentImportEntry(entry: unknown) {
+function normalizeAgentImportEntry(entry: unknown, resolveTextFile?: (path: unknown) => string | null) {
   const source = getFolderManifestConfig(entry);
   if (!isJsonRecord(source)) return null;
 
@@ -180,7 +205,8 @@ function normalizeAgentImportEntry(entry: unknown) {
   if (!type || !name) return null;
   const phase = normalizeAgentPhaseForType(type, normalizeAgentPhaseValue(source.phase));
 
-  const settings = sanitizeAgentSettingsForTransfer(parseAgentSettings(source.settings));
+  const settingsText = resolveTextFile?.(source.settingsPath);
+  const settings = sanitizeAgentSettingsForTransfer(parseAgentSettings(settingsText ?? source.settings));
   if (typeof source.author === "string" && !settings.author) {
     settings.author = source.author;
   }
@@ -197,18 +223,34 @@ function normalizeAgentImportEntry(entry: unknown) {
     name,
     description,
     phase,
-    enabled: parseBooleanValue(source.enabled),
+    enabled: true,
     connectionId: null,
     imagePath: null,
-    promptTemplate: typeof source.promptTemplate === "string" ? source.promptTemplate : "",
+    promptTemplate:
+      resolveTextFile?.(source.promptTemplatePath) ?? (typeof source.promptTemplate === "string" ? source.promptTemplate : ""),
     settings,
     ...(typeof resultType === "string" ? { resultType } : {}),
   };
 }
 
+function getReferencedCustomTools(agents: AgentConfigRow[], customTools: CustomToolRow[]) {
+  if (agents.length === 0 || customTools.length === 0) return [];
+  const referencedNames = new Set<string>();
+  for (const agent of agents) {
+    const enabledTools = parseAgentSettings(agent.settings).enabledTools;
+    if (!Array.isArray(enabledTools)) continue;
+    for (const tool of enabledTools) {
+      if (typeof tool === "string" && tool.trim()) referencedNames.add(tool);
+    }
+  }
+  return customTools.filter((tool) => referencedNames.has(tool.name));
+}
+
 export function AgentsPanel() {
   const { data: agentConfigs, isLoading } = useAgentConfigs();
+  const { data: customTools } = useCustomTools();
   const createAgent = useCreateAgent();
+  const createCustomTool = useCreateCustomTool();
   const deleteAgent = useDeleteAgent();
   const uploadAgentImage = useUploadAgentImage();
   const { data: agentFolders = [] } = useLibraryFolders("agents");
@@ -217,9 +259,12 @@ export function AgentsPanel() {
   const deleteAgentFolder = useDeleteLibraryFolder("agents");
   const moveAgentItem = useMoveLibraryItem("agents");
   const openAgentDetail = useUIStore((s) => s.openAgentDetail);
+  const sort = useUIStore((s) => s.agentPanelSort);
+  const setSort = useUIStore((s) => s.setAgentPanelSort);
   const [agentSearch, setAgentSearch] = useState("");
   const agentImageInputRef = useRef<HTMLInputElement>(null);
   const agentImportInputRef = useRef<HTMLInputElement>(null);
+  const agentFolderImportInputRef = useRef<HTMLInputElement>(null);
   const imageTargetAgentIdRef = useRef<string | null>(null);
   const [agentImportError, setAgentImportError] = useState<string | null>(null);
   const [agentImportSuccess, setAgentImportSuccess] = useState<string | null>(null);
@@ -230,9 +275,13 @@ export function AgentsPanel() {
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [editFolderName, setEditFolderName] = useState("");
   const [draggedAgentId, setDraggedAgentId] = useState<string | null>(null);
+  const suppressAgentClickRef = useRef(false);
   const handleFolderRenameGesture = useFolderRenameGesture();
+  const touchSafeAgentDragMode = useTouchSafeAgentDragMode();
+  const nativeAgentDragEnabled = !touchSafeAgentDragMode;
 
   const agentConfigRows = useMemo(() => (agentConfigs ?? []) as AgentConfigRow[], [agentConfigs]);
+  const customToolRows = useMemo(() => (customTools ?? []) as CustomToolRow[], [customTools]);
   const visibleAgentConfigs = useMemo(
     () => agentConfigRows.filter((config) => !isAgentConfigDeleted(config.settings)),
     [agentConfigRows],
@@ -271,6 +320,8 @@ export function AgentsPanel() {
           ...agent,
           name: agent.name,
           description: config?.description ?? agent.description,
+          createdAt: config?.createdAt ?? "",
+          updatedAt: config?.updatedAt ?? "",
         };
       }),
     [configByType, visibleBuiltInAgents],
@@ -311,8 +362,8 @@ export function AgentsPanel() {
     { category: "tracker", title: "Tracker Agents", icon: <Radar size="0.8125rem" /> },
     { category: "misc", title: "Misc Agents", icon: <Puzzle size="0.8125rem" /> },
   ];
-  const visibleCustomAgents = customAgents
-    .filter(
+  const visibleCustomAgents = sortBasicPanelItems(
+    customAgents.filter(
       (agent) =>
         !folderedAgentIds.has(agent.id) &&
         matchesAgentSearch({
@@ -320,8 +371,11 @@ export function AgentsPanel() {
           description: agent.description,
           category: "custom",
         }),
-    )
-    .sort((a, b) => a.name.localeCompare(b.name));
+    ),
+    sort,
+    (agent) => agent.name,
+    (agent) => agent.createdAt || agent.updatedAt,
+  );
   const hasVisibleFolderAgents = agentFolders.some((folder) =>
     folder.itemIds.some((id) => {
       const agent = selectableAgentById.get(id);
@@ -401,28 +455,22 @@ export function AgentsPanel() {
 
     setExportingSelected(true);
     try {
-      const envelope = {
-        kind: "marinara.agent-folder",
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        folderName: "Agents",
-        agents: selectedAgents.map(serializeAgentFolderEntry),
-      };
-      if (selectedAgents.length > 1) {
-        downloadZipFile(
-          [{ path: "marinara-agents.json", content: JSON.stringify(envelope, null, 2) }],
-          "marinara-agents.zip",
-        );
-      } else {
-        downloadJsonFile(envelope, "marinara-agents.json");
-      }
+      const files = createAgentFolderPackageFiles(selectedAgents.map(serializeAgentConfig), {
+        customTools: getReferencedCustomTools(selectedAgents, customToolRows).map(serializeCustomToolForTransfer),
+      });
+      const firstAgent = selectedAgents[0];
+      const filename =
+        selectedAgents.length === 1 && firstAgent
+          ? createAgentFolderPackageFilename(getAgentLibraryDisplayName(firstAgent), "agent")
+          : "marinara-agents.zip";
+      downloadZipFile(files, filename);
       toast.success(`Exported ${selectedAgents.length} agent${selectedAgents.length === 1 ? "" : "s"}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to export agents");
     } finally {
       setExportingSelected(false);
     }
-  }, [selectedAgents]);
+  }, [customToolRows, selectedAgents]);
 
   const handleDuplicateAgent = useCallback(
     async (agent: AgentConfigRow) => {
@@ -472,6 +520,46 @@ export function AgentsPanel() {
     exitSelectionMode();
   }, [deleteAgent, exitSelectionMode, selectedAgents]);
 
+  const importAgentEntries = useCallback(
+    async (entries: FolderPackageImportEntry[], functionEntries: FolderPackageImportEntry[] = []) => {
+      if (entries.length === 0) throw new Error("No agents found in file");
+
+      let imported = 0;
+      const failed: string[] = [];
+      let importedFunctions = 0;
+      if (functionEntries.length > 0) {
+        const result = await importCustomToolEntries(functionEntries, createCustomTool);
+        importedFunctions = result.imported;
+        failed.push(...result.failed);
+      }
+      for (const entry of entries) {
+        const normalized = normalizeAgentImportEntry(entry.raw, entry.resolveTextFile);
+        if (!normalized) continue;
+        try {
+          await createAgent.mutateAsync(normalized);
+          imported++;
+        } catch (error) {
+          failed.push(error instanceof Error ? error.message : `Failed to import ${normalized.name}`);
+        }
+      }
+
+      if (imported === 0 && failed.length === 0) {
+        throw new Error("No valid agents found in file");
+      }
+      if (imported > 0) {
+        setAgentImportSuccess(
+          `Imported ${imported} agent${imported === 1 ? "" : "s"}${
+            importedFunctions > 0 ? ` and ${importedFunctions} function${importedFunctions === 1 ? "" : "s"}` : ""
+          }.`,
+        );
+      }
+      if (failed.length > 0) {
+        setAgentImportError(`${failed.length} import item${failed.length === 1 ? "" : "s"} failed. ${failed[0]}`);
+      }
+    },
+    [createAgent, createCustomTool],
+  );
+
   const handleImportAgents = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       setAgentImportError(null);
@@ -480,40 +568,72 @@ export function AgentsPanel() {
       if (!file) return;
 
       try {
-        const text = isZipFile(file) ? await readTextFileFromZip(file, ["marinara-agents.json"]) : await file.text();
-        const parsed = JSON.parse(text);
-        const entries = getAgentImportEntries(parsed);
-        if (entries.length === 0) throw new Error("No agents found in file");
-
-        let imported = 0;
-        const failed: string[] = [];
-        for (const entry of entries) {
-          const normalized = normalizeAgentImportEntry(entry);
-          if (!normalized) continue;
-          try {
-            await createAgent.mutateAsync(normalized);
-            imported++;
-          } catch (error) {
-            failed.push(error instanceof Error ? error.message : `Failed to import ${normalized.name}`);
-          }
-        }
-
-        if (imported === 0 && failed.length === 0) {
-          throw new Error("No valid agents found in file");
-        }
-        if (imported > 0) {
-          setAgentImportSuccess(`Imported ${imported} agent${imported === 1 ? "" : "s"}.`);
-        }
-        if (failed.length > 0) {
-          setAgentImportError(`${failed.length} agent${failed.length === 1 ? "" : "s"} failed. ${failed[0]}`);
-        }
+        const entries = isZipFile(file)
+          ? await (async () => {
+              const files = await readTextFilesFromZip(file);
+              return {
+                agents: collectFolderPackageEntries(files, {
+                  rootFilenames: ["marinara-agents.json", "marinara-agent.json"],
+                  collectionKeys: ["agents"],
+                }),
+                functions: collectFolderPackageEntries(files, {
+                  rootFilenames: ["marinara-agents.json", "marinara-agent.json", "marinara-functions.json"],
+                  collectionKeys: ["functions", "customTools", "tools"],
+                }),
+              };
+            })()
+          : await (async () => {
+              const parsed = JSON.parse(await file.text());
+              return {
+                agents: getAgentImportEntries(parsed).map(
+                  (raw): FolderPackageImportEntry => ({
+                    raw,
+                    path: file.name,
+                    basePath: "",
+                    resolveTextFile: () => null,
+                  }),
+                ),
+                functions: getFolderImportEntries(parsed, ["functions", "customTools", "tools"]).map(
+                  (raw): FolderPackageImportEntry => ({
+                    raw,
+                    path: file.name,
+                    basePath: "",
+                    resolveTextFile: () => null,
+                  }),
+                ),
+              };
+            })();
+        await importAgentEntries(entries.agents, entries.functions);
       } catch (error) {
         setAgentImportError(error instanceof Error ? error.message : "Failed to import agents");
       }
 
       event.target.value = "";
     },
-    [createAgent],
+    [importAgentEntries],
+  );
+
+  const handleImportAgentFolder = useCallback(
+    async (event: ChangeEvent<HTMLInputElement>) => {
+      setAgentImportError(null);
+      setAgentImportSuccess(null);
+      try {
+        const files = await readTextFilesFromFileList(event.target.files);
+        const entries = collectFolderPackageEntries(files, {
+          rootFilenames: ["marinara-agents.json", "marinara-agent.json"],
+          collectionKeys: ["agents"],
+        });
+        const functionEntries = collectFolderPackageEntries(files, {
+          rootFilenames: ["marinara-agents.json", "marinara-agent.json", "marinara-functions.json"],
+          collectionKeys: ["functions", "customTools", "tools"],
+        });
+        await importAgentEntries(entries, functionEntries);
+      } catch (error) {
+        setAgentImportError(error instanceof Error ? error.message : "Failed to import agents");
+      }
+      event.target.value = "";
+    },
+    [importAgentEntries],
   );
 
   const handlePickAgentImage = useCallback((agentIdOrType: string) => {
@@ -552,6 +672,9 @@ export function AgentsPanel() {
           event.dataTransfer.setData("text/plain", agent.id);
         },
         onDragEnd: () => setDraggedAgentId(null),
+        nativeDragEnabled: nativeAgentDragEnabled,
+        touchSafeDragMode: touchSafeAgentDragMode,
+        suppressClickRef: suppressAgentClickRef,
         onDelete: async () => {
           const deleteMessage = custom
             ? `Delete "${agent.name}"?`
@@ -575,9 +698,11 @@ export function AgentsPanel() {
       getDraggedAgentIds,
       handlePickAgentImage,
       handleDuplicateAgent,
+      nativeAgentDragEnabled,
       openAgentDetail,
       selectedAgentIds,
       selectionMode,
+      touchSafeAgentDragMode,
       toggleAgentSelection,
     ],
   );
@@ -621,23 +746,7 @@ export function AgentsPanel() {
   );
 
   return (
-    <div
-      onDragOver={(event) => {
-        if (draggedAgentId) {
-          event.preventDefault();
-          event.dataTransfer.dropEffect = "move";
-        }
-      }}
-      onDrop={(event) => {
-        if (!draggedAgentId) return;
-        event.preventDefault();
-        const target = event.target as Element | null;
-        if (target?.closest("[data-agent-folder-id]")) return;
-        const payload = event.dataTransfer.getData("application/x-marinara-agent-ids");
-        handleAgentDrop(null, payload ? (JSON.parse(payload) as string[]) : undefined);
-      }}
-      className="flex min-h-full flex-col gap-2 p-3"
-    >
+    <div className="flex min-h-full flex-col gap-2 p-3">
       <input
         ref={agentImageInputRef}
         type="file"
@@ -652,6 +761,15 @@ export function AgentsPanel() {
         className="hidden"
         onChange={handleImportAgents}
       />
+      <input
+        ref={agentFolderImportInputRef}
+        type="file"
+        multiple
+        className="hidden"
+        onChange={handleImportAgentFolder}
+        // @ts-expect-error — webkitdirectory is a non-standard but widely-supported attribute
+        webkitdirectory=""
+      />
 
       <div className="flex gap-2">
         <button onClick={handleCreateAgent} className={cn("flex-1 text-xs", AGENT_GRADIENT_BUTTON)} title="Novo">
@@ -663,6 +781,13 @@ export function AgentsPanel() {
           title="Import agents"
         >
           <Download size="0.8125rem" />
+        </button>
+        <button
+          onClick={() => agentFolderImportInputRef.current?.click()}
+          className="mari-chrome-control mari-chrome-control--primary flex-1 text-xs"
+          title="Import agent folder"
+        >
+          <FolderOpen size="0.8125rem" />
         </button>
         <button
           onClick={() => {
@@ -687,20 +812,40 @@ export function AgentsPanel() {
         <div className="rounded-lg bg-emerald-500/10 px-2 py-1.5 text-xs text-emerald-500">{agentImportSuccess}</div>
       )}
 
-      <div className="relative">
-        <Search
-          size="0.8125rem"
-          className="mari-chrome-field-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-        />
-        <input
-          value={agentSearch}
-          onChange={(event) => setAgentSearch(event.target.value)}
-          placeholder="Search agents"
-          className="mari-chrome-field h-10 w-full py-0 pl-8 pr-3 text-xs md:h-9"
-        />
+      <div className="flex gap-1.5">
+        <div className="relative flex-1">
+          <Search
+            size="0.8125rem"
+            className="mari-chrome-field-icon pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+          />
+          <input
+            value={agentSearch}
+            onChange={(event) => setAgentSearch(event.target.value)}
+            placeholder="Search agents"
+            className="mari-chrome-field h-10 w-full py-0 pl-8 pr-3 text-xs md:h-9"
+          />
+        </div>
+        <div className="relative">
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value as ResourcePanelSort)}
+            className="mari-chrome-field mari-chrome-sort-field mari-accent-animated h-10 appearance-none py-0 pl-2.5 pr-7 text-[0.6875rem] md:h-9"
+            title="Ordem de classificação"
+            aria-label="Sort agents"
+          >
+            <option value="name-asc">A-Z</option>
+            <option value="name-desc">Z-A</option>
+            <option value="newest">Mais recentes</option>
+            <option value="oldest">Mais antigos</option>
+          </select>
+          <ArrowUpDown
+            size="0.625rem"
+            className="mari-chrome-field-icon mari-chrome-sort-icon mari-accent-animated pointer-events-none absolute right-2 top-1/2 -translate-y-1/2"
+          />
+        </div>
       </div>
 
-      {isLoading && <div className="py-4 text-center text-xs text-[var(--muted-foreground)]">Carregando...</div>}
+      {isLoading && <div className="mari-chrome-text-muted py-4 text-center text-xs">Carregando...</div>}
 
       {!hasVisibleAgents && (
         <p className="px-1 py-2 text-[0.625rem] text-[var(--muted-foreground)]">No agents match your search.</p>
@@ -718,12 +863,34 @@ export function AgentsPanel() {
           </button>
         </div>
         {agentFolders.length > 0 && <p className="mari-folder-helper">Drag and drop agents to folders</p>}
+        {draggedAgentId && (
+          <div
+            data-agent-folder-root
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "move";
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              const payload = event.dataTransfer.getData("application/x-marinara-agent-ids");
+              handleAgentDrop(null, payload ? (JSON.parse(payload) as string[]) : undefined);
+            }}
+            className="rounded-xl border border-dashed border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-highlight-bg)] px-3 py-2 text-[0.625rem] text-[var(--marinara-chat-chrome-button-text-active)]"
+          >
+            Drop here to move out of folder
+          </div>
+        )}
         {agentFolders.map((folder) => {
           const isEditing = editingFolderId === folder.id;
-          const folderAgents = folder.itemIds
-            .map((id) => selectableAgentById.get(id))
-            .filter((agent): agent is AgentConfigRow => Boolean(agent))
-            .filter((agent) => matchesAgentSearch(getAgentSearchData(agent)));
+          const folderAgents = sortBasicPanelItems(
+            folder.itemIds
+              .map((id) => selectableAgentById.get(id))
+              .filter((agent): agent is AgentConfigRow => Boolean(agent))
+              .filter((agent) => matchesAgentSearch(getAgentSearchData(agent))),
+            sort,
+            (agent) => agent.name,
+            (agent) => agent.createdAt || agent.updatedAt,
+          );
           if (agentSearchActive && folderAgents.length === 0) return null;
           const isExpanded = (agentSearchActive && folderAgents.length > 0) || expandedFolderId === folder.id;
           return (
@@ -845,9 +1012,14 @@ export function AgentsPanel() {
       </div>
 
       {agentCategorySections.map((section) => {
-        const visibleAgents = visibleBuiltInDisplayAgents.filter(
-          (agent) =>
-            !folderedAgentIds.has(agent.id) && agent.category === section.category && matchesAgentSearch(agent),
+        const visibleAgents = sortBasicPanelItems(
+          visibleBuiltInDisplayAgents.filter(
+            (agent) =>
+              !folderedAgentIds.has(agent.id) && agent.category === section.category && matchesAgentSearch(agent),
+          ),
+          sort,
+          (agent) => agent.name,
+          (agent) => agent.createdAt || agent.updatedAt,
         );
         if (visibleAgents.length === 0 && agentSearchQuery) return null;
         return (
@@ -883,6 +1055,9 @@ export function AgentsPanel() {
                     event.dataTransfer.setData("text/plain", agent.id);
                   },
                   onDragEnd: () => setDraggedAgentId(null),
+                  nativeDragEnabled: nativeAgentDragEnabled,
+                  touchSafeDragMode: touchSafeAgentDragMode,
+                  suppressClickRef: suppressAgentClickRef,
                   onDelete: async () => {
                     const deleteMessage =
                       `Delete "${agent.name}"? ` + "This basic agent will be hidden from the library and pickers.";
@@ -933,6 +1108,9 @@ export function AgentsPanel() {
                   event.dataTransfer.setData("text/plain", agent.id);
                 },
                 onDragEnd: () => setDraggedAgentId(null),
+                nativeDragEnabled: nativeAgentDragEnabled,
+                touchSafeDragMode: touchSafeAgentDragMode,
+                suppressClickRef: suppressAgentClickRef,
                 onDelete: async () => {
                   if (
                     await showConfirmDialog({
@@ -953,6 +1131,7 @@ export function AgentsPanel() {
 
       {selectionMode && (
         <SelectionActionBar
+          placement="panel"
           selectedCount={selectedAgents.length}
           onExport={() => void handleExportSelectedAgents()}
           onDelete={handleDeleteSelectedAgents}
@@ -981,6 +1160,9 @@ function renderAgentCard({
   isDragging = false,
   onDragStart,
   onDragEnd,
+  nativeDragEnabled = true,
+  touchSafeDragMode = false,
+  suppressClickRef,
 }: {
   id: string;
   type: string;
@@ -999,6 +1181,9 @@ function renderAgentCard({
   isDragging?: boolean;
   onDragStart?: (event: React.DragEvent<HTMLDivElement>) => void;
   onDragEnd?: () => void;
+  nativeDragEnabled?: boolean;
+  touchSafeDragMode?: boolean;
+  suppressClickRef?: { current: boolean };
 }) {
   const iconContent = imagePath ? (
     <img src={imagePath} alt="" className="h-full w-full object-cover" draggable={false} />
@@ -1015,18 +1200,30 @@ function renderAgentCard({
       key={id}
       data-agent-card
       data-agent-name={name}
-      draggable
-      onDragStart={onDragStart}
+      draggable={nativeDragEnabled}
+      onContextMenu={(event) => {
+        if (!touchSafeDragMode) return;
+        event.preventDefault();
+      }}
+      onDragStart={(event) => {
+        if (!nativeDragEnabled) {
+          event.preventDefault();
+          return;
+        }
+        onDragStart?.(event);
+      }}
       onDragEnd={onDragEnd}
       onClick={() => {
+        if (suppressClickRef?.current) return;
         if (selectionMode && onToggleSelected) onToggleSelected();
       }}
       className={cn(
-        "group relative flex cursor-pointer items-center gap-2.5 rounded-xl p-2 transition-all hover:bg-[var(--sidebar-accent)]",
+        "group relative flex touch-pan-y cursor-pointer items-center gap-2.5 rounded-xl p-2 transition-all hover:bg-[var(--sidebar-accent)]",
         selectionMode &&
           selected &&
           "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
         isDragging && "opacity-50",
+        touchSafeDragMode && "select-none",
       )}
     >
       {selectionMode && (
@@ -1045,6 +1242,7 @@ function renderAgentCard({
         type="button"
         onClick={(event) => {
           event.stopPropagation();
+          if (suppressClickRef?.current) return;
           if (selectionMode && onToggleSelected) {
             onToggleSelected();
             return;
@@ -1069,6 +1267,7 @@ function renderAgentCard({
         className={cn("min-w-0 flex-1 text-left", !selectionMode && (onDelete ? "pr-16" : "pr-10"))}
         onClick={(event) => {
           event.stopPropagation();
+          if (suppressClickRef?.current) return;
           if (selectionMode && onToggleSelected) {
             onToggleSelected();
             return;

@@ -84,6 +84,8 @@ export function ConversationSoundSetting() {
   const setRpNotificationSound = useUIStore((s) => s.setRpNotificationSound);
   const gameNotificationSound = useUIStore((s) => s.gameNotificationSound);
   const setGameNotificationSound = useUIStore((s) => s.setGameNotificationSound);
+  const notificationSoundsOnlyWhenUnfocused = useUIStore((s) => s.notificationSoundsOnlyWhenUnfocused);
+  const setNotificationSoundsOnlyWhenUnfocused = useUIStore((s) => s.setNotificationSoundsOnlyWhenUnfocused);
   const conversationBrowserNotifications = useUIStore((s) => s.conversationBrowserNotifications);
   const setConversationBrowserNotifications = useUIStore((s) => s.setConversationBrowserNotifications);
   const [browserPermission, setBrowserPermission] = useState<LocalNotificationPermission>("default");
@@ -150,7 +152,11 @@ export function ConversationSoundSetting() {
           setGameNotificationSound(v);
           if (v) playNotificationPing();
         }}
-        help="Play when a Game turn finishes loading."
+      />
+      <ToggleSetting
+        label="Only when Marinara is unfocused"
+        checked={notificationSoundsOnlyWhenUnfocused}
+        onChange={setNotificationSoundsOnlyWhenUnfocused}
       />
       <div className="mt-1 flex items-center gap-1.5">
         <Bell size="0.75rem" className="text-[var(--muted-foreground)]" />
@@ -172,12 +178,14 @@ export function ToggleSetting({
   onChange,
   help,
   disabled = false,
+  switchClassName,
 }: {
-  label: string;
+  label: ReactNode;
   checked: boolean;
   onChange: (v: boolean) => void;
   help?: string;
   disabled?: boolean;
+  switchClassName?: string;
 }) {
   return (
     <SettingsSwitch
@@ -189,6 +197,7 @@ export function ToggleSetting({
       labelPosition="start"
       className="justify-between gap-3 p-1.5"
       labelClassName="text-xs"
+      switchClassName={switchClassName}
     />
   );
 }
@@ -233,7 +242,7 @@ export function SettingsCheckbox({
     <span className={cn("min-w-0 text-xs", labelClassName)}>
       <span className="inline-flex min-w-0 items-center gap-1.5">
         <span className="min-w-0">{label}</span>
-        {help && (
+        {align !== "between" && help && (
           <span onClick={(e) => e.preventDefault()}>
             <HelpTooltip text={help} />
           </span>
@@ -244,6 +253,16 @@ export function SettingsCheckbox({
           {description}
         </span>
       )}
+    </span>
+  );
+  const inputCluster = (
+    <span className="inline-flex shrink-0 items-center gap-1.5">
+      {align === "between" && help && (
+        <span onClick={(e) => e.preventDefault()}>
+          <HelpTooltip text={help} />
+        </span>
+      )}
+      {input}
     </span>
   );
 
@@ -259,7 +278,7 @@ export function SettingsCheckbox({
       {align === "between" ? (
         <>
           {text}
-          {input}
+          {inputCluster}
         </>
       ) : (
         <>
@@ -283,6 +302,8 @@ type SettingsSwitchProps = SettingsSwitchAccessibleLabel & {
   labelPosition?: "start" | "end";
   className?: string;
   labelClassName?: string;
+  /** Appended last so callers can intentionally override checked-track visuals. */
+  switchClassName?: string;
 };
 
 export function SettingsSwitch({
@@ -297,6 +318,7 @@ export function SettingsSwitch({
   labelPosition = "end",
   className,
   labelClassName,
+  switchClassName,
 }: SettingsSwitchProps) {
   const inputId = useId();
   const switchControl = (
@@ -318,6 +340,7 @@ export function SettingsSwitch({
           checked ? "bg-[var(--primary)]/70" : "bg-[var(--border)]",
           checked && "mari-accent-animated",
           disabled ? "cursor-not-allowed" : "cursor-pointer",
+          switchClassName,
         )}
       >
         <span
@@ -329,13 +352,18 @@ export function SettingsSwitch({
       </label>
     </span>
   );
+  const switchCluster = (
+    <span className="inline-flex shrink-0 items-center gap-1.5">
+      {help && <HelpTooltip text={help} />}
+      {switchControl}
+    </span>
+  );
   const text = label ? (
     <span className={cn("min-w-0 text-sm", labelClassName)}>
       <span className="inline-flex min-w-0 items-center gap-1.5">
         <label htmlFor={inputId} className={cn("min-w-0", disabled ? "cursor-not-allowed" : "cursor-pointer")}>
           {label}
         </label>
-        {help && <HelpTooltip text={help} />}
       </span>
       {description && (
         <label
@@ -361,7 +389,7 @@ export function SettingsSwitch({
       )}
     >
       {labelPosition === "start" && text}
-      {switchControl}
+      {switchCluster}
       {labelPosition === "end" && text}
     </div>
   );

@@ -14,7 +14,7 @@ Official Docker/Podman images keep runtime configuration in `/app/data/.env` so 
 
 | Variable                                    | Default                                                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | ------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PORT`                                      | `7860`                                                   | Server port. Keep Android builds, launchers, Docker, and Termux on the same value. The Android APK is only a WebView shell for the Termux-served app; it must point at the same port as the running Termux server.                                                                                                                                                                                                                                                                                                                                                                                      |
+| `PORT`                                      | `7860`                                                   | Server port. Keep Android builds, launchers, Docker, and Termux on the same value. The Android APK is a Termux bootstrap + WebView shell and must point at the same port as the running Termux server.                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `HOST`                                      | `127.0.0.1` (`pnpm start`) / `0.0.0.0` (shell launchers) | Bind address. Set to `0.0.0.0` to allow access from other devices on your network.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `AUTO_OPEN_BROWSER`                         | `true`                                                   | Whether the shell launchers auto-open the local app URL. Set to `false`, `0`, `no`, or `off` to disable. Does not apply to the Android WebView wrapper.                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `AUTO_CREATE_DEFAULT_CONNECTION`            | `true`                                                   | Whether Marinara auto-creates the built-in OpenRouter Free starter connection when no saved connections exist. Set to `false`, `0`, `no`, or `off` to disable.                                                                                                                                                                                                                                                                                                                                                                                                                                          |
@@ -214,7 +214,19 @@ For the broader "trust every private network" toggle (RFC 1918 + CGNAT + ULA + l
 
 ### Privileged APIs
 
-Destructive or high-risk features require `ADMIN_SECRET` in addition to the global network/auth checks. The official client sends it as `X-Admin-Secret` after you save it in **Settings -> Advanced -> Admin Access**. These APIs fail closed when `ADMIN_SECRET` is unset or wrong:
+Destructive or high-risk features require `ADMIN_SECRET` in addition to the global network/auth checks. Set it on the server, then send the same value in the `X-Admin-Secret` header:
+
+```env
+ADMIN_SECRET=replace-this-with-a-long-random-secret
+```
+
+The official client sends that header for you after you paste the same value in **Settings -> Advanced -> Admin Access**. For raw API calls, include it yourself:
+
+```bash
+curl -H "X-Admin-Secret: replace-this-with-a-long-random-secret" http://127.0.0.1:7860/api/...
+```
+
+These APIs fail closed when `ADMIN_SECRET` is unset or wrong:
 
 - Admin data clearing and expunge.
 - Backup create/download/delete, profile export, and profile import. Profile exports redact obvious secret/token/password/API-key fields by default.
@@ -233,6 +245,6 @@ Security headers and API rate limits are enabled by default. Chat HTML is saniti
 ## Notes
 
 - The shell launchers (`start.bat`, `start.sh`, `start-termux.sh`) source `.env` automatically. If you run `pnpm start` directly, make sure the variables are set in your environment or `.env` file.
-- The Android APK does not start the server. It only opens the Termux-served app, so keep Termux running and keep the APK build port aligned with `PORT`.
+- The Android APK can ask Termux to run the setup/start command after the user grants Android and Termux permissions. The server still runs in Termux, so keep the APK build port aligned with `PORT`.
 - Container deployments can pass variables via `docker run -e` flags or a `docker-compose.yml` `environment` block instead of a `.env` file.
 - `HOST=0.0.0.0` is required for LAN access. The shell launchers default to this, but `pnpm start` binds to `127.0.0.1` unless overridden.

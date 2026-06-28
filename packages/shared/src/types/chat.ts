@@ -34,6 +34,7 @@ export const CONVERSATION_COMMAND_KEYS = [
   "selfie",
   "memory",
   "scene",
+  "uno",
   "music",
   "haptic",
   "influence",
@@ -43,6 +44,17 @@ export const CONVERSATION_COMMAND_KEYS = [
 export type ConversationCommandKey = (typeof CONVERSATION_COMMAND_KEYS)[number];
 
 export type ConversationCommandToggles = Partial<Record<ConversationCommandKey, boolean>>;
+
+export type ConversationPresenceStatus = "online" | "idle" | "dnd" | "offline";
+
+export type ConversationManualPresenceStatus = ConversationPresenceStatus;
+
+export interface ConversationStatusOverride {
+  status: ConversationManualPresenceStatus;
+  activity?: string | null;
+  createdAt: string;
+  expiresAt?: string | null;
+}
 
 /** Role of a message in the conversation. */
 export type MessageRole = "user" | "assistant" | "system" | "narrator";
@@ -137,6 +149,13 @@ export interface ChatSummaryEntry {
   rangeStartIndex?: number;
   rangeEndIndex?: number;
   messageIds?: string[];
+  /**
+   * The exact messages this entry hid from AI when "Hide summarised messages" was
+   * on (the summarized set minus the protected tail). Persisted so deletion can
+   * restore precisely what was hidden, rather than assuming it equals messageIds.
+   * Absent on entries created before this field or when nothing was hidden.
+   */
+  hiddenMessageIds?: string[];
   promptTemplateId?: string | null;
   tokenEstimate: number;
   createdAt: string;
@@ -158,6 +177,14 @@ export interface ChatMemoryChunk {
   embeddingStatus?: "vectorized" | "pending" | "unavailable";
 }
 
+/**
+ * Bounds for `ChatMetadata.summaryTailMessages` — the single source of truth for
+ * the tail limits, shared by the server resolver (read) and the popover slider
+ * (write) so display and persistence can't drift. `DEFAULT` applies only when the
+ * value is unset; an explicit `MIN` (0) means "hide the whole batch".
+ */
+export const SUMMARY_TAIL_MESSAGES = { MIN: 0, MAX: 50, DEFAULT: 10 } as const;
+
 /** Extra metadata stored on a chat. */
 export interface ChatMetadata {
   /** Compiled enabled rolling summary text for context injection. Derived from summaryEntries when present. */
@@ -176,6 +203,17 @@ export interface ChatMetadata {
   summaryPromptTemplates?: ChatSummaryPromptTemplate[];
   /** Selected manual summary prompt template ID. Null/omitted uses the built-in default. */
   activeSummaryPromptTemplateId?: string | null;
+  /** Optional text connection used for manual and automatic Roleplay chat summaries. Null uses the agent default. */
+  summaryConnectionId?: string | null;
+  /**
+   * When true, the automatic roleplay/visual-novel rolling summary hides the
+   * messages it summarized (hiddenFromAI=true) except the most-recent
+   * `summaryTailMessages`, so the summary is a net token reduction. Opt-in:
+   * undefined/false never hides (back-compat for existing chats). Read by the
+   * SERVER auto-summary path; promoted from the browser-local ui.store
+   * `summaryPopoverSettings.hideSummarisedMessages` preference.
+   */
+  hideSummarisedMessages?: boolean;
   /** Custom tags for organisation */
   tags: string[];
   /** Whether agents are enabled for this chat */
@@ -292,12 +330,19 @@ export interface ChatMetadata {
   entryTimingStates?: Record<string, import("./lorebook.js").LorebookEntryTimingState>;
   /** Per-chat global lorebook token budget. Missing uses app default; 0 means unlimited. */
   lorebookTokenBudget?: number | null;
+  /** Lorebook IDs the user has explicitly disabled for THIS chat. Auto-activated
+   *  books (bound to a present character / global / the active persona) that the
+   *  user turned off via the chat Lorebooks panel land here; the scope filter
+   *  drops them before injection without unbinding the book. */
+  excludedLorebookIds?: string[];
   /** ID of the chat preset most recently applied to this chat (drives the preset bar dropdown). */
   appliedChatPresetId?: string | null;
   /** Custom prompt prefix used by the /impersonate slash command. */
   impersonatePrompt?: string | null;
   /** Show a manual draft translation button beside the send control. */
   showInputTranslateButton?: boolean;
+  /** Optional per-chat AI translation system prompt override. Missing or blank uses the default prompt. */
+  translationPrompt?: string | null;
   /** Allow roleplay characters to create direct-message conversation chats with hidden [dm] commands. */
   roleplayDmCommandsEnabled?: boolean;
   /** Chat-scoped Intiface Central WebSocket URL for haptic manual and auto-connect. */
@@ -322,6 +367,12 @@ export interface ChatMetadata {
   autonomousUnreadCharacterIds?: string[];
   /** Timestamp of the newest autonomous unread message. */
   autonomousUnreadAt?: string | null;
+  /** Daily autonomous attention-budget counts by character. */
+  autonomousDailyBudget?: { date: string; counts: Record<string, number> };
+  /** Per-chat override for the daily autonomous check-in cap. Null/omitted uses talkativeness defaults. */
+  autonomousDailyCapOverride?: number | null;
+  /** Last successful autonomous message timestamp by character and intent key. */
+  intentCooldowns?: Record<string, Record<string, string>>;
 
   // ── Conversation Mode Fields ──
   /** Whether conversation character schedules are enabled for this chat. */
@@ -332,6 +383,10 @@ export interface ChatMetadata {
   conversationCommandToggles?: ConversationCommandToggles;
   /** Chat-scoped generated schedules for conversation characters. */
   characterSchedules?: Record<string, unknown>;
+  /** Chat-scoped manual status overrides for conversation characters. */
+  conversationStatusOverrides?: Record<string, ConversationStatusOverride>;
+  /** Chat-scoped derived presence status per character, updated each generation. Replaces extensions.conversationStatus to avoid cross-chat bleed. */
+  conversationCharacterStatuses?: Record<string, { status: ConversationPresenceStatus; activity: string }>;
   /** Week start timestamp for the current generated conversation schedules. */
   scheduleWeekStart?: string;
   /** Chat-scoped selfie prompt-builder template. Empty/null uses the global/default prompt. */
@@ -444,9 +499,12 @@ export interface ChatMetadata {
    */
   dayRolloverHour?: number;
   /**
-   * How many of the most recent messages to keep verbatim in the prompt even
-   * after they've been summarized. Bridges the day boundary so characters can
-   * pick up the actual flow of recent conversation, not just the gist. 0 disables.
+   * How many of the most recent messages to keep verbatim even after they've
+   * been summarized. In conversation mode this bridges the day boundary so
+   * characters pick up the actual flow of recent conversation, not just the
+   * gist. In roleplay/visual-novel mode it is the protected tail for
+   * `hideSummarisedMessages`: the last N messages stay visible (never hidden)
+   * when the auto-summary hides the rest. 0 disables (hide the whole batch).
    * Valid range: 0-50. Default: 10.
    */
   summaryTailMessages?: number;
@@ -509,6 +567,10 @@ export interface MessageExtra {
   generationInfo: GenerationInfo | null;
   /** User-uploaded or generated attachments associated with this message. */
   attachments?: MessageAttachment[] | null;
+  /** Persisted translated text for this message, if the user generated one. */
+  translation?: string | null;
+  /** User hid the persisted translation from display without deleting it. */
+  translationHidden?: boolean | null;
   /** Conversation-mode reactions on this message (emoji/custom-emoji + who reacted). */
   reactions?: MessageReaction[] | null;
   /** When true, this message marks the "new start" of the conversation — all earlier messages are excluded from context */
@@ -519,6 +581,12 @@ export interface MessageExtra {
   proseGuardianOriginalText?: string | null;
   /** Timestamp for the last post-processing rewrite applied to this message. */
   proseGuardianRewrittenAt?: string | null;
+  /**
+   * Conversation-mode assistant content before hidden character commands were
+   * stripped from visible display. Used for future prompt history so commands
+   * like [selfie] remain part of the model-visible transcript.
+   */
+  conversationCommandContent?: string | null;
   /** Professor Mari workspace trace shown on the home assistant transcript. */
   mariWorkspaceTimeline?: MariWorkspaceTraceItem[] | null;
   /** Per-swipe sprite expressions from the Expression Engine agent */
@@ -593,6 +661,8 @@ export interface GenerateRequest {
   userMessage: string | null;
   /** If set, regenerate the message at this ID */
   regenerateMessageId: string | null;
+  /** If set, append the generated continuation to this assistant message */
+  continueMessageId?: string | null;
   /** Override connection for this generation */
   connectionId: string | null;
   /** One-shot attachments sent with the user message. */

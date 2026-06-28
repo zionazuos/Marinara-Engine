@@ -33,6 +33,16 @@ function stripAnthropicSamplingParameters(body: Record<string, unknown>): void {
   delete body.top_p;
 }
 
+/**
+ * Anthropic's Messages API only accepts `temperature` in [0, 1] and 400s above that.
+ * Many other providers accept up to 2, so a portable preset may legitimately store a
+ * value > 1. Clamp at serialization time only — the user's stored preset is never
+ * mutated, so the same preset still sends its original value to providers that allow it.
+ */
+function clampAnthropicTemperature(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
+
 function resolveAdaptiveThinkingHeadroom(options: ChatOptions, visibleMaxTokens: number): number {
   const effort = options.reasoningEffort ?? "high";
   const effortHeadroom: Record<string, number> = {
@@ -78,8 +88,25 @@ interface AnthropicMessageResponse {
   usage?: { input_tokens?: number; output_tokens?: number };
 }
 
+function normalizeAnthropicFinishReason(reason: string | null | undefined): string {
+  if (reason === "max_tokens") return "length";
+  if (reason === "tool_use") return "tool_calls";
+  return reason ?? "stop";
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function formatAnthropicStreamError(error: unknown): string {
+  if (isRecord(error)) {
+    const type = typeof error.type === "string" && error.type.trim() ? error.type.trim() : null;
+    const message = typeof error.message === "string" && error.message.trim() ? error.message.trim() : null;
+    if (type && message) return `${type}: ${message}`;
+    if (message) return message;
+    if (type) return type;
+  }
+  return "Anthropic stream error";
 }
 
 function parseToolArguments(value: string): Record<string, unknown> {
@@ -199,6 +226,31 @@ function formatAnthropicPayloadMessages(messages: ChatMessage[]): AnthropicMessa
   return mergeAnthropicPayloadMessages(payload);
 }
 
+/**
+ * Anthropic rejects a final assistant turn whose content ends in whitespace
+ * (HTTP 400: "final assistant content must not end with trailing whitespace"),
+ * which surfaces to users as a refusal/block. The prefill-only fix (#2673 /
+ * #2674) trims at the prefill helper, so it misses the no-prefill case where
+ * the trailing assistant message is a depth-injected `role:assistant` section
+ * or — under markdown/none wrap — the last chat-history assistant message.
+ *
+ * Trimming the trailing edge of the last assistant message here, at the point
+ * of serialization, covers EVERY trailing-assistant surface (prefill,
+ * depth-injected, merged, history) in one place. Only the trailing edge Claude
+ * rejects is stripped; leading whitespace and non-trailing turns are untouched.
+ * See issue #2679.
+ */
+function trimTrailingAssistantWhitespace(messages: ChatMessage[]): ChatMessage[] {
+  const lastIndex = messages.length - 1;
+  const last = messages[lastIndex];
+  if (!last || last.role !== "assistant" || typeof last.content !== "string") return messages;
+  const trimmed = last.content.trimEnd();
+  if (trimmed === last.content) return messages;
+  const result = messages.slice();
+  result[lastIndex] = { ...last, content: trimmed };
+  return result;
+}
+
 function anthropicToolCallFromBlock(block: AnthropicContentBlock): LLMToolCall | null {
   if (block.type !== "tool_use" || typeof block.name !== "string") return null;
   const id =
@@ -225,11 +277,11 @@ export class AnthropicProvider extends BaseLLMProvider {
     if (this.shouldSuppressModelParameters(options) || !options.tools?.length)
       return super.chatComplete(messages, options);
 
-    const configuredMaxTokens = options.maxTokens ?? 4096;
+    const configuredMaxTokens = this.applyMaxTokensCap(options.maxTokens ?? 4096);
     const contextFit = this.fitMessagesToContext(messages, { ...options, maxTokens: configuredMaxTokens });
     messages = contextFit.messages;
     this.logContextTrim(contextFit, options.model);
-    const maxTokens = contextFit.maxTokens ?? configuredMaxTokens;
+    const maxTokens = this.applyMaxTokensCap(contextFit.maxTokens ?? configuredMaxTokens);
 
     const url = `${this.baseUrl}/messages`;
     const systemMessages = messages.filter((m) => m.role === "system" && m.content?.trim());
@@ -237,20 +289,23 @@ export class AnthropicProvider extends BaseLLMProvider {
 
     const body: Record<string, unknown> = {
       model: options.model,
-      max_tokens: maxTokens,
+      ...(this.shouldSendParameter(options, "maxTokens") ? { max_tokens: maxTokens } : {}),
       ...(systemField !== undefined ? { system: systemField } : {}),
-      messages: formatAnthropicPayloadMessages(messages),
+      messages: formatAnthropicPayloadMessages(trimTrailingAssistantWhitespace(messages)),
       tools: formatAnthropicTools(options.tools),
       stream: false,
-      ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
-      ...(options.topK ? { top_k: options.topK } : {}),
+      ...(this.shouldSendParameter(options, "temperature") && options.temperature !== undefined
+        ? { temperature: clampAnthropicTemperature(options.temperature) }
+        : {}),
+      ...(this.shouldSendParameter(options, "topK") && options.topK ? { top_k: options.topK } : {}),
+      ...(options.stop?.length ? { stop_sequences: options.stop } : {}),
     };
 
     const modelLower = options.model.toLowerCase();
     const isAdaptiveOnly = isClaudeAdaptiveOnlyNoSamplingModel(options.model);
     if (isAdaptiveOnly) stripAnthropicSamplingParameters(body);
 
-    if (options.enableThinking) {
+    if (this.shouldSendParameter(options, "reasoningEffort") && options.enableThinking) {
       if (isAdaptiveOnly) {
         applyAdaptiveThinkingConfig(body, options, maxTokens);
       } else {
@@ -270,14 +325,16 @@ export class AnthropicProvider extends BaseLLMProvider {
     this.applyCustomParameters(body, options);
     if (isAdaptiveOnly) {
       stripAnthropicSamplingParameters(body);
-      if (options.enableThinking) applyAdaptiveThinkingConfig(body, options);
+      if (this.shouldSendParameter(options, "reasoningEffort") && options.enableThinking) {
+        applyAdaptiveThinkingConfig(body, options);
+      }
     }
 
     const response = await llmFetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": this.apiKey,
+        ...(this.apiKey.trim() ? { "x-api-key": this.apiKey.trim() } : {}),
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify(body),
@@ -307,7 +364,7 @@ export class AnthropicProvider extends BaseLLMProvider {
     return {
       content: text || null,
       toolCalls,
-      finishReason: toolCalls.length > 0 ? "tool_calls" : (json.stop_reason ?? "stop"),
+      finishReason: toolCalls.length > 0 ? "tool_calls" : normalizeAnthropicFinishReason(json.stop_reason),
       usage:
         typeof json.usage?.input_tokens === "number" && typeof json.usage.output_tokens === "number"
           ? {
@@ -321,7 +378,7 @@ export class AnthropicProvider extends BaseLLMProvider {
 
   async *chat(messages: ChatMessage[], options: ChatOptions): AsyncGenerator<string, LLMUsage | void, unknown> {
     const suppressModelParameters = this.shouldSuppressModelParameters(options);
-    const configuredMaxTokens = suppressModelParameters ? undefined : (options.maxTokens ?? 4096);
+    const configuredMaxTokens = this.applyMaxTokensCap(options.maxTokens ?? 4096);
     const contextFit = this.fitMessagesToContext(messages, { ...options, maxTokens: configuredMaxTokens });
     messages = contextFit.messages;
     this.logContextTrim(contextFit, options.model);
@@ -331,10 +388,14 @@ export class AnthropicProvider extends BaseLLMProvider {
 
     // Claude requires system prompt separate from messages — filter out empty-content messages
     const systemMessages = messages.filter((m) => m.role === "system" && m.content?.trim());
-    const chatMessages = messages.filter((m) => m.role !== "system" && (m.content?.trim() || m.images?.length || m.files?.length));
+    const chatMessages = messages.filter(
+      (m) => m.role !== "system" && (m.content?.trim() || m.images?.length || m.files?.length),
+    );
 
-    // Ensure alternating user/assistant pattern (Claude requirement)
-    const mergedMessages = this.mergeConsecutiveMessages(chatMessages);
+    // Ensure alternating user/assistant pattern (Claude requirement), then
+    // strip any trailing whitespace from the final assistant turn (Claude 400s
+    // on it — see trimTrailingAssistantWhitespace / issue #2679).
+    const mergedMessages = trimTrailingAssistantWhitespace(this.mergeConsecutiveMessages(chatMessages));
 
     const enableCaching = options.enableCaching ?? false;
     const cachingAtDepth = normalizeCachingAtDepth(options.cachingAtDepth);
@@ -379,12 +440,15 @@ export class AnthropicProvider extends BaseLLMProvider {
     };
     if (!suppressModelParameters) {
       const outputMaxTokens = maxTokens ?? 4096;
-      body.max_tokens = outputMaxTokens;
+      if (this.shouldSendParameter(options, "maxTokens")) body.max_tokens = outputMaxTokens;
       body.stream = options.stream ?? true;
-      if (options.temperature !== undefined) body.temperature = options.temperature;
-      if (options.topK) body.top_k = options.topK;
+      if (this.shouldSendParameter(options, "temperature") && options.temperature !== undefined) {
+        body.temperature = clampAnthropicTemperature(options.temperature);
+      }
+      if (this.shouldSendParameter(options, "topK") && options.topK) body.top_k = options.topK;
+      if (options.stop?.length) body.stop_sequences = options.stop;
     } else {
-      body.max_tokens = maxTokens ?? 4096;
+      if (this.shouldSendParameter(options, "maxTokens")) body.max_tokens = maxTokens ?? 4096;
       if (options.stream) body.stream = true;
     }
 
@@ -397,7 +461,7 @@ export class AnthropicProvider extends BaseLLMProvider {
     }
 
     // Enable extended thinking for reasoning models
-    if (!suppressModelParameters && options.enableThinking) {
+    if (!suppressModelParameters && this.shouldSendParameter(options, "reasoningEffort") && options.enableThinking) {
       const outputMaxTokens = maxTokens ?? 4096;
       if (isAdaptiveOnly) {
         // Adaptive-only Claude models use adaptive thinking (budget_tokens removed).
@@ -425,7 +489,7 @@ export class AnthropicProvider extends BaseLLMProvider {
     this.applyCustomParameters(body, options);
     if (isAdaptiveOnly && !suppressModelParameters) {
       stripAnthropicSamplingParameters(body);
-      if (options.enableThinking) {
+      if (this.shouldSendParameter(options, "reasoningEffort") && options.enableThinking) {
         applyAdaptiveThinkingConfig(body, options);
       }
     }
@@ -434,7 +498,7 @@ export class AnthropicProvider extends BaseLLMProvider {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": this.apiKey,
+        ...(this.apiKey.trim() ? { "x-api-key": this.apiKey.trim() } : {}),
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify(body),
@@ -453,11 +517,15 @@ export class AnthropicProvider extends BaseLLMProvider {
         usage?: { input_tokens: number; output_tokens: number };
       };
       // Extract thinking content if present
-      const thinkingBlock = json.content.find((c) => c.type === "thinking");
-      if (thinkingBlock?.thinking && options.onThinking) {
-        options.onThinking(thinkingBlock.thinking);
+      for (const block of json.content) {
+        if (block.type === "thinking" && block.thinking && options.onThinking) {
+          options.onThinking(block.thinking);
+        }
       }
-      yield json.content.find((c) => c.type === "text")?.text ?? "";
+      yield json.content
+        .filter((block) => block.type === "text" && typeof block.text === "string")
+        .map((block) => block.text)
+        .join("");
       if (json.usage) {
         return {
           promptTokens: json.usage.input_tokens,
@@ -486,70 +554,100 @@ export class AnthropicProvider extends BaseLLMProvider {
     let currentBlockType = "text"; // track whether we're in a thinking or text block
     let inputTokens = 0;
     let outputTokens = 0;
+    let finishReason = "stop";
+    let emittedText = false;
 
     try {
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
+        buffer += done ? decoder.decode() : decoder.decode(value, { stream: true });
+        const lines = buffer.split(/\r?\n/);
+        buffer = done ? "" : (lines.pop() ?? "");
 
         for (const line of lines) {
           const trimmed = line.trim();
-          if (!trimmed.startsWith("data: ")) continue;
-          const data = trimmed.slice(6);
+          if (!trimmed.startsWith("data:")) continue;
+          const data = trimmed.slice(5).trimStart();
 
+          let event: {
+            type: string;
+            error?: unknown;
+            message?: { usage?: { input_tokens: number; output_tokens: number } };
+            content_block?: { type: string };
+            delta?: { type: string; text?: string; thinking?: string; stop_reason?: string | null };
+            usage?: { output_tokens: number };
+          };
           try {
-            const event = JSON.parse(data) as {
-              type: string;
-              message?: { usage?: { input_tokens: number; output_tokens: number } };
-              content_block?: { type: string };
-              delta?: { type: string; text?: string; thinking?: string };
-              usage?: { output_tokens: number };
-            };
-            // Capture input token count from message_start
-            if (event.type === "message_start" && event.message?.usage) {
-              inputTokens = event.message.usage.input_tokens;
-              outputTokens = event.message.usage.output_tokens;
-            }
-            // Capture final output token count from message_delta
-            if (event.type === "message_delta" && event.usage) {
-              outputTokens = event.usage.output_tokens;
-            }
-            // Track block type (thinking vs text)
-            if (event.type === "content_block_start" && event.content_block) {
-              currentBlockType = event.content_block.type;
-            }
-            if (event.type === "content_block_delta") {
-              if (currentBlockType === "thinking" && event.delta?.thinking && options.onThinking) {
-                options.onThinking(event.delta.thinking);
-              } else if (event.delta?.text) {
-                yield event.delta.text;
-              }
-            }
-            if (event.type === "message_stop") {
-              if (inputTokens || outputTokens) {
-                return {
-                  promptTokens: inputTokens,
-                  completionTokens: outputTokens,
-                  totalTokens: inputTokens + outputTokens,
-                };
-              }
-              return;
-            }
+            event = JSON.parse(data) as typeof event;
           } catch {
             // Skip malformed lines
+            continue;
+          }
+
+          if (event.type === "error") {
+            throw new Error(`Anthropic stream error: ${formatAnthropicStreamError(event.error)}`);
+          }
+          // Capture input token count from message_start
+          if (event.type === "message_start" && event.message?.usage) {
+            inputTokens = event.message.usage.input_tokens;
+            outputTokens = event.message.usage.output_tokens;
+          }
+          // Capture final output token count from message_delta
+          if (event.type === "message_delta" && event.usage) {
+            outputTokens = event.usage.output_tokens;
+          }
+          if (event.type === "message_delta" && typeof event.delta?.stop_reason === "string") {
+            finishReason = normalizeAnthropicFinishReason(event.delta.stop_reason);
+          }
+          // Track block type (thinking vs text)
+          if (event.type === "content_block_start" && event.content_block) {
+            currentBlockType = event.content_block.type;
+          }
+          if (event.type === "content_block_delta") {
+            if (currentBlockType === "thinking" && event.delta?.thinking && options.onThinking) {
+              options.onThinking(event.delta.thinking);
+            } else if (event.delta?.text) {
+              emittedText = true;
+              yield event.delta.text;
+            }
+          }
+          if (event.type === "message_stop") {
+            if (!emittedText && !options.signal?.aborted) {
+              throw new Error(`Anthropic stream completed without text (finish reason: ${finishReason})`);
+            }
+            if (inputTokens || outputTokens) {
+              return {
+                promptTokens: inputTokens,
+                completionTokens: outputTokens,
+                totalTokens: inputTokens + outputTokens,
+                finishReason,
+              };
+            }
+            return;
           }
         }
+        if (done) break;
       }
     } finally {
       if (options.signal) options.signal.removeEventListener("abort", onAbort);
     }
-    if (inputTokens || outputTokens) {
-      return { promptTokens: inputTokens, completionTokens: outputTokens, totalTokens: inputTokens + outputTokens };
+    if (!emittedText && !options.signal?.aborted) {
+      throw new Error(`Anthropic stream completed without text (finish reason: ${finishReason})`);
     }
+    if (inputTokens || outputTokens) {
+      return {
+        promptTokens: inputTokens,
+        completionTokens: outputTokens,
+        totalTokens: inputTokens + outputTokens,
+        finishReason,
+      };
+    }
+  }
+
+  override async embed(_texts: string[], _model: string, _signal?: AbortSignal): Promise<number[][]> {
+    throw new Error(
+      "Anthropic connections do not support embeddings through Marinara's OpenAI-compatible /embeddings path. Configure a dedicated OpenAI-compatible or local embedding connection.",
+    );
   }
 
   /**

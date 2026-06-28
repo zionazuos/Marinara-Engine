@@ -12,6 +12,7 @@ import {
   useState,
   type DragEvent as ReactDragEvent,
   type MouseEvent as ReactMouseEvent,
+  type TouchEvent as ReactTouchEvent,
 } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -31,19 +32,19 @@ import {
   Settings2,
   Sparkles,
   Square,
-  ToggleLeft,
-  ToggleRight,
   Trash2,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { showConfirmDialog } from "../../lib/app-dialogs";
 import { useUpdateLorebookEntry, useDeleteLorebookEntry, useDuplicateLorebookEntry } from "../../hooks/use-lorebooks";
 import { MacroTextarea } from "../ui/MacroTextarea";
+import { SettingsSwitch } from "../panels/settings/SettingControls";
 import type {
   LorebookEntry,
   LorebookFilterMode,
   LorebookFolder,
   LorebookMatchingSource,
+  SelectiveLogic,
 } from "@marinara-engine/shared";
 import {
   ExpandableTextarea,
@@ -77,6 +78,7 @@ interface Props {
   onDragOver: (e: ReactDragEvent<HTMLDivElement>) => void;
   onDrop: (e: ReactDragEvent<HTMLDivElement>) => void;
   onDragEnd: () => void;
+  onDragHandleTouchStart?: (e: ReactTouchEvent<HTMLButtonElement>, sourceElement: HTMLDivElement | null) => void;
   selectionMode?: boolean;
   isSelected?: boolean;
   onToggleSelected?: () => void;
@@ -118,10 +120,17 @@ const STATUS_LABEL: Record<EntryStatus, string> = {
 };
 
 const STATUS_DOT_COLOR: Record<EntryStatus, string> = {
-  constant: "bg-amber-400",
-  selective: "bg-violet-400",
+  constant: "bg-yellow-300",
+  selective: "bg-red-400",
   normal: "bg-emerald-400",
 };
+
+const SELECTIVE_LOGIC_OPTIONS: Array<{ value: SelectiveLogic; label: string }> = [
+  { value: "and", label: "AND Any" },
+  { value: "and_all", label: "AND All" },
+  { value: "not", label: "NOT Any" },
+  { value: "not_all", label: "NOT All" },
+];
 
 const STATUS_GUIDE: Array<{ status: EntryStatus; description: string }> = [
   { status: "normal", description: "Triggers when primary keys match the scanned text." },
@@ -187,6 +196,7 @@ export function LorebookEntryRow({
   onDragOver,
   onDrop,
   onDragEnd,
+  onDragHandleTouchStart,
   selectionMode = false,
   isSelected = false,
   onToggleSelected,
@@ -212,6 +222,7 @@ export function LorebookEntryRow({
   const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [statusMenuPosition, setStatusMenuPosition] = useState({ top: 0, left: 0, width: ENTRY_STATUS_MENU_WIDTH });
   const mobileControlsRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
   const statusButtonRef = useRef<HTMLButtonElement>(null);
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
@@ -334,14 +345,12 @@ export function LorebookEntryRow({
     [],
   );
 
-  const handleEnableToggle = useCallback(
-    (e: ReactMouseEvent) => {
-      e.stopPropagation();
-      const next = !localEnabled;
+  const handleEnabledChange = useCallback(
+    (next: boolean) => {
       setLocalEnabled(next);
       patch({ enabled: next });
     },
-    [localEnabled, patch],
+    [patch],
   );
 
   const handleUseRegexToggle = useCallback(
@@ -435,11 +444,13 @@ export function LorebookEntryRow({
   return (
     <div
       className={cn(
-        "relative rounded-xl bg-[var(--secondary)] ring-1 ring-[var(--border)] transition-all",
-        isExpanded ? "ring-amber-400/40" : "hover:ring-amber-400/30",
-        selectionMode && isSelected && "bg-amber-400/10 ring-amber-400/40",
+        "mari-editor-panel mari-editor-panel--soft relative transition-all",
+        isExpanded ? "border-[var(--marinara-editor-border-strong)]" : "hover:border-[var(--marinara-editor-border-strong)]",
+        selectionMode && isSelected && "mari-chrome-accent-surface mari-accent-animated",
         isDragging && "opacity-40",
       )}
+      ref={rowRef}
+      data-lorebook-entry-row-id={entry.id}
       draggable={draggable && isDragReady}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
@@ -453,21 +464,21 @@ export function LorebookEntryRow({
           aria-hidden
           className={cn(
             "pointer-events-none absolute inset-y-0 left-0 w-[3px] rounded-l-xl",
-            previewMatch === "matched" ? "bg-emerald-400" : "bg-amber-400",
+            previewMatch === "matched" ? "bg-emerald-400" : "mari-chrome-accent-progress mari-accent-animated",
           )}
         />
       )}
 
       {/* ── Compact row ── */}
       <div
-        className="group flex cursor-pointer items-center gap-1 px-2 py-1.5 sm:gap-2"
+        className="group flex min-w-0 cursor-pointer items-center gap-0.5 px-1.5 py-1.5 sm:gap-2 sm:px-2"
         onClick={selectionMode ? onToggleSelected : onToggleExpand}
       >
         {/* Drag handle */}
         <button
           type="button"
           className={cn(
-            "shrink-0 rounded p-0.5 text-[var(--muted-foreground)] transition-colors",
+            "flex h-6 w-4 shrink-0 items-center justify-center rounded p-0 text-[var(--muted-foreground)] transition-colors sm:h-auto sm:w-auto sm:p-0.5",
             draggable
               ? "cursor-grab hover:bg-[var(--accent)] hover:text-[var(--foreground)] active:cursor-grabbing"
               : "cursor-not-allowed opacity-40",
@@ -481,6 +492,10 @@ export function LorebookEntryRow({
           onMouseUp={(e) => {
             e.stopPropagation();
             onDragHandleMouseUp();
+          }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            if (draggable) onDragHandleTouchStart?.(e, rowRef.current);
           }}
         >
           <GripVertical size="0.875rem" />
@@ -496,9 +511,9 @@ export function LorebookEntryRow({
               onToggleSelected?.();
             }}
             className={cn(
-              "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ring)]",
+              "flex h-6 w-6 shrink-0 items-center justify-center rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ring)] sm:h-7 sm:w-7",
               isSelected
-                ? "bg-amber-400/15 text-amber-400 ring-1 ring-amber-400/30"
+                ? "mari-chrome-accent-surface mari-accent-animated ring-1"
                 : "text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
             )}
           >
@@ -510,7 +525,7 @@ export function LorebookEntryRow({
         <button
           type="button"
           aria-label={isExpanded ? "Collapse entry" : "Expand entry"}
-          className="shrink-0 rounded p-0.5 text-[var(--muted-foreground)] transition-transform hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
+          className="flex h-6 w-4 shrink-0 items-center justify-center rounded p-0 text-[var(--muted-foreground)] transition-transform hover:bg-[var(--accent)] hover:text-[var(--foreground)] sm:h-auto sm:w-auto sm:p-0.5"
           onClick={(e) => {
             e.stopPropagation();
             onToggleExpand();
@@ -519,20 +534,19 @@ export function LorebookEntryRow({
           <ChevronDown size="0.875rem" className={cn("transition-transform", isExpanded ? "rotate-0" : "-rotate-90")} />
         </button>
 
-        {/* Enable toggle */}
-        <button
-          type="button"
-          aria-label={localEnabled ? "Disable entry" : "Enable entry"}
-          title={localEnabled ? "Entry enabled" : "Entry disabled"}
-          onClick={handleEnableToggle}
-          className="shrink-0"
+        <div
+          className="-mx-1 shrink-0 sm:mx-0"
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
         >
-          {localEnabled ? (
-            <ToggleRight size="1.125rem" className="text-amber-400" />
-          ) : (
-            <ToggleLeft size="1.125rem" className="text-[var(--muted-foreground)]" />
-          )}
-        </button>
+          <SettingsSwitch
+            ariaLabel={localEnabled ? "Disable entry" : "Enable entry"}
+            title={localEnabled ? "Entry enabled" : "Entry disabled"}
+            checked={localEnabled}
+            onChange={handleEnabledChange}
+            className="p-0 hover:bg-transparent"
+          />
+        </div>
 
         {/* Regex key matching toggle */}
         <button
@@ -541,7 +555,7 @@ export function LorebookEntryRow({
           title={localUseRegex ? "Regex key matching enabled" : "Plain-text key matching"}
           onClick={handleUseRegexToggle}
           className={cn(
-            "shrink-0 rounded p-0.5 transition-colors",
+            "ml-1 shrink-0 rounded p-0 transition-colors sm:ml-0 sm:p-0.5",
             localUseRegex
               ? "bg-orange-400/15 text-orange-300 ring-1 ring-orange-400/25"
               : "text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
@@ -556,7 +570,7 @@ export function LorebookEntryRow({
           type="button"
           onClick={handleStatusMenuToggle}
           className={cn(
-            "flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]",
+            "flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] sm:h-7 sm:w-7",
             showStatusMenu && "bg-[var(--accent)]",
           )}
           aria-label={`Entry type: ${STATUS_LABEL[localStatus]}. Choose entry type.`}
@@ -618,7 +632,7 @@ export function LorebookEntryRow({
               "inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[0.625rem] font-medium ring-1",
               previewMatch === "matched"
                 ? "bg-emerald-400/12 text-emerald-300 ring-emerald-400/30"
-                : "bg-amber-400/12 text-amber-300 ring-amber-400/30",
+                : "mari-editor-chip mari-editor-chip--accent",
             )}
             title={
               previewMatch === "matched"
@@ -642,13 +656,13 @@ export function LorebookEntryRow({
           }}
           onClick={(e) => e.stopPropagation()}
           placeholder="Entrada sem título"
-          className="min-w-[4rem] flex-1 truncate rounded bg-transparent px-1 text-sm font-medium outline-none transition-colors hover:bg-[var(--accent)]/40 focus:bg-[var(--accent)]/40 focus:ring-1 focus:ring-[var(--ring)] sm:min-w-[7rem]"
+          className="min-w-0 flex-1 truncate rounded bg-transparent px-1 text-sm font-medium outline-none transition-colors hover:bg-[var(--accent)]/40 focus:bg-[var(--accent)]/40 focus:ring-1 focus:ring-[var(--ring)] sm:min-w-[7rem]"
         />
 
         <button
           type="button"
           className={cn(
-            "relative inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[0.625rem] ring-1 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ring)]",
+            "relative inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[0.625rem] ring-1 transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ring)] sm:h-6 sm:w-6",
             isVectorExcluded
               ? "bg-[var(--destructive)]/10 text-[var(--destructive)] ring-[var(--destructive)]/20"
               : isVectorized
@@ -688,7 +702,7 @@ export function LorebookEntryRow({
             title="Controles rápidos da entrada"
             onClick={() => setShowMobileControls((current) => !current)}
             className={cn(
-              "flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]",
+              "flex h-6 w-6 items-center justify-center rounded-md text-[var(--muted-foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] sm:h-7 sm:w-7",
               showMobileControls && "bg-[var(--accent)] text-[var(--foreground)]",
             )}
           >
@@ -770,7 +784,7 @@ export function LorebookEntryRow({
         {/* Lock badge (display-only on the row; toggled inside the drawer) */}
         {entry.locked && (
           <span
-            className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-sky-400/15 text-sky-400 ring-1 ring-sky-400/20"
+            className="mari-editor-chip mari-editor-chip--accent h-6 w-6 shrink-0 justify-center rounded-md p-0"
             title="Entrada bloqueada"
             aria-label="Entrada bloqueada"
           >
@@ -866,7 +880,7 @@ export function LorebookEntryRow({
           title="Duplicate entry"
           disabled={duplicateDisabled}
           onClick={handleDuplicate}
-          className="shrink-0 rounded p-1 text-[var(--muted-foreground)] opacity-0 transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)] group-hover:opacity-100 disabled:cursor-not-allowed max-md:opacity-100"
+          className="shrink-0 rounded p-0.5 text-[var(--muted-foreground)] opacity-0 transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)] group-hover:opacity-100 disabled:cursor-not-allowed max-md:opacity-100 sm:p-1"
         >
           <Copy size="0.75rem" />
         </button>
@@ -876,7 +890,7 @@ export function LorebookEntryRow({
           type="button"
           aria-label="Excluir entrada"
           onClick={handleDelete}
-          className="shrink-0 rounded p-1 opacity-0 transition-all hover:bg-[var(--destructive)]/15 group-hover:opacity-100 max-md:opacity-100"
+          className="shrink-0 rounded p-0.5 opacity-0 transition-all hover:bg-[var(--destructive)]/15 group-hover:opacity-100 max-md:opacity-100 sm:p-1"
         >
           <Trash2 size="0.75rem" className="text-[var(--destructive)]" />
         </button>
@@ -913,7 +927,7 @@ function CompactSelect({
       title={title}
       onChange={(e) => onChange(e.target.value)}
       className={cn(
-        "h-6 min-w-0 truncate rounded-md bg-[var(--secondary)] px-1 text-[0.625rem] ring-1 ring-[var(--border)] transition-colors hover:ring-amber-400/40 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]",
+        "mari-editor-field h-6 min-w-0 truncate px-1 text-[0.625rem]",
         className,
       )}
     >
@@ -970,7 +984,7 @@ function CompactNumber({
 
   return (
     <label
-      className="flex h-6 items-center gap-px rounded-md bg-[var(--secondary)] px-1 text-[0.625rem] ring-1 ring-[var(--border)] transition-colors hover:ring-amber-400/40 focus-within:ring-2 focus-within:ring-[var(--ring)]"
+      className="mari-editor-field flex h-6 items-center gap-px px-1 text-[0.625rem]"
       title={title}
     >
       {prefix && <span className="text-[var(--muted-foreground)]">{prefix}:</span>}
@@ -1012,7 +1026,7 @@ function MobileSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-9 w-full min-w-0 rounded-lg bg-[var(--secondary)] px-2 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+        className="mari-editor-field h-9 w-full min-w-0 px-2 text-xs"
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -1064,7 +1078,7 @@ function MobileNumber({
   return (
     <label className="grid grid-cols-[5.75rem_minmax(0,1fr)] items-center gap-2 text-[0.6875rem]">
       <span className="text-[var(--muted-foreground)]">{label}</span>
-      <span className="flex h-9 min-w-0 items-center rounded-lg bg-[var(--secondary)] px-2 ring-1 ring-[var(--border)] focus-within:ring-2 focus-within:ring-[var(--ring)]">
+      <span className="mari-editor-field flex h-9 min-w-0 items-center px-2">
         <input
           type="number"
           value={draft}
@@ -1118,6 +1132,8 @@ function buildEntrySavePayload(form: Partial<LorebookEntry>) {
     tag: form.tag,
     locked: form.locked,
     preventRecursion: form.preventRecursion,
+    excludeRecursion: form.excludeRecursion,
+    delayUntilRecursion: form.delayUntilRecursion,
     excludeFromVectorization: form.excludeFromVectorization,
   };
 }
@@ -1133,7 +1149,7 @@ function FilterModeSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as LorebookFilterMode)}
-      className="h-7 rounded-lg bg-[var(--secondary)] px-2 text-[0.6875rem] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+      className="mari-editor-field h-7 px-2 text-[0.6875rem]"
     >
       {(["any", "include", "exclude"] as LorebookFilterMode[]).map((mode) => (
         <option key={mode} value={mode}>
@@ -1171,8 +1187,8 @@ function FilterPills({
             className={cn(
               "rounded-full px-2 py-0.5 text-[0.625rem] ring-1 transition-colors",
               active
-                ? "bg-amber-400/15 text-amber-300 ring-amber-400/30"
-                : "bg-[var(--secondary)] text-[var(--muted-foreground)] ring-[var(--border)] hover:text-[var(--foreground)]",
+                ? "mari-chrome-accent-surface mari-accent-animated"
+                : "mari-editor-chip text-[var(--marinara-editor-muted)] hover:text-[var(--marinara-editor-text)]",
             )}
           >
             {item.label}
@@ -1332,7 +1348,7 @@ function ExpandedDrawer({
 
   return (
     <div
-      className="space-y-3 border-t border-[var(--border)] px-3 py-3 sm:px-4"
+      className="space-y-3 border-t border-[var(--marinara-editor-divider)] px-3 py-3 sm:px-4"
       onBlurCapture={(event) => {
         const nextTarget = event.relatedTarget;
         if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) return;
@@ -1351,7 +1367,7 @@ function ExpandedDrawer({
             onChange={(value) => update({ description: value })}
             onBlur={flushAutosave}
             rows={3}
-            className="w-full resize-y rounded-lg bg-[var(--secondary)] px-2.5 py-2 text-xs leading-5 ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+            className="mari-editor-field w-full resize-y px-2.5 py-2 text-xs leading-5"
             placeholder="Brief summary for routing."
             title="Edit Description"
           />
@@ -1370,37 +1386,37 @@ function ExpandedDrawer({
         <FieldGroup
           label="Chaves secundárias"
           icon={Key}
-          help="Additional keywords used with AND/OR/NOT logic. 'AND' means both primary AND secondary must match. 'NOT' means primary must match but secondary must NOT."
+          help="Additional keywords used with SillyTavern-style selective logic. Any means at least one secondary key; All means every secondary key."
         >
           <KeysEditor keys={form.secondaryKeys ?? []} onChange={(keys) => update({ secondaryKeys: keys })} />
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             <label className="text-[0.6875rem] text-[var(--muted-foreground)]">Lógica:</label>
-            {(["and", "or", "not"] as const).map((logic) => (
+            {SELECTIVE_LOGIC_OPTIONS.map((option) => (
               <button
-                key={logic}
-                onClick={() => update({ selectiveLogic: logic })}
+                key={option.value}
+                onClick={() => update({ selectiveLogic: option.value })}
                 className={cn(
                   "rounded-md px-2 py-0.5 text-[0.6875rem] font-medium transition-colors",
-                  form.selectiveLogic === logic
-                    ? "bg-[var(--accent)] text-[var(--accent-foreground)]"
-                    : "text-[var(--muted-foreground)] hover:bg-[var(--secondary)]",
+                  (form.selectiveLogic === "or" ? "and" : form.selectiveLogic) === option.value
+                    ? "mari-chrome-accent-surface mari-accent-animated"
+                    : "text-[var(--muted-foreground)] hover:bg-[var(--marinara-editor-control-bg-hover)]",
                 )}
               >
-                {logic.toUpperCase()}
+                {option.label}
               </button>
             ))}
           </div>
         </FieldGroup>
       </div>
 
-      <details className="rounded-lg border border-[var(--border)] bg-[var(--card)]/40 px-3 py-2">
+      <details className="mari-editor-panel mari-editor-panel--soft px-3 py-2">
         <summary className="cursor-pointer text-xs font-medium text-[var(--foreground)]">
           
           Filtros de contexto e fontes de correspondência
         </summary>
         <div className="mt-3 space-y-3">
           <div className="grid gap-3 lg:grid-cols-3">
-            <div className="space-y-2 rounded-lg bg-[var(--secondary)]/45 p-2 ring-1 ring-[var(--border)]">
+            <div className="mari-editor-panel mari-editor-panel--soft space-y-2 p-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[0.6875rem] font-medium">Personagens</span>
                 <FilterModeSelect
@@ -1416,7 +1432,7 @@ function ExpandedDrawer({
               />
             </div>
 
-            <div className="space-y-2 rounded-lg bg-[var(--secondary)]/45 p-2 ring-1 ring-[var(--border)]">
+            <div className="mari-editor-panel mari-editor-panel--soft space-y-2 p-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[0.6875rem] font-medium">Tags do personagem</span>
                 <FilterModeSelect
@@ -1432,7 +1448,7 @@ function ExpandedDrawer({
               />
             </div>
 
-            <div className="space-y-2 rounded-lg bg-[var(--secondary)]/45 p-2 ring-1 ring-[var(--border)]">
+            <div className="mari-editor-panel mari-editor-panel--soft space-y-2 p-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[0.6875rem] font-medium">Geração</span>
                 <FilterModeSelect
@@ -1449,7 +1465,7 @@ function ExpandedDrawer({
             </div>
           </div>
 
-          <div className="space-y-2 rounded-lg bg-[var(--secondary)]/45 p-2 ring-1 ring-[var(--border)]">
+          <div className="mari-editor-panel mari-editor-panel--soft space-y-2 p-2">
             <div>
               <p className="text-[0.6875rem] font-medium">Fontes de correspondência adicionais</p>
               <p className="text-[0.625rem] text-[var(--muted-foreground)]">
@@ -1507,10 +1523,10 @@ function ExpandedDrawer({
           tooltip="Impede que o agente Lorebook Keeper modifique esta entrada."
         />
         <ToggleButton
-          label="Sem recursão"
-          value={form.preventRecursion ?? false}
-          onChange={(v) => update({ preventRecursion: v })}
-          tooltip="Quando ativado, o conteúdo desta entrada não dispara entradas adicionais durante a varredura recursiva."
+          label="Recursion"
+          value={!(form.preventRecursion ?? true)}
+          onChange={(v) => update({ preventRecursion: !v })}
+          tooltip="When enabled, this entry's content can trigger additional entries during recursive scanning. Keep this off unless this entry should chain lore."
         />
         <ToggleButton
           label="Sem vetor"
@@ -1530,7 +1546,7 @@ function ExpandedDrawer({
           <select
             value={form.role ?? "system"}
             onChange={(e) => update({ role: e.target.value as "system" | "user" | "assistant" })}
-            className="w-full rounded-lg bg-[var(--secondary)] px-2 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+            className="mari-editor-field w-full px-2 py-1.5 text-xs"
           >
             <option value="system">Sistema</option>
             <option value="user">Usuário</option>
@@ -1585,7 +1601,7 @@ function ExpandedDrawer({
                 value={form.group ?? ""}
                 onChange={(e) => update({ group: e.target.value })}
                 onBlur={flushAutosave}
-                className="w-full rounded-lg bg-[var(--secondary)] px-2 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                className="mari-editor-field w-full px-2 py-1.5 text-xs"
                 placeholder="Nome do grupo"
               />
             </div>
@@ -1595,7 +1611,7 @@ function ExpandedDrawer({
                 value={form.tag ?? ""}
                 onChange={(e) => update({ tag: e.target.value })}
                 onBlur={flushAutosave}
-                className="w-full rounded-lg bg-[var(--secondary)] px-2 py-1.5 text-xs ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                className="mari-editor-field w-full px-2 py-1.5 text-xs"
                 placeholder="ex.: local, item, lore"
               />
             </div>
@@ -1603,7 +1619,7 @@ function ExpandedDrawer({
         </FieldGroup>
       </div>
 
-      <div className="flex items-center justify-end border-t border-[var(--border)] pt-3">
+      <div className="flex items-center justify-end border-t border-[var(--marinara-editor-divider)] pt-3">
         <span
           className={cn("text-[0.6875rem]", saveError ? "text-[var(--destructive)]" : "text-[var(--muted-foreground)]")}
         >

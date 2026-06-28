@@ -27,6 +27,7 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
   const { data: chatPresetsData } = useChatPresets();
   const applyChatPreset = useApplyChatPreset();
   const openRightPanel = useUIStore((s) => s.openRightPanel);
+  const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
   const [connectionId, setConnectionId] = useState<string>("");
 
   const connectionRows = useMemo(
@@ -59,21 +60,21 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
         mode,
         characterIds: [],
         connectionId,
+        promptPresetId: starred?.settings.promptPresetId ?? undefined,
       },
       {
-        onSuccess: async (chat) => {
+        onSuccess: (chat) => {
           const store = useChatStore.getState();
           store.setPendingNewChatMode(null);
+          if (typeof window !== "undefined" && window.innerWidth < 768) setSidebarOpen(false);
           store.setActiveChatId(chat.id);
-          if (starred) {
-            try {
-              await applyChatPreset.mutateAsync({ presetId: starred.id, chatId: chat.id });
-            } catch {
-              /* non-fatal — chat still opens with system defaults */
-            }
-          }
           store.setShouldOpenSettings(true);
           store.setShouldOpenWizard(true);
+          if (starred) {
+            void applyChatPreset.mutateAsync({ presetId: starred.id, chatId: chat.id, connectionId }).catch(() => {
+              /* non-fatal — chat still opens with system defaults */
+            });
+          }
         },
       },
     );

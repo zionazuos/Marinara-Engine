@@ -553,7 +553,7 @@ export function TrackerCardColorSettings() {
           Selecione um chat para editar as cores dos cards de rastreador.
         </p>
       ) : isLoadingGameState && targets.length === 0 ? (
-        <p className="rounded-md bg-[var(--secondary)]/42 px-2 py-2 text-[0.625rem] leading-relaxed text-[var(--muted-foreground)]">
+        <p className="mari-chrome-text-muted rounded-md bg-[var(--secondary)]/42 px-2 py-2 text-[0.625rem] leading-relaxed">
           
           Carregando cards de rastreador atuais...
         </p>

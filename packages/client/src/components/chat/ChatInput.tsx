@@ -420,13 +420,23 @@ export const ChatInput = memo(function ChatInput({
     });
   }, [activeChatId, qc]);
   const messagesData = qc.getQueryData<InfiniteData<Message[]>>(chatKeys.messages(activeChatId ?? ""));
-  const lastMessageRole = useMemo(() => {
+  const lastMessage = useMemo(() => {
     const firstPage = messagesData?.pages?.[0];
-    return firstPage?.[firstPage.length - 1]?.role ?? null;
+    return firstPage?.[firstPage.length - 1] ?? null;
   }, [messagesData]);
+  const latestAssistantMessage = useMemo(() => {
+    for (const page of messagesData?.pages ?? []) {
+      for (let i = page.length - 1; i >= 0; i--) {
+        const message = page[i];
+        if (message?.role === "assistant") return message;
+      }
+    }
+    return null;
+  }, [messagesData]);
+  const lastMessageRole = lastMessage?.role ?? null;
 
   const canRetry = !isStreaming && lastMessageRole === "user";
-  const canContinue = !isStreaming && mode === "roleplay" && lastMessageRole === "assistant";
+  const canContinue = false;
   const pendingAttachmentReads = activeChatId ? (pendingAttachmentReadsByChat[activeChatId] ?? 0) : 0;
   const isReadingAttachments = pendingAttachmentReads > 0;
   const hasPendingAttachments = isReadingAttachments || attachments.length > 0;
@@ -546,6 +556,8 @@ export const ChatInput = memo(function ChatInput({
       invalidate: () => qc.invalidateQueries({ queryKey: chatKeys.all }),
       characterNames: activeCharacterNames,
       characters: activeChatCharacters,
+      latestAssistantMessageId: latestAssistantMessage?.id ?? null,
+      lastMessageRole,
       setSpriteExpression: onExpressionChange
         ? (characterId, expression) => onExpressionChange(characterId, expression, { immediate: true })
         : undefined,
@@ -557,6 +569,8 @@ export const ChatInput = memo(function ChatInput({
     createMessage,
     activeCharacterNames,
     activeChatCharacters,
+    latestAssistantMessage,
+    lastMessageRole,
     onExpressionChange,
     qc,
   ]);
@@ -613,10 +627,13 @@ export const ChatInput = memo(function ChatInput({
       const cached = qc.getQueryData<InfiniteData<Message[]>>(chatKeys.messages(activeChatId));
       const firstPage = cached?.pages?.[0];
       const lastMsg = firstPage?.[firstPage.length - 1];
-      if (lastMsg && (lastMsg.role === "user" || (lastMsg.role === "assistant" && mode === "roleplay"))) {
-        // Retry (last msg is user) or Continue (last msg is assistant, roleplay mode)
+      if (lastMsg?.role === "user") {
+        // Retry from the last visible user turn. Continuing an assistant turn is explicit via /continue.
         try {
-          await generateWithNarrativeDirector({ chatId: activeChatId, connectionId: null });
+          await generateWithNarrativeDirector({
+            chatId: activeChatId,
+            connectionId: null,
+          });
         } catch (error) {
           const msg = error instanceof Error ? error.message : "Generation failed";
           toast.error(msg);
@@ -776,7 +793,6 @@ export const ChatInput = memo(function ChatInput({
     clearInputDraft,
     attachments,
     isReadingAttachments,
-    mode,
     groupResponseOrder,
     responseQueue,
     removeFromResponseQueue,
@@ -1564,7 +1580,7 @@ export const ChatInput = memo(function ChatInput({
         {/* Send / Stop button */}
 
         <button
-          onClick={isStreaming ? () => useChatStore.getState().stopGeneration() : handleSend}
+          onClick={isStreaming ? () => useChatStore.getState().stopGeneration(activeChatId ?? undefined) : handleSend}
           disabled={
             (!isStreaming && isReadingAttachments) ||
             (!hasInput && !attachments.length && !isStreaming && !canRetry && !canContinue) ||

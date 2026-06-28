@@ -36,6 +36,7 @@ type ConversationSurfaceProps = {
   sceneInfo?: SceneInfo;
   settingsOpen: boolean;
   settingsAnchor: ComponentProps<typeof ChatCommonOverlays>["settingsAnchor"];
+  settingsInitialSection?: ComponentProps<typeof ChatCommonOverlays>["settingsInitialSection"];
   galleryOpen: boolean;
   galleryAnchor: ComponentProps<typeof ChatCommonOverlays>["galleryAnchor"];
   wizardOpen: boolean;
@@ -99,6 +100,7 @@ export function ChatConversationSurface({
   sceneInfo,
   settingsOpen,
   settingsAnchor,
+  settingsInitialSection,
   galleryOpen,
   galleryAnchor,
   wizardOpen,
@@ -184,9 +186,9 @@ export function ChatConversationSurface({
 
       <ChatCommonOverlays
         chat={chat}
-        activeChatId={activeChatId}
         settingsOpen={settingsOpen}
         settingsAnchor={settingsAnchor}
+        settingsInitialSection={settingsInitialSection}
         filesOpen={false}
         galleryOpen={galleryOpen}
         galleryAnchor={galleryAnchor}

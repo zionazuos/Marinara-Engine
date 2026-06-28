@@ -11,6 +11,7 @@
 // - [selfie], [selfie: context="description of the selfie"], [selfie: "description"], or [selfie: description]
 // - [memory: target="CharName", summary="description of the memory"]
 // - [scene: scenario="...", background="...", plan="..."] (initiate a mini-roleplay scene)
+// - [uno] (start a game of UNO at the table; Conversation mode)
 // - [spotify: title="Song title", artist="Artist"] (play a song on the user's active Spotify player)
 // - [youtube: query="Song title Artist"] (play a song on the user's active YouTube player)
 // - [react: emoji="😂"] or [react: emoji=":custom_name:"] (react to the user's latest message; Conversation mode)
@@ -30,6 +31,8 @@
 // - [create_chat: character="...", mode="conversation|roleplay"]
 // - [navigate: panel="...", tab="..."]
 // - [fetch: type="character|persona|lorebook|chat|preset", name="..."]
+
+import { normalizeTextForMatch } from "@marinara-engine/shared";
 
 import { stripConversationPromptTimestamps } from "./transcript-sanitize.js";
 
@@ -68,6 +71,11 @@ export interface SceneCommand {
   background?: string;
   /** Optional plot plan / outline for how the scene unfolds */
   plan?: string;
+}
+
+export interface UnoCommand {
+  /** Start a game of UNO at the table. Param-less; the system deals + runs the game. */
+  type: "uno";
 }
 
 export interface InfluenceCommand {
@@ -318,6 +326,7 @@ export type CharacterCommand =
   | SelfieCommand
   | MemoryCommand
   | SceneCommand
+  | UnoCommand
   | InfluenceCommand
   | NoteCommand
   | DirectMessageCommand
@@ -341,6 +350,8 @@ const CROSS_POST_RE = /\[cross_post:\s*target="([^"]+)"\]/gi;
 const SELFIE_RE = /\[selfie(?::\s*(?:context="([^"]*)"|"([^"]*)"|([^\]\r\n"]+)))?\]/gi;
 const MEMORY_RE = /\[memory:\s*target="([^"]+)"\s*,\s*summary="([^"]+)"\]/gi;
 const SCENE_RE = new RegExp(`\\[scene:\\s*(${QUOTED_PARAM_BLOCK})\\]`, "gi");
+// Param-less UNO trigger. Tolerates a stray `[uno: ...]` so a chatty model can't dodge the match.
+const UNO_RE = /\[uno(?::[^\]\r\n]*)?\]/gi;
 const HAPTIC_RE = new RegExp(`\\[haptic:\\s*(${QUOTED_PARAM_BLOCK})\\]`, "gi");
 const SPOTIFY_RE = new RegExp(`\\[spotify:\\s*(${QUOTED_PARAM_BLOCK})\\]`, "gi");
 const YOUTUBE_RE = new RegExp(`\\[youtube:\\s*(${QUOTED_PARAM_BLOCK})\\]`, "gi");
@@ -852,6 +863,12 @@ export function parseCharacterCommands(content: string): {
     if (cmd.scenario) commands.push(cmd);
   }
 
+  // Parse uno command — start a game of UNO. Param-less; only one per message.
+  for (const _unoMatch of content.matchAll(UNO_RE)) {
+    commands.push({ type: "uno" });
+    break;
+  }
+
   // Parse influence commands (<influence>text</influence>)
   for (const match of content.matchAll(INFLUENCE_RE)) {
     const text = stripConversationPromptTimestamps(match[1]!.trim());
@@ -1040,6 +1057,7 @@ export function parseCharacterCommands(content: string): {
     .replace(SELFIE_RE, "")
     .replace(MEMORY_RE, "")
     .replace(SCENE_RE, "")
+    .replace(UNO_RE, "")
     .replace(HAPTIC_RE, "")
     .replace(SPOTIFY_RE, "")
     .replace(YOUTUBE_RE, "")
@@ -1061,6 +1079,81 @@ export function parseCharacterCommands(content: string): {
     .trim();
 
   return { cleanContent, commands };
+}
+
+/**
+ * Parse character commands from a merged group response, attributing each command
+ * to the character whose `Name:` line-prefixed segment it appears in.
+ *
+ * Conversation-mode group chats use "merged" generation: a single response carries
+ * multiple characters' turns, each introduced by a `CharacterName: ` line prefix
+ * (the same format the client splits on for display — see parseNamePrefixFormat).
+ * The base parseCharacterCommands() attributes every command to one character, so a
+ * command emitted by, say, the third character (e.g. `[selfie]`) is wrongly executed
+ * for the first. This segments the response the same way and matches each parsed
+ * command back to its segment so it is attributed to its actual speaker.
+ *
+ * The authoritative command list and cleaned content come from a single whole-response
+ * parse, so no command is dropped or reordered even if one spans a name boundary;
+ * only the attribution is layered on. Commands with no matching segment (and text
+ * before the first recognised name prefix) fall back to `fallbackCharacterId`.
+ */
+export function parseCharacterCommandsBySpeaker(
+  content: string,
+  knownCharacters: ReadonlyArray<{ id: string; name: string }>,
+  fallbackCharacterId: string | null,
+): { commands: CharacterCommand[]; commandCharacterIds: (string | null)[]; cleanContent: string } {
+  const base = parseCharacterCommands(content);
+
+  const nameToId = new Map<string, string>();
+  for (const character of knownCharacters) {
+    const key = normalizeTextForMatch(character.name);
+    if (key && !nameToId.has(key)) nameToId.set(key, character.id);
+  }
+
+  // Segment the response by leading "Name: " line prefixes, mirroring the client's
+  // parseNamePrefixFormat so server-side attribution matches the rendered split.
+  const segments: Array<{ characterId: string | null; text: string }> = [];
+  let currentId: string | null = fallbackCharacterId;
+  let currentLines: string[] = [];
+  const flush = () => {
+    if (currentLines.length > 0) segments.push({ characterId: currentId, text: currentLines.join("\n") });
+    currentLines = [];
+  };
+  for (const line of content.split("\n")) {
+    const colonIdx = line.indexOf(": ");
+    if (colonIdx > 0) {
+      const mappedId = nameToId.get(normalizeTextForMatch(line.slice(0, colonIdx)));
+      if (mappedId) {
+        flush();
+        currentId = mappedId;
+        currentLines = [line.slice(colonIdx + 2)];
+        continue;
+      }
+    }
+    currentLines.push(line);
+  }
+  flush();
+
+  // Build a per-command attribution queue keyed by command shape, consumed in
+  // segment order so duplicate commands attribute left-to-right.
+  const attributionQueue = new Map<string, (string | null)[]>();
+  for (const segment of segments) {
+    for (const command of parseCharacterCommands(segment.text).commands) {
+      const key = JSON.stringify(command);
+      const queue = attributionQueue.get(key) ?? [];
+      queue.push(segment.characterId);
+      attributionQueue.set(key, queue);
+    }
+  }
+
+  const commandCharacterIds = base.commands.map((command) => {
+    const queue = attributionQueue.get(JSON.stringify(command));
+    const matched = queue?.shift();
+    return matched === undefined ? fallbackCharacterId : matched;
+  });
+
+  return { commands: base.commands, commandCharacterIds, cleanContent: base.cleanContent };
 }
 
 /** Parse Roleplay-only direct-message commands without enabling the wider Conversation command set. */

@@ -22,6 +22,7 @@ import {
   type CustomToolRow,
 } from "../../hooks/use-custom-tools";
 import {
+  Activity,
   ArrowLeft,
   Save,
   Sparkles,
@@ -33,11 +34,8 @@ import {
   FileText,
   RotateCcw,
   Clock,
-  Activity,
   Info,
   Wrench,
-  ToggleLeft,
-  ToggleRight,
   Trash2,
   Plus,
   Layers,
@@ -46,6 +44,7 @@ import {
   ChevronUp,
   ExternalLink,
   BookOpen,
+  FolderOpen,
   Upload,
   Loader2,
   ImageIcon,
@@ -69,10 +68,10 @@ import {
   stepCadenceValue,
 } from "../../lib/agent-cadence";
 import { HelpTooltip } from "../ui/HelpTooltip";
+import { SettingsSwitch } from "../panels/settings/SettingControls";
 import {
   BUILT_IN_AGENTS,
   BUILT_IN_TOOLS,
-  createFolderEntry,
   DEFAULT_AGENT_CONTEXT_SIZE,
   DEFAULT_AGENT_TOOLS,
   DEFAULT_AGENT_MAX_TOKENS,
@@ -84,6 +83,7 @@ import {
   MIN_AGENT_MAX_TOKENS,
   getDefaultBuiltInAgentSettings,
   getDefaultAgentPrompt,
+  isAgentConfigDeleted,
   mergeBuiltInAgentSettings,
   normalizeAgentPhaseForType,
   normalizeCustomAgentCapabilities,
@@ -96,8 +96,13 @@ import {
   type CustomAgentCapabilityMap,
   type ToolDefinition,
 } from "@marinara-engine/shared";
-import { sanitizeAgentSettingsForTransfer } from "../../lib/agent-transfer";
-import { downloadJsonFile } from "../../lib/download-json";
+import {
+  createAgentFolderPackageFilename,
+  createAgentFolderPackageFiles,
+  sanitizeAgentSettingsForTransfer,
+} from "../../lib/agent-transfer";
+import { serializeCustomToolForTransfer } from "../../lib/custom-tool-transfer";
+import { downloadZipFile } from "../../lib/download-zip";
 
 function parseActivationKeywordsText(value: string): string[] {
   const seen = new Set<string>();
@@ -129,8 +134,30 @@ function createCustomAgentType(name: string): string {
 const LOREBOOK_WRITE_TOOL_NAME = "save_lorebook_entry";
 const MESSAGE_EDIT_TOOL_NAME = "edit_chat_message";
 const DEFAULT_PROSE_GUARDIAN_BANNED_WORDS = "ozone";
+type MusicProvider = "spotify" | "youtube" | "custom";
+type CustomMusicSource = "game-assets" | "folder";
 const DEFAULT_PROSE_GUARDIAN_AVOID =
   "no repetition of any phrases or sentence structure from the last messages, if the last output started with dialogue line, this one needs to start with narration, no purple prose";
+
+function normalizeCustomMusicFolderInput(value: string): string {
+  const normalized = value.trim().replace(/\\/g, "/").replace(/^\/+/, "").replace(/\/+$/g, "");
+  if (!normalized || normalized.includes("..")) return "music";
+  return normalized.startsWith("music") ? normalized : `music/${normalized}`;
+}
+
+function normalizeMusicProvider(settings: Record<string, unknown>): MusicProvider {
+  if (settings.musicProvider === "custom" || settings.musicPlayerSource === "custom") return "custom";
+  if (settings.musicProvider === "youtube" || settings.musicPlayerSource === "youtube") return "youtube";
+  return "spotify";
+}
+
+function normalizeCustomMusicSource(settings: Record<string, unknown>): CustomMusicSource {
+  return settings.customMusicSource === "folder" || settings.localMusicSource === "folder" ? "folder" : "game-assets";
+}
+
+function normalizeExternalMusicFolderInput(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
 
 // Mirrors the server's buildSpotifyRedirectUri rule: Spotify only accepts
 // https:// or http://127.0.0.1, so fall back to loopback whenever the page
@@ -382,6 +409,12 @@ function normalizeStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === "string") : [];
 }
 
+function getReferencedCustomTools(toolNames: string[], customTools: CustomToolRow[]) {
+  if (toolNames.length === 0 || customTools.length === 0) return [];
+  const referenced = new Set(toolNames);
+  return customTools.filter((tool) => referenced.has(tool.name));
+}
+
 // ═══════════════════════════════════════════════
 //  Main Editor
 // ═══════════════════════════════════════════════
@@ -397,6 +430,47 @@ export function AgentEditor() {
   const createAgent = useCreateAgent();
   const qc = useQueryClient();
   const deleteAgent = useDeleteAgent();
+  const connectionIndexRef = useRef<{
+    loaded: boolean;
+    llmIds: Set<string>;
+    imageIds: Set<string>;
+  }>({ loaded: false, llmIds: new Set(), imageIds: new Set() });
+
+  useEffect(() => {
+    const rows =
+      (connections as
+        | Array<{
+            id: string;
+            provider: string;
+          }>
+        | undefined) ?? [];
+    connectionIndexRef.current = {
+      loaded: Array.isArray(connections),
+      llmIds: new Set(
+        rows.filter((connection) => connection.provider !== "image_generation").map((connection) => connection.id),
+      ),
+      imageIds: new Set(
+        rows.filter((connection) => connection.provider === "image_generation").map((connection) => connection.id),
+      ),
+    };
+  }, [connections]);
+
+  const normalizeTextConnectionOverride = useCallback((connectionId: unknown): string => {
+    if (typeof connectionId !== "string" || !connectionId.trim()) return "";
+    if (connectionId === LOCAL_SIDECAR_CONNECTION_ID) {
+      return import.meta.env.VITE_MARINARA_LITE === "true" ? "" : connectionId;
+    }
+    const index = connectionIndexRef.current;
+    if (!index.loaded) return connectionId;
+    return index.llmIds.has(connectionId) ? connectionId : "";
+  }, []);
+
+  const normalizeImageConnectionOverride = useCallback((connectionId: unknown): string => {
+    if (typeof connectionId !== "string" || !connectionId.trim()) return "";
+    const index = connectionIndexRef.current;
+    if (!index.loaded) return connectionId;
+    return index.imageIds.has(connectionId) ? connectionId : "";
+  }, []);
 
   // Find built-in meta (null for custom agents)
   const builtIn = useMemo(() => BUILT_IN_AGENTS.find((a) => a.id === agentDetailId) ?? null, [agentDetailId]);
@@ -415,9 +489,6 @@ export function AgentEditor() {
       ? getAgentRunIntervalMeta(isNewCustomAgent ? "__new__" : (dbConfig?.type ?? agentDetailId ?? ""), false)
       : null;
 
-  // Default prompt for this agent type
-  const defaultPrompt = useMemo(() => (agentDetailId ? getDefaultAgentPrompt(agentDetailId) : ""), [agentDetailId]);
-
   // ── Local editable state ──
   const [localName, setLocalName] = useState("");
   const [localDescription, setLocalDescription] = useState("");
@@ -435,7 +506,6 @@ export function AgentEditor() {
   const [localPrompt, setLocalPrompt] = useState("");
   const [localAuthor, setLocalAuthor] = useState("");
   const [localPromptTemplates, setLocalPromptTemplates] = useState<AgentPromptTemplateOption[]>([]);
-  const [localAgentEnabled, setLocalAgentEnabled] = useState(true);
   const [localResultType, setLocalResultType] = useState<CustomAgentResultType>("context_injection");
   const [localCustomCapabilities, setLocalCustomCapabilities] = useState<CustomAgentCapabilityMap>({});
   const [localInjectAsSection, setLocalInjectAsSection] = useState(false);
@@ -445,7 +515,10 @@ export function AgentEditor() {
   const [toolsSectionOpen, setToolsSectionOpen] = useState(false);
   const [localLorebookWriteEnabled, setLocalLorebookWriteEnabled] = useState(false);
   const [localWritableLorebookId, setLocalWritableLorebookId] = useState("");
-  const [localMusicProvider, setLocalMusicProvider] = useState<"spotify" | "youtube">("spotify");
+  const [localMusicProvider, setLocalMusicProvider] = useState<MusicProvider>("spotify");
+  const [localCustomMusicSource, setLocalCustomMusicSource] = useState<CustomMusicSource>("game-assets");
+  const [localCustomMusicFolder, setLocalCustomMusicFolder] = useState("music");
+  const [localCustomMusicExternalFolder, setLocalCustomMusicExternalFolder] = useState("");
   const [localSpotifyClientId, setLocalSpotifyClientId] = useState("");
   const [localSourceLorebookIds, setLocalSourceLorebookIds] = useState<string[]>([]);
   const [localUseChatActiveLorebooks, setLocalUseChatActiveLorebooks] = useState(false);
@@ -500,8 +573,7 @@ export function AgentEditor() {
       setLocalName(builtIn ? builtIn.name : dbConfig.name);
       setLocalDescription(dbConfig.description);
       setLocalPhase(normalizeAgentPhaseForType(agentType, dbConfig.phase));
-      setLocalAgentEnabled(dbConfig.enabled !== "false");
-      setLocalConnectionId(dbConfig.connectionId ?? "");
+      setLocalConnectionId(normalizeTextConnectionOverride(dbConfig.connectionId));
       const settings = mergeBuiltInAgentSettings(agentType, dbConfig.settings);
       const promptTemplateSource = settings.promptTemplates ?? defaultSettings.promptTemplates;
       setLocalAuthor(
@@ -510,7 +582,7 @@ export function AgentEditor() {
       setLocalPromptTemplates(normalizeAgentPromptTemplateOptions(promptTemplateSource));
       setLocalContextSize(normalizeOptionalNumber(settings.contextSize));
       setLocalMaxTokens(normalizeOptionalNumber(settings.maxTokens) || (defaultSettings.maxTokens as number) || "");
-      setLocalImageConnectionId((settings.imageConnectionId as string) ?? "");
+      setLocalImageConnectionId(normalizeImageConnectionOverride(settings.imageConnectionId));
       setLocalRunInterval(
         (settings.runInterval as number | undefined) ?? (defaultSettings.runInterval as number) ?? "",
       );
@@ -541,8 +613,19 @@ export function AgentEditor() {
         settings.lorebookWriteEnabled === true || enabledTools.includes(LOREBOOK_WRITE_TOOL_NAME),
       );
       setLocalWritableLorebookId(writableLorebookId);
-      setLocalMusicProvider(
-        settings.musicProvider === "youtube" || settings.musicPlayerSource === "youtube" ? "youtube" : "spotify",
+      setLocalMusicProvider(normalizeMusicProvider(settings));
+      setLocalCustomMusicSource(normalizeCustomMusicSource(settings));
+      setLocalCustomMusicFolder(
+        normalizeCustomMusicFolderInput(
+          typeof settings.customMusicFolder === "string"
+            ? settings.customMusicFolder
+            : typeof settings.localMusicFolder === "string"
+              ? settings.localMusicFolder
+              : "music",
+        ),
+      );
+      setLocalCustomMusicExternalFolder(
+        normalizeExternalMusicFolderInput(settings.customMusicExternalFolder ?? settings.localMusicExternalFolder),
       );
       setLocalSpotifyClientId(typeof settings.spotifyClientId === "string" ? settings.spotifyClientId : "");
       setLocalSourceLorebookIds(normalizeStringArray(settings.sourceLorebookIds));
@@ -603,7 +686,6 @@ export function AgentEditor() {
       setLocalAuthor(builtIn.author ?? DEFAULT_AGENT_AUTHOR);
       setLocalPromptTemplates(normalizeAgentPromptTemplateOptions(defaultSettings.promptTemplates));
       setLocalPhase(normalizeAgentPhaseForType(builtIn.id, builtIn.phase));
-      setLocalAgentEnabled(true);
       setLocalConnectionId("");
       setLocalImageConnectionId("");
       setLocalContextSize("");
@@ -640,7 +722,18 @@ export function AgentEditor() {
       setLocalIncludeParallelResults(false);
       setLocalLorebookWriteEnabled(false);
       setLocalWritableLorebookId("");
-      setLocalMusicProvider(defaultSettings.musicProvider === "youtube" ? "youtube" : "spotify");
+      setLocalMusicProvider(normalizeMusicProvider(defaultSettings));
+      setLocalCustomMusicSource(normalizeCustomMusicSource(defaultSettings));
+      setLocalCustomMusicFolder(
+        normalizeCustomMusicFolderInput(
+          typeof defaultSettings.customMusicFolder === "string" ? defaultSettings.customMusicFolder : "music",
+        ),
+      );
+      setLocalCustomMusicExternalFolder(
+        normalizeExternalMusicFolderInput(
+          defaultSettings.customMusicExternalFolder ?? defaultSettings.localMusicExternalFolder,
+        ),
+      );
       setLocalPrompt("");
     } else {
       // Brand new custom agent — start empty
@@ -649,7 +742,6 @@ export function AgentEditor() {
       setLocalAuthor("");
       setLocalPromptTemplates([]);
       setLocalPhase("post_processing");
-      setLocalAgentEnabled(true);
       setLocalConnectionId("");
       setLocalImageConnectionId("");
       setLocalContextSize("");
@@ -683,17 +775,44 @@ export function AgentEditor() {
       setLocalLorebookWriteEnabled(false);
       setLocalWritableLorebookId("");
       setLocalMusicProvider("spotify");
+      setLocalCustomMusicSource("game-assets");
+      setLocalCustomMusicFolder("music");
+      setLocalCustomMusicExternalFolder("");
       setLocalPrompt("");
     }
     setDirty(false);
     setSaveError(null);
-  }, [agentDetailId, dbConfig, builtIn, connections, customRunIntervalMeta?.defaultValue, isCustomAgent]);
+  }, [
+    agentDetailId,
+    dbConfig,
+    builtIn,
+    customRunIntervalMeta?.defaultValue,
+    isCustomAgent,
+    normalizeTextConnectionOverride,
+    normalizeImageConnectionOverride,
+  ]);
 
   // Fetch music connection status when viewing Music DJ.
   const isSpotifyAgent = agentDetailId === "spotify" || dbConfig?.type === "spotify";
   const isMusicAgent = isSpotifyAgent;
 
   const showsYoutubeSettings = isMusicAgent;
+
+  // In YouTube mode Music DJ runs tool-free and returns its pick as a search-query
+  // JSON, so the editor reflects the YouTube-specific built-in prompt and skips the
+  // (Spotify-only) tool toggles.
+  const musicDjYoutubeMode = isMusicAgent && localMusicProvider === "youtube";
+  const musicDjCustomMode = isMusicAgent && localMusicProvider === "custom";
+
+  // Default prompt for this agent type. Music DJ has a separate built-in prompt per
+  // provider, so show the service-specific prompt when that provider is selected.
+  const defaultPrompt = useMemo(
+    () =>
+      agentDetailId
+        ? getDefaultAgentPrompt(musicDjCustomMode ? "local-music" : musicDjYoutubeMode ? "youtube" : agentDetailId)
+        : "",
+    [agentDetailId, musicDjCustomMode, musicDjYoutubeMode],
+  );
 
   // Lorebook Keeper agent — run interval setting
   const isLorebookKeeperAgent = agentDetailId === "lorebook-keeper" || dbConfig?.type === "lorebook-keeper";
@@ -718,18 +837,15 @@ export function AgentEditor() {
   // Continuity Checker agent — shares the rewrite reveal timing control.
   const isContinuityAgent = agentDetailId === "continuity" || dbConfig?.type === "continuity";
 
-  // Detect when both knowledge agents will actually run in parallel. Shows a
-  // soft warning so users don't accidentally do overlapping work that bloats
-  // the prompt with two injection blocks. Requires BOTH agents to have saved
-  // config rows AND be enabled — a saved-but-disabled config doesn't run, so
-  // pairing one disabled config with one active config wouldn't actually
-  // produce the parallel-run problem the warning is about.
+  // Detect when both knowledge agents are configured. Actual activation is
+  // chat-scoped, but saving both with overlapping sources can still bloat the
+  // prompt when a chat enables them together.
   const bothKnowledgeAgentsConfigured = useMemo(() => {
     if (!agentConfigs) return false;
     if (!isKnowledgeRouterAgent && !isKnowledgeRetrievalAgent) return false;
     const rows = agentConfigs as AgentConfigRow[];
-    const enabledTypes = new Set(rows.filter((c) => c.enabled === "true").map((c) => c.type));
-    return enabledTypes.has("knowledge-router") && enabledTypes.has("knowledge-retrieval");
+    const configuredTypes = new Set(rows.filter((c) => !isAgentConfigDeleted(c.settings)).map((c) => c.type));
+    return configuredTypes.has("knowledge-router") && configuredTypes.has("knowledge-retrieval");
   }, [agentConfigs, isKnowledgeRetrievalAgent, isKnowledgeRouterAgent]);
 
   const { data: allLorebooks } = useLorebooks();
@@ -885,18 +1001,20 @@ export function AgentEditor() {
       "spotifyExpiresAt",
       "spotifyScope",
       // YouTube key is encrypted server-side and not exposed by the form — preserve it
-      // so a normal agent Save (e.g. toggling Enabled) doesn't wipe the stored key.
+      // so a normal agent Save doesn't wipe the stored key.
       "youtubeApiKey",
     ]) {
       if (currentSettings[key] !== undefined) preservedSpotifyFields[key] = currentSettings[key];
     }
+    const savedConnectionId = normalizeTextConnectionOverride(localConnectionId);
+    const savedImageConnectionId = normalizeImageConnectionOverride(localImageConnectionId);
 
     const payload = {
       name: localName,
       description: localDescription,
       phase: savedPhase,
-      enabled: localAgentEnabled,
-      connectionId: localConnectionId || null,
+      enabled: true,
+      connectionId: savedConnectionId || null,
       promptTemplate: localPrompt,
       settings: {
         ...preservedSpotifyFields,
@@ -916,8 +1034,17 @@ export function AgentEditor() {
         ...(localMaxTokens !== "" ? { maxTokens: clampAgentMaxTokens(localMaxTokens) } : {}),
         ...(!isDirectorAgent && localRunInterval !== "" ? { runInterval: Number(localRunInterval) } : {}),
         ...(!isDirectorAgent && localInjectAsSection ? { injectAsSection: true } : {}),
-        ...(isMusicAgent ? { musicProvider: localMusicProvider } : {}),
-        enabledTools: isMusicAgent && localMusicProvider === "youtube" ? [] : effectiveEnabledTools,
+        ...(isMusicAgent
+          ? {
+              musicProvider: localMusicProvider,
+              customMusicSource: localCustomMusicSource,
+              customMusicFolder: normalizeCustomMusicFolderInput(localCustomMusicFolder),
+              ...(localCustomMusicExternalFolder.trim()
+                ? { customMusicExternalFolder: localCustomMusicExternalFolder.trim() }
+                : {}),
+            }
+          : {}),
+        enabledTools: isMusicAgent && localMusicProvider !== "spotify" ? [] : effectiveEnabledTools,
         ...(lorebookWriterEnabled
           ? { lorebookWriteEnabled: true, writableLorebookId, writableLorebookIds: [writableLorebookId] }
           : {}),
@@ -931,7 +1058,7 @@ export function AgentEditor() {
         // Retrieval to Router would leave behind stale file IDs the user can no
         // longer see or remove via the UI.
         ...(isKnowledgeRetrievalAgent && localSourceFileIds.length > 0 ? { sourceFileIds: localSourceFileIds } : {}),
-        ...(localImageConnectionId ? { imageConnectionId: localImageConnectionId } : {}),
+        ...(savedImageConnectionId ? { imageConnectionId: savedImageConnectionId } : {}),
         ...(localAutoGenerateAvatars ? { autoGenerateAvatars: true } : {}),
         ...(localAutoGenerateBackgrounds ? { autoGenerateBackgrounds: true } : {}),
         ...(isIllustratorAgent
@@ -988,7 +1115,6 @@ export function AgentEditor() {
     localName,
     localDescription,
     localPhase,
-    localAgentEnabled,
     localResultType,
     localCustomCapabilities,
     localConnectionId,
@@ -1008,6 +1134,9 @@ export function AgentEditor() {
     localLorebookWriteEnabled,
     localWritableLorebookId,
     localMusicProvider,
+    localCustomMusicSource,
+    localCustomMusicFolder,
+    localCustomMusicExternalFolder,
     localSpotifyClientId,
     localUseChatActiveLorebooks,
     localSourceLorebookIds,
@@ -1039,6 +1168,8 @@ export function AgentEditor() {
     updateAgent,
     createAgent,
     openAgentDetail,
+    normalizeTextConnectionOverride,
+    normalizeImageConnectionOverride,
   ]);
 
   const handleExportAgent = () => {
@@ -1086,8 +1217,17 @@ export function AgentEditor() {
       ...(localMaxTokens !== "" ? { maxTokens: clampAgentMaxTokens(localMaxTokens) } : {}),
       ...(!isDirectorAgent && localRunInterval !== "" ? { runInterval: Number(localRunInterval) } : {}),
       ...(!isDirectorAgent && localInjectAsSection ? { injectAsSection: true } : {}),
-      ...(exportingMusicAgent ? { musicProvider: localMusicProvider } : {}),
-      enabledTools: exportingMusicAgent && localMusicProvider === "youtube" ? [] : effectiveEnabledTools,
+      ...(exportingMusicAgent
+        ? {
+            musicProvider: localMusicProvider,
+            customMusicSource: localCustomMusicSource,
+            customMusicFolder: normalizeCustomMusicFolderInput(localCustomMusicFolder),
+            ...(localCustomMusicExternalFolder.trim()
+              ? { customMusicExternalFolder: localCustomMusicExternalFolder.trim() }
+              : {}),
+          }
+        : {}),
+      enabledTools: exportingMusicAgent && localMusicProvider !== "spotify" ? [] : effectiveEnabledTools,
       ...(lorebookWriterEnabled
         ? { lorebookWriteEnabled: true, writableLorebookId, writableLorebookIds: [writableLorebookId] }
         : {}),
@@ -1125,33 +1265,29 @@ export function AgentEditor() {
       ...(localImagePositivePrompt.trim() ? { imagePositivePrompt: localImagePositivePrompt.trim() } : {}),
       ...(localImageNegativePrompt.trim() ? { imageNegativePrompt: localImageNegativePrompt.trim() } : {}),
     });
-    const agentEntry = createFolderEntry({
-      folderName: "Agents",
-      itemName: agentType,
-      itemKind: "marinara.agent",
-      config: {
-        type: agentType,
-        name: localName,
-        description: localDescription,
-        phase: savedPhase,
-        enabled: localAgentEnabled,
-        connectionId: null,
-        imagePath: null,
-        promptTemplate: localPrompt,
-        settings,
-        ...(isEditingCustomAgent ? { resultType: localResultType } : {}),
-      },
-      fallbackName: "agent",
-    });
-    downloadJsonFile(
-      {
-        kind: "marinara.agent-folder",
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        folderName: "Agents",
-        agents: [agentEntry],
-      },
-      "marinara-agent.json",
+    const bundledCustomTools = getReferencedCustomTools(
+      Array.isArray(settings.enabledTools) ? settings.enabledTools.filter((tool): tool is string => typeof tool === "string") : [],
+      (customToolsRaw as CustomToolRow[] | undefined) ?? [],
+    ).map(serializeCustomToolForTransfer);
+    downloadZipFile(
+      createAgentFolderPackageFiles(
+        [
+          {
+            type: agentType,
+            name: localName,
+            description: localDescription,
+            phase: savedPhase,
+            enabled: true,
+            connectionId: null,
+            imagePath: null,
+            promptTemplate: localPrompt,
+            settings,
+            ...(isEditingCustomAgent ? { resultType: localResultType } : {}),
+          },
+        ],
+        { customTools: bundledCustomTools },
+      ),
+      createAgentFolderPackageFilename(localName || agentType, "agent"),
     );
     toast.success(`Exported ${localName || "agent"}`);
   };
@@ -1169,16 +1305,51 @@ export function AgentEditor() {
   const markDirty = useCallback(() => setDirty(true), []);
 
   const handleMusicProviderChange = useCallback(
-    (provider: "spotify" | "youtube") => {
+    (provider: MusicProvider) => {
       setLocalMusicProvider(provider);
       setMusicPlayerSource(provider);
       if (provider === "spotify" && localEnabledTools.length === 0) {
         setLocalEnabledTools(DEFAULT_AGENT_TOOLS.spotify ?? []);
+      } else if (provider !== "spotify" && localEnabledTools.length > 0) {
+        setLocalEnabledTools([]);
       }
       setDirty(true);
     },
     [localEnabledTools.length, setMusicPlayerSource],
   );
+
+  const handleOpenCustomMusicFolder = useCallback(async () => {
+    const subfolder = normalizeCustomMusicFolderInput(localCustomMusicFolder);
+    try {
+      await fetch("/api/game-assets/open-folder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subfolder }),
+      });
+      toast.success(`Opened Game Assets/${subfolder}`);
+    } catch {
+      toast.error("Could not open the Custom music folder.");
+    }
+  }, [localCustomMusicFolder]);
+
+  const handleSelectCustomMusicFolder = useCallback(async () => {
+    try {
+      const res = await fetch("/api/game-assets/pick-local-music-folder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = (await res.json().catch(() => ({}))) as { success?: boolean; path?: string; error?: string };
+      if (!res.ok || data.success !== true || !data.path) {
+        throw new Error(data.error ?? "No folder selected.");
+      }
+      setLocalCustomMusicExternalFolder(data.path);
+      setLocalCustomMusicSource("folder");
+      setDirty(true);
+      toast.success("Selected custom music folder.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not select a custom music folder.");
+    }
+  }, []);
 
   const toggleCustomCapability = useCallback(
     (capability: CustomAgentCapability) => {
@@ -1224,6 +1395,25 @@ export function AgentEditor() {
   );
 
   const currentAgentType = dbConfig?.type ?? builtIn?.id ?? agentDetailId ?? "";
+  const defaultPromptTemplateById = useMemo(() => {
+    const defaultSettings = getDefaultBuiltInAgentSettings(currentAgentType);
+    return new Map(
+      normalizeAgentPromptTemplateOptions(defaultSettings.promptTemplates).map((option) => [option.id, option]),
+    );
+  }, [currentAgentType]);
+  const handleResetPromptTemplate = useCallback(
+    (id: string) => {
+      const defaultOption = defaultPromptTemplateById.get(id);
+      if (!defaultOption) return;
+      setLocalPromptTemplates((options) =>
+        options.map((option) =>
+          option.id === id ? { ...option, promptTemplate: defaultOption.promptTemplate } : option,
+        ),
+      );
+      markDirty();
+    },
+    [defaultPromptTemplateById, markDirty],
+  );
   const normalizedLocalPhase = normalizeAgentPhaseForType(currentAgentType, localPhase);
   const phaseMeta = PHASE_META[normalizedLocalPhase];
   const effectivePhase =
@@ -1283,7 +1473,7 @@ export function AgentEditor() {
   const isPending = updateAgent.isPending || createAgent.isPending;
 
   return (
-    <div className="mari-editor-shell flex flex-1 flex-col overflow-hidden">
+    <div className="mari-editor-shell mari-editor-legacy-bridge flex flex-1 flex-col overflow-hidden">
       {/* ── Header ── */}
       <div className="mari-editor-header">
         <button
@@ -1398,7 +1588,9 @@ export function AgentEditor() {
         <div className="flex items-center gap-2 bg-amber-500/10 px-4 py-2 text-xs text-amber-400">
           <AlertCircle size="0.8125rem" />
           <span className="flex-1">
-            {isKnowledgeRouterAgent ? "Knowledge Retrieval" : "Knowledge Router"}  também está configurado. Ambos os agentes rodarão em paralelo e injetarão contexto sobreposto. Considere desativar um para prompts mais limpos.
+            {isKnowledgeRouterAgent ? "Knowledge Retrieval" : "Knowledge Router"} is also configured. Both agents can
+            run in parallel if a chat enables both, injecting overlapping context. Consider enabling only one for cleaner
+            prompts.
           </span>
         </div>
       )}
@@ -1438,41 +1630,6 @@ export function AgentEditor() {
                 />
               </label>
             </div>
-          </FieldGroup>
-
-          {/* Agent Status */}
-          <FieldGroup
-            label="Status do agente"
-            icon={<Activity size="0.875rem" className="text-[var(--primary)]" />}
-            help="Controls whether this agent can run. Add as Prompt Section only controls whether saved output appears in prompt presets."
-          >
-            <button
-              type="button"
-              onClick={() => {
-                setLocalAgentEnabled((enabled) => !enabled);
-                markDirty();
-              }}
-              className={cn(
-                "flex w-full items-center gap-3 rounded-xl p-3 text-left ring-1 transition-all",
-                localAgentEnabled
-                  ? "bg-[var(--primary)]/10 text-[var(--foreground)] ring-[var(--primary)]/40"
-                  : "bg-[var(--secondary)] text-[var(--muted-foreground)] ring-[var(--border)]",
-              )}
-            >
-              {localAgentEnabled ? (
-                <ToggleRight size="1rem" className="shrink-0 text-amber-400" />
-              ) : (
-                <ToggleLeft size="1rem" className="shrink-0" />
-              )}
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-medium">{localAgentEnabled ? "Enabled" : "Disabled"}</span>
-                <span className="block text-xs text-[var(--muted-foreground)]">
-                  {localAgentEnabled
-                    ? "This agent can run when its chat settings allow it."
-                    : "This agent is globally disabled and will appear under Disabled Agents."}
-                </span>
-              </span>
-            </button>
           </FieldGroup>
 
           {/* Agent Pipeline Phase */}
@@ -1518,28 +1675,13 @@ export function AgentEditor() {
                 {CUSTOM_AGENT_CAPABILITY_META.map((capability) => {
                   const enabled = localCustomCapabilities[capability.id] === true;
                   return (
-                    <button
+                    <EditorSwitchRow
                       key={capability.id}
-                      type="button"
-                      aria-pressed={enabled}
-                      onClick={() => toggleCustomCapability(capability.id)}
-                      className={cn(
-                        "flex items-start gap-3 rounded-xl p-3 text-left text-xs ring-1 transition-all",
-                        enabled
-                          ? "bg-[var(--primary)]/10 ring-[var(--primary)] text-[var(--foreground)]"
-                          : "ring-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
-                      )}
-                    >
-                      {enabled ? (
-                        <ToggleRight size="1rem" className="mt-0.5 shrink-0 text-emerald-400" />
-                      ) : (
-                        <ToggleLeft size="1rem" className="mt-0.5 shrink-0" />
-                      )}
-                      <span className="min-w-0">
-                        <span className="block font-semibold">{capability.label}</span>
-                        <span className="mt-0.5 block text-[0.625rem] leading-tight">{capability.description}</span>
-                      </span>
-                    </button>
+                      label={capability.label}
+                      description={capability.description}
+                      checked={enabled}
+                      onChange={() => toggleCustomCapability(capability.id)}
+                    />
                   );
                 })}
               </div>
@@ -1603,58 +1745,24 @@ export function AgentEditor() {
               help="Optional current-turn data for custom post-processing agents. Existing agents stay isolated unless these are enabled."
             >
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() => {
+                <EditorSwitchRow
+                  label="Injeções de pré-geração"
+                  checked={localIncludePreGenInjections}
+                  onChange={() => {
                     setLocalIncludePreGenInjections((value) => !value);
                     markDirty();
                   }}
-                  className={cn(
-                    "flex items-start gap-3 rounded-xl p-3 text-left text-xs ring-1 transition-all",
-                    localIncludePreGenInjections
-                      ? "bg-[var(--primary)]/10 ring-[var(--primary)] text-[var(--foreground)]"
-                      : "ring-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
-                  )}
-                >
-                  {localIncludePreGenInjections ? (
-                    <ToggleRight size="1rem" className="mt-0.5 shrink-0 text-emerald-400" />
-                  ) : (
-                    <ToggleLeft size="1rem" className="mt-0.5 shrink-0" />
-                  )}
-                  <span className="min-w-0">
-                    <span className="block font-semibold">Injeções de pré-geração</span>
-                    <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                      
-                      Contexto do turno atual injetado antes da resposta.
-                    </span>
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
+                  description="Contexto do turno atual injetado antes da resposta."
+                />
+                <EditorSwitchRow
+                  label="Resultados de agentes paralelos"
+                  checked={localIncludeParallelResults}
+                  onChange={() => {
                     setLocalIncludeParallelResults((value) => !value);
                     markDirty();
                   }}
-                  className={cn(
-                    "flex items-start gap-3 rounded-xl p-3 text-left text-xs ring-1 transition-all",
-                    localIncludeParallelResults
-                      ? "bg-[var(--primary)]/10 ring-[var(--primary)] text-[var(--foreground)]"
-                      : "ring-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
-                  )}
-                >
-                  {localIncludeParallelResults ? (
-                    <ToggleRight size="1rem" className="mt-0.5 shrink-0 text-emerald-400" />
-                  ) : (
-                    <ToggleLeft size="1rem" className="mt-0.5 shrink-0" />
-                  )}
-                  <span className="min-w-0">
-                    <span className="block font-semibold">Resultados de agentes paralelos</span>
-                    <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                      
-                      Resultados dos agentes que rodaram junto com a resposta.
-                    </span>
-                  </span>
-                </button>
+                  description="Resultados dos agentes que rodaram junto com a resposta."
+                />
               </div>
             </FieldGroup>
           )}
@@ -1666,37 +1774,21 @@ export function AgentEditor() {
               help="Lets this custom agent call a function that creates or updates entries in one selected lorebook."
             >
               <div className="space-y-3">
-                <button
-                  type="button"
-                  aria-pressed={localLorebookWriteEnabled}
-                  onClick={() => {
+                <EditorSwitchRow
+                  label="Allow lorebook entry writes"
+                  checked={localLorebookWriteEnabled}
+                  disabled={localCustomCapabilities.edit_lorebooks !== true}
+                  onChange={() => {
                     if (localCustomCapabilities.edit_lorebooks !== true) return;
                     setLocalLorebookWriteEnabled((value) => !value);
                     markDirty();
                   }}
-                  className={cn(
-                    "flex w-full items-start gap-3 rounded-xl p-3 text-left text-xs ring-1 transition-all",
-                    localLorebookWriteEnabled
-                      ? "bg-[var(--primary)]/10 ring-[var(--primary)] text-[var(--foreground)]"
-                      : localCustomCapabilities.edit_lorebooks === true
-                        ? "ring-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--accent)]"
-                        : "cursor-not-allowed ring-[var(--border)] text-[var(--muted-foreground)] opacity-45",
-                  )}
-                >
-                  {localLorebookWriteEnabled ? (
-                    <ToggleRight size="1.25rem" className="mt-0.5 shrink-0 text-emerald-400" />
-                  ) : (
-                    <ToggleLeft size="1.25rem" className="mt-0.5 shrink-0" />
-                  )}
-                  <span className="min-w-0">
-                    <span className="block font-semibold">Allow lorebook entry writes</span>
-                    <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                      {localCustomCapabilities.edit_lorebooks === true
-                        ? "The agent can only write to the lorebook selected below."
-                        : "Enable Edit lorebooks above before selecting a target."}
-                    </span>
-                  </span>
-                </button>
+                  description={
+                    localCustomCapabilities.edit_lorebooks === true
+                      ? "The agent can only write to the lorebook selected below."
+                      : "Enable Edit lorebooks above before selecting a target."
+                  }
+                />
 
                 <div className="space-y-1.5">
                   <p className="text-[0.6875rem] font-medium text-[var(--muted-foreground)]">Target lorebook</p>
@@ -1828,38 +1920,26 @@ export function AgentEditor() {
                 sent directly to the image generator and combine with any connection-level defaults. NovelAI tag syntax
                 is supported.
               </p>
-              <label className="mt-3 flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+              <div className="mt-3 grid gap-2">
+                <EditorSwitchRow
+                  label="Send matching character and persona avatars as reference images"
                   checked={localUseAvatarReferences}
-                  onChange={(e) => {
-                    setLocalUseAvatarReferences(e.target.checked);
+                  onChange={(checked) => {
+                    setLocalUseAvatarReferences(checked);
                     markDirty();
                   }}
-                  className="rounded border-[var(--border)] bg-[var(--secondary)] text-[var(--primary)] focus:ring-[var(--ring)]"
+                  description="Sends references only for characters or persona names matched in the Illustrator request. Works best with providers that support reference images."
                 />
-                <span className="text-sm">Send matching character &amp; persona avatars as reference images</span>
-              </label>
-              <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Sends references only for characters or persona names matched in the Illustrator request. Works best
-                with providers that support reference images (NovelAI, Stability, A1111, ComfyUI).
-              </p>
-              <label className="mt-3 flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+                <EditorSwitchRow
+                  label="Attach matching character appearance descriptions to image prompts"
                   checked={localIncludeCharacterAppearance}
-                  onChange={(e) => {
-                    setLocalIncludeCharacterAppearance(e.target.checked);
+                  onChange={(checked) => {
+                    setLocalIncludeCharacterAppearance(checked);
                     markDirty();
                   }}
-                  className="rounded border-[var(--border)] bg-[var(--secondary)] text-[var(--primary)] focus:ring-[var(--ring)]"
+                  description="Adds only matched visible names as lines like Name's Appearance: card appearance. Characters can be found from the full character database."
                 />
-                <span className="text-sm">Attach matching character appearance descriptions to image prompts</span>
-              </label>
-              <p className="mt-1 text-[0.625rem] text-[var(--muted-foreground)]">
-                Adds only matched visible names as lines like Name&apos;s Appearance: card appearance. Characters can be
-                found from the full character database, even when they are not attached to the current chat.
-              </p>
+              </div>
             </FieldGroup>
           )}
 
@@ -1870,18 +1950,14 @@ export function AgentEditor() {
               icon={<Sparkles size="0.875rem" className="text-[var(--primary)]" />}
               help="When enabled, the Character Tracker will automatically generate portrait images for NPCs that don't have an avatar, using their appearance description."
             >
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={localAutoGenerateAvatars}
-                  onChange={(e) => {
-                    setLocalAutoGenerateAvatars(e.target.checked);
-                    markDirty();
-                  }}
-                  className="rounded border-[var(--border)] bg-[var(--secondary)] text-[var(--primary)] focus:ring-[var(--ring)]"
-                />
-                <span className="text-sm">Gerar retratos de avatar para novos NPCs</span>
-              </label>
+              <EditorSwitchRow
+                label="Gerar retratos de avatar para novos NPCs"
+                checked={localAutoGenerateAvatars}
+                onChange={(checked) => {
+                  setLocalAutoGenerateAvatars(checked);
+                  markDirty();
+                }}
+              />
               {localAutoGenerateAvatars && (
                 <div className="mt-2">
                   <label className="block text-xs text-[var(--muted-foreground)] mb-1">
@@ -1915,30 +1991,20 @@ export function AgentEditor() {
               icon={<ImageIcon size="0.875rem" className="text-[var(--primary)]" />}
               help="When enabled, the Background agent can generate a new reusable roleplay background when none of your existing backgrounds fit the scene."
             >
-              <button
-                type="button"
-                onClick={() => {
+              <EditorSwitchRow
+                label={localAutoGenerateBackgrounds ? "Generate missing backgrounds" : "Only pick existing backgrounds"}
+                checked={localAutoGenerateBackgrounds}
+                onChange={() => {
                   setLocalAutoGenerateBackgrounds(!localAutoGenerateBackgrounds);
                   markDirty();
                 }}
-                className="flex w-full items-center gap-3 rounded-xl bg-[var(--secondary)] px-4 py-3 text-left ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)]"
-              >
-                {localAutoGenerateBackgrounds ? (
-                  <ToggleRight size="1.25rem" className="shrink-0 text-emerald-400" />
-                ) : (
-                  <ToggleLeft size="1.25rem" className="shrink-0 text-[var(--muted-foreground)]" />
-                )}
-                <div>
-                  <p className="text-sm font-medium">
-                    {localAutoGenerateBackgrounds ? "Generate missing backgrounds" : "Only pick existing backgrounds"}
-                  </p>
-                  <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    {localAutoGenerateBackgrounds
-                      ? "If nothing fits a changed location, the agent can request a new background image."
-                      : "The agent will choose the closest uploaded background and never create a new one."}
-                  </p>
-                </div>
-              </button>
+                description={
+                  localAutoGenerateBackgrounds
+                    ? "If nothing fits a changed location, the agent can request a new background image."
+                    : "The agent will choose the closest uploaded background and never create a new one."
+                }
+                labelClassName="text-sm"
+              />
 
               {localAutoGenerateBackgrounds && (
                 <div className="mt-3 space-y-2">
@@ -2098,34 +2164,20 @@ export function AgentEditor() {
                   className="min-h-[6.5rem] resize-y rounded-xl bg-[var(--secondary)] px-3 py-2.5 text-sm ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                 />
               </label>
-              <button
-                type="button"
-                aria-pressed={localProseGuardianHoldForRewrite}
-                onClick={() => {
+              <EditorSwitchRow
+                label="Hold message until rewrite"
+                checked={localProseGuardianHoldForRewrite}
+                onChange={() => {
                   setLocalProseGuardianHoldForRewrite((value) => !value);
                   markDirty();
                 }}
-                className={cn(
-                  "mt-3 flex w-full items-start gap-3 rounded-xl p-3 text-left text-xs ring-1 transition-all",
+                description={
                   localProseGuardianHoldForRewrite
-                    ? "bg-[var(--primary)]/10 ring-[var(--primary)] text-[var(--foreground)]"
-                    : "ring-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
-                )}
-              >
-                {localProseGuardianHoldForRewrite ? (
-                  <ToggleRight size="1.25rem" className="mt-0.5 shrink-0 text-emerald-400" />
-                ) : (
-                  <ToggleLeft size="1.25rem" className="mt-0.5 shrink-0" />
-                )}
-                <span className="min-w-0">
-                  <span className="block font-semibold">Hold message until rewrite</span>
-                  <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                    {localProseGuardianHoldForRewrite
-                      ? "Show the working state, then reveal the rewritten message."
-                      : "Show the original response first, then replace it if Prose Guardian edits it."}
-                  </span>
-                </span>
-              </button>
+                    ? "Show the working state, then reveal the rewritten message."
+                    : "Show the original response first, then replace it if Prose Guardian edits it."
+                }
+                className="mt-3"
+              />
             </FieldGroup>
           )}
 
@@ -2135,34 +2187,19 @@ export function AgentEditor() {
               icon={<ShieldCheck size="0.875rem" className="text-[var(--primary)]" />}
               help="Choose whether Continuity Checker should hold the raw response until its rewrite pass finishes. Chat settings can override this for one chat."
             >
-              <button
-                type="button"
-                aria-pressed={localProseGuardianHoldForRewrite}
-                onClick={() => {
+              <EditorSwitchRow
+                label="Hold message until rewrite"
+                checked={localProseGuardianHoldForRewrite}
+                onChange={() => {
                   setLocalProseGuardianHoldForRewrite((value) => !value);
                   markDirty();
                 }}
-                className={cn(
-                  "flex w-full items-start gap-3 rounded-xl p-3 text-left text-xs ring-1 transition-all",
+                description={
                   localProseGuardianHoldForRewrite
-                    ? "bg-[var(--primary)]/10 ring-[var(--primary)] text-[var(--foreground)]"
-                    : "ring-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
-                )}
-              >
-                {localProseGuardianHoldForRewrite ? (
-                  <ToggleRight size="1.25rem" className="mt-0.5 shrink-0 text-emerald-400" />
-                ) : (
-                  <ToggleLeft size="1.25rem" className="mt-0.5 shrink-0" />
-                )}
-                <span className="min-w-0">
-                  <span className="block font-semibold">Hold message until rewrite</span>
-                  <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                    {localProseGuardianHoldForRewrite
-                      ? "Show the working state, then reveal the continuity-checked message."
-                      : "Show the original response first, then replace it if Continuity Checker edits it."}
-                  </span>
-                </span>
-              </button>
+                    ? "Show the working state, then reveal the continuity-checked message."
+                    : "Show the original response first, then replace it if Continuity Checker edits it."
+                }
+              />
             </FieldGroup>
           )}
 
@@ -2392,32 +2429,15 @@ export function AgentEditor() {
               icon={<Sparkles size="0.875rem" className="text-[var(--primary)]" />}
               help="Default hidden arc maintenance for Roleplay chats that use Narrative Director."
             >
-              <button
-                type="button"
-                aria-pressed={localSecretPlotEnabled}
-                onClick={() => {
+              <EditorSwitchRow
+                label="Maintain hidden arc"
+                checked={localSecretPlotEnabled}
+                onChange={() => {
                   setLocalSecretPlotEnabled((value) => !value);
                   markDirty();
                 }}
-                className={cn(
-                  "flex w-full items-start gap-3 rounded-xl p-3 text-left text-xs ring-1 transition-all",
-                  localSecretPlotEnabled
-                    ? "bg-[var(--primary)]/10 ring-[var(--primary)] text-[var(--foreground)]"
-                    : "ring-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
-                )}
-              >
-                {localSecretPlotEnabled ? (
-                  <ToggleRight size="1.25rem" className="mt-0.5 shrink-0 text-emerald-400" />
-                ) : (
-                  <ToggleLeft size="1.25rem" className="mt-0.5 shrink-0" />
-                )}
-                <span className="min-w-0">
-                  <span className="block font-semibold">Maintain hidden arc</span>
-                  <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                    Store and inject a spoilered long-term arc for Roleplay chats.
-                  </span>
-                </span>
-              </button>
+                description="Store and inject a spoilered long-term arc for Roleplay chats."
+              />
               {localSecretPlotEnabled && (
                 <div className="mt-3">
                   <label className="mb-1 block text-[0.6875rem] font-medium text-[var(--muted-foreground)]">
@@ -2482,27 +2502,20 @@ export function AgentEditor() {
               icon={<Layers size="0.875rem" className="text-[var(--primary)]" />}
               help="When enabled, this agent's output becomes available as a marker section in prompt presets. Add the section in your preset to inject the agent's latest data into the prompt."
             >
-              <button
-                onClick={() => {
+              <EditorSwitchRow
+                label={localInjectAsSection ? "Enabled" : "Disabled"}
+                checked={localInjectAsSection}
+                onChange={() => {
                   setLocalInjectAsSection(!localInjectAsSection);
                   markDirty();
                 }}
-                className="flex items-center gap-3 rounded-xl bg-[var(--secondary)] px-4 py-3 ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)]"
-              >
-                {localInjectAsSection ? (
-                  <ToggleRight size="1.25rem" className="text-emerald-400" />
-                ) : (
-                  <ToggleLeft size="1.25rem" className="text-[var(--muted-foreground)]" />
-                )}
-                <div className="text-left">
-                  <p className="text-sm font-medium">{localInjectAsSection ? "Enabled" : "Disabled"}</p>
-                  <p className="text-[0.625rem] text-[var(--muted-foreground)]">
-                    {localInjectAsSection
-                      ? `"${localName}" appears as a section option in prompt presets`
-                      : "Agent output is not injected into prompts"}
-                  </p>
-                </div>
-              </button>
+                description={
+                  localInjectAsSection
+                    ? `"${localName}" appears as a section option in prompt presets`
+                    : "Agent output is not injected into prompts"
+                }
+                labelClassName="text-sm"
+              />
             </FieldGroup>
           )}
 
@@ -2513,9 +2526,10 @@ export function AgentEditor() {
               help="Choose which service Music DJ should use for future music picks. The same choice switches the visible player surface."
             >
               <div className="flex flex-col gap-2">
-                <div className="grid grid-cols-2 gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-1">
-                  {(["spotify", "youtube"] as const).map((provider) => {
+                <div className="grid grid-cols-3 gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-1">
+                  {(["spotify", "youtube", "custom"] as const).map((provider) => {
                     const active = localMusicProvider === provider;
+                    const label = provider === "spotify" ? "Spotify" : provider === "youtube" ? "YouTube" : "Custom";
                     return (
                       <button
                         key={provider}
@@ -2528,14 +2542,21 @@ export function AgentEditor() {
                             : "text-white/45 hover:bg-white/8 hover:text-white/75",
                         )}
                       >
-                        {provider === "spotify" ? "Spotify" : "YouTube"}
+                        {label}
                       </button>
                     );
                   })}
                 </div>
                 <p className="text-[0.625rem] text-white/40">
-                  Visible player: {musicPlayerSource === "spotify" ? "Spotify" : "YouTube"}. Saved provider:{" "}
-                  {localMusicProvider === "spotify" ? "Spotify" : "YouTube"}.
+                  Visible player:{" "}
+                  {musicPlayerSource === "spotify" ? "Spotify" : musicPlayerSource === "youtube" ? "YouTube" : "Custom"}
+                  . Saved provider:{" "}
+                  {localMusicProvider === "spotify"
+                    ? "Spotify"
+                    : localMusicProvider === "youtube"
+                      ? "YouTube"
+                      : "Custom"}
+                  .
                 </p>
               </div>
             </FieldGroup>
@@ -2975,6 +2996,98 @@ export function AgentEditor() {
             </FieldGroup>
           )}
 
+          {isMusicAgent && (
+            <FieldGroup
+              label="Custom Music Library"
+              icon={<FolderOpen size="0.875rem" className="text-[var(--muted-foreground)]" />}
+              help="Choose where the Custom Music DJ looks for local audio files."
+            >
+              <div className="space-y-3">
+                <EditorSwitchRow
+                  label="Use Game Assets music folder"
+                  checked={localCustomMusicSource === "game-assets"}
+                  onChange={(checked) => {
+                    setLocalCustomMusicSource(checked ? "game-assets" : "folder");
+                    setDirty(true);
+                  }}
+                  description={
+                    localCustomMusicSource === "game-assets"
+                      ? "Custom mode will search audio uploaded to Game Assets."
+                      : "Custom mode will search the folder selected from this device."
+                  }
+                />
+
+                {localCustomMusicSource === "game-assets" ? (
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                    <label className="mb-1 block text-[0.6875rem] font-medium text-white/60">
+                      Game Assets music folder
+                    </label>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <input
+                        type="text"
+                        value={localCustomMusicFolder}
+                        onChange={(event) => {
+                          setLocalCustomMusicFolder(event.target.value);
+                          setDirty(true);
+                        }}
+                        onBlur={() => setLocalCustomMusicFolder((current) => normalizeCustomMusicFolderInput(current))}
+                        placeholder="music"
+                        className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs text-white outline-none placeholder-white/30 focus:border-[var(--primary)]/50 focus:ring-1 focus:ring-[var(--primary)]/20"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleOpenCustomMusicFolder}
+                        className="mari-editor-action mari-editor-action--secondary inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold"
+                      >
+                        <ExternalLink size="0.8rem" />
+                        Open Folder
+                      </button>
+                    </div>
+                    <p className="mt-2 text-[0.625rem] leading-relaxed text-white/40">
+                      
+                      Usar <code>music</code> for the whole Game Assets music library, or a subfolder like{" "}
+                      <code>music/combat</code>.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                    <label className="mb-1 block text-[0.6875rem] font-medium text-white/60">
+                      Music folder on this device
+                    </label>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <input
+                        type="text"
+                        value={localCustomMusicExternalFolder}
+                        onChange={(event) => {
+                          setLocalCustomMusicExternalFolder(event.target.value);
+                          setDirty(true);
+                        }}
+                        onBlur={() =>
+                          setLocalCustomMusicExternalFolder((current) => normalizeExternalMusicFolderInput(current))
+                        }
+                        placeholder="No folder selected"
+                        className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs text-white outline-none placeholder-white/30"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSelectCustomMusicFolder}
+                        className="mari-editor-action mari-editor-action--secondary inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold"
+                      >
+                        <FolderOpen size="0.8rem" />
+                        Select Folder
+                      </button>
+                    </div>
+                    <p className="mt-2 text-[0.625rem] leading-relaxed text-white/40">
+                      The folder picker opens on the device running Marinara&apos;s server. Custom mode will list and
+                      play supported audio files from that folder. On devices without a folder picker, paste the path
+                      here.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </FieldGroup>
+          )}
+
           {/* ── Knowledge Source Lorebooks (Knowledge Retrieval + Knowledge Router) ── */}
           {(isKnowledgeRetrievalAgent || isKnowledgeRouterAgent) && (
             <FieldGroup
@@ -2987,34 +3100,15 @@ export function AgentEditor() {
               }
             >
               <div className="space-y-4">
-                <button
-                  type="button"
-                  aria-pressed={localUseChatActiveLorebooks}
-                  aria-label={`Use this chat's active lorebooks: ${localUseChatActiveLorebooks ? "on" : "off"}`}
-                  onClick={() => {
+                <EditorSwitchRow
+                  label="Use this chat's active lorebooks"
+                  checked={localUseChatActiveLorebooks}
+                  onChange={() => {
                     setLocalUseChatActiveLorebooks((value) => !value);
                     markDirty();
                   }}
-                  className={cn(
-                    "flex w-full items-start gap-3 rounded-xl p-3 text-left text-xs ring-1 transition-all",
-                    localUseChatActiveLorebooks
-                      ? "bg-[var(--primary)]/10 ring-[var(--primary)] text-[var(--foreground)]"
-                      : "ring-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--accent)]",
-                  )}
-                >
-                  {localUseChatActiveLorebooks ? (
-                    <ToggleRight size="1.25rem" className="mt-0.5 shrink-0 text-emerald-400" />
-                  ) : (
-                    <ToggleLeft size="1.25rem" className="mt-0.5 shrink-0" />
-                  )}
-                  <span className="min-w-0">
-                    <span className="block font-semibold">Use this chat&apos;s active lorebooks</span>
-                    <span className="mt-0.5 block text-[0.625rem] leading-tight">
-                      
-                      Quando nenhuma fonte fixa é selecionada abaixo, este agente escaneia os lorebooks anexados ao chat atual.
-                    </span>
-                  </span>
-                </button>
+                  description="When no fixed source is selected below, this agent scans the lorebooks attached to the current chat."
+                />
                 {/* ── Lorebooks ── */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
@@ -3346,46 +3440,64 @@ export function AgentEditor() {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {localPromptTemplates.map((option, index) => (
-                    <div
-                      key={option.id}
-                      className="rounded-xl bg-[var(--secondary)]/70 p-3 ring-1 ring-[var(--border)]"
-                    >
-                      <div className="mb-2 flex items-center gap-2">
-                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[var(--background)] text-[0.6875rem] font-semibold text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                          {index + 1}
-                        </span>
+                  {localPromptTemplates.map((option, index) => {
+                    const defaultPromptTemplate = defaultPromptTemplateById.get(option.id);
+                    const matchesDefaultPrompt =
+                      !!defaultPromptTemplate && option.promptTemplate === defaultPromptTemplate.promptTemplate;
+                    return (
+                      <div
+                        key={option.id}
+                        className="rounded-xl bg-[var(--secondary)]/70 p-3 ring-1 ring-[var(--border)]"
+                      >
+                        <div className="mb-2 flex items-center gap-2">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[var(--background)] text-[0.6875rem] font-semibold text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
+                            {index + 1}
+                          </span>
+                          <input
+                            value={option.name}
+                            onChange={(e) => handleUpdatePromptTemplate(option.id, { name: e.target.value })}
+                            className="min-w-0 flex-1 rounded-lg bg-[var(--background)] px-2.5 py-1.5 text-sm ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                            placeholder="Option name"
+                          />
+                          {defaultPromptTemplate && (
+                            <button
+                              type="button"
+                              onClick={() => handleResetPromptTemplate(option.id)}
+                              disabled={matchesDefaultPrompt}
+                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[var(--muted-foreground)]"
+                              title={
+                                matchesDefaultPrompt ? "Prompt already matches the default" : "Restore default prompt"
+                              }
+                            >
+                              <RotateCcw size="0.75rem" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleRemovePromptTemplate(option.id)}
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
+                            title="Remove prompt option"
+                          >
+                            <Trash2 size="0.75rem" />
+                          </button>
+                        </div>
                         <input
-                          value={option.name}
-                          onChange={(e) => handleUpdatePromptTemplate(option.id, { name: e.target.value })}
-                          className="min-w-0 flex-1 rounded-lg bg-[var(--background)] px-2.5 py-1.5 text-sm ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-                          placeholder="Option name"
+                          value={option.description ?? ""}
+                          onChange={(e) => handleUpdatePromptTemplate(option.id, { description: e.target.value })}
+                          className="mb-2 w-full rounded-lg bg-[var(--background)] px-2.5 py-1.5 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                          placeholder="Short description shown in Chat Settings"
                         />
-                        <button
-                          type="button"
-                          onClick={() => handleRemovePromptTemplate(option.id)}
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/15 hover:text-[var(--destructive)]"
-                          title="Remove prompt option"
-                        >
-                          <Trash2 size="0.75rem" />
-                        </button>
+                        <MacroTextarea
+                          value={option.promptTemplate}
+                          onChange={(value) => handleUpdatePromptTemplate(option.id, { promptTemplate: value })}
+                          rows={7}
+                          title={option.name ? `${option.name} Prompt` : `Prompt Option ${index + 1}`}
+                          className="w-full resize-y rounded-lg bg-[var(--background)] px-3 py-2 font-mono text-xs leading-relaxed ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                          placeholder="Write the prompt template for this option…"
+                        />
                       </div>
-                      <input
-                        value={option.description ?? ""}
-                        onChange={(e) => handleUpdatePromptTemplate(option.id, { description: e.target.value })}
-                        className="mb-2 w-full rounded-lg bg-[var(--background)] px-2.5 py-1.5 text-xs ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-                        placeholder="Short description shown in Chat Settings"
-                      />
-                      <MacroTextarea
-                        value={option.promptTemplate}
-                        onChange={(value) => handleUpdatePromptTemplate(option.id, { promptTemplate: value })}
-                        rows={7}
-                        title={option.name ? `${option.name} Prompt` : `Prompt Option ${index + 1}`}
-                        className="w-full resize-y rounded-lg bg-[var(--background)] px-3 py-2 font-mono text-xs leading-relaxed ring-1 ring-[var(--border)] placeholder:text-[var(--muted-foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-                        placeholder="Write the prompt template for this option…"
-                      />
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -3401,49 +3513,62 @@ export function AgentEditor() {
             collapsible
             expanded={toolsSectionOpen}
             onExpandedChange={setToolsSectionOpen}
-            summary={`${selectedVisibleToolCount}/${availableVisibleToolCount} enabled`}
+            summary={
+              musicDjYoutubeMode
+                ? "Not used in YouTube mode"
+                : `${selectedVisibleToolCount}/${availableVisibleToolCount} enabled`
+            }
           >
-            <p className="text-[0.625rem] text-[var(--muted-foreground)] mb-3">
-              
-              Ative ou desative ferramentas para este agente. Quando ativadas em um chat, apenas as ferramentas selecionadas ficarão disponíveis durante a geração.
-            </p>
-            <div className="space-y-2">
-              {visibleBuiltInTools.map((tool: ToolDefinition) => (
-                <ToolCard
-                  key={tool.name}
-                  tool={tool}
-                  enabled={localEnabledTools.includes(tool.name)}
-                  onToggle={(name) => {
-                    setLocalEnabledTools((prev) =>
-                      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
-                    );
-                    markDirty();
-                  }}
-                />
-              ))}
-              {selectableCustomTools.map((tool) => (
-                <ToolCard
-                  key={tool.name}
-                  tool={{
-                    name: tool.name,
-                    description: tool.description,
-                    parameters: JSON.parse(tool.parametersSchema || "{}"),
-                  }}
-                  enabled={localEnabledTools.includes(tool.name)}
-                  onToggle={(name) => {
-                    setLocalEnabledTools((prev) =>
-                      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
-                    );
-                    markDirty();
-                  }}
-                  isCustom
-                />
-              ))}
-            </div>
-            <p className="mt-2 text-[0.625rem] text-[var(--muted-foreground)]">
-              
-              O uso de ferramentas também precisa ser ativado por chat em Configurações do Chat → "Ativar chamada de função".
-            </p>
+            {musicDjYoutubeMode ? (
+              <p className="rounded-xl bg-[var(--secondary)]/60 px-3 py-2 text-[0.6875rem] text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
+                In YouTube mode, Music DJ doesn't use function tools. It returns its pick as JSON and the app plays the
+                top YouTube search result directly. Switch the Music Player to Spotify to enable playback tools.
+              </p>
+            ) : (
+              <>
+                <p className="text-[0.625rem] text-[var(--muted-foreground)] mb-3">
+                  Toggle tools on or off for this agent. When enabled for a chat, only selected tools will be available
+                  during generation.
+                </p>
+                <div className="space-y-2">
+                  {visibleBuiltInTools.map((tool: ToolDefinition) => (
+                    <ToolCard
+                      key={tool.name}
+                      tool={tool}
+                      enabled={localEnabledTools.includes(tool.name)}
+                      onToggle={(name) => {
+                        setLocalEnabledTools((prev) =>
+                          prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
+                        );
+                        markDirty();
+                      }}
+                    />
+                  ))}
+                  {selectableCustomTools.map((tool) => (
+                    <ToolCard
+                      key={tool.name}
+                      tool={{
+                        name: tool.name,
+                        description: tool.description,
+                        parameters: JSON.parse(tool.parametersSchema || "{}"),
+                      }}
+                      enabled={localEnabledTools.includes(tool.name)}
+                      onToggle={(name) => {
+                        setLocalEnabledTools((prev) =>
+                          prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
+                        );
+                        markDirty();
+                      }}
+                      isCustom
+                    />
+                  ))}
+                </div>
+                <p className="mt-2 text-[0.625rem] text-[var(--muted-foreground)]">
+                  
+                  O uso de ferramentas também precisa ser ativado por chat em Configurações do Chat → "Ativar chamada de função".
+                </p>
+              </>
+            )}
           </FieldGroup>
         </div>
       </div>
@@ -3476,7 +3601,7 @@ function FieldGroup({
 }) {
   const contentVisible = !collapsible || expanded;
   return (
-    <div className="space-y-2">
+    <div className="mari-editor-panel space-y-2 p-3">
       <div className="flex items-center gap-1.5">
         {collapsible ? (
           <button
@@ -3511,6 +3636,45 @@ function FieldGroup({
   );
 }
 
+function EditorSwitchRow({
+  label,
+  description,
+  checked,
+  onChange,
+  disabled = false,
+  className,
+  labelClassName,
+}: {
+  label: React.ReactNode;
+  description?: React.ReactNode;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+  className?: string;
+  labelClassName?: string;
+}) {
+  return (
+    <SettingsSwitch
+      label={label}
+      description={description}
+      checked={checked}
+      onChange={onChange}
+      disabled={disabled}
+      labelPosition="start"
+      className={cn(
+        "w-full items-start justify-between rounded-xl p-3 text-left text-xs ring-1",
+        checked
+          ? "bg-[var(--primary)]/10 text-[var(--foreground)] ring-[var(--primary)]/40"
+          : "bg-[var(--secondary)]/55 text-[var(--muted-foreground)] ring-[var(--border)]",
+        !disabled && !checked && "hover:bg-[var(--accent)]",
+        disabled && "opacity-45",
+        className,
+      )}
+      labelClassName={cn("text-xs [&>span:first-child]:font-semibold", labelClassName)}
+    />
+  );
+}
+
 function ToolCard({
   tool,
   enabled,
@@ -3534,13 +3698,12 @@ function ToolCard({
       )}
     >
       <div className="flex w-full items-center gap-2.5 px-3 py-2.5">
-        <button onClick={() => onToggle(tool.name)} className="shrink-0">
-          {enabled ? (
-            <ToggleRight size="1.25rem" className="text-[var(--primary)]" />
-          ) : (
-            <ToggleLeft size="1.25rem" className="text-[var(--muted-foreground)]" />
-          )}
-        </button>
+        <SettingsSwitch
+          ariaLabel={`${enabled ? "Disable" : "Enable"} ${tool.name}`}
+          checked={enabled}
+          onChange={() => onToggle(tool.name)}
+          className="shrink-0 p-0 hover:bg-transparent"
+        />
         <button
           onClick={() => setExpanded(!expanded)}
           className="flex min-w-0 flex-1 items-center gap-2.5 text-left hover:opacity-80 transition-opacity"

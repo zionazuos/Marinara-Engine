@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────
 // Panel: Characters (overhauled — search, folders, avatars)
 // ──────────────────────────────────────────────
-import { useState, useMemo, useCallback, useLayoutEffect, useRef, type UIEvent } from "react";
+import { useState, useMemo, useCallback, useEffect, useLayoutEffect, useRef, type UIEvent } from "react";
 import { toast } from "sonner";
 import {
   useCharacters,
@@ -37,10 +37,12 @@ import {
 import { getCharacterTitle } from "../../lib/character-display";
 import { useUIStore, type CharacterLibrarySort } from "../../stores/ui.store";
 import { handleFolderRenameKeyDown, useFolderRenameGesture } from "../../hooks/use-folder-rename-gesture";
+import { useTouchFolderDrag } from "../../hooks/use-touch-folder-drag";
 import { cn, getAvatarCropStyle, type AvatarCropValue } from "../../lib/utils";
 import { estimateCharacterCardTokens, formatEstimatedTokens } from "../../lib/character-token-count";
 import { SelectionActionBar } from "../ui/SelectionActionBar";
 import { SmoothFolderContent } from "../ui/SmoothFolderContent";
+import { TouchDragHandle } from "../ui/TouchDragHandle";
 
 type CharacterRow = {
   id: string;
@@ -117,6 +119,23 @@ function getCharacterPreviewMetadata(char: ParsedCharacterRow): string | null {
   return null;
 }
 
+function usePanelMobileOverlay() {
+  const [isMobileOverlay, setIsMobileOverlay] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia("(max-width: 767px)").matches : false,
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const query = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobileOverlay(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  return isMobileOverlay;
+}
+
 export function CharactersPanel() {
   const { data: characters, isLoading } = useCharacters();
   const { data: groups } = useCharacterGroups();
@@ -131,9 +150,18 @@ export function CharactersPanel() {
   const openCharacterLibrary = useUIStore((s) => s.openCharacterLibrary);
   const sort = useUIStore((s) => s.characterLibrarySort);
   const setCharacterLibrarySort = useUIStore((s) => s.setCharacterLibrarySort);
+  const search = useUIStore((s) => s.characterPanelSearch);
+  const setSearch = useUIStore((s) => s.setCharacterPanelSearch);
+  const includedTagValues = useUIStore((s) => s.characterPanelIncludedTags);
+  const setCharacterPanelIncludedTags = useUIStore((s) => s.setCharacterPanelIncludedTags);
+  const excludedTagValues = useUIStore((s) => s.characterPanelExcludedTags);
+  const setCharacterPanelExcludedTags = useUIStore((s) => s.setCharacterPanelExcludedTags);
+  const tagsExpanded = useUIStore((s) => s.characterPanelTagsExpanded);
+  const setTagsExpanded = useUIStore((s) => s.setCharacterPanelTagsExpanded);
+  const favFilter = useUIStore((s) => s.characterPanelFavoriteFilter);
+  const setFavFilter = useUIStore((s) => s.setCharacterPanelFavoriteFilter);
   const setCharacterPanelScrollTop = useUIStore((s) => s.setCharacterPanelScrollTop);
 
-  const [search, setSearch] = useState("");
   const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [editGroupName, setEditGroupName] = useState("");
@@ -141,13 +169,11 @@ export function CharactersPanel() {
   const panelScrollRef = useRef<HTMLDivElement | null>(null);
   const pendingPanelScrollTopRef = useRef(0);
   const panelScrollFrameRef = useRef<number | null>(null);
-  const characterTouchDragRef = useRef<{ id: string; timer: number | null; active: boolean } | null>(null);
   const suppressCharacterClickRef = useRef(false);
+  const isMobileOverlay = usePanelMobileOverlay();
   const handleFolderRenameGesture = useFolderRenameGesture();
-  const [includedTags, setIncludedTags] = useState<Set<string>>(new Set());
-  const [excludedTags, setExcludedTags] = useState<Set<string>>(new Set());
-  const [tagsExpanded, setTagsExpanded] = useState(false);
-  const [favFilter, setFavFilter] = useState<"all" | "favorites" | "non-favorites">("all");
+  const includedTags = useMemo(() => new Set(includedTagValues), [includedTagValues]);
+  const excludedTags = useMemo(() => new Set(excludedTagValues), [excludedTagValues]);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<Set<string>>(new Set());
   const [exportingSelected, setExportingSelected] = useState(false);
@@ -259,47 +285,52 @@ export function CharactersPanel() {
           await updateCharacter.mutateAsync({ id: c.id, data: { tags: newTags } });
         }
         if (includedTags.has(tag)) {
-          setIncludedTags((prev) => {
-            const next = new Set(prev);
-            next.delete(tag);
-            return next;
-          });
-        }
-        setExcludedTags((prev) => {
-          if (!prev.has(tag)) return prev;
-          const next = new Set(prev);
+          const next = new Set(includedTags);
           next.delete(tag);
-          return next;
-        });
+          setCharacterPanelIncludedTags([...next]);
+        }
+        if (excludedTags.has(tag)) {
+          const next = new Set(excludedTags);
+          next.delete(tag);
+          setCharacterPanelExcludedTags([...next]);
+        }
       } catch {
         toast.error("Falha ao remover a tag de alguns personagens");
       }
     },
-    [parsedCharacters, updateCharacter, includedTags],
+    [
+      parsedCharacters,
+      updateCharacter,
+      includedTags,
+      excludedTags,
+      setCharacterPanelIncludedTags,
+      setCharacterPanelExcludedTags,
+    ],
   );
 
-  const toggleIncludedTag = useCallback((tag: string) => {
-    setIncludedTags((prev) => {
-      const next = new Set(prev);
-      if (next.has(tag)) {
-        next.delete(tag);
+  const toggleIncludedTag = useCallback(
+    (tag: string) => {
+      const nextIncluded = new Set(includedTags);
+      if (nextIncluded.has(tag)) {
+        nextIncluded.delete(tag);
       } else {
-        next.add(tag);
+        nextIncluded.add(tag);
       }
-      return next;
-    });
-    setExcludedTags((prev) => {
-      if (!prev.has(tag)) return prev;
-      const next = new Set(prev);
-      next.delete(tag);
-      return next;
-    });
-  }, []);
+      setCharacterPanelIncludedTags([...nextIncluded]);
+
+      if (excludedTags.has(tag)) {
+        const nextExcluded = new Set(excludedTags);
+        nextExcluded.delete(tag);
+        setCharacterPanelExcludedTags([...nextExcluded]);
+      }
+    },
+    [excludedTags, includedTags, setCharacterPanelExcludedTags, setCharacterPanelIncludedTags],
+  );
 
   const clearTagFilters = useCallback(() => {
-    setIncludedTags(new Set());
-    setExcludedTags(new Set());
-  }, []);
+    setCharacterPanelIncludedTags([]);
+    setCharacterPanelExcludedTags([]);
+  }, [setCharacterPanelExcludedTags, setCharacterPanelIncludedTags]);
 
   const sortedCharacters = useMemo(() => {
     const list = [...filteredCharacters];
@@ -435,6 +466,7 @@ export function CharactersPanel() {
   useLayoutEffect(() => {
     const node = panelScrollRef.current;
     if (!node || isLoading) return;
+    if (isMobileOverlay) return;
     const restoreScroll = () => {
       const maxScrollTop = Math.max(0, node.scrollHeight - node.clientHeight);
       node.scrollTop = Math.min(useUIStore.getState().characterPanelScrollTop, maxScrollTop);
@@ -442,7 +474,7 @@ export function CharactersPanel() {
     restoreScroll();
     const frame = window.requestAnimationFrame(restoreScroll);
     return () => window.cancelAnimationFrame(frame);
-  }, [isLoading, parsedGroups.length, sortedCharacters.length, visibleRootCharacters.length]);
+  }, [isLoading, isMobileOverlay, parsedGroups.length, sortedCharacters.length, visibleRootCharacters.length]);
 
   useLayoutEffect(
     () => () => {
@@ -532,40 +564,15 @@ export function CharactersPanel() {
     [draggedCharacterId, moveCharactersToFolder],
   );
 
-  const startCharacterTouchDrag = useCallback((event: React.TouchEvent, charId: string) => {
-    const timer = window.setTimeout(() => {
-      characterTouchDragRef.current = { id: charId, timer: null, active: true };
-      suppressCharacterClickRef.current = true;
-      setDraggedCharacterId(charId);
-    }, 450);
-    characterTouchDragRef.current = { id: charId, timer, active: false };
-    event.currentTarget.addEventListener(
-      "touchcancel",
-      () => {
-        const current = characterTouchDragRef.current;
-        if (current?.timer) window.clearTimeout(current.timer);
-        characterTouchDragRef.current = null;
-        setDraggedCharacterId(null);
-      },
-      { once: true },
-    );
-  }, []);
-
   const finishCharacterTouchDrag = useCallback(
-    (event: React.TouchEvent) => {
-      const current = characterTouchDragRef.current;
-      if (!current) return;
-      if (current.timer) window.clearTimeout(current.timer);
-      characterTouchDragRef.current = null;
-      if (!current.active) return;
-      const touch = event.changedTouches[0];
-      const target = touch ? document.elementFromPoint(touch.clientX, touch.clientY) : null;
+    (characterId: string, x: number, y: number) => {
+      const target = document.elementFromPoint(x, y);
       const folderElement = target?.closest("[data-character-folder-id]") as HTMLElement | null;
       const rootElement = target?.closest("[data-character-folder-root]") as HTMLElement | null;
       if (folderElement?.dataset.characterFolderId) {
-        void moveCharactersToFolder(getDraggedCharacterIds(current.id), folderElement.dataset.characterFolderId);
+        void moveCharactersToFolder(getDraggedCharacterIds(characterId), folderElement.dataset.characterFolderId);
       } else if (rootElement) {
-        void moveCharactersToFolder(getDraggedCharacterIds(current.id), null);
+        void moveCharactersToFolder(getDraggedCharacterIds(characterId), null);
       }
       setDraggedCharacterId(null);
       window.setTimeout(() => {
@@ -574,6 +581,26 @@ export function CharactersPanel() {
     },
     [getDraggedCharacterIds, moveCharactersToFolder],
   );
+
+  const cancelCharacterTouchDrag = useCallback((_characterId: string, wasActive: boolean) => {
+    setDraggedCharacterId(null);
+    if (wasActive) {
+      window.setTimeout(() => {
+        suppressCharacterClickRef.current = false;
+      }, 0);
+    } else {
+      suppressCharacterClickRef.current = false;
+    }
+  }, []);
+
+  const { startTouchDrag: startCharacterTouchDrag } = useTouchFolderDrag({
+    onActivate: (characterId) => {
+      suppressCharacterClickRef.current = true;
+      setDraggedCharacterId(characterId);
+    },
+    onDrop: finishCharacterTouchDrag,
+    onCancel: cancelCharacterTouchDrag,
+  });
 
   const exitSelectionMode = useCallback(() => {
     setSelectionMode(false);
@@ -942,6 +969,7 @@ export function CharactersPanel() {
                   return (
                     <div
                       key={memberId}
+                      data-touch-drag-card="character"
                       onClick={() => {
                         if (suppressCharacterClickRef.current) return;
                         if (selectionMode) {
@@ -968,12 +996,10 @@ export function CharactersPanel() {
                         event.dataTransfer.setData("text/plain", memberId);
                       }}
                       onDragEnd={() => setDraggedCharacterId(null)}
-                      onTouchStart={(event) => startCharacterTouchDrag(event, memberId)}
-                      onTouchEnd={finishCharacterTouchDrag}
                       role="button"
                       tabIndex={0}
                       className={cn(
-                        "group/member flex cursor-pointer items-center gap-2 rounded-lg p-1.5 transition-all hover:bg-[var(--sidebar-accent)]",
+                        "group group/member flex touch-pan-y cursor-pointer items-center gap-2 rounded-lg p-1.5 transition-all hover:bg-[var(--sidebar-accent)]",
                         selectionMode &&
                           isBulkSelected &&
                           "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
@@ -998,7 +1024,19 @@ export function CharactersPanel() {
                           <Check size="0.75rem" />
                         </button>
                       )}
-                      <div className="mari-accent-gradient-fill relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--primary-foreground)]">
+                      <TouchDragHandle
+                        label="Drag character"
+                        size="0.75rem"
+                        onTouchStart={(event) => {
+                          startCharacterTouchDrag(event, memberId, {
+                            allowInteractiveTarget: true,
+                            sourceElement: event.currentTarget.closest<HTMLElement>(
+                              '[data-touch-drag-card="character"]',
+                            ),
+                          });
+                        }}
+                      />
+                      <div className="mari-avatar-placeholder mari-avatar-placeholder--character relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg">
                         <div className="absolute inset-0 overflow-hidden rounded-lg">
                           {member.avatarPath ? (
                             <img
@@ -1134,29 +1172,25 @@ export function CharactersPanel() {
         </div>
       )}
 
-      <div
-        data-character-folder-root
-        onDragOver={(event) => {
-          if (draggedCharacterId) {
+      {draggedCharacterId && (
+        <div
+          data-character-folder-root
+          onDragOver={(event) => {
             event.preventDefault();
             event.dataTransfer.dropEffect = "move";
-          }
-        }}
-        onDrop={(event) => {
-          event.preventDefault();
-          const payload = event.dataTransfer.getData("application/x-marinara-character-ids");
-          handleCharacterDrop(null, parseDroppedCharacterIds(payload));
-        }}
-        className={cn(
-          "stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors",
-          draggedCharacterId && "ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
-        )}
-      >
-        {draggedCharacterId && (
-          <div className="rounded-xl border border-dashed border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-highlight-bg)] px-3 py-2 text-[0.625rem] text-[var(--marinara-chat-chrome-button-text-active)]">
-            Drop here to move out of folder
-          </div>
-        )}
+          }}
+          onDrop={(event) => {
+            event.preventDefault();
+            const payload = event.dataTransfer.getData("application/x-marinara-character-ids");
+            handleCharacterDrop(null, parseDroppedCharacterIds(payload));
+          }}
+          className="rounded-xl border border-dashed border-[var(--marinara-chat-chrome-button-border-active)] bg-[var(--marinara-chat-chrome-highlight-bg)] px-3 py-2 text-[0.625rem] text-[var(--marinara-chat-chrome-button-text-active)]"
+        >
+          Drop here to move out of folder
+        </div>
+      )}
+
+      <div className="stagger-children flex min-h-8 flex-col gap-1 rounded-xl transition-colors">
         {visibleRootCharacters.map((char) => {
           const charName = char.parsed.name ?? "Unnamed";
           const charTitle = getCharacterTitle({ name: charName, comment: char.comment });
@@ -1171,6 +1205,7 @@ export function CharactersPanel() {
           return (
             <div
               key={char.id}
+              data-touch-drag-card="character"
               onClick={() => {
                 if (suppressCharacterClickRef.current) return;
                 if (selectionMode) {
@@ -1188,10 +1223,8 @@ export function CharactersPanel() {
                 event.dataTransfer.setData("text/plain", char.id);
               }}
               onDragEnd={() => setDraggedCharacterId(null)}
-              onTouchStart={(event) => startCharacterTouchDrag(event, char.id)}
-              onTouchEnd={finishCharacterTouchDrag}
               className={cn(
-                "group relative flex items-center gap-2.5 rounded-xl p-2 transition-all hover:bg-[var(--sidebar-accent)] cursor-pointer",
+                "group relative flex touch-pan-y cursor-pointer items-center gap-2.5 rounded-xl p-2 transition-all hover:bg-[var(--sidebar-accent)]",
                 selectionMode &&
                   isBulkSelected &&
                   "bg-[var(--marinara-chat-chrome-highlight-bg)] ring-1 ring-[var(--marinara-chat-chrome-button-border-active)]",
@@ -1216,8 +1249,17 @@ export function CharactersPanel() {
                   <Check size="0.75rem" />
                 </button>
               )}
+              <TouchDragHandle
+                label="Drag character"
+                onTouchStart={(event) => {
+                  startCharacterTouchDrag(event, char.id, {
+                    allowInteractiveTarget: true,
+                    sourceElement: event.currentTarget.closest<HTMLElement>('[data-touch-drag-card="character"]'),
+                  });
+                }}
+              />
               {/* Avatar */}
-              <div className="mari-accent-gradient-fill relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[var(--primary-foreground)] shadow-sm">
+              <div className="mari-avatar-placeholder mari-avatar-placeholder--character relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-sm">
                 {avatarUrl ? (
                   <div className="absolute inset-0 overflow-hidden rounded-xl">
                     <img
@@ -1345,6 +1387,7 @@ export function CharactersPanel() {
 
       {selectionMode && (
         <SelectionActionBar
+          placement="panel"
           selectedCount={selectedCharacterIds.size}
           onExport={() => void handleExportSelected()}
           onDelete={handleDeleteSelected}

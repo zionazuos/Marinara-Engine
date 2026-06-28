@@ -44,7 +44,9 @@ import { ImageUploadDropzone } from "../ui/ImageUploadDropzone";
 import { CustomEmojiTagButton } from "../ui/CustomEmojiTagButton";
 import { CharacterRegexSection } from "./CharacterRegexSection";
 import {
+  ArrowDown,
   ArrowLeft,
+  ArrowUp,
   Save,
   User,
   IdCard,
@@ -86,7 +88,13 @@ import { SpriteWandCleanupEditor } from "../ui/SpriteWandCleanupEditor";
 import { ExportFormatDialog, type ExportFormatChoice } from "../ui/ExportFormatDialog";
 import { EditorTabRail } from "../ui/EditorTabRail";
 import { EditorSectionAnchor, EditorSectionJumps } from "../ui/EditorSectionJumps";
-import type { CharacterCardVersion, CharacterData, RPGStatsConfig } from "@marinara-engine/shared";
+import { SettingsSwitch } from "../panels/settings/SettingControls";
+import {
+  normalizeSpriteExpressionLabel,
+  type CharacterCardVersion,
+  type CharacterData,
+  type RPGStatsConfig,
+} from "@marinara-engine/shared";
 import { parseTrackerCardColorConfig, serializeTrackerCardColorConfig } from "../../lib/tracker-card-colors";
 import { useQuoteFormatter } from "../../hooks/use-quote-formatter";
 import { LorebookAssignmentSection } from "../lorebooks/LorebookAssignmentSection";
@@ -776,7 +784,7 @@ export function CharacterEditor() {
   );
 
   return (
-    <div className="mari-editor-shell flex flex-1 flex-col overflow-hidden">
+    <div className="mari-editor-shell mari-editor-legacy-bridge flex flex-1 flex-col overflow-hidden">
       <ExportFormatDialog
         open={exportDialogOpen}
         title="Exportar personagem"
@@ -809,18 +817,16 @@ export function CharacterEditor() {
       {/* ── Header ── */}
       <div className="mari-editor-header items-start">
         <div className="mari-editor-header-main max-md:min-w-full">
-          <button
-            type="button"
-            onClick={handleClose}
-            className="mari-editor-action inline-flex"
-            title="Voltar"
-          >
+          <button type="button" onClick={handleClose} className="mari-editor-action inline-flex" title="Voltar">
             <ArrowLeft size="1.125rem" />
           </button>
 
           {/* Avatar */}
           <div
-            className="mari-editor-avatar-tile group relative"
+            className={cn(
+              "mari-editor-avatar-tile group relative",
+              !avatarPreview && "mari-avatar-placeholder mari-avatar-placeholder--character",
+            )}
             onClick={() => fileInputRef.current?.click()}
           >
             {avatarPreview ? (
@@ -1086,25 +1092,23 @@ function CharacterDescriptionTab({
   updateField: <K extends keyof CharacterData>(key: K, value: CharacterData[K]) => void;
 }) {
   return (
-    <div className="space-y-6">
-      <div>
-        <SectionHeader
-          title="Descrição"
-          subtitle="A descrição geral do personagem. Isso é enviado em todo prompt como parte da identidade do personagem."
-          helpText={CHARACTER_DESCRIPTION_HELP}
-        />
-        <MacroTextarea
-          value={formData.description}
-          onChange={(value) => updateField("description", value)}
-          placeholder="Descreva quem é este personagem, seu papel e seus traços principais…"
-          rows={12}
-          title="Descrição"
-          className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
-        />
-        <p className="mt-1.5 text-right text-[0.625rem] text-[var(--muted-foreground)]">
-          {formData.description.length} characters
-        </p>
-      </div>
+    <div className="mari-editor-panel space-y-3 p-3">
+      <SectionHeader
+        title="Descrição"
+        subtitle="A descrição geral do personagem. Isso é enviado em todo prompt como parte da identidade do personagem."
+        helpText={CHARACTER_DESCRIPTION_HELP}
+      />
+      <MacroTextarea
+        value={formData.description}
+        onChange={(value) => updateField("description", value)}
+        placeholder="Descreva quem é este personagem, seu papel e seus traços principais…"
+        rows={12}
+        title="Descrição"
+        className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40 focus:ring-1 focus:ring-[var(--primary)]/20"
+      />
+      <p className="mt-1.5 text-right text-[0.625rem] text-[var(--muted-foreground)]">
+        {formData.description.length} characters
+      </p>
     </div>
   );
 }
@@ -1127,7 +1131,7 @@ function TextareaTab({
   rows?: number;
 }) {
   return (
-    <div>
+    <div className="mari-editor-panel space-y-3 p-3">
       <SectionHeader title={title} subtitle={subtitle} helpText={helpText} />
       <MacroTextarea
         value={value}
@@ -1182,6 +1186,30 @@ function MetadataTab({
         subtitle="Info básica do personagem — nome, criador, versão, tags."
         helpText={CHARACTER_METADATA_HELP}
       />
+
+      {characterId && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--secondary)]/70 px-3 py-2">
+          <span className="text-[0.625rem] font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
+            Character ID
+          </span>
+          <code className="min-w-0 flex-1 break-all rounded-lg bg-[var(--background)] px-2 py-1 text-[0.6875rem] text-[var(--foreground)]">
+            {characterId}
+          </code>
+          <button
+            type="button"
+            onClick={() => {
+              void navigator.clipboard?.writeText(characterId);
+              toast.success("Character ID copied");
+            }}
+            className="mari-editor-action inline-flex h-8 px-2 text-[0.6875rem]"
+            title="Copy character ID"
+          >
+            <Copy size="0.75rem" />
+            
+            Copiar
+          </button>
+        </div>
+      )}
 
       {/* Avatar Crop */}
       {avatarPreview && (
@@ -1271,7 +1299,7 @@ function MetadataTab({
             <button
               type="button"
               onClick={removeAllTags}
-              className="rounded-lg px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--destructive)]/10 hover:text-[var(--destructive)]"
+              className="mari-chrome-control mari-chrome-control--compact mari-chrome-control--danger"
             >
               
               Remover tudo
@@ -1280,16 +1308,14 @@ function MetadataTab({
         </div>
         <div className="flex flex-wrap gap-1.5">
           {formData.tags.map((tag) => (
-            <span
-              key={tag}
-              className="flex items-center gap-1 rounded-full bg-[var(--primary)]/10 px-2.5 py-1 text-[0.6875rem] font-medium text-[var(--primary)]"
-            >
+            <span key={tag} className="mari-chrome-control mari-chrome-control--compact group/tag">
               <Tag size="0.625rem" />
               {tag}
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
-                className="ml-0.5 rounded-full transition-colors hover:text-[var(--destructive)]"
+                className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-[var(--destructive)]/20 hover:text-[var(--destructive)]"
+                title={`Remove tag "${tag}"`}
               >
                 <X size="0.625rem" />
               </button>
@@ -1312,7 +1338,7 @@ function MetadataTab({
           <button
             type="button"
             onClick={addTag}
-            className="rounded-xl bg-[var(--primary)]/15 px-3 py-1.5 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/25"
+            className="mari-chrome-control mari-chrome-control--compact mari-chrome-control--selected px-3 py-1.5"
           >
             
             Adicionar
@@ -1616,6 +1642,25 @@ function DialogueTab({
     );
   };
 
+  const moveGreeting = (i: number, offset: -1 | 1) => {
+    const nextIndex = i + offset;
+    if (nextIndex < 0 || nextIndex >= formData.alternate_greetings.length) return;
+
+    const nextGreetings = [...formData.alternate_greetings];
+    const [movedGreeting] = nextGreetings.splice(i, 1);
+    nextGreetings.splice(nextIndex, 0, movedGreeting ?? "");
+
+    const nextKeys = [...greetingKeysRef.current];
+    const [movedKey] = nextKeys.splice(i, 1);
+    nextKeys.splice(nextIndex, 0, movedKey ?? generateClientId());
+    greetingKeysRef.current = nextKeys;
+
+    updateField("alternate_greetings", nextGreetings);
+  };
+
+  const greetingActionButtonClassName =
+    "inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--secondary)] text-[var(--muted-foreground)] transition-all hover:border-[var(--primary)]/40 hover:text-[var(--foreground)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[var(--border)] disabled:hover:text-[var(--muted-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]";
+
   return (
     <div className="space-y-6">
       <SectionHeader
@@ -1658,27 +1703,56 @@ function DialogueTab({
           </button>
         </div>
         {formData.alternate_greetings.map((g, i) => (
-          <MacroTextarea
+          <div
             key={greetingKeysRef.current[i] ?? i}
-            value={g}
-            onChange={(value) => updateGreeting(i, value)}
-            rows={3}
-            title={`Alternate Greeting #${i + 1}`}
-            className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-3 text-sm outline-none placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40"
-            placeholder={`Greeting #${i + 1}…`}
-            controlPaddingClassName="pr-14"
-            toolbarExtra={
-              <button
-                type="button"
-                onClick={() => removeGreeting(i)}
-                className="rounded p-1 text-[var(--muted-foreground)] transition-colors hover:text-[var(--destructive)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-                aria-label={`Remove alternate greeting ${i + 1}`}
-                title="Remove greeting"
-              >
-                <Trash2 size="0.75rem" />
-              </button>
-            }
-          />
+            className="space-y-2 rounded-xl border border-[var(--border)]/70 bg-[var(--background)]/35 p-2.5"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-medium text-[var(--muted-foreground)]">Greeting #{i + 1}</span>
+              <div className="flex shrink-0 items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => moveGreeting(i, -1)}
+                  disabled={i === 0}
+                  className={greetingActionButtonClassName}
+                  aria-label={`Move alternate greeting ${i + 1} up`}
+                  title="Mover para cima"
+                >
+                  <ArrowUp size="0.75rem" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveGreeting(i, 1)}
+                  disabled={i === formData.alternate_greetings.length - 1}
+                  className={greetingActionButtonClassName}
+                  aria-label={`Move alternate greeting ${i + 1} down`}
+                  title="Mover para baixo"
+                >
+                  <ArrowDown size="0.75rem" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeGreeting(i)}
+                  className={cn(
+                    greetingActionButtonClassName,
+                    "hover:border-[var(--destructive)]/40 hover:text-[var(--destructive)]",
+                  )}
+                  aria-label={`Remove alternate greeting ${i + 1}`}
+                  title="Remove greeting"
+                >
+                  <Trash2 size="0.75rem" />
+                </button>
+              </div>
+            </div>
+            <MacroTextarea
+              value={g}
+              onChange={(value) => updateGreeting(i, value)}
+              rows={3}
+              title={`Alternate Greeting #${i + 1}`}
+              className="w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--secondary)] p-3 text-sm outline-none placeholder:text-[var(--muted-foreground)]/40 focus:border-[var(--primary)]/40"
+              placeholder={`Greeting #${i + 1}...`}
+            />
+          </div>
         ))}
       </div>
 
@@ -2052,15 +2126,7 @@ function SpritesTab({
     spriteCapabilities?.backgroundRemover?.reason ?? "Local backgroundremover is not installed.";
 
   const normalizeExpressionForCategory = (raw: string) => {
-    const cleaned = raw
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9_-]/g, "_");
-    if (!cleaned) return "";
-    if (category === "full-body") {
-      return cleaned.startsWith("full_") ? cleaned : `full_${cleaned}`;
-    }
-    return cleaned.replace(/^full_/, "");
+    return normalizeSpriteExpressionLabel(raw, { fullBody: category === "full-body" });
   };
 
   const displayExpression = useCallback(
@@ -2791,22 +2857,15 @@ function StatsTab({
         helpText={CHARACTER_STATS_HELP}
       />
 
-      {/* Enable toggle */}
-      <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
-        <input
-          type="checkbox"
-          checked={stats.enabled}
-          onChange={(e) => update({ enabled: e.target.checked })}
-          className="h-4 w-4 rounded accent-[var(--primary)]"
-        />
-        <div>
-          <p className="text-sm font-medium">Ativar atributos de RPG</p>
-          <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
-            
-            Os atributos serão injetados no prompt e rastreados pelo agente Character Tracker.
-          </p>
-        </div>
-      </label>
+      <SettingsSwitch
+        label={<span className="font-medium">Ativar atributos de RPG</span>}
+        description="Os atributos serão injetados no prompt e rastreados pelo agente Character Tracker."
+        checked={stats.enabled}
+        onChange={(checked) => update({ enabled: checked })}
+        labelPosition="start"
+        className="justify-between rounded-xl border border-[var(--border)] bg-[var(--card)] p-4"
+        labelClassName="text-sm"
+      />
 
       {stats.enabled && (
         <>
