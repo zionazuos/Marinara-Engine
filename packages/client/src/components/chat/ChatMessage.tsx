@@ -464,55 +464,87 @@ function highlightDialogue(text: string, dialogueColor?: string, boldDialogue = 
   const markdownRanges = collectInlineMarkdownRanges(text);
   const isInsideInlineMarkdown = (start: number, end: number) => markdownRanges.some(([s, e]) => start > s && end < e);
 
-  // Step 2: Find quote pairs, skipping protected zones and quotes already enclosed by inline markdown.
+  // Step 2a: Find paired-quote dialogue, skipping protected zones and quotes
+  // already enclosed by inline markdown.
+  type DialogueSeg = { start: number; end: number; kind: "quote" | "dash" };
   const quoteRe = new RegExp(`(?:${DIALOGUE_QUOTE_PATTERN_SOURCE})`, "g");
-  const quotePairs: Array<{ start: number; end: number }> = [];
+  const segments: DialogueSeg[] = [];
   let qm: RegExpExecArray | null;
   while ((qm = quoteRe.exec(text)) !== null) {
     const start = qm.index;
     const end = qm.index + qm[0].length;
     if (!isProtected(start) && !isInsideInlineMarkdown(start, end)) {
-      quotePairs.push({ start, end });
+      segments.push({ start, end, kind: "quote" });
     }
   }
 
-  // No dialogue quotes found — just apply markdown and return.
-  if (quotePairs.length === 0) {
+  // Step 2b: Find travessão (em-dash) dialogue lines — the standard pt-BR / European
+  // convention `— Bom dia, disse ela.`, which uses no closing delimiter. The whole
+  // line, from the leading dash to end-of-line, is treated as spoken dialogue. Any
+  // paired quotes inside such a line are dropped (the line is already dialogue).
+  const dashRanges: Array<[number, number]> = [];
+  const dashRe = /^[^\S\n]*[–—―].*$/gm;
+  let dm: RegExpExecArray | null;
+  while ((dm = dashRe.exec(text)) !== null) {
+    const start = dm.index;
+    const end = dm.index + dm[0].length;
+    if (end > start && !isProtected(start)) {
+      segments.push({ start, end, kind: "dash" });
+      dashRanges.push([start, end]);
+    }
+  }
+  const insideDash = (s: number, e: number) => dashRanges.some(([ds, de]) => s >= ds && e <= de);
+
+  // Drop quote pairs that fall inside a travessão line, then order left-to-right.
+  const ordered = segments
+    .filter((seg) => seg.kind === "dash" || !insideDash(seg.start, seg.end))
+    .sort((a, b) => a.start - b.start);
+
+  // No dialogue found — just apply markdown and return.
+  if (ordered.length === 0) {
     return applyInlineMarkdown(text, "m");
   }
 
-  // Step 3: Split text into quoted / non-quoted segments and render.
+  // Step 3: Split text into dialogue / non-dialogue segments and render.
   const result: ReactNode[] = [];
   let lastIndex = 0;
   let key = 0;
+  const DialogueTag = boldDialogue ? "strong" : "span";
+  const dialogueStyle = dialogueColor ? { color: dialogueColor } : undefined;
+  const dialogueClass = !dialogueColor ? "text-black dark:text-white" : undefined;
 
-  for (const q of quotePairs) {
-    // Non-quoted text before this pair — apply markdown only
-    if (q.start > lastIndex) {
-      result.push(...applyInlineMarkdown(text.slice(lastIndex, q.start), `m${key}`));
+  for (const seg of ordered) {
+    if (seg.start < lastIndex) continue; // skip overlaps
+    // Non-dialogue text before this segment — apply markdown only
+    if (seg.start > lastIndex) {
+      result.push(...applyInlineMarkdown(text.slice(lastIndex, seg.start), `m${key}`));
     }
 
-    const raw = text.slice(q.start, q.end);
-    const openQuote = raw[0];
-    const closeQuote = raw[raw.length - 1];
-    const inner = raw.slice(1, -1);
-    const DialogueTag = boldDialogue ? "strong" : "span";
+    const raw = text.slice(seg.start, seg.end);
 
-    // Apply markdown inside the quoted text, then wrap in a dialogue span/strong.
-    const innerNodes = applyInlineMarkdown(inner, `mq${key}`);
-    result.push(
-      <DialogueTag
-        key={`d${key++}`}
-        style={dialogueColor ? { color: dialogueColor } : undefined}
-        className={!dialogueColor ? "text-black dark:text-white" : undefined}
-      >
-        {openQuote}
-        {innerNodes}
-        {closeQuote}
-      </DialogueTag>,
-    );
+    if (seg.kind === "quote") {
+      const openQuote = raw[0];
+      const closeQuote = raw[raw.length - 1];
+      const inner = raw.slice(1, -1);
+      const innerNodes = applyInlineMarkdown(inner, `mq${key}`);
+      result.push(
+        <DialogueTag key={`d${key++}`} style={dialogueStyle} className={dialogueClass}>
+          {openQuote}
+          {innerNodes}
+          {closeQuote}
+        </DialogueTag>,
+      );
+    } else {
+      // Travessão line: color the whole line (dash included), no delimiter stripping.
+      const innerNodes = applyInlineMarkdown(raw, `mq${key}`);
+      result.push(
+        <DialogueTag key={`d${key++}`} style={dialogueStyle} className={dialogueClass}>
+          {innerNodes}
+        </DialogueTag>,
+      );
+    }
 
-    lastIndex = q.end;
+    lastIndex = seg.end;
   }
 
   // Remaining text after the last quote pair
