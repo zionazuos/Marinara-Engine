@@ -623,6 +623,10 @@ interface UIState {
   lorebookPanelTagsExpanded: boolean;
   /** Sort order for imported characters in the Browser panel */
   botBrowserPanelSort: ResourcePanelSort;
+  /** Translate downloaded character cards to pt-BR before importing them. */
+  botBrowserTranslateBeforeImport: boolean;
+  /** Preferred text connection for character-card translation. */
+  botBrowserTranslationConnectionId: string | null;
   /** Sort order for the compact Presets panel */
   presetPanelSort: ResourcePanelSort;
   /** Sort order for the compact Connections panel */
@@ -928,6 +932,8 @@ interface UIState {
   setLorebookPanelActiveTag: (tag: string | null) => void;
   setLorebookPanelTagsExpanded: (expanded: boolean) => void;
   setBotBrowserPanelSort: (sort: ResourcePanelSort) => void;
+  setBotBrowserTranslateBeforeImport: (enabled: boolean) => void;
+  setBotBrowserTranslationConnectionId: (id: string | null) => void;
   setPresetPanelSort: (sort: ResourcePanelSort) => void;
   setConnectionPanelSort: (sort: ConnectionPanelSort) => void;
   setAgentPanelSort: (sort: ResourcePanelSort) => void;
@@ -1368,6 +1374,8 @@ export const useUIStore = create<UIState>()(
       lorebookPanelActiveTag: null,
       lorebookPanelTagsExpanded: false,
       botBrowserPanelSort: "name-asc" as ResourcePanelSort,
+      botBrowserTranslateBeforeImport: true,
+      botBrowserTranslationConnectionId: null,
       presetPanelSort: "name-asc" as ResourcePanelSort,
       connectionPanelSort: "name-asc" as ConnectionPanelSort,
       agentPanelSort: "name-asc" as ResourcePanelSort,
@@ -1643,6 +1651,9 @@ export const useUIStore = create<UIState>()(
       setLorebookPanelActiveTag: (tag) => set({ lorebookPanelActiveTag: tag ? tag.trim() || null : null }),
       setLorebookPanelTagsExpanded: (expanded) => set({ lorebookPanelTagsExpanded: expanded }),
       setBotBrowserPanelSort: (sort) => set({ botBrowserPanelSort: normalizeBasicPanelSort(sort) }),
+      setBotBrowserTranslateBeforeImport: (enabled) => set({ botBrowserTranslateBeforeImport: enabled }),
+      setBotBrowserTranslationConnectionId: (id) =>
+        set({ botBrowserTranslationConnectionId: typeof id === "string" && id.trim() ? id : null }),
       setPresetPanelSort: (sort) => set({ presetPanelSort: normalizeBasicPanelSort(sort) }),
       setConnectionPanelSort: (sort) => set({ connectionPanelSort: normalizeConnectionPanelSort(sort) }),
       setAgentPanelSort: (sort) => set({ agentPanelSort: normalizeBasicPanelSort(sort) }),
@@ -3009,6 +3020,12 @@ export const useUIStore = create<UIState>()(
         persisted.appAccentRgbMode = persisted.appAccentRgbMode === true;
         persisted.customCursorEnabled = persisted.customCursorEnabled !== false;
         persisted.professorMariSuggestionsEnabled = persisted.professorMariSuggestionsEnabled !== false;
+        persisted.botBrowserTranslateBeforeImport = persisted.botBrowserTranslateBeforeImport !== false;
+        persisted.botBrowserTranslationConnectionId =
+          typeof persisted.botBrowserTranslationConnectionId === "string" &&
+          persisted.botBrowserTranslationConnectionId.trim()
+            ? persisted.botBrowserTranslationConnectionId
+            : null;
         persisted.includeReasoningInExports = persisted.includeReasoningInExports === true;
         persisted.roleplayReducedPaintEffects = persisted.roleplayReducedPaintEffects === true;
         persisted.roleplayNarratorAvatarCycling = persisted.roleplayNarratorAvatarCycling !== false;
@@ -3056,6 +3073,8 @@ export const useUIStore = create<UIState>()(
         lorebookPanelActiveTag: state.lorebookPanelActiveTag,
         lorebookPanelTagsExpanded: state.lorebookPanelTagsExpanded,
         botBrowserPanelSort: state.botBrowserPanelSort,
+        botBrowserTranslateBeforeImport: state.botBrowserTranslateBeforeImport,
+        botBrowserTranslationConnectionId: state.botBrowserTranslationConnectionId,
         presetPanelSort: state.presetPanelSort,
         connectionPanelSort: state.connectionPanelSort,
         agentPanelSort: state.agentPanelSort,

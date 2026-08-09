@@ -28,8 +28,16 @@ import {
   Cookie,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import type { APIConnection } from "@marinara-engine/shared";
 import { characterKeys } from "../../hooks/use-characters";
+import { useConnections } from "../../hooks/use-connections";
 import { lorebookKeys } from "../../hooks/use-lorebooks";
+import {
+  CARD_TRANSLATION_SYSTEM_PROMPT,
+  translateCharacterCardPayload,
+  type CardTranslationProgress,
+} from "../../lib/character-card-translation";
+import { api } from "../../lib/api-client";
 import { parsePngCharacterCard } from "../../lib/png-parser";
 import { useUIStore } from "../../stores/ui.store";
 import { toast } from "sonner";
@@ -58,6 +66,7 @@ const TAG_IMPORT_OPTIONS: Array<{ value: TagImportMode; label: string; descripti
 const SOURCE_MENU_MIN_WIDTH = 180;
 const SOURCE_MENU_MARGIN = 8;
 const JANNY_DOWNLOAD_API = "https://api.jannyai.com/api/v1/download";
+const NON_TEXT_CONNECTION_PROVIDERS = new Set<string>(["image_generation", "video_generation"]);
 
 async function fetchCompleteJannyCard(characterId: string, signal?: AbortSignal): Promise<Response> {
   const requestSignal = signal
@@ -1428,6 +1437,30 @@ export function BotBrowserView() {
   const qc = useQueryClient();
   const botBrowserOpen = useUIStore((s) => s.botBrowserOpen);
   const closeBotBrowser = useUIStore((s) => s.closeBotBrowser);
+  const translateBeforeImport = useUIStore((s) => s.botBrowserTranslateBeforeImport);
+  const setTranslateBeforeImport = useUIStore((s) => s.setBotBrowserTranslateBeforeImport);
+  const savedTranslationConnectionId = useUIStore((s) => s.botBrowserTranslationConnectionId);
+  const setSavedTranslationConnectionId = useUIStore((s) => s.setBotBrowserTranslationConnectionId);
+  const { data: connectionData = [] } = useConnections();
+  const translationConnections = useMemo(
+    () =>
+      (connectionData as APIConnection[]).filter(
+        (connection) => !NON_TEXT_CONNECTION_PROVIDERS.has(connection.provider),
+      ),
+    [connectionData],
+  );
+  const translationConnectionId = useMemo(() => {
+    if (translationConnections.some((connection) => connection.id === savedTranslationConnectionId)) {
+      return savedTranslationConnectionId;
+    }
+    return translationConnections.find((connection) => connection.isDefault)?.id ?? translationConnections[0]?.id ?? null;
+  }, [savedTranslationConnectionId, translationConnections]);
+
+  useEffect(() => {
+    if (translationConnectionId && translationConnectionId !== savedTranslationConnectionId) {
+      setSavedTranslationConnectionId(translationConnectionId);
+    }
+  }, [savedTranslationConnectionId, setSavedTranslationConnectionId, translationConnectionId]);
 
   const [sourceId, setSourceId] = useState("chub");
   const [sourceOpen, setSourceOpen] = useState(false);
@@ -1512,6 +1545,7 @@ export function BotBrowserView() {
   const [detail, setDetail] = useState<CardDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [translationProgress, setTranslationProgress] = useState<CardTranslationProgress | null>(null);
   const [tagImportMode, setTagImportMode] = useState<TagImportMode>("all");
   const mainScrollRef = useRef<HTMLDivElement | null>(null);
   const resultsScrollTopRef = useRef(0);
@@ -1728,8 +1762,30 @@ export function BotBrowserView() {
     }
   };
 
+  const translateImportPayload = async (payload: Record<string, unknown>) => {
+    if (!translateBeforeImport) return payload;
+    if (!translationConnectionId) {
+      throw new Error(localizeUi("ui.botBrowser.detailview.translationConnectionRequired"));
+    }
+    return translateCharacterCardPayload(
+      payload,
+      async (text) => {
+        const response = await api.post<{ translatedText: string }>("/translate", {
+          text,
+          provider: "ai",
+          targetLanguage: "Brazilian Portuguese (pt-BR)",
+          connectionId: translationConnectionId,
+          systemPrompt: CARD_TRANSLATION_SYSTEM_PROMPT,
+        });
+        return response.translatedText;
+      },
+      setTranslationProgress,
+    );
+  };
+
   const handleImport = async (card: BrowseCard) => {
     setImporting(true);
+    setTranslationProgress(null);
     try {
       let downloadUrl = "";
       if (sourceId === "chub") downloadUrl = `/api/bot-browser/chub/download/${card.id}`;
@@ -1780,11 +1836,12 @@ export function BotBrowserView() {
           card.name,
           cardDetail?.embeddedLorebook ?? readEmbeddedLorebookFromCharacterPayload(importJson),
         );
+        const translatedImportJson = await translateImportPayload(importJson);
         const importRes = await fetch("/api/import/st-character", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            ...importJson,
+            ...translatedImportJson,
             _avatarDataUrl: imageDataUrl,
             _botBrowserSource: `${sourceId}:${card.id}`,
             importEmbeddedLorebook,
@@ -1833,6 +1890,7 @@ export function BotBrowserView() {
         if (hasLorebookEntries(cardDetail?.embeddedLorebook)) {
           v2.character_book = cardDetail?.embeddedLorebook;
         }
+        const importPayload = await translateImportPayload(v2);
         const avatarSrc = card.avatarUrl;
         if (avatarSrc) {
           try {
@@ -1844,7 +1902,7 @@ export function BotBrowserView() {
                 reader.onload = () => resolve(reader.result as string);
                 reader.readAsDataURL(avatarBlob);
               });
-              v2._avatarDataUrl = dataUrl;
+              importPayload._avatarDataUrl = dataUrl;
             }
           } catch {
             /* ignore */
@@ -1853,7 +1911,7 @@ export function BotBrowserView() {
         const importRes = await fetch("/api/import/st-character", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(v2),
+          body: JSON.stringify(importPayload),
         });
         const data = await importRes.json();
         if (data.success) {
@@ -1865,6 +1923,7 @@ export function BotBrowserView() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message :localizeUi("ui.botBrowser.botbrowserview.importFailed"));
     } finally {
+      setTranslationProgress(null);
       setImporting(false);
     }
   };
@@ -2247,6 +2306,12 @@ export function BotBrowserView() {
               onImport={handleImport}
               tagImportMode={tagImportMode}
               onTagImportModeChange={setTagImportMode}
+              translateBeforeImport={translateBeforeImport}
+              onTranslateBeforeImportChange={setTranslateBeforeImport}
+              translationConnections={translationConnections}
+              translationConnectionId={translationConnectionId}
+              onTranslationConnectionChange={setSavedTranslationConnectionId}
+              translationProgress={translationProgress}
               onDetailUpdate={setDetail}
             />
           ) : (
@@ -2897,6 +2962,12 @@ function DetailView({
   onImport,
   tagImportMode,
   onTagImportModeChange,
+  translateBeforeImport,
+  onTranslateBeforeImportChange,
+  translationConnections,
+  translationConnectionId,
+  onTranslationConnectionChange,
+  translationProgress,
   onDetailUpdate,
 }: {
   card: BrowseCard;
@@ -2908,6 +2979,12 @@ function DetailView({
   onImport: (card: BrowseCard) => void;
   tagImportMode: TagImportMode;
   onTagImportModeChange: (mode: TagImportMode) => void;
+  translateBeforeImport: boolean;
+  onTranslateBeforeImportChange: (enabled: boolean) => void;
+  translationConnections: APIConnection[];
+  translationConnectionId: string | null;
+  onTranslationConnectionChange: (id: string | null) => void;
+  translationProgress: CardTranslationProgress | null;
   onDetailUpdate?: (detail: CardDetail) => void;
 }) {
   const { t: localizeUi } = useUiTranslation();
@@ -3035,13 +3112,63 @@ function DetailView({
                   ))}
                 </div>
               </div>
+              <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/60 p-2.5">
+                <label className="flex cursor-pointer items-start gap-2">
+                  <input
+                    type="checkbox"
+                    checked={translateBeforeImport}
+                    disabled={importing}
+                    onChange={(event) => onTranslateBeforeImportChange(event.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-[var(--primary)]"
+                  />
+                  <span>
+                    <span className="block text-[0.6875rem] font-semibold text-[var(--foreground)]">
+                      {localizeUi("ui.botBrowser.detailview.translateBeforeImport")}
+                    </span>
+                    <span className="block text-[0.5625rem] leading-snug text-[var(--muted-foreground)]">
+                      {localizeUi("ui.botBrowser.detailview.translateBeforeImportHelp")}
+                    </span>
+                  </span>
+                </label>
+                {translateBeforeImport && (
+                  <label className="mt-2 block">
+                    <span className="mb-1 block text-[0.625rem] font-medium text-[var(--muted-foreground)]">
+                      {localizeUi("ui.botBrowser.detailview.translationConnection")}
+                    </span>
+                    <select
+                      value={translationConnectionId ?? ""}
+                      disabled={importing || translationConnections.length === 0}
+                      onChange={(event) => onTranslationConnectionChange(event.target.value || null)}
+                      className="mari-chrome-field h-8 w-full px-2 text-xs"
+                    >
+                      {translationConnections.length === 0 && (
+                        <option value="">{localizeUi("ui.botBrowser.detailview.noTextConnections")}</option>
+                      )}
+                      {translationConnections.map((connection) => (
+                        <option key={connection.id} value={connection.id}>
+                          {connection.isDefault
+                            ? localizeUi("ui.botBrowser.detailview.connectionOptionDefault", { name: connection.name })
+                            : connection.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+              </div>
               <button
                 onClick={() => onImport(card)}
-                disabled={importing}
+                disabled={importing || (translateBeforeImport && !translationConnectionId)}
                 className="mari-panel-gradient-button mari-panel-gradient--browser px-4 py-2.5 text-xs"
               >
                 {importing ? <Loader2 size="0.875rem" className="animate-spin" /> : <Download size="0.875rem" />}
-                {importing ?localizeUi("ui.botBrowser.detailview.importing") :localizeUi("ui.chat.chatbranchselector.import")}
+                {translationProgress
+                  ? localizeUi("ui.botBrowser.detailview.translatingProgress", {
+                      completed: translationProgress.completed,
+                      total: translationProgress.total,
+                    })
+                  : importing
+                    ? localizeUi("ui.botBrowser.detailview.importing")
+                    : localizeUi("ui.chat.chatbranchselector.import")}
               </button>
               <button
                 onClick={handleDownloadPng}
