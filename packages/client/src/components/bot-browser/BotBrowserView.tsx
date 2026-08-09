@@ -3068,8 +3068,8 @@ function DetailView({
         </div>
       ) : (
         <div className="flex gap-5 max-md:flex-col">
-          <div className="flex w-56 shrink-0 flex-col gap-3 max-md:w-full max-md:flex-row max-md:items-start">
-            <div className="aspect-square w-full overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--secondary)] max-md:w-32">
+          <div className="flex w-56 shrink-0 flex-col gap-3 max-md:w-full max-md:flex-row max-md:items-start max-sm:flex-col">
+            <div className="aspect-square w-full overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--secondary)] max-md:w-32 max-sm:w-40">
               {imgError || !card.avatarUrl ? (
                 <div className="flex h-full items-center justify-center text-[var(--muted-foreground)]">
                   <Hash size="2.5rem" />
@@ -3083,7 +3083,7 @@ function DetailView({
                 />
               )}
             </div>
-            <div className="flex flex-col gap-2 max-md:flex-1">
+            <div className="flex flex-col gap-2 max-md:flex-1 max-sm:w-full">
               <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/60 p-2.5">
                 <p className="mb-2 text-[0.6875rem] font-semibold text-[var(--foreground)]">{localizeUi("ui.botBrowser.detailview.importedTags")}</p>
                 <div className="flex flex-col gap-1.5">
