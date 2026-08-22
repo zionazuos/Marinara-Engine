@@ -4,7 +4,6 @@ import {
   isClaudeAdaptiveOnlyNoSamplingModel,
   resolveProviderReasoningEffort,
   resolveMacros,
-  stripMacroComments,
   DEFAULT_CONVERSATION_PROMPT,
   DEFAULT_GAME_SYSTEM_PROMPT,
   normalizeGameStoryboardKeyframeCount,
@@ -16,6 +15,7 @@ import { createChatsStorage } from "../../services/storage/chats.storage.js";
 import { createConnectionsStorage } from "../../services/storage/connections.storage.js";
 import { createPromptsStorage } from "../../services/storage/prompts.storage.js";
 import { createCharactersStorage } from "../../services/storage/characters.storage.js";
+import { createAgentsStorage } from "../../services/storage/agents.storage.js";
 import { createRegexScriptsStorage } from "../../services/storage/regex-scripts.storage.js";
 import {
   injectOwnerSpatialPrompt,
@@ -32,6 +32,7 @@ import { getLocalSidecarProvider } from "../../services/llm/local-sidecar.js";
 import {
   assemblePrompt,
   buildPromptMacroContext,
+  normalizeChatMacroVariables,
   collectCharacterAdvancedPromptEntries,
   resolveCharacterAdvancedPromptIds,
   resolveCharacterMacroData,
@@ -41,6 +42,7 @@ import {
   resolvePromptMessageMacros,
   type AssemblerInput,
 } from "../../services/prompt/index.js";
+import { cardPromptText } from "../../services/prompt/card-text.js";
 import { mergeAdjacentMessages } from "../../services/prompt/merger.js";
 import { wrapContent } from "../../services/prompt/format-engine.js";
 import {
@@ -56,6 +58,7 @@ import {
   resolveStoredModelContextLimit,
 } from "../../services/generation/model-access-policy.js";
 import { normalizeChatTopP } from "../../services/generation/generation-parameters.js";
+import { filterPromptMessagesForCharacterAudience } from "../../services/generation/prompt-message-scope.js";
 import { applyAllSegmentEdits } from "../../services/game/segment-edits.js";
 import { applyRegexScriptsToPromptMessages } from "../../services/regex/regex-application.js";
 import { sendSseEvent, startSseReply } from "./sse.js";
@@ -69,6 +72,7 @@ import {
   extractImageAttachmentDataUrls,
   findTrackerContextInsertIndex,
   formatConversationInstructionsForWrap,
+  getMessageConversationStartCharacterIds,
   getMessageHiddenFromAICharacterIds,
   isMessageHiddenFromAI,
   mergeCustomParameters,
@@ -95,6 +99,7 @@ import { buildGenerationPromptPresetCandidates, type PromptPresetCandidateSource
 import { CONVERSATION_NO_REPEAT_INSTRUCTION } from "./conversation-prompt-formatting.js";
 import { createGameStateStorage, type GameStateVisibleAnchor } from "../../services/storage/game-state.storage.js";
 import { buildCommittedTrackerContextBlock } from "../../services/generation/committed-tracker-context.js";
+import { loadPriorBeholderState } from "../../services/agents/beholder-state.js";
 import { logger } from "../../lib/logger.js";
 import { resolveGameGmPromptTemplate } from "../../services/generation/game-gm-prompt-runtime.js";
 
@@ -107,12 +112,10 @@ type DryRunPromptMessage = {
   contextKind?: "prompt" | "history" | "injection";
   characterId?: string | null;
   personaSnapshotName?: string | null;
+  hiddenFromAICharacterIds?: string[];
+  conversationStartForCharacterIds?: string[];
   providerMetadata?: Record<string, unknown>;
 };
-
-function cardPromptText(value: unknown): string {
-  return typeof value === "string" ? stripMacroComments(value).trim() : "";
-}
 
 function presetStringField(preset: Record<string, unknown> | null | undefined, field: string): string {
   const value = preset?.[field];
@@ -166,6 +169,7 @@ async function loadLatestGameSnapshot(
 function formatTrackersContextBlock(args: {
   wrapFormat: WrapFormat;
   snap: any;
+  beholderState?: unknown;
   chatMeta: Record<string, unknown>;
   chatEnableAgents: boolean;
   activeAgentIds: string[];
@@ -174,6 +178,7 @@ function formatTrackersContextBlock(args: {
     chatEnableAgents: args.chatEnableAgents,
     activeAgentIds: args.activeAgentIds,
     latestGameState: args.snap,
+    beholderState: args.beholderState,
     chatMetadata: args.chatMeta,
     wrapFormat: args.wrapFormat,
   });
@@ -605,6 +610,14 @@ export async function registerDryRunRoute(app: FastifyInstance) {
       typeof body.regenerateMessageId === "string" && body.regenerateMessageId.trim()
         ? body.regenerateMessageId.trim()
         : null;
+    const dryRunBeholderState = await loadPriorBeholderState({
+      agentsStore: createAgentsStorage(app.db),
+      chatId,
+      chatMode,
+      activeAgentIds: dryRunActiveAgentIds,
+      chatEnableAgents: dryRunChatEnableAgents,
+      excludeMessageId: regenerateMessageId,
+    });
     const ownerSpatialProjection = await resolveOwnerSpatialProjection(
       chatId,
       regenerateMessageId ? { beforeMessageId: regenerateMessageId } : {},
@@ -667,13 +680,14 @@ export async function registerDryRunRoute(app: FastifyInstance) {
 
     const isGoogleProvider = conn.provider === "google" || conn.provider === "google_vertex";
     const excludePastReasoning = chatMeta.excludePastReasoning !== false;
-    let mappedMessages = chatMessages.map((m: any) => {
+    let mappedMessages: DryRunPromptMessage[] = chatMessages.map((m: any) => {
       const extra = parseExtra(m.extra);
       const personaSnapshotName = m.role === "user" ? readPersonaSnapshotName(extra) : null;
       const attachments = extra.attachments as PromptAttachment[] | undefined;
       const images = extractImageAttachmentDataUrls(attachments);
       const files = extractFileAttachmentInputs(attachments);
       const hiddenFromAICharacterIds = getMessageHiddenFromAICharacterIds(m);
+      const conversationStartForCharacterIds = getMessageConversationStartCharacterIds(m);
       const geminiParts =
         !excludePastReasoning && isGoogleProvider && m.role === "assistant" && extra.geminiParts
           ? { providerMetadata: { geminiParts: extra.geminiParts } }
@@ -686,6 +700,7 @@ export async function registerDryRunRoute(app: FastifyInstance) {
         characterId: typeof m.characterId === "string" && m.characterId ? m.characterId : null,
         ...(personaSnapshotName ? { personaSnapshotName } : {}),
         ...(hiddenFromAICharacterIds.length ? { hiddenFromAICharacterIds } : {}),
+        ...(conversationStartForCharacterIds.length ? { conversationStartForCharacterIds } : {}),
         ...(images?.length ? { images } : {}),
         ...(files.length ? { files } : {}),
         ...geminiParts,
@@ -732,10 +747,7 @@ export async function registerDryRunRoute(app: FastifyInstance) {
       !impersonate;
     const audienceCharacterIds = impersonate ? [] : promptTargetCharacterId ? [promptTargetCharacterId] : characterIds;
     if (audienceCharacterIds.length > 0) {
-      const audience = new Set(audienceCharacterIds);
-      mappedMessages = mappedMessages.filter(
-        (message) => !message.hiddenFromAICharacterIds?.some((characterId) => audience.has(characterId)),
-      );
+      mappedMessages = filterPromptMessagesForCharacterAudience(mappedMessages, audienceCharacterIds);
     }
 
     // Persona resolution (same strategy as generation; read-only)
@@ -814,6 +826,7 @@ export async function registerDryRunRoute(app: FastifyInstance) {
 
     const chatChoices: Record<string, string | string[]> =
       requestChoices ?? (isDifferentPresetOverride ? (presetDefaultChoices ?? {}) : chatChoicesFromMeta);
+    const chatMacroVariables = normalizeChatMacroVariables(chatMeta.macroVariables);
     const promptMacroContext = await buildPromptMacroContext({
       db: app.db,
       characterIds: promptCharacterIds,
@@ -824,6 +837,7 @@ export async function registerDryRunRoute(app: FastifyInstance) {
       variables: {
         gameStoryboardKeyframeCount: String(normalizeGameStoryboardKeyframeCount(chatMeta.gameStoryboardKeyframeCount)),
       },
+      localVariables: chatMacroVariables,
       groupScenarioOverrideText:
         typeof chatMeta.groupScenarioText === "string" && (chatMeta.groupScenarioText as string).trim()
           ? (chatMeta.groupScenarioText as string).trim()
@@ -854,11 +868,10 @@ export async function registerDryRunRoute(app: FastifyInstance) {
     }
     mappedMessages = resolveHistoryMessageMacros(mappedMessages);
     const shouldPrefixGroupHistorySpeakers =
-      chatMeta.groupSpeakerNamesInHistory === true &&
       characterIds.length > 1 &&
-      chatMode !== "conversation" &&
       chatMode !== "game" &&
-      dryRunGroupChatMode === "individual";
+      dryRunGroupChatMode === "individual" &&
+      (chatMode === "conversation" || chatMeta.groupSpeakerNamesInHistory === true);
     if (shouldPrefixGroupHistorySpeakers) {
       const characterNamesById = await resolveCharacterNameMap(allCharacterIds, (id) => chars.getById(id));
       mappedMessages = prefixGroupIndividualHistorySpeakers(mappedMessages, {
@@ -1112,10 +1125,10 @@ export async function registerDryRunRoute(app: FastifyInstance) {
       const trackersBlock = includeTrackers
         ? await (async () => {
             const snap = await loadLatestGameSnapshot(app, chatId, visibleGameStateAnchor, regenerateMessageId);
-            if (!snap) return null;
             return formatTrackersContextBlock({
               wrapFormat,
               snap,
+              beholderState: dryRunBeholderState,
               chatMeta,
               chatEnableAgents: dryRunChatEnableAgents,
               activeAgentIds: dryRunActiveAgentIds,
@@ -1236,6 +1249,7 @@ export async function registerDryRunRoute(app: FastifyInstance) {
         groups: groups as any,
         choiceBlocks: choiceBlocks as any,
         chatChoices,
+        localVariables: chatMacroVariables,
         chatId,
         characterIds: promptCharacterIds,
         groupCharacterIds: characterIds,
@@ -1501,15 +1515,14 @@ export async function registerDryRunRoute(app: FastifyInstance) {
         await loadLatestGameSnapshot(app, chatId, visibleGameStateAnchor, regenerateMessageId),
         ownerSpatialProjection,
       );
-      const contextBlock = snap
-        ? formatTrackersContextBlock({
-            wrapFormat,
-            snap,
-            chatMeta,
-            chatEnableAgents: dryRunChatEnableAgents,
-            activeAgentIds: dryRunActiveAgentIds,
-          })
-        : null;
+      const contextBlock = formatTrackersContextBlock({
+        wrapFormat,
+        snap,
+        beholderState: dryRunBeholderState,
+        chatMeta,
+        chatEnableAgents: dryRunChatEnableAgents,
+        activeAgentIds: dryRunActiveAgentIds,
+      });
       if (contextBlock) {
         finalMessages = injectTrackerContext(finalMessages, contextBlock, "beforeLastHistoryMessage");
       }

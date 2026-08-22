@@ -38,7 +38,6 @@ interface GenerationSendBlockInput {
 }
 
 interface GenerationStartBlockInput {
-  setupLocked: boolean;
   activeController: boolean;
   backgroundIllustration: boolean;
 }
@@ -46,6 +45,8 @@ interface GenerationStartBlockInput {
 const ROLEPLAY_QUEUE_RESERVE_SECONDS = 0.9;
 const ROLEPLAY_SLOWDOWN_RESPONSE_MS = 120;
 const ROLEPLAY_SPEEDUP_RESPONSE_MS = 480;
+const TYPEWRITER_TARGET_FRAME_MS = 1000 / 60;
+const TYPEWRITER_MAX_CATCH_UP_FRAMES = 2;
 
 /** Keep send actions guarded while leaving the draft field itself editable. */
 export function isGenerationSendBlocked(input: GenerationSendBlockInput): boolean {
@@ -54,7 +55,7 @@ export function isGenerationSendBlocked(input: GenerationSendBlockInput): boolea
 
 /** An Illustrator-only SSE tail may coexist with the chat's next text generation. */
 export function isGenerationStartBlocked(input: GenerationStartBlockInput): boolean {
-  return input.setupLocked || (input.activeController && !input.backgroundIllustration);
+  return input.activeController && !input.backgroundIllustration;
 }
 
 /**
@@ -90,7 +91,7 @@ export function getRoleplayTypewriterRevealCharsPerSecond(input: RoleplayTypewri
   return input.previousCharsPerSecond + (targetRate - input.previousCharsPerSecond) * blend;
 }
 
-/** Preserve the selected reveal rate even when animation frames arrive below 60 Hz. */
+/** Carry delayed-frame debt forward without painting a visible burst in one frame. */
 export function getTypewriterFrameBudget(
   charsPerSecond: number,
   elapsedMs: number,
@@ -99,7 +100,10 @@ export function getTypewriterFrameBudget(
   const newlyAccruedCharacters = (charsPerSecond * Math.max(0, elapsedMs)) / 1000;
   return {
     accruedCharacters: carriedRemainder + newlyAccruedCharacters,
-    maxCharacters: Math.max(1, Math.ceil(newlyAccruedCharacters)),
+    maxCharacters: Math.max(
+      1,
+      Math.ceil((charsPerSecond * TYPEWRITER_TARGET_FRAME_MS * TYPEWRITER_MAX_CATCH_UP_FRAMES) / 1000),
+    ),
   };
 }
 

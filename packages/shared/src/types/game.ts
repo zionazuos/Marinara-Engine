@@ -209,10 +209,18 @@ export interface GameSetupConfig {
   enableAgents?: boolean;
   /** Enable automatic sprite generation for characters using image model */
   enableSpriteGeneration?: boolean;
+  /** Ask the configured prompt model to rewrite Game Illustrator prompts before image generation. */
+  gameImageDynamicPromptEnabled?: boolean;
   /** Connection ID for image generation (NPC portraits + location backgrounds) */
   imageConnectionId?: string;
   /** Connection ID for video generation (animated scene clips from generated illustrations). */
   videoConnectionId?: string;
+  /** Connection ID for audio generation (speech, game sound effects, and music). */
+  audioConnectionId?: string;
+  /** Generate scene sound effects for this game (requires a capable audio connection). Defaults to true. */
+  enableGameSoundEffects?: boolean;
+  /** Generate scene music for this game (requires a capable audio connection). Defaults to true. */
+  enableGameMusic?: boolean;
   /** Automatically create storyboard keyframe illustrations after completed GM turns. */
   gameStoryboardAutoIllustrationsEnabled?: boolean;
   /** Automatically create storyboard keyframe videos after completed GM turns. */
@@ -267,6 +275,25 @@ export interface GameSetupConfig {
   gameSpecialInstructions?: string | null;
 }
 
+/** Resolve the setup-time Illustrator prompt choice into the root chat-metadata value used at runtime. */
+export function resolveGameImageDynamicPromptEnabled(
+  config: Readonly<Pick<GameSetupConfig, "enableSpriteGeneration" | "gameImageDynamicPromptEnabled">>,
+): boolean {
+  return config.enableSpriteGeneration === true && config.gameImageDynamicPromptEnabled === true;
+}
+
+/** Retain the new prompt choice when an older/imported setup omits it; other undefined fields still clear as before. */
+export function mergeGameSetupConfigPreservingDynamicPrompt(
+  stored: Readonly<Partial<GameSetupConfig>>,
+  submitted: Readonly<Partial<GameSetupConfig>>,
+): Partial<GameSetupConfig> {
+  const merged = { ...stored, ...submitted };
+  if (submitted.gameImageDynamicPromptEnabled === undefined) {
+    merged.gameImageDynamicPromptEnabled = stored.gameImageDynamicPromptEnabled;
+  }
+  return merged;
+}
+
 /** Safe, immutable connection details retained for sharing a game's original setup. */
 export interface GameInitialSetupConnectionSnapshot {
   name: string;
@@ -296,6 +323,7 @@ export interface GameInitialSetupSnapshot {
     scene?: GameInitialSetupConnectionSnapshot | null;
     image?: GameInitialSetupConnectionSnapshot | null;
     video?: GameInitialSetupConnectionSnapshot | null;
+    audio?: GameInitialSetupConnectionSnapshot | null;
   };
   labels?: GameInitialSetupLabels;
   createdAt: string;
@@ -327,6 +355,16 @@ export interface SkillCheckResult {
   criticalSuccess: boolean;
   criticalFailure: boolean;
   rollMode: "advantage" | "disadvantage" | "normal";
+  /** How the reported total was calculated from the dice. */
+  resolution: "sum" | "successes";
+  /**
+   * Dice notation actually rolled (e.g. "1d20", "6d10"). Absent on results from
+   * before this field existed, and on the built-in resolver's own output where
+   * it is always "1d20" — readers should default to that. Non-d20 values only
+   * arrive from a GM-declared [skill_check: dice="..."] tag, which is how
+   * non-d20 systems (pool systems like V20) reach the dice card intact.
+   */
+  dice?: string;
 }
 
 // ── Combat ──
@@ -454,6 +492,9 @@ export interface GameCombatStateSnapshot {
   dialogueCues: CombatDialogueCue[];
   /** ID of the assistant message whose `[combat:]` tag opened this encounter. */
   startMessageId: string | null;
+  /** Encounter tier for context-bound combat music (#5161). Optional so
+   *  snapshots from older clients stay valid. */
+  musicTier?: string | null;
 }
 
 /** Post-combat summary handed to the GM for narration. */
@@ -705,6 +746,8 @@ export type GameStoryboardKeyframeStatus =
   | "complete"
   | "failed";
 
+export type StoryboardAnimationSuitability = "suitable" | "simplify" | "subtle" | "regenerate";
+
 export interface GameStoryboardMediaRef {
   id: string;
   url: string;
@@ -727,6 +770,7 @@ export interface GameTurnStoryboardKeyframe {
   mangaPanelPrompt: string;
   imagePrompt: string;
   videoPrompt: string;
+  animationSuitability: StoryboardAnimationSuitability | "";
   characters: string[];
   continuityNotes: string;
   cameraMotion: string;

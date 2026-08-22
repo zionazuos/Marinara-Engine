@@ -61,7 +61,9 @@ function sanitizePresetAgentMap(value: unknown) {
 
 function sanitizePresetMetadataValue(key: string, value: unknown) {
   if (key === "activeAgentIds") return sanitizePresetAgentIds(value);
-  if (key === "agentOverrides" || key === "agentPromptTemplateIds") return sanitizePresetAgentMap(value);
+  if (key === "agentOverrides" || key === "agentPromptTemplateIds" || key === "customAgentImageSettings") {
+    return sanitizePresetAgentMap(value);
+  }
   return value;
 }
 
@@ -216,9 +218,7 @@ export function createChatPresetsStorage(db: DB) {
           const fallbackRows = (await tx
             .select()
             .from(chatPresets)
-            .where(
-              and(eq(chatPresets.mode, existing.mode), eq(chatPresets.isDefault, "true")),
-            )) as ChatPresetRow[];
+            .where(and(eq(chatPresets.mode, existing.mode), eq(chatPresets.isDefault, "true")))) as ChatPresetRow[];
           const fallback = fallbackRows[0];
           if (fallback) {
             const ts = now();
@@ -248,10 +248,7 @@ export function createChatPresetsStorage(db: DB) {
           .set({ isActive: "false", updatedAt: ts })
           .where(and(eq(chatPresets.mode, target.mode), ne(chatPresets.id, id)));
         await tx.update(chatPresets).set({ isActive: "true", updatedAt: ts }).where(eq(chatPresets.id, id));
-        const updatedRows = (await tx
-          .select()
-          .from(chatPresets)
-          .where(eq(chatPresets.id, id))) as ChatPresetRow[];
+        const updatedRows = (await tx.select().from(chatPresets).where(eq(chatPresets.id, id))) as ChatPresetRow[];
         return updatedRows[0] ? rowToPreset(updatedRows[0]) : null;
       });
     },
@@ -283,6 +280,7 @@ export function createChatPresetsStorage(db: DB) {
         const rows = await db.select().from(chats).where(eq(chats.id, chatId));
         const chatRow = rows[0];
         if (!chatRow) return null;
+        if (preset.mode !== chatRow.mode) return null;
 
         const currentMetadata: Record<string, unknown> = (() => {
           try {
@@ -292,7 +290,7 @@ export function createChatPresetsStorage(db: DB) {
           }
         })();
 
-        const presetMetadata = (preset.settings.metadata ?? {}) as Record<string, unknown>;
+        const presetMetadata = (sanitizePresetSettings(preset.settings).metadata ?? {}) as Record<string, unknown>;
 
         // Preserve only chat-specific (non-profile) metadata keys.
         const preserved: Record<string, unknown> = {};
@@ -307,6 +305,9 @@ export function createChatPresetsStorage(db: DB) {
         }
         if (!Object.prototype.hasOwnProperty.call(presetMetadata, "agentPromptTemplateIds")) {
           preserved.agentPromptTemplateIds = sanitizePresetAgentMap(currentMetadata.agentPromptTemplateIds);
+        }
+        if (!Object.prototype.hasOwnProperty.call(presetMetadata, "customAgentImageSettings")) {
+          preserved.customAgentImageSettings = sanitizePresetAgentMap(currentMetadata.customAgentImageSettings);
         }
 
         const baseDefaults: Record<string, unknown> = {
@@ -348,9 +349,7 @@ export function createChatPresetsStorage(db: DB) {
           const defaultRows = (await tx
             .select()
             .from(chatPresets)
-            .where(
-              and(eq(chatPresets.mode, mode), eq(chatPresets.isDefault, "true")),
-            )) as ChatPresetRow[];
+            .where(and(eq(chatPresets.mode, mode), eq(chatPresets.isDefault, "true")))) as ChatPresetRow[];
           const canonicalDefault = [...defaultRows].sort(
             (left, right) => left.createdAt.localeCompare(right.createdAt) || left.id.localeCompare(right.id),
           )[0];
@@ -406,20 +405,12 @@ export function createChatPresetsStorage(db: DB) {
           const activeId =
             activeRows.length === 0
               ? defaultId
-              : [...activeRows].sort(
-                  (left, right) => right.updatedAt.localeCompare(left.updatedAt),
-                )[0]!.id;
+              : [...activeRows].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))[0]!.id;
           if (!activeId) return;
 
           const ts = now();
-          await tx
-            .update(chatPresets)
-            .set({ isActive: "false", updatedAt: ts })
-            .where(eq(chatPresets.mode, mode));
-          await tx
-            .update(chatPresets)
-            .set({ isActive: "true", updatedAt: ts })
-            .where(eq(chatPresets.id, activeId));
+          await tx.update(chatPresets).set({ isActive: "false", updatedAt: ts }).where(eq(chatPresets.mode, mode));
+          await tx.update(chatPresets).set({ isActive: "true", updatedAt: ts }).where(eq(chatPresets.id, activeId));
         });
       }
     },

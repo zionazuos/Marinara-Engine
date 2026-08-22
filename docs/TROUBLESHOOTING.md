@@ -238,6 +238,12 @@ The cleanest long-term fix is to put the server behind HTTPS. Last checked again
 
 ## Storage and data
 
+### Startup says another process may be using the data directory
+
+Marinara allows only one running server to write to a local data directory. If startup reports **Another Marinara Engine process ... may be using** the directory, close the other Marinara process and start again.
+
+After a crash or a moved Docker data volume, startup can instead report **The storage writer lease ... is incomplete or invalid** or identify a process that no longer exists on this host. First verify that every Marinara process and container using that data directory is stopped. Then remove only the `.writer-lease` directory named in the error and restart Marinara. Do not remove the surrounding `storage` directory or any table files.
+
 ### Data seems missing after an update
 
 If your chats or presets look missing after an update, do not delete any data folders yet. Marinara keeps your live data in a `storage` folder inside its data directory.
@@ -248,6 +254,27 @@ Check both of these local locations for a `storage` folder:
 2. `data/`
 
 The server prints the data and storage directories it resolved on startup.
+
+### Chats show no messages after switching to an older version
+
+Newer versions of Marinara store each chat's data (messages, swipes, memories, images, and other per-chat records) in its own files instead of one big file per table, which makes saving long chats much faster. Older versions do not understand that layout. If you switch to an older version, your chats look empty — the data is still on disk, the older version just cannot see it.
+
+Marinara refuses obvious downgrades on its own: the launcher skips an auto-update that would land on an incompatible version, and the in-app updater blocks it with an error that points here.
+
+To downgrade anyway:
+
+1. Stop the Marinara server.
+2. From the Marinara folder, run:
+
+   ```bash
+   node scripts/protect-launcher-data.mjs unshard
+   ```
+
+3. Switch to the older version and start it normally.
+
+The command rebuilds the old single-file layout from the per-chat files. Nothing is deleted: the per-chat files are kept next to each rebuilt file in folders named `<table>.post-unshard-<timestamp>` (for example `messages.post-unshard-…`), and any pre-migration originals stay as `.pre-shard` files. When you upgrade again later, Marinara converts your data back automatically.
+
+Docker and Podman keep data in the `marinara-data` volume, so run the command in a one-off container instead: stop the running container, then `docker compose run --rm marinara node scripts/protect-launcher-data.mjs unshard`, then start the older image.
 
 ### Backup or Export returns 403
 
@@ -264,7 +291,23 @@ The Android app is a small shell around Termux. Termux is a Linux terminal app f
 3. If Android asks to run commands in Termux, grant it.
 4. Wait for the launcher to finish and start the server, then return to the app.
 
+The normal APK path never asks you to paste a Marinara secret. The app generates its private localhost credential, provisions it in Termux, and signs in automatically. Android's app-install and Termux permission dialogs are still required system prompts. Do not add `null`, `http://null`, or the APK's secret to `CSRF_TRUSTED_ORIGINS`; none is a valid or necessary Android setup step.
+
 Also confirm the app and Termux use the same port. The default is `7860`. If you built the app with a different port, set the matching `PORT` in the Termux `.env` too.
+
+### Android localhost opens the login page or returns 401/503
+
+APK-managed Termux installs protect localhost with a private per-install secret. The Android app authenticates automatically and should not display this login page during setup. If the login page appears inside the Marinara Engine app, install the [latest APK](https://github.com/Pasta-Devs/Marinara-Engine/releases/latest/download/marinara-engine-android.apk), tap **Install / Start Marinara** again, and return to the app when Termux finishes.
+
+An error naming origin `null` means an older APK/server pair let Android's opaque WebView origin reach the general CSRF gate before the private handshake. Editing `.env` cannot fix that: literal `null` is deliberately ignored, and trusting an opaque origin globally would weaken every unsafe API route. Update the APK and Engine instead; current Android login routes verify their own one-time proof or per-install secret while `null` remains rejected everywhere else.
+
+Only a separate browser on the same phone needs manual local-browser authentication. In that browser, open `/android-login` and paste the value shown by this Termux command:
+
+```bash
+cat ~/.marinara-engine/android-secret
+```
+
+The local `mari` CLI reads the same file automatically. A 401 means the pasted secret or an authentication challenge was rejected; reload `/android-login` and paste the current value. A 503 means the server received a malformed configured secret. Restart through `./start-termux.sh`; if the launcher reports that its secret file is invalid or empty, return to the Android app and tap **Install / Start Marinara** so the APK provisions it again. Do not put this secret in screenshots or issue reports.
 
 ### Android update stops with exit status 134
 
@@ -275,6 +318,12 @@ Exit status 134 usually means Android ran out of memory during a build step. Upd
 ```
 
 If it still stops, close other Android apps, reopen Termux, and run the command again.
+
+### Termux closes or restarts while Marinara is running
+
+The launcher requests an Android wake lock while the server runs and saves each server session under `~/.marinara-engine/logs/`. After an unexpected restart, include the newest `server-*.log` file in the report. If the file ends without a Marinara or Node error, Android or the phone vendor most likely terminated Termux outside the server process.
+
+Allow Termux to run in the background and remove battery optimization for it in Android settings. On devices that support the Termux:API add-on, install that add-on and the `termux-api` package so `termux-wake-lock` is available. These settings cannot prevent every vendor-specific process kill, but they remove the common idle-suspension cause while the persistent log preserves evidence from application-level failures.
 
 ### Android update runs out of storage while installing dependencies
 

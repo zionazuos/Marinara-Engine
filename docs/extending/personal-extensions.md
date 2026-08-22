@@ -8,6 +8,8 @@ The default message is:
 
 There is no New Draft action and there are no import controls in this section. Ask Professor Mari to create or revise a draft. She can save code, but she cannot approve or enable it.
 
+To write and import your own package, use the [Personal Extension authoring guide](writing-personal-extensions.md). Self-authored packages use the separately gated External Extensions flow.
+
 ## Review and enable
 
 Every draft starts disabled. Marinara fingerprints the exact executable code with SHA-256. Open the draft, inspect the code, compare the displayed hash, then choose **Review and Run** only if you accept that exact version. Any executable edit or restored revision disables the extension and requires a fresh approval.
@@ -148,6 +150,8 @@ If an External Extension genuinely depends on host DOM access, it may request:
 
 **Full page access is not a sandbox capability.** The approved JavaScript and CSS run inside Marinara's page. The code can read or change anything visible to the current browser session, inspect chats and cards, use browser storage, make network requests, and call same-origin Marinara APIs. It has the same practical page authority as code pasted into the browser console. Professor Mari drafts cannot request it.
 
+Full page extensions should use `marinara.fetch(...)` for network requests. It has the same signature and result as `window.fetch`, while allowing **Settings > Addons > External Extensions** to show that extension's session request count, transferred bytes reported by responses, recent request rate, and sustained high-traffic warning. Raw `window.fetch` remains available because full page access is trusted page code, but those requests cannot be attributed to the extension.
+
 Marinara recognizes the older `kind: "marinara.extension"` v1 envelope without an explicit `capabilities` field as a pre-sandbox package and assigns **Full page access** during import. This allows legacy packages such as WeatherTweaker to reach the correct review flow instead of silently failing in a Worker. A modern package that uses that envelope but wants the safe runtime must include `"capabilities": []`.
 
 The two External Extension gates and exact-hash approval still apply. A code, CSS, or permission change disables the extension and requires fresh approval. Disabling removes Marinara's script and stylesheet nodes, cancels timers created through the compatibility API, and runs callbacks registered through `marinara.onCleanup(...)`. Because page code can create unregistered listeners, timers, globals, or DOM changes, cleanup is best effort; reload the page after disabling an extension if anything remains.
@@ -204,6 +208,7 @@ If an extension misbehaves, choose **Disable**. If the interface is unavailable,
 
 ## Related guides
 
+- [Writing Personal Extensions](writing-personal-extensions.md)
 - [Professor Mari](../home/professor-mari.md)
 - [Server Configuration](../CONFIGURATION.md)
 - [Backup and Restore](../data/backup-and-restore.md)

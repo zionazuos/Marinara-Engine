@@ -9,6 +9,16 @@ import { PROFESSOR_MARI_ID, TTS_SETTINGS_KEY } from "@marinara-engine/shared";
 import { DATA_DIR } from "../utils/data-dir.js";
 import * as schema from "../db/schema/index.js";
 import { requirePrivilegedAccess } from "../middleware/privileged-gate.js";
+import { AVATAR_STORAGE_RATE_LIMIT } from "../middleware/rate-limit.js";
+import { logger } from "../lib/logger.js";
+import {
+  ABANDONED_AVATAR_MIN_AGE_MS,
+  collectCharacterAvatarPaths,
+  collectPersonaAvatarPaths,
+  deleteAbandonedAvatarFiles,
+  mutateAvatarReferencesAndCleanup,
+  scanAbandonedAvatarFiles,
+} from "../services/image/avatar-file-lifecycle.js";
 
 type ExpungeScope =
   | "chats"
@@ -52,6 +62,26 @@ function isValidScope(scope: unknown): scope is ExpungeScope {
 }
 
 export async function adminRoutes(app: FastifyInstance) {
+  app.get("/avatar-storage/abandoned", { config: { rateLimit: AVATAR_STORAGE_RATE_LIMIT } }, async (req, reply) => {
+    if (!requirePrivilegedAccess(req, reply, { feature: "Avatar storage scan" })) return;
+    const result = await scanAbandonedAvatarFiles({ db: app.db });
+    return { ...result, minimumAgeMinutes: ABANDONED_AVATAR_MIN_AGE_MS / 60_000 };
+  });
+
+  app.post<{ Body: { confirm: boolean } }>(
+    "/avatar-storage/cleanup",
+    { config: { rateLimit: AVATAR_STORAGE_RATE_LIMIT } },
+    async (req, reply) => {
+      if (!requirePrivilegedAccess(req, reply, { feature: "Avatar storage cleanup" })) return;
+      if (req.body?.confirm !== true) {
+        return reply.status(400).send({ error: "Must send { confirm: true } to proceed" });
+      }
+      const result = await deleteAbandonedAvatarFiles({ db: app.db });
+      logger.info("Removed %d abandoned avatar files (%d bytes)", result.files, result.bytes);
+      return { ...result, minimumAgeMinutes: ABANDONED_AVATAR_MIN_AGE_MS / 60_000 };
+    },
+  );
+
   const runExpunge = async (requestedScopes: ExpungeScope[], reply: FastifyReply) => {
     if (requestedScopes.length === 0) {
       return reply.status(400).send({ error: "At least one valid scope is required" });
@@ -87,15 +117,50 @@ export async function adminRoutes(app: FastifyInstance) {
     }
 
     if (requestedScopes.includes("characters")) {
-      await runDelete("character_groups", () => db.delete(schema.characterGroups).run());
-      await runDelete("characters", () =>
-        db.delete(schema.characters).where(ne(schema.characters.id, PROFESSOR_MARI_ID)).run(),
-      );
+      const cleanup = await mutateAvatarReferencesAndCleanup({
+        db,
+        collectAvatarPaths: async () => {
+          const [deletedCharacters, deletedGroups] = await Promise.all([
+            db
+              .select({ id: schema.characters.id })
+              .from(schema.characters)
+              .where(ne(schema.characters.id, PROFESSOR_MARI_ID)),
+            db.select({ avatarPath: schema.characterGroups.avatarPath }).from(schema.characterGroups),
+          ]);
+          const characterAvatarPaths = await collectCharacterAvatarPaths(
+            db,
+            deletedCharacters.map((row) => row.id),
+          );
+          return [...characterAvatarPaths, ...deletedGroups.flatMap((row) => (row.avatarPath ? [row.avatarPath] : []))];
+        },
+        mutateReferences: async () => {
+          await runDelete("character_groups", () => db.delete(schema.characterGroups).run());
+          await runDelete("characters", () =>
+            db.delete(schema.characters).where(ne(schema.characters.id, PROFESSOR_MARI_ID)).run(),
+          );
+        },
+        cleanupFiles: !requestedScopes.includes("media"),
+      });
+      filesDeleted.avatars = (filesDeleted.avatars ?? 0) + cleanup.filesDeleted;
     }
 
     if (requestedScopes.includes("personas")) {
-      await runDelete("persona_groups", () => db.delete(schema.personaGroups).run());
-      await runDelete("personas", () => db.delete(schema.personas).run());
+      const cleanup = await mutateAvatarReferencesAndCleanup({
+        db,
+        collectAvatarPaths: async () => {
+          const deletedPersonas = await db.select({ id: schema.personas.id }).from(schema.personas);
+          return collectPersonaAvatarPaths(
+            db,
+            deletedPersonas.map((row) => row.id),
+          );
+        },
+        mutateReferences: async () => {
+          await runDelete("persona_groups", () => db.delete(schema.personaGroups).run());
+          await runDelete("personas", () => db.delete(schema.personas).run());
+        },
+        cleanupFiles: !requestedScopes.includes("media"),
+      });
+      filesDeleted.avatars = (filesDeleted.avatars ?? 0) + cleanup.filesDeleted;
     }
 
     if (requestedScopes.includes("lorebooks")) {

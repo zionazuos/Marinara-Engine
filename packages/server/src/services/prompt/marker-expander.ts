@@ -4,12 +4,7 @@
 // ──────────────────────────────────────────────
 import type { DB } from "../../db/connection.js";
 import { logger } from "../../lib/logger.js";
-import {
-  formatRpgStatsForPrompt,
-  isExternallyImportedAgent,
-  resolveMacros,
-  stripMacroComments,
-} from "@marinara-engine/shared";
+import { formatRpgStatsForPrompt, isExternallyImportedAgent, resolveMacros } from "@marinara-engine/shared";
 import type {
   CharacterMacroProfile,
   MarkerConfig,
@@ -25,6 +20,7 @@ import { createCharactersStorage } from "../storage/characters.storage.js";
 import { createAgentsStorage } from "../storage/agents.storage.js";
 import { getCustomAgentImportPolicy } from "../agents/custom-agent-import-policy.service.js";
 import { processLorebooks, type LorebookFinalContentResolver, type LorebookScanResult } from "../lorebook/index.js";
+import { cardPromptText } from "./card-text.js";
 import { wrapContent } from "./format-engine.js";
 import { sanitizeExampleDialoguePromptLeaf, sanitizePromptLeaf } from "./prompt-escaping.js";
 import { agentRuns } from "../../db/schema/index.js";
@@ -69,6 +65,8 @@ export interface MarkerContext {
   chatEmbedding?: number[] | null;
   /** Per-lorebook pre-computed embeddings for semantic lorebook matching. */
   semanticEmbeddingsByLorebookId?: ReadonlyMap<string, number[] | null>;
+  /** Provider/model/profile identity used to create semantic query vectors. */
+  semanticEmbeddingSpaceId?: string | null;
   /** Unrelated-text cosine floor used to calibrate clustered embedding models. */
   semanticSimilarityBaseline?: number;
   /** Per-chat ephemeral state overrides for lorebook entries (from chat metadata). */
@@ -103,8 +101,8 @@ export interface MarkerContext {
   lorebookScanResultApplied?: boolean;
   /** When set, replaces all individual character scenario fields with this shared group scenario. */
   groupScenarioOverrideText?: string | null;
-  /** Whether the preset has an enabled marker that owns Example Dialogue placement. */
-  hasDialogueExamplesMarker?: boolean;
+  /** Include card example dialogue in Character Info when the preset has no dedicated marker for it. */
+  includeExampleDialogueInCharacterMarker?: boolean;
 }
 
 /** Expanded marker result. */
@@ -113,10 +111,6 @@ export interface ExpandedMarker {
   content: string;
   /** If the marker produces multiple messages (e.g. chat_history), they go here */
   messages?: ChatMLMessage[];
-}
-
-function cardPromptText(value: unknown): string {
-  return typeof value === "string" ? stripMacroComments(value).trim() : "";
 }
 
 function resolveSanitizedPromptLeaf(
@@ -155,16 +149,9 @@ export function orderCharacterMarkerFields(fields: readonly string[]): string[] 
     .map(({ field }) => field);
 }
 
-/** Append Example Dialogue to Character Info when no dedicated marker owns it. */
-export function resolveCharacterMarkerFields(
-  configuredFields: readonly string[] | undefined,
-  hasDialogueExamplesMarker: boolean,
-): string[] {
-  const fields = [...(configuredFields ?? DEFAULT_CHARACTER_MARKER_FIELDS)];
-  if (!hasDialogueExamplesMarker && !fields.includes("mes_example") && !fields.includes("example_dialogue")) {
-    fields.push("mes_example");
-  }
-  return orderCharacterMarkerFields(fields);
+/** Resolve only the card fields explicitly owned by the Character Info marker. */
+export function resolveCharacterMarkerFields(configuredFields: readonly string[] | undefined): string[] {
+  return orderCharacterMarkerFields(configuredFields ?? DEFAULT_CHARACTER_MARKER_FIELDS);
 }
 
 /**
@@ -209,7 +196,15 @@ async function expandCharacter(config: MarkerConfig, ctx: MarkerContext): Promis
     const profile = characterMacroProfileFromData(data);
     const characterMacroContext = macroContextForCharacterProfile(ctx.macroCtx, profile);
 
-    const fields = resolveCharacterMarkerFields(config.characterFields, ctx.hasDialogueExamplesMarker === true);
+    let fields = resolveCharacterMarkerFields(config.characterFields);
+    if (
+      ctx.includeExampleDialogueInCharacterMarker === true &&
+      config.characterFields === undefined &&
+      !fields.includes("mes_example") &&
+      !fields.includes("example_dialogue")
+    ) {
+      fields = orderCharacterMarkerFields([...fields, "mes_example"]);
+    }
 
     const charParts: string[] = [];
     for (const field of fields) {
@@ -388,6 +383,7 @@ export async function ensureLorebookScan(ctx: MarkerContext): Promise<LorebookSc
         tokenBudget: ctx.lorebookTokenBudget,
         chatEmbedding: ctx.chatEmbedding ?? null,
         semanticEmbeddingsByLorebookId: ctx.semanticEmbeddingsByLorebookId,
+        semanticEmbeddingSpaceId: ctx.semanticEmbeddingSpaceId,
         semanticSimilarityBaseline: ctx.semanticSimilarityBaseline,
         entryStateOverrides: ctx.entryStateOverrides,
         entryTimingStates: ctx.entryTimingStates,
@@ -556,6 +552,7 @@ async function expandAgentData(config: MarkerConfig, ctx: MarkerContext): Promis
     "character-tracker",
     "persona-stats",
     "custom-tracker",
+    "inventory-tracker",
   ]);
   if (AUTO_INJECTED_TRACKERS.has(agentType)) return { content: "" };
 

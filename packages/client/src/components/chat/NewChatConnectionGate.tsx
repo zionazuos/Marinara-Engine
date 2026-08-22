@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, MessageCircle, Plug, X, BookOpen } from "lucide-react";
+import { Loader2, Plug, X } from "lucide-react";
 import { useConnections } from "../../hooks/use-connections";
 import { useCreateChat } from "../../hooks/use-chats";
 import { useChatPresets, useApplyChatPreset } from "../../hooks/use-chat-presets";
@@ -9,13 +9,14 @@ import { useSidecarStore } from "../../stores/sidecar.store";
 import { appendLocalSidecarConnectionOption } from "../../lib/connection-filters";
 import { cn } from "../../lib/utils";
 import { useTranslation as useUiTranslation } from "react-i18next";
+import { ChatModeIcon } from "./ChatModeIcon";
 
 type Mode = "conversation" | "roleplay" | "game";
 
 const MODE_META: Record<Mode, { label: string; icon: React.ReactNode }> = {
-  conversation: { label: "Conversation", icon: <MessageCircle size="0.875rem" /> },
-  roleplay: { label: "Roleplay", icon: <BookOpen size="0.875rem" /> },
-  game: { label: "Game", icon: <BookOpen size="0.875rem" /> },
+  conversation: { label: "Conversation", icon: <ChatModeIcon mode="conversation" size="0.875rem" /> },
+  roleplay: { label: "Roleplay", icon: <ChatModeIcon mode="roleplay" size="0.875rem" /> },
+  game: { label: "Game", icon: <ChatModeIcon mode="game" size="0.875rem" /> },
 };
 
 interface NewChatConnectionGateProps {
@@ -103,8 +104,12 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
         <div className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-sm flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl sm:max-h-[min(90dvh,38rem)]">
           <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] px-4 py-3">
             <div>
-              <h3 className="text-sm font-semibold">{localizeUi("ui.chat.newchatconnectiongate.setUp")} {MODE_META[mode].label}</h3>
-              <p className="text-[0.6875rem] text-[var(--muted-foreground)]">{localizeUi("ui.chat.newchatconnectiongate.chooseAConnectionBeforeWeCreateTheChat")}</p>
+              <h3 className="text-sm font-semibold">
+                {localizeUi("ui.chat.newchatconnectiongate.setUp")} {MODE_META[mode].label}
+              </h3>
+              <p className="text-[0.6875rem] text-[var(--muted-foreground)]">
+                {localizeUi("ui.chat.newchatconnectiongate.chooseAConnectionBeforeWeCreateTheChat")}
+              </p>
             </div>
             <button
               onClick={onClose}
@@ -118,17 +123,25 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
             {showEmptyState ? (
               <div className="rounded-xl border border-[var(--primary)]/20 bg-[var(--primary)]/8 p-4">
                 <div className="mb-2 flex items-center gap-2 text-sm font-medium text-[var(--foreground)]">
-                  <Plug size="0.875rem" className="text-[var(--primary)]" />{localizeUi("ui.chat.newchatconnectiongate.noConnectionsFound")}</div>
-                <p className="text-xs text-[var(--muted-foreground)]">{localizeUi("ui.chat.newchatconnectiongate.createAConnectionFirstThenComeBackHereAnd")}</p>
+                  <Plug size="0.875rem" className="text-[var(--primary)]" />
+                  {localizeUi("ui.chat.newchatconnectiongate.noConnectionsFound")}
+                </div>
+                <p className="text-xs text-[var(--muted-foreground)]">
+                  {localizeUi("ui.chat.newchatconnectiongate.createAConnectionFirstThenComeBackHereAnd")}
+                </p>
                 <button
                   onClick={() => openRightPanel("connections")}
                   className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-3 py-2 text-xs font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)]/20"
                 >
-                  <Plug size="0.75rem" />{localizeUi("ui.chat.newchatconnectiongate.openConnections")}</button>
+                  <Plug size="0.75rem" />
+                  {localizeUi("ui.chat.newchatconnectiongate.openConnections")}
+                </button>
               </div>
             ) : (
               <div className="space-y-1.5">
-                <label className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]">{localizeUi("ui.chat.conversationquicksetup.connection")}</label>
+                <label className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--muted-foreground)]">
+                  {localizeUi("ui.chat.conversationquicksetup.connection")}
+                </label>
                 <select
                   value={connectionId}
                   onChange={(e) => setConnectionId(e.target.value)}
@@ -150,7 +163,9 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
             <button
               onClick={onClose}
               className="rounded-lg px-3 py-1.5 text-xs text-[var(--muted-foreground)] transition-colors hover:bg-[var(--secondary)] hover:text-[var(--foreground)]"
-            >{localizeUi("chat.delete.dialog.cancel")}</button>
+            >
+              {localizeUi("chat.delete.dialog.cancel")}
+            </button>
             <button
               onClick={handleCreate}
               disabled={showEmptyState || !connectionId || createChat.isPending}
@@ -161,7 +176,9 @@ export function NewChatConnectionGate({ mode, onClose }: NewChatConnectionGatePr
                   : "bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90",
               )}
             >
-              {createChat.isPending ? <Loader2 size="0.75rem" className="animate-spin" /> : MODE_META[mode].icon}{localizeUi("ui.chat.newchatconnectiongate.createChat")}</button>
+              {createChat.isPending ? <Loader2 size="0.75rem" className="animate-spin" /> : MODE_META[mode].icon}
+              {localizeUi("ui.chat.newchatconnectiongate.createChat")}
+            </button>
           </div>
         </div>
       </div>

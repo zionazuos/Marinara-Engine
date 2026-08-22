@@ -81,8 +81,10 @@ assert.equal(
 const storageDir = mkdtempSync(join(tmpdir(), "marinara-regeneration-context-"));
 process.env.FILE_STORAGE_DIR = storageDir;
 const db = await createFileNativeDB();
+const embeddingSpaceId = "regeneration-regression-space";
 const embeddingSource: MemoryRecallEmbeddingSource = {
   label: "regeneration regression",
+  spaceId: embeddingSpaceId,
   embed: async (texts) => texts.map(() => [1, 0]),
 };
 
@@ -93,6 +95,7 @@ try {
       chatId: "regen-chat",
       content: "Settled memory.",
       embedding: JSON.stringify([1, 0]),
+      embeddingSpaceId,
       messageCount: 5,
       sourceChatId: null,
       firstMessageAt: "2026-07-29T08:00:00.000Z",
@@ -104,6 +107,7 @@ try {
       chatId: "regen-chat",
       content: "Latest user prompt and discarded assistant response.",
       embedding: JSON.stringify([1, 0]),
+      embeddingSpaceId,
       messageCount: 5,
       sourceChatId: null,
       firstMessageAt: "2026-07-29T09:30:00.000Z",
@@ -115,6 +119,7 @@ try {
       chatId: "regen-chat",
       content: "Anything newer than the regenerated response.",
       embedding: JSON.stringify([1, 0]),
+      embeddingSpaceId,
       messageCount: 5,
       sourceChatId: null,
       firstMessageAt: "2026-07-29T10:01:00.000Z",
@@ -199,6 +204,28 @@ try {
     );
   }
 
+  const swipeMetadataMessage = createdMessages[5]!;
+  await chatStorage.updateMessageExtra(swipeMetadataMessage.id, {
+    isConversationStart: true,
+    conversationStartForCharacterIds: ["new-character"],
+    hiddenFromAICharacterIds: ["private-character"],
+  });
+  await chatStorage.addSwipe(swipeMetadataMessage.id, "Silent alternate response.", true);
+  const retainedSwipe = (await chatStorage.getSwipes(swipeMetadataMessage.id)).find((swipe) => swipe.index === 1);
+  assert.ok(retainedSwipe);
+  const retainedSwipeExtra = JSON.parse(retainedSwipe.extra as string) as Record<string, unknown>;
+  assert.equal(retainedSwipeExtra.isConversationStart, true);
+  assert.deepEqual(retainedSwipeExtra.conversationStartForCharacterIds, ["new-character"]);
+  assert.deepEqual(retainedSwipeExtra.hiddenFromAICharacterIds, ["private-character"]);
+  await chatStorage.setActiveSwipe(swipeMetadataMessage.id, 1);
+  const switchedMessageExtra = JSON.parse((await chatStorage.getMessage(swipeMetadataMessage.id))!.extra as string) as Record<
+    string,
+    unknown
+  >;
+  assert.deepEqual(switchedMessageExtra.conversationStartForCharacterIds, ["new-character"]);
+  assert.deepEqual(switchedMessageExtra.hiddenFromAICharacterIds, ["private-character"]);
+  assert.equal(switchedMessageExtra.isConversationStart, true);
+
   await db.insert(memoryChunks).values({
     id: "unaffected-earlier-memory",
     chatId: editedChat.id,
@@ -207,6 +234,7 @@ try {
       .map((message) => message.content)
       .join("\n\n"),
     embedding: JSON.stringify([1, 0]),
+    embeddingSpaceId,
     messageCount: 5,
     sourceChatId: null,
     firstMessageAt: "2026-07-30T10:00:00.000Z",
@@ -221,6 +249,7 @@ try {
       .map((message) => message.content)
       .join("\n\n"),
     embedding: JSON.stringify([1, 0]),
+    embeddingSpaceId,
     messageCount: 5,
     sourceChatId: null,
     firstMessageAt: "2026-07-30T10:05:00.000Z",

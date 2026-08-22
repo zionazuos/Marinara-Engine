@@ -10,6 +10,8 @@ import {
   useMemo,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
+  type DragEvent as ReactDragEvent,
+  type TouchEvent as ReactTouchEvent,
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
@@ -18,6 +20,7 @@ import {
   useDeleteSummaryEntry,
   useGenerateSummary,
   useRollingSummaryBackfill,
+  useReorderSummaryEntries,
   useToggleSummaryEntry,
   useUpdateChatMetadata,
   useUpdateSummaryEntry,
@@ -31,6 +34,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRollingBackfillStore } from "../../stores/backfill.store";
 import {
   Check,
+  ArrowDown,
+  ArrowUp,
   ChevronRight,
   Copy,
   Info,
@@ -38,6 +43,7 @@ import {
   PenLine,
   Plus,
   RefreshCw,
+  GripVertical,
   Save,
   ScrollText,
   Sparkles,
@@ -49,13 +55,13 @@ import { cn, generateClientId } from "../../lib/utils";
 import { useUIStore } from "../../stores/ui.store";
 import { useConnections } from "../../hooks/use-connections";
 import {
-  ROLEPLAY_POPOVER_CLOSE_BUTTON,
-  ROLEPLAY_POPOVER_CLOSE_ICON_SIZE,
-  ROLEPLAY_POPOVER_SCROLL_AREA,
-  ROLEPLAY_POPOVER_SHELL,
-  ROLEPLAY_POPOVER_SUBTITLE,
-  ROLEPLAY_POPOVER_TITLE,
-} from "./roleplay-popover-styles";
+  NEUTRAL_PANEL_CLOSE_BUTTON,
+  NEUTRAL_PANEL_CLOSE_ICON_SIZE,
+  NEUTRAL_PANEL_SCROLL_AREA,
+  NEUTRAL_PANEL_SHELL,
+  NEUTRAL_PANEL_SUBTITLE,
+  NEUTRAL_PANEL_TITLE,
+} from "../ui/neutral-surface-styles";
 import {
   type APIConnection,
   CHAT_SUMMARY_PROMPT_MAX_LENGTH,
@@ -73,8 +79,11 @@ import {
 } from "@marinara-engine/shared";
 import { showConfirmDialog } from "../../lib/app-dialogs";
 import { DraftNumberInput } from "../ui/DraftNumberInput";
+import { MacroTextarea } from "../ui/MacroTextarea";
 import { isChatToolbarPanelTrigger } from "./ChatToolbarControls";
 import { useTranslation as useUiTranslation } from "react-i18next";
+import { useTouchFolderDrag } from "../../hooks/use-touch-folder-drag";
+import { getTouchReorderDropIndex } from "../../lib/touch-reorder";
 
 interface SummaryPopoverProps {
   chatId: string;
@@ -127,20 +136,30 @@ const SUMMARY_BULLET_PATTERN = /^[-*•]\s+/;
 const MOBILE_SUMMARY_PADDING = 8;
 const DESKTOP_SUMMARY_WIDTH = 576;
 
+function reorderSummaryEntryIdsToGap(
+  entries: Array<{ id: string }>,
+  sourceIndex: number,
+  targetGapIndex: number,
+): string[] | null {
+  if (sourceIndex < 0 || sourceIndex >= entries.length) return null;
+  if (targetGapIndex < 0 || targetGapIndex > entries.length) return null;
+  if (targetGapIndex === sourceIndex || targetGapIndex === sourceIndex + 1) return null;
+  const next = [...entries];
+  const [moved] = next.splice(sourceIndex, 1);
+  if (!moved) return null;
+  next.splice(targetGapIndex > sourceIndex ? targetGapIndex - 1 : targetGapIndex, 0, moved);
+  return next.map((entry) => entry.id);
+}
+
 function clampSummaryMaxTokens(value: unknown): number {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed <= 0) return CHAT_SUMMARY_OUTPUT_TOKENS.DEFAULT;
-  return Math.max(
-    CHAT_SUMMARY_OUTPUT_TOKENS.MIN,
-    Math.min(CHAT_SUMMARY_OUTPUT_TOKENS.MAX, Math.trunc(parsed)),
-  );
+  return Math.max(CHAT_SUMMARY_OUTPUT_TOKENS.MIN, Math.min(CHAT_SUMMARY_OUTPUT_TOKENS.MAX, Math.trunc(parsed)));
 }
 
 function getMobileSummaryFrame(anchor: SummaryPopoverAnchor | null | undefined) {
   if (typeof window === "undefined") return null;
-  const rightEdge = anchor?.overflowMenu
-    ? anchor.right
-    : (anchor?.right ?? window.innerWidth - MOBILE_SUMMARY_PADDING);
+  const rightEdge = anchor?.overflowMenu ? anchor.right : (anchor?.right ?? window.innerWidth - MOBILE_SUMMARY_PADDING);
   const width = Math.min(
     560,
     window.innerWidth - MOBILE_SUMMARY_PADDING * 2,
@@ -164,10 +183,7 @@ function getDesktopSummaryFrame(anchor: SummaryPopoverAnchor | null | undefined)
     Math.min(rightEdge - width, window.innerWidth - width - MOBILE_SUMMARY_PADDING),
   );
   const top = Math.max(MOBILE_SUMMARY_PADDING, (anchor?.bottom ?? 52) + 4);
-  const maxHeight = Math.max(
-    240,
-    Math.min(736, window.innerHeight - top - MOBILE_SUMMARY_PADDING),
-  );
+  const maxHeight = Math.max(240, Math.min(736, window.innerHeight - top - MOBILE_SUMMARY_PADDING));
   return { top, left, width, maxHeight };
 }
 
@@ -207,7 +223,8 @@ function isSummaryConnectionOption(value: unknown): value is SummaryConnectionOp
     typeof record.model === "string" &&
     typeof record.provider === "string" &&
     record.provider !== "image_generation" &&
-    record.provider !== "video_generation"
+    record.provider !== "video_generation" &&
+    record.provider !== "audio"
   );
 }
 
@@ -377,8 +394,13 @@ export function SummaryPopover({
   const updateSummaryEntry = useUpdateSummaryEntry();
   const deleteSummaryEntry = useDeleteSummaryEntry();
   const toggleSummaryEntry = useToggleSummaryEntry();
+  const reorderSummaryEntries = useReorderSummaryEntries();
   const entryTextareaRef = useRef<HTMLTextAreaElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const summaryEntryListRef = useRef<HTMLDivElement>(null);
+  const [draggingEntryIndex, setDraggingEntryIndex] = useState<number | null>(null);
+  const [dragReadyEntryIndex, setDragReadyEntryIndex] = useState<number | null>(null);
+  const [summaryDropIndex, setSummaryDropIndex] = useState<number | null>(null);
 
   const { startBackfill, stopBackfill } = useRollingSummaryBackfill();
   const backfillState = useRollingBackfillStore();
@@ -484,13 +506,14 @@ export function SummaryPopover({
     ? cleanedPromptTemplates.find((template) => template.id === normalizedActivePromptTemplateId)
     : null;
   const isLongTermMemoryPromptSelected =
-    longTermMemorySummaryPromptAvailable && normalizedActivePromptTemplateId === LONG_TERM_MEMORY_CHAT_SUMMARY_PROMPT_ID;
+    longTermMemorySummaryPromptAvailable &&
+    normalizedActivePromptTemplateId === LONG_TERM_MEMORY_CHAT_SUMMARY_PROMPT_ID;
   const promptTemplateSummary = isLongTermMemoryPromptSelected
     ? localizeUi("chat.summary.template.longTermMemory")
-    : activePromptTemplate?.name ?? localizeUi("ui.chat.summarypopover.builtInDefault");
+    : (activePromptTemplate?.name ?? localizeUi("ui.chat.summarypopover.builtInDefault"));
   const activeSummaryPrompt = isLongTermMemoryPromptSelected
     ? DEFAULT_LONG_TERM_MEMORY_CHAT_SUMMARY_PROMPT
-    : activePromptTemplate?.prompt ?? DEFAULT_CHAT_SUMMARY_PROMPT;
+    : (activePromptTemplate?.prompt ?? DEFAULT_CHAT_SUMMARY_PROMPT);
   const readCurrentPromptSettings = useCallback(() => {
     const cached = queryClient.getQueryData<ChatSummaryPromptSettings & { hasPersistedSettings?: boolean }>(
       chatSummaryPromptKeys.settings,
@@ -551,7 +574,10 @@ export function SummaryPopover({
   const showSummaryInjectionHint = enabledEntryCount > 0 && !!summaryInjectionHint;
   const tokenWarning = enabledTokenEstimate > SUMMARY_TOKEN_WARNING_THRESHOLD;
   const entryMutationPending =
-    updateSummaryEntry.isPending || deleteSummaryEntry.isPending || toggleSummaryEntry.isPending;
+    updateSummaryEntry.isPending ||
+    deleteSummaryEntry.isPending ||
+    toggleSummaryEntry.isPending ||
+    reorderSummaryEntries.isPending;
   const automaticSummariesOn = automaticSummaryEnabled;
   const summaryConnections = useMemo(
     () => (connectionsData ?? []).filter(isSummaryConnectionOption),
@@ -561,7 +587,8 @@ export function SummaryPopover({
   const selectedSummaryConnectionId =
     typeof summaryConnectionId === "string" && summaryConnectionId.trim() ? summaryConnectionId.trim() : "";
   const selectedSummaryConnectionMissing =
-    !!selectedSummaryConnectionId && !summaryConnections.some((connection) => connection.id === selectedSummaryConnectionId);
+    !!selectedSummaryConnectionId &&
+    !summaryConnections.some((connection) => connection.id === selectedSummaryConnectionId);
   const defaultConnectionLabel = defaultAgentConnection
     ? localizeUi("chat.summary.connection.agentDefaultNamed", {
         name: defaultAgentConnection.name,
@@ -715,7 +742,8 @@ export function SummaryPopover({
     sourceMode,
     normalizedActivePromptTemplateId,
     persistSummaryMaxTokens,
-    summaryMaxTokensDraft, localizeUi,
+    summaryMaxTokensDraft,
+    localizeUi,
   ]);
 
   const handleBackfill = useCallback(async () => {
@@ -765,6 +793,104 @@ export function SummaryPopover({
     });
   }, []);
 
+  const commitSummaryEntryReorder = useCallback(
+    async (sourceIndex: number, targetGapIndex: number) => {
+      const entryIds = reorderSummaryEntryIdsToGap(displayEntries, sourceIndex, targetGapIndex);
+      if (!entryIds) return;
+      try {
+        await reorderSummaryEntries.mutateAsync({ chatId, entryIds });
+      } catch {
+        toast.error(localizeUi("ui.chat.summarypopover.couldNotReorderSummaryEntries"));
+      }
+    },
+    [chatId, displayEntries, localizeUi, reorderSummaryEntries],
+  );
+
+  const handleSummaryDragStart = useCallback((entryIndex: number, event: ReactDragEvent) => {
+    setDraggingEntryIndex(entryIndex);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(entryIndex));
+  }, []);
+
+  const handleSummaryDragOver = useCallback((entryIndex: number, event: ReactDragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "move";
+    const rect = event.currentTarget.getBoundingClientRect();
+    setSummaryDropIndex(event.clientY < rect.top + rect.height / 2 ? entryIndex : entryIndex + 1);
+  }, []);
+
+  const finishSummaryDrag = useCallback(() => {
+    setDraggingEntryIndex(null);
+    setDragReadyEntryIndex(null);
+    setSummaryDropIndex(null);
+  }, []);
+
+  const handleSummaryDrop = useCallback(
+    (event: ReactDragEvent) => {
+      event.preventDefault();
+      const sourceIndex = draggingEntryIndex;
+      const targetGapIndex = summaryDropIndex;
+      finishSummaryDrag();
+      if (sourceIndex === null || targetGapIndex === null) return;
+      void commitSummaryEntryReorder(sourceIndex, targetGapIndex);
+    },
+    [commitSummaryEntryReorder, draggingEntryIndex, finishSummaryDrag, summaryDropIndex],
+  );
+
+  const handleSummaryContainerDragOver = useCallback(
+    (event: ReactDragEvent) => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      const root = summaryEntryListRef.current;
+      if (!root || displayEntries.length === 0) {
+        setSummaryDropIndex(displayEntries.length);
+        return;
+      }
+      const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-touch-reorder-item="summary-entry"]'));
+      const firstRow = rows[0];
+      const lastRow = rows[rows.length - 1];
+      if (firstRow && event.clientY < firstRow.getBoundingClientRect().top) {
+        setSummaryDropIndex(0);
+      } else if (lastRow && event.clientY > lastRow.getBoundingClientRect().bottom) {
+        setSummaryDropIndex(displayEntries.length);
+      }
+    },
+    [displayEntries.length],
+  );
+
+  const moveSummaryEntryByOffset = useCallback(
+    (entryIndex: number, offset: number) => {
+      const targetIndex = entryIndex + offset;
+      if (targetIndex < 0 || targetIndex >= displayEntries.length) return;
+      void commitSummaryEntryReorder(entryIndex, offset < 0 ? targetIndex : targetIndex + 1);
+    },
+    [commitSummaryEntryReorder, displayEntries.length],
+  );
+
+  const { startTouchDrag: startSummaryEntryTouchDrag } = useTouchFolderDrag({
+    onActivate: (entryId) => {
+      const entryIndex = displayEntries.findIndex((entry) => entry.id === entryId);
+      if (entryIndex < 0) return;
+      setDraggingEntryIndex(entryIndex);
+      setDragReadyEntryIndex(entryIndex);
+    },
+    onDrop: (entryId, x, y) => {
+      const sourceIndex = displayEntries.findIndex((entry) => entry.id === entryId);
+      const targetGapIndex = getTouchReorderDropIndex({
+        x,
+        y,
+        itemSelector: '[data-touch-reorder-item="summary-entry"]',
+        rootSelector: "[data-summary-entry-root]",
+        itemCount: displayEntries.length,
+      });
+      finishSummaryDrag();
+      if (sourceIndex < 0 || targetGapIndex === null) return;
+      void commitSummaryEntryReorder(sourceIndex, targetGapIndex);
+    },
+    onCancel: finishSummaryDrag,
+  });
+
   const handleCombineSelected = useCallback(async () => {
     if (selectedEntries.length < 2 || generateSummary.isPending) return;
     try {
@@ -782,6 +908,7 @@ export function SummaryPopover({
       {
         onSuccess: (data) => {
           setSelectedEntryIds(new Set());
+          setShowInactiveSummaries(true);
           const entryId = data.entry?.id;
           if (entryId) setExpandedEntryIds((current) => new Set(current).add(entryId));
         },
@@ -817,38 +944,41 @@ export function SummaryPopover({
     setDraftEntry(null);
   }, []);
 
-  const handleSaveEntry = useCallback(async (entry: ChatSummaryEntry) => {
-    const content = entry.content.trim();
-    const title = entry.title.trim() || localizeUi("chat.summary.manual");
-    if (!content) {
-      toast.error(localizeUi("ui.chat.summarypopover.summaryContentIsRequired"));
-      return;
-    }
-    const existingEntry = displayEntries.find((candidate) => candidate.id === entry.id);
-    const entryPayload = existingEntry
-      ? {
-          id: entry.id,
-          title,
-          content,
-          tokenEstimate: estimateChatSummaryTokens(content),
-        }
-      : {
-          ...entry,
-          title,
-          content,
-          tokenEstimate: estimateChatSummaryTokens(content),
-        };
-    try {
-      await updateSummaryEntry.mutateAsync({
-        chatId,
-        entry: entryPayload,
-      });
-      setEditingEntryId(null);
-      setDraftEntry(null);
-    } catch {
-      toast.error(localizeUi("ui.chat.summarypopover.couldNotSaveSummaryEntry"));
-    }
-  }, [chatId, displayEntries, updateSummaryEntry, localizeUi]);
+  const handleSaveEntry = useCallback(
+    async (entry: ChatSummaryEntry) => {
+      const content = entry.content.trim();
+      const title = entry.title.trim() || localizeUi("chat.summary.manual");
+      if (!content) {
+        toast.error(localizeUi("ui.chat.summarypopover.summaryContentIsRequired"));
+        return;
+      }
+      const existingEntry = displayEntries.find((candidate) => candidate.id === entry.id);
+      const entryPayload = existingEntry
+        ? {
+            id: entry.id,
+            title,
+            content,
+            tokenEstimate: estimateChatSummaryTokens(content),
+          }
+        : {
+            ...entry,
+            title,
+            content,
+            tokenEstimate: estimateChatSummaryTokens(content),
+          };
+      try {
+        await updateSummaryEntry.mutateAsync({
+          chatId,
+          entry: entryPayload,
+        });
+        setEditingEntryId(null);
+        setDraftEntry(null);
+      } catch {
+        toast.error(localizeUi("ui.chat.summarypopover.couldNotSaveSummaryEntry"));
+      }
+    },
+    [chatId, displayEntries, updateSummaryEntry, localizeUi],
+  );
 
   const handleToggleEntry = useCallback(
     async (entry: ChatSummaryEntry, enabled: boolean) => {
@@ -879,11 +1009,11 @@ export function SummaryPopover({
   const handleDeleteEntry = useCallback(
     async (entry: ChatSummaryEntry) => {
       const confirmed = await showConfirmDialog({
-        title:localizeUi("ui.chat.summarypopover.deleteSummaryEntry"),
+        title: localizeUi("ui.chat.summarypopover.deleteSummaryEntry"),
         message: localizeUi("chat.summary.deleteEntryConfirmation", {
           title: entry.title,
         }),
-        confirmLabel:localizeUi("lorebook.editor.batch.delete"),
+        confirmLabel: localizeUi("lorebook.editor.batch.delete"),
         cancelLabel: localizeUi("chat.delete.dialog.cancel"),
         tone: "destructive",
       });
@@ -918,8 +1048,7 @@ export function SummaryPopover({
       promptSettingsSaveLockedRef.current = true;
       setPromptSettingsSaveLocked(true);
       const normalizedCombinePrompt =
-        combinePrompt.trim().slice(0, CHAT_SUMMARY_PROMPT_MAX_LENGTH) ||
-        DEFAULT_CHAT_SUMMARY_COMBINE_PROMPT;
+        combinePrompt.trim().slice(0, CHAT_SUMMARY_PROMPT_MAX_LENGTH) || DEFAULT_CHAT_SUMMARY_COMBINE_PROMPT;
       const queuedSave = promptSettingsSaveQueueRef.current.then(async () => {
         try {
           await updateGlobalPromptSettings.mutateAsync({
@@ -972,11 +1101,7 @@ export function SummaryPopover({
         combinePromptSaveRef.current = null;
       }
     }
-  }, [
-    globalCombinePrompt,
-    persistPromptTemplates,
-    readCurrentPromptSettings,
-  ]);
+  }, [globalCombinePrompt, persistPromptTemplates, readCurrentPromptSettings]);
 
   const handleCombinePromptBlur = useCallback(async () => {
     await commitCombinePromptDraft();
@@ -1142,11 +1267,11 @@ export function SummaryPopover({
       const target = cleanedPromptTemplates.find((template) => template.id === templateId);
       if (!target) return;
       const confirmed = await showConfirmDialog({
-        title:localizeUi("ui.chat.summarypopover.deleteSummaryTemplate"),
+        title: localizeUi("ui.chat.summarypopover.deleteSummaryTemplate"),
         message: localizeUi("chat.summary.deleteTemplateConfirmation", {
           name: target.name,
         }),
-        confirmLabel:localizeUi("lorebook.editor.batch.delete"),
+        confirmLabel: localizeUi("lorebook.editor.batch.delete"),
         cancelLabel: localizeUi("chat.delete.dialog.cancel"),
         tone: "destructive",
       });
@@ -1193,8 +1318,8 @@ export function SummaryPopover({
     >
       <div
         className={cn(
-          ROLEPLAY_POPOVER_SHELL,
-          ROLEPLAY_POPOVER_SCROLL_AREA,
+          NEUTRAL_PANEL_SHELL,
+          NEUTRAL_PANEL_SCROLL_AREA,
           "relative flex w-full flex-col overflow-hidden p-3",
         )}
         style={panelFrame ? { maxHeight: panelFrame.maxHeight } : undefined}
@@ -1202,36 +1327,38 @@ export function SummaryPopover({
         {/* Header */}
         <div className="mb-2 flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className={ROLEPLAY_POPOVER_TITLE}>
+            <div className={NEUTRAL_PANEL_TITLE}>
               <ScrollText size="0.75rem" className="shrink-0 text-[var(--muted-foreground)]" />
               <span className="truncate">{localizeUi("chat.summary.toolbarLabel")}</span>
             </div>
-            <p className={cn(ROLEPLAY_POPOVER_SUBTITLE, "truncate")}>
+            <p className={cn(NEUTRAL_PANEL_SUBTITLE, "truncate")}>
               {hasEntries
                 ? localizeUi("chat.summary.headerActive", {
                     count: enabledEntryCount,
                     tokens: formatTokenCount(enabledTokenEstimate),
                   })
-                :localizeUi("ui.chat.summarypopover.noSummariesYet")}
+                : localizeUi("ui.chat.summarypopover.noSummariesYet")}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
             <button
               type="button"
               onClick={() => void handleClose()}
-              className={ROLEPLAY_POPOVER_CLOSE_BUTTON}
+              className={NEUTRAL_PANEL_CLOSE_BUTTON}
               aria-label={localizeUi("ui.chat.summarypopover.closeSummary")}
             >
-              <X size={ROLEPLAY_POPOVER_CLOSE_ICON_SIZE} />
+              <X size={NEUTRAL_PANEL_CLOSE_ICON_SIZE} />
             </button>
           </div>
         </div>
 
-        <div className={cn(ROLEPLAY_POPOVER_SCROLL_AREA, "min-h-0 flex-1 overflow-y-auto pr-1")}>
+        <div className={cn(NEUTRAL_PANEL_SCROLL_AREA, "min-h-0 flex-1 overflow-y-auto pr-1")}>
           <div className="mb-3 space-y-2">
             <div className="grid gap-2 sm:grid-cols-2">
               <div className="space-y-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/40 p-2">
-                <p className="px-1 text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">{localizeUi("ui.chat.summarypopover.summaryScope")}</p>
+                <p className="px-1 text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">
+                  {localizeUi("ui.chat.summarypopover.summaryScope")}
+                </p>
                 <div className="grid grid-cols-2 gap-1 rounded-lg bg-[var(--background)]/30 p-1">
                   {(["last", "range"] as const).map((mode) => (
                     <button
@@ -1245,14 +1372,18 @@ export function SummaryPopover({
                           : "text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
                       )}
                     >
-                      {mode === "last" ?localizeUi("ui.chat.summarypopover.last") :localizeUi("ui.chat.summarypopover.range")}
+                      {mode === "last"
+                        ? localizeUi("ui.chat.summarypopover.last")
+                        : localizeUi("ui.chat.summarypopover.range")}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className="space-y-1 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/25 p-2">
-                <p className="px-1 text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">{localizeUi("ui.chat.summarypopover.display")}</p>
+                <p className="px-1 text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">
+                  {localizeUi("ui.chat.summarypopover.display")}
+                </p>
                 <SummarySettingsToggle
                   label={localizeUi("ui.chat.summarypopover.hideSummarisedMessages")}
                   checked={hideSummarisedResolved}
@@ -1276,8 +1407,11 @@ export function SummaryPopover({
                         className="w-16 rounded-md bg-[var(--secondary)] px-2 py-1 text-right text-xs outline-none ring-1 ring-transparent transition-shadow focus:ring-[var(--primary)]/40"
                       />
                     </label>
-                    <p className="text-[0.625rem] text-[var(--muted-foreground)]">{localizeUi("ui.chat.summarypopover.mostRecentMessagesKeptWordForWordWhenAuto")}{" "}
-                      <span className="font-medium">0</span> {localizeUi("ui.chat.summarypopover.toHideTheWholeBatchHigherValuesIncreasePrompt")}</p>
+                    <p className="text-[0.625rem] text-[var(--muted-foreground)]">
+                      {localizeUi("ui.chat.summarypopover.mostRecentMessagesKeptWordForWordWhenAuto")}{" "}
+                      <span className="font-medium">0</span>{" "}
+                      {localizeUi("ui.chat.summarypopover.toHideTheWholeBatchHigherValuesIncreasePrompt")}
+                    </p>
                   </div>
                 )}
                 <SummarySettingsToggle
@@ -1300,13 +1434,15 @@ export function SummaryPopover({
                 <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/35 p-2">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">{localizeUi("ui.chat.summarypopover.automaticSummaries")}</p>
+                      <p className="text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">
+                        {localizeUi("ui.chat.summarypopover.automaticSummaries")}
+                      </p>
                       <p className="mt-0.5 text-[0.625rem] leading-snug text-[var(--muted-foreground)]">
                         {automaticSummariesOn
                           ? localizeUi("chat.summary.automatic.updateInterval", {
                               count: normalizedAutomaticSummaryInterval,
                             })
-                          :localizeUi("ui.chat.summarypopover.offForThisRoleplayChat")}
+                          : localizeUi("ui.chat.summarypopover.offForThisRoleplayChat")}
                       </p>
                     </div>
                     <SummarySettingsToggle
@@ -1362,7 +1498,10 @@ export function SummaryPopover({
                           }}
                         />
                       </div>
-                      <p id="backfill-progress-label" className="text-[0.625rem] leading-snug text-[var(--muted-foreground)]">
+                      <p
+                        id="backfill-progress-label"
+                        className="text-[0.625rem] leading-snug text-[var(--muted-foreground)]"
+                      >
                         {backfillState.currentRangeStart && backfillState.currentRangeEnd
                           ? localizeUi("chat.summary.backfill.rangeProgress", {
                               start: backfillState.currentRangeStart,
@@ -1385,7 +1524,9 @@ export function SummaryPopover({
                         onClick={stopBackfill}
                         className="flex items-center gap-1.5 rounded-md bg-[var(--destructive)]/10 px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--destructive)] ring-1 ring-[var(--destructive)]/30 transition-colors hover:bg-[var(--destructive)]/20"
                       >
-                        <Loader2 size="0.75rem" className="animate-spin" />{localizeUi("ui.chat.summarypopover.stop")}</button>
+                        <Loader2 size="0.75rem" className="animate-spin" />
+                        {localizeUi("ui.chat.summarypopover.stop")}
+                      </button>
                     ) : (
                       <button
                         type="button"
@@ -1393,7 +1534,9 @@ export function SummaryPopover({
                         disabled={totalMessageCount === 0 || !globalPromptSettingsReady}
                         className="flex items-center gap-1.5 rounded-md bg-[var(--secondary)] px-2.5 py-1.5 text-[0.6875rem] font-medium text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        <RefreshCw size="0.75rem" />{localizeUi("ui.chat.summarypopover.backfillSummary")}</button>
+                        <RefreshCw size="0.75rem" />
+                        {localizeUi("ui.chat.summarypopover.backfillSummary")}
+                      </button>
                     )}
                   </div>
                 </div>
@@ -1407,7 +1550,9 @@ export function SummaryPopover({
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">{localizeUi("ui.chat.summarypopover.summaryPrompt")}</p>
+                    <p className="text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">
+                      {localizeUi("ui.chat.summarypopover.summaryPrompt")}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -1464,196 +1609,204 @@ export function SummaryPopover({
 
                 {summaryPromptView === "summary" ? (
                   <div className="h-48 space-y-2 overflow-y-auto pr-0.5">
-                <div className="grid grid-cols-1 gap-1">
-                  <div className="relative min-w-0">
-                    <button
-                      type="button"
-                      onClick={() => setTemplateSelectOpen((open) => !open)}
-                      disabled={!globalPromptSettingsReady || promptSettingsSaveLocked}
-                      className="flex w-full min-w-0 items-center justify-between gap-2 rounded-md bg-[var(--card)] py-1 pl-2 pr-2 text-left truncate text-xs font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50"
-                      aria-haspopup="listbox"
-                      aria-expanded={templateSelectOpen}
-                      aria-label={localizeUi("ui.chat.summarypopover.summaryPromptTemplate")}
-                    >
-                      <span className="min-w-0 truncate">{promptTemplateSummary}</span>
-                      <ChevronRight
-                        size="0.75rem"
-                        className={cn(
-                          "shrink-0 text-[var(--muted-foreground)] transition-transform",
-                          templateSelectOpen && "rotate-90",
-                        )}
-                      />
-                    </button>
-                    {templateSelectOpen && (
-                      <div
-                        role="listbox"
-                        className="mt-1 max-h-40 overflow-y-auto rounded-md border border-[var(--border)] bg-[var(--popover)] p-1 text-[var(--popover-foreground)] shadow-xl shadow-black/25"
-                      >
-                        <SummaryPromptSelectOption
-                          active={!normalizedActivePromptTemplateId}
-                          label={localizeUi("ui.chat.summarypopover.builtInDefault")}
-                          disabled={promptSettingsSaveLocked}
-                          onSelect={() => void handleSelectPromptTemplate(null)}
-                        />
-                        {longTermMemorySummaryPromptAvailable && (
-                          <SummaryPromptSelectOption
-                            active={isLongTermMemoryPromptSelected}
-                            label={localizeUi("chat.summary.template.longTermMemory")}
-                            disabled={promptSettingsSaveLocked}
-                            onSelect={() => void handleSelectPromptTemplate(LONG_TERM_MEMORY_CHAT_SUMMARY_PROMPT_ID)}
+                    <div className="grid grid-cols-1 gap-1">
+                      <div className="relative min-w-0">
+                        <button
+                          type="button"
+                          onClick={() => setTemplateSelectOpen((open) => !open)}
+                          disabled={!globalPromptSettingsReady || promptSettingsSaveLocked}
+                          className="flex w-full min-w-0 items-center justify-between gap-2 rounded-md bg-[var(--card)] py-1 pl-2 pr-2 text-left truncate text-xs font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50"
+                          aria-haspopup="listbox"
+                          aria-expanded={templateSelectOpen}
+                          aria-label={localizeUi("ui.chat.summarypopover.summaryPromptTemplate")}
+                        >
+                          <span className="min-w-0 truncate">{promptTemplateSummary}</span>
+                          <ChevronRight
+                            size="0.75rem"
+                            className={cn(
+                              "shrink-0 text-[var(--muted-foreground)] transition-transform",
+                              templateSelectOpen && "rotate-90",
+                            )}
                           />
+                        </button>
+                        {templateSelectOpen && (
+                          <div
+                            role="listbox"
+                            className="mt-1 max-h-40 overflow-y-auto rounded-md border border-[var(--border)] bg-[var(--popover)] p-1 text-[var(--popover-foreground)] shadow-xl shadow-black/25"
+                          >
+                            <SummaryPromptSelectOption
+                              active={!normalizedActivePromptTemplateId}
+                              label={localizeUi("ui.chat.summarypopover.builtInDefault")}
+                              disabled={promptSettingsSaveLocked}
+                              onSelect={() => void handleSelectPromptTemplate(null)}
+                            />
+                            {longTermMemorySummaryPromptAvailable && (
+                              <SummaryPromptSelectOption
+                                active={isLongTermMemoryPromptSelected}
+                                label={localizeUi("chat.summary.template.longTermMemory")}
+                                disabled={promptSettingsSaveLocked}
+                                onSelect={() =>
+                                  void handleSelectPromptTemplate(LONG_TERM_MEMORY_CHAT_SUMMARY_PROMPT_ID)
+                                }
+                              />
+                            )}
+                            {cleanedPromptTemplates.map((template) => (
+                              <SummaryPromptSelectOption
+                                key={template.id}
+                                active={normalizedActivePromptTemplateId === template.id}
+                                label={template.name}
+                                disabled={promptSettingsSaveLocked}
+                                onSelect={() => void handleSelectPromptTemplate(template.id)}
+                              />
+                            ))}
+                          </div>
                         )}
-                        {cleanedPromptTemplates.map((template) => (
-                          <SummaryPromptSelectOption
-                            key={template.id}
-                            active={normalizedActivePromptTemplateId === template.id}
-                            label={template.name}
-                            disabled={promptSettingsSaveLocked}
-                            onSelect={() => void handleSelectPromptTemplate(template.id)}
-                          />
-                        ))}
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                {!templateEditorOpen && (
-                  <div className="h-36 overflow-y-auto whitespace-pre-wrap rounded-md bg-[var(--background)]/25 px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                    {activeSummaryPrompt}
-                  </div>
-                )}
-
-                {templateEditorOpen && (
-                  <div className="space-y-2 border-t border-[var(--border)] pt-2">
-                    <div className="max-h-28 space-y-1 overflow-y-auto pr-0.5">
-                      <SummaryPromptTemplateRow
-                        active={!normalizedActivePromptTemplateId}
-                        name={localizeUi("ui.chat.summarypopover.builtInDefault")}
-                        detail={localizeUi("chat.summary.template.appDefault")}
-                        disabled={promptSettingsSaveLocked}
-                        onSelect={() => void handleSelectPromptTemplate(null)}
-                        onCopy={() => handleDuplicatePromptTemplate(null, DEFAULT_CHAT_SUMMARY_PROMPT)}
-                      />
-                      {longTermMemorySummaryPromptAvailable && (
-                        <SummaryPromptTemplateRow
-                          active={isLongTermMemoryPromptSelected}
-                          name={localizeUi("chat.summary.template.longTermMemory")}
-                          detail={localizeUi("chat.summary.template.appDefault")}
-                          disabled={promptSettingsSaveLocked}
-                          onSelect={() => void handleSelectPromptTemplate(LONG_TERM_MEMORY_CHAT_SUMMARY_PROMPT_ID)}
-                          onCopy={() =>
-                            handleDuplicatePromptTemplate(null, DEFAULT_LONG_TERM_MEMORY_CHAT_SUMMARY_PROMPT)
-                          }
-                        />
-                      )}
-                      {cleanedPromptTemplates.map((template) => (
-                        <SummaryPromptTemplateRow
-                          key={template.id}
-                          active={normalizedActivePromptTemplateId === template.id}
-                          name={template.name}
-                          detail={localizeUi("chat.summary.template.tokenEstimate", {
-                            count: Math.ceil(template.prompt.length / 4),
-                          })}
-                          disabled={promptSettingsSaveLocked}
-                          onSelect={() => void handleSelectPromptTemplate(template.id)}
-                          onCopy={() => handleDuplicatePromptTemplate(template)}
-                          onEdit={() => handleEditPromptTemplate(template)}
-                          onDelete={() => void handleDeletePromptTemplate(template.id)}
-                        />
-                      ))}
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleNewPromptTemplate}
-                      disabled={!globalPromptSettingsReady || promptSettingsSaveLocked}
-                      className="flex w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-[var(--border)] bg-[var(--accent)]/35 px-2 py-1.5 text-[0.625rem] font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <Plus size="0.6875rem" />{localizeUi("ui.chat.summarypopover.newTemplate")}</button>
-
-                    {(templateNameDraft || templatePromptDraft) && (
-                      <div className="space-y-1.5 rounded-lg bg-[var(--background)]/30 p-2 ring-1 ring-[var(--border)]">
-                        <input
-                          value={templateNameDraft}
-                          onChange={(event) => setTemplateNameDraft(event.target.value)}
-                          disabled={promptSettingsSaveLocked}
-                          maxLength={80}
-                          placeholder={localizeUi("ui.chat.summarypopover.templateName")}
-                          className="w-full rounded-md bg-[var(--card)] px-2 py-1 text-[0.6875rem] font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50"
-                        />
-                        <textarea
-                          value={templatePromptDraft}
-                          onChange={(event) => setTemplatePromptDraft(event.target.value)}
-                          disabled={promptSettingsSaveLocked}
-                          rows={8}
-                          placeholder={localizeUi("ui.chat.summarypopover.promptInstructionsForSummaryGeneration")}
-                          className="max-h-48 w-full resize-y rounded-md bg-[var(--card)] px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50"
-                        />
-                        <div className="flex justify-end gap-1">
-                          <button
-                            type="button"
-                            onClick={resetTemplateDraft}
-                            disabled={promptSettingsSaveLocked}
-                            className="rounded-md px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
-                          >{localizeUi("chat.delete.dialog.cancel")}</button>
-                          <button
-                            type="button"
-                            onClick={() => void handleSavePromptTemplate()}
-                            disabled={
-                              !hasTemplateDraft ||
-                              promptSettingsSaveLocked ||
-                              !globalPromptSettingsReady
-                            }
-                            className="flex items-center gap-1 rounded-md bg-[var(--secondary)] px-2 py-1 text-[0.625rem] font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            <Save size="0.625rem" />
-                            {isEditingExistingTemplate ?localizeUi("ui.noodle.noodlehome.save") :localizeUi("ui.characters.metadatatab.add")}
-                          </button>
-                        </div>
+                    {!templateEditorOpen && (
+                      <div className="h-36 overflow-y-auto whitespace-pre-wrap rounded-md bg-[var(--background)]/25 px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
+                        {activeSummaryPrompt}
                       </div>
                     )}
-                  </div>
-                )}
+
+                    {templateEditorOpen && (
+                      <div className="space-y-2 border-t border-[var(--border)] pt-2">
+                        <div className="max-h-28 space-y-1 overflow-y-auto pr-0.5">
+                          <SummaryPromptTemplateRow
+                            active={!normalizedActivePromptTemplateId}
+                            name={localizeUi("ui.chat.summarypopover.builtInDefault")}
+                            detail={localizeUi("chat.summary.template.appDefault")}
+                            disabled={promptSettingsSaveLocked}
+                            onSelect={() => void handleSelectPromptTemplate(null)}
+                            onCopy={() => handleDuplicatePromptTemplate(null, DEFAULT_CHAT_SUMMARY_PROMPT)}
+                          />
+                          {longTermMemorySummaryPromptAvailable && (
+                            <SummaryPromptTemplateRow
+                              active={isLongTermMemoryPromptSelected}
+                              name={localizeUi("chat.summary.template.longTermMemory")}
+                              detail={localizeUi("chat.summary.template.appDefault")}
+                              disabled={promptSettingsSaveLocked}
+                              onSelect={() => void handleSelectPromptTemplate(LONG_TERM_MEMORY_CHAT_SUMMARY_PROMPT_ID)}
+                              onCopy={() =>
+                                handleDuplicatePromptTemplate(null, DEFAULT_LONG_TERM_MEMORY_CHAT_SUMMARY_PROMPT)
+                              }
+                            />
+                          )}
+                          {cleanedPromptTemplates.map((template) => (
+                            <SummaryPromptTemplateRow
+                              key={template.id}
+                              active={normalizedActivePromptTemplateId === template.id}
+                              name={template.name}
+                              detail={localizeUi("chat.summary.template.tokenEstimate", {
+                                count: Math.ceil(template.prompt.length / 4),
+                              })}
+                              disabled={promptSettingsSaveLocked}
+                              onSelect={() => void handleSelectPromptTemplate(template.id)}
+                              onCopy={() => handleDuplicatePromptTemplate(template)}
+                              onEdit={() => handleEditPromptTemplate(template)}
+                              onDelete={() => void handleDeletePromptTemplate(template.id)}
+                            />
+                          ))}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={handleNewPromptTemplate}
+                          disabled={!globalPromptSettingsReady || promptSettingsSaveLocked}
+                          className="flex w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-[var(--border)] bg-[var(--accent)]/35 px-2 py-1.5 text-[0.625rem] font-semibold text-[var(--foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <Plus size="0.6875rem" />
+                          {localizeUi("ui.chat.summarypopover.newTemplate")}
+                        </button>
+
+                        {(templateNameDraft || templatePromptDraft) && (
+                          <div className="space-y-1.5 rounded-lg bg-[var(--background)]/30 p-2 ring-1 ring-[var(--border)]">
+                            <input
+                              value={templateNameDraft}
+                              onChange={(event) => setTemplateNameDraft(event.target.value)}
+                              disabled={promptSettingsSaveLocked}
+                              maxLength={80}
+                              placeholder={localizeUi("ui.chat.summarypopover.templateName")}
+                              className="w-full rounded-md bg-[var(--card)] px-2 py-1 text-[0.6875rem] font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50"
+                            />
+                            <textarea
+                              value={templatePromptDraft}
+                              onChange={(event) => setTemplatePromptDraft(event.target.value)}
+                              disabled={promptSettingsSaveLocked}
+                              rows={8}
+                              placeholder={localizeUi("ui.chat.summarypopover.promptInstructionsForSummaryGeneration")}
+                              className="max-h-48 w-full resize-y rounded-md bg-[var(--card)] px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50"
+                            />
+                            <div className="flex justify-end gap-1">
+                              <button
+                                type="button"
+                                onClick={resetTemplateDraft}
+                                disabled={promptSettingsSaveLocked}
+                                className="rounded-md px-2 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {localizeUi("chat.delete.dialog.cancel")}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void handleSavePromptTemplate()}
+                                disabled={!hasTemplateDraft || promptSettingsSaveLocked || !globalPromptSettingsReady}
+                                className="flex items-center gap-1 rounded-md bg-[var(--secondary)] px-2 py-1 text-[0.625rem] font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                <Save size="0.625rem" />
+                                {isEditingExistingTemplate
+                                  ? localizeUi("ui.noodle.noodlehome.save")
+                                  : localizeUi("ui.characters.metadatatab.add")}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
-                <div className="h-48 space-y-1 overflow-y-auto pr-0.5">
-                  <span className="text-[0.625rem] font-semibold text-[var(--muted-foreground)]">
-                    {localizeUi("ui.chat.summarypopover.combinePrompt")}
-                  </span>
-                  {combinePromptEditorOpen ? (
-                    <textarea
-                      value={combinePromptDraft}
-                      onFocus={() => {
-                        combinePromptFocused.current = true;
-                      }}
-                      onChange={(event) => {
-                        combinePromptDraftRef.current = event.target.value;
-                        setCombinePromptDraft(event.target.value);
-                      }}
-                      onBlur={() => void handleCombinePromptBlur()}
-                      maxLength={CHAT_SUMMARY_PROMPT_MAX_LENGTH}
-                      rows={5}
-                      disabled={!globalPromptSettingsReady || promptSettingsSaveLocked}
-                      aria-label={localizeUi("ui.chat.summarypopover.combinePrompt")}
-                      className="h-28 w-full resize-none rounded-md bg-[var(--card)] px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50"
-                    />
-                  ) : (
-                    <div className="h-28 overflow-y-auto whitespace-pre-wrap rounded-md bg-[var(--background)]/25 px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
-                      {combinePromptDraft}
-                    </div>
-                  )}
-                  <span className="block text-[0.5625rem] leading-snug text-[var(--muted-foreground)]">
-                    {localizeUi("ui.chat.summarypopover.combinePromptHelp")}
-                  </span>
-                </div>
+                  <div className="h-48 space-y-1 overflow-y-auto pr-0.5">
+                    <span className="text-[0.625rem] font-semibold text-[var(--muted-foreground)]">
+                      {localizeUi("ui.chat.summarypopover.combinePrompt")}
+                    </span>
+                    {combinePromptEditorOpen ? (
+                      <textarea
+                        value={combinePromptDraft}
+                        onFocus={() => {
+                          combinePromptFocused.current = true;
+                        }}
+                        onChange={(event) => {
+                          combinePromptDraftRef.current = event.target.value;
+                          setCombinePromptDraft(event.target.value);
+                        }}
+                        onBlur={() => void handleCombinePromptBlur()}
+                        maxLength={CHAT_SUMMARY_PROMPT_MAX_LENGTH}
+                        rows={5}
+                        disabled={!globalPromptSettingsReady || promptSettingsSaveLocked}
+                        aria-label={localizeUi("ui.chat.summarypopover.combinePrompt")}
+                        className="h-28 w-full resize-none rounded-md bg-[var(--card)] px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    ) : (
+                      <div className="h-28 overflow-y-auto whitespace-pre-wrap rounded-md bg-[var(--background)]/25 px-2 py-1.5 font-mono text-[0.625rem] leading-relaxed text-[var(--muted-foreground)] ring-1 ring-[var(--border)]">
+                        {combinePromptDraft}
+                      </div>
+                    )}
+                    <span className="block text-[0.5625rem] leading-snug text-[var(--muted-foreground)]">
+                      {localizeUi("ui.chat.summarypopover.combinePromptHelp")}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
 
             <div className="space-y-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)]/35 p-2">
               <div className="min-w-0">
-                <p className="text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">{localizeUi("ui.chat.summarypopover.summaryConnection")}</p>
-                <p className="mt-0.5 text-[0.625rem] leading-snug text-[var(--muted-foreground)]">{localizeUi("ui.chat.summarypopover.chooseTheModelConnectionUsedForManualAndAutomatic")}</p>
+                <p className="text-[0.6875rem] font-semibold text-[var(--popover-foreground)]">
+                  {localizeUi("ui.chat.summarypopover.summaryConnection")}
+                </p>
+                <p className="mt-0.5 text-[0.625rem] leading-snug text-[var(--muted-foreground)]">
+                  {localizeUi("ui.chat.summarypopover.chooseTheModelConnectionUsedForManualAndAutomatic")}
+                </p>
               </div>
               <select
                 value={selectedSummaryConnectionId}
@@ -1677,7 +1830,9 @@ export function SummaryPopover({
                 ))}
               </select>
               <label className="space-y-1">
-                <span className="text-[0.625rem] font-semibold text-[var(--muted-foreground)]">{localizeUi("ui.chat.summarypopover.maximumOutputSize")}</span>
+                <span className="text-[0.625rem] font-semibold text-[var(--muted-foreground)]">
+                  {localizeUi("ui.chat.summarypopover.maximumOutputSize")}
+                </span>
                 <input
                   type="number"
                   min={CHAT_SUMMARY_OUTPUT_TOKENS.MIN}
@@ -1772,46 +1927,110 @@ export function SummaryPopover({
               )}
 
               {allEntriesDisabled && (
-                <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/20 px-2.5 py-2 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]">{localizeUi("ui.chat.summarypopover.allSummariesAreDisabledTheModelWillNotReceive")}</div>
+                <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/20 px-2.5 py-2 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]">
+                  {localizeUi("ui.chat.summarypopover.allSummariesAreDisabledTheModelWillNotReceive")}
+                </div>
               )}
 
               {draftEntry && !displayEntries.some((entry) => entry.id === draftEntry.id) && (
-                <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/20 px-2.5 py-2 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]">{localizeUi("ui.chat.summarypopover.newManualSummarySaveItToIncludeItIn")}</div>
+                <div className="rounded-lg border border-[var(--border)] bg-[var(--secondary)]/20 px-2.5 py-2 text-[0.6875rem] leading-relaxed text-[var(--muted-foreground)]">
+                  {localizeUi("ui.chat.summarypopover.newManualSummarySaveItToIncludeItIn")}
+                </div>
               )}
 
               {hasEntries ? (
-                visibleEntries.map((entry) => (
-                  <SummaryEntryRow
-                    key={entry.id}
-                    entry={entry}
-                    expanded={expandedEntryIds.has(entry.id)}
-                    editing={editingEntryId === entry.id}
-                    draftEntry={editingEntryId === entry.id ? draftEntry : null}
-                    textareaRef={entryTextareaRef}
-                    mutationPending={entryMutationPending}
-                    selected={selectedEntryIds.has(entry.id)}
-                    onToggleSelected={() => handleToggleSelected(entry.id)}
-                    onToggleExpanded={() => handleToggleExpanded(entry.id)}
-                    onToggleEnabled={(enabled) => handleToggleEntry(entry, enabled)}
-                    onStartEdit={() => handleStartEditEntry(entry)}
-                    onCancelEdit={handleCancelEditEntry}
-                    onSaveEdit={handleSaveEntry}
-                    onDelete={() => void handleDeleteEntry(entry)}
-                    dockedToFooter={entry.id === visibleEntries[visibleEntries.length - 1]?.id}
-                  />
-                ))
+                <div
+                  ref={summaryEntryListRef}
+                  data-summary-entry-root
+                  className="space-y-2"
+                  onDragOver={handleSummaryContainerDragOver}
+                  onDrop={handleSummaryDrop}
+                >
+                  {visibleEntries.map((entry) => {
+                    const entryIndex = displayEntries.findIndex((candidate) => candidate.id === entry.id);
+                    const reorderable = entryIndex >= 0;
+                    const showDropBefore =
+                      reorderable &&
+                      summaryDropIndex === entryIndex &&
+                      draggingEntryIndex !== null &&
+                      draggingEntryIndex !== entryIndex &&
+                      draggingEntryIndex !== entryIndex - 1;
+                    const showDropAfter =
+                      reorderable &&
+                      entryIndex === displayEntries.length - 1 &&
+                      summaryDropIndex === displayEntries.length &&
+                      draggingEntryIndex !== null &&
+                      draggingEntryIndex !== entryIndex;
+
+                    return (
+                      <div key={entry.id}>
+                        {showDropBefore && (
+                          <div className="mari-chrome-accent-progress mari-accent-animated mx-2 mb-2 h-0.5 rounded-full" />
+                        )}
+                        <SummaryEntryRow
+                          entry={entry}
+                          entryIndex={entryIndex}
+                          entryCount={displayEntries.length}
+                          reorderable={reorderable}
+                          dragReady={dragReadyEntryIndex === entryIndex}
+                          dragging={draggingEntryIndex === entryIndex}
+                          expanded={expandedEntryIds.has(entry.id)}
+                          editing={editingEntryId === entry.id}
+                          draftEntry={editingEntryId === entry.id ? draftEntry : null}
+                          textareaRef={entryTextareaRef}
+                          mutationPending={entryMutationPending}
+                          selected={selectedEntryIds.has(entry.id)}
+                          onDragReadyChange={(ready) => setDragReadyEntryIndex(ready ? entryIndex : null)}
+                          onDragStart={(event) => handleSummaryDragStart(entryIndex, event)}
+                          onDragOver={(event) => handleSummaryDragOver(entryIndex, event)}
+                          onDrop={(event) => {
+                            event.stopPropagation();
+                            handleSummaryDrop(event);
+                          }}
+                          onDragEnd={finishSummaryDrag}
+                          onTouchStartDrag={(event) => {
+                            event.stopPropagation();
+                            startSummaryEntryTouchDrag(event, entry.id, {
+                              allowInteractiveTarget: true,
+                              sourceElement: event.currentTarget.closest<HTMLElement>(
+                                '[data-touch-reorder-item="summary-entry"]',
+                              ),
+                            });
+                          }}
+                          onMoveUp={() => moveSummaryEntryByOffset(entryIndex, -1)}
+                          onMoveDown={() => moveSummaryEntryByOffset(entryIndex, 1)}
+                          onToggleSelected={() => handleToggleSelected(entry.id)}
+                          onToggleExpanded={() => handleToggleExpanded(entry.id)}
+                          onToggleEnabled={(enabled) => handleToggleEntry(entry, enabled)}
+                          onStartEdit={() => handleStartEditEntry(entry)}
+                          onCancelEdit={handleCancelEditEntry}
+                          onSaveEdit={handleSaveEntry}
+                          onDelete={() => void handleDeleteEntry(entry)}
+                          dockedToFooter={entry.id === visibleEntries[visibleEntries.length - 1]?.id}
+                        />
+                        {showDropAfter && (
+                          <div className="mari-chrome-accent-progress mari-accent-animated mx-2 mt-2 h-0.5 rounded-full" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               ) : allVisibleEntriesHidden ? (
                 <button
                   type="button"
                   onClick={() => setShowInactiveSummaries(true)}
                   className="w-full rounded-t-lg rounded-b-none border border-b-0 border-dashed border-[var(--border)] bg-[var(--secondary)]/20 p-5 text-center text-xs italic text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]/35"
-                >{localizeUi("ui.chat.summarypopover.inactiveSummariesAreHiddenShowInactiveSummariesToView")}</button>
+                >
+                  {localizeUi("ui.chat.summarypopover.inactiveSummariesAreHiddenShowInactiveSummariesToView")}
+                </button>
               ) : (
                 <button
                   type="button"
                   onClick={handleCreateManualEntry}
                   className="w-full rounded-t-lg rounded-b-none border border-b-0 border-dashed border-[var(--border)] bg-[var(--secondary)]/20 p-5 text-center text-xs italic text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]/35"
-                >{localizeUi("ui.chat.summarypopover.noSummariesYetGenerateOneOrWriteYourOwn")}</button>
+                >
+                  {localizeUi("ui.chat.summarypopover.noSummariesYetGenerateOneOrWriteYourOwn")}
+                </button>
               )}
             </div>
           </div>
@@ -1826,7 +2045,9 @@ export function SummaryPopover({
                 <p className="truncate text-[0.625rem] text-[var(--muted-foreground)]">{sourceDetail}</p>
               </div>
               <div className="min-w-0 text-right">
-                <p className="truncate text-xs font-semibold text-[var(--foreground)]">{localizeUi("ui.chat.summarypopover.activePrompt")}</p>
+                <p className="truncate text-xs font-semibold text-[var(--foreground)]">
+                  {localizeUi("ui.chat.summarypopover.activePrompt")}
+                </p>
                 <p className="truncate text-[0.625rem] text-[var(--muted-foreground)]">{promptTemplateSummary}</p>
               </div>
             </div>
@@ -1861,7 +2082,9 @@ export function SummaryPopover({
             ) : (
               <div className="space-y-1.5">
                 <div className="grid grid-cols-2 gap-2">
-                  <label className="space-y-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">{localizeUi("ui.chat.summarypopover.from")}<input
+                  <label className="space-y-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
+                    {localizeUi("ui.chat.summarypopover.from")}
+                    <input
                       type="number"
                       min={1}
                       max={Math.max(1, totalMessageCount)}
@@ -1886,7 +2109,9 @@ export function SummaryPopover({
                       className="w-full rounded-md bg-[var(--card)] px-2 py-1 text-center text-xs tabular-nums text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                     />
                   </label>
-                  <label className="space-y-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">{localizeUi("ui.chat.summarypopover.to")}<input
+                  <label className="space-y-1 text-[0.625rem] font-medium text-[var(--muted-foreground)]">
+                    {localizeUi("ui.chat.summarypopover.to")}
+                    <input
                       type="number"
                       min={1}
                       max={Math.max(1, totalMessageCount)}
@@ -1926,7 +2151,9 @@ export function SummaryPopover({
               className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-[var(--muted-foreground)] transition-all hover:bg-[var(--accent)] hover:text-[var(--foreground)] active:scale-[0.98]"
               title={localizeUi("ui.chat.summarypopover.writeSummaryEntry")}
             >
-              <PenLine size="0.8125rem" />{localizeUi("ui.chat.summarypopover.write")}</button>
+              <PenLine size="0.8125rem" />
+              {localizeUi("ui.chat.summarypopover.write")}
+            </button>
             <button
               type="button"
               onClick={handleGenerate}
@@ -1940,7 +2167,9 @@ export function SummaryPopover({
               title={localizeUi("ui.chat.summarypopover.generateSummaryWithAi")}
             >
               {isGenerating ? <Loader2 size="0.8125rem" className="animate-spin" /> : <Sparkles size="0.8125rem" />}
-              {isGenerating ?localizeUi("ui.chat.summarypopover.generating") :localizeUi("ui.characters.characterclipcard.generate")}
+              {isGenerating
+                ? localizeUi("ui.chat.summarypopover.generating")
+                : localizeUi("ui.characters.characterclipcard.generate")}
             </button>
           </div>
         </div>
@@ -1973,12 +2202,25 @@ function SummarySettingsToggle({ label, checked, onChange }: SummarySettingsTogg
 
 interface SummaryEntryRowProps {
   entry: ChatSummaryEntry;
+  entryIndex: number;
+  entryCount: number;
+  reorderable: boolean;
+  dragReady: boolean;
+  dragging: boolean;
   expanded: boolean;
   editing: boolean;
   draftEntry: ChatSummaryEntry | null;
   textareaRef: RefObject<HTMLTextAreaElement | null>;
   mutationPending: boolean;
   selected: boolean;
+  onDragReadyChange: (ready: boolean) => void;
+  onDragStart: (event: ReactDragEvent<HTMLDivElement>) => void;
+  onDragOver: (event: ReactDragEvent<HTMLDivElement>) => void;
+  onDrop: (event: ReactDragEvent<HTMLDivElement>) => void;
+  onDragEnd: () => void;
+  onTouchStartDrag: (event: ReactTouchEvent<HTMLButtonElement>) => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
   onToggleSelected: () => void;
   onToggleExpanded: () => void;
   onToggleEnabled: (enabled: boolean) => void;
@@ -1991,12 +2233,25 @@ interface SummaryEntryRowProps {
 
 function SummaryEntryRow({
   entry,
+  entryIndex,
+  entryCount,
+  reorderable,
+  dragReady,
+  dragging,
   expanded,
   editing,
   draftEntry,
   textareaRef,
   mutationPending,
   selected,
+  onDragReadyChange,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+  onTouchStartDrag,
+  onMoveUp,
+  onMoveDown,
   onToggleSelected,
   onToggleExpanded,
   onToggleEnabled,
@@ -2010,8 +2265,15 @@ function SummaryEntryRow({
   const metaLine = getSummaryEntryMetaLine(entry, localizeUi);
   return (
     <div
+      data-touch-reorder-item={reorderable ? "summary-entry" : undefined}
+      data-touch-reorder-index={reorderable ? entryIndex : undefined}
+      draggable={reorderable && dragReady}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
       className={cn(
-        "group overflow-hidden rounded-lg border shadow-sm shadow-black/10 ring-1 ring-[var(--border)]/25 transition-colors",
+        "group overflow-hidden rounded-lg border shadow-sm shadow-black/10 ring-1 ring-[var(--border)]/25 transition-all",
         dockedToFooter && "rounded-b-none border-b-0",
         expanded
           ? "border-[var(--primary)]/45 bg-[var(--accent)]/22 ring-[var(--primary)]/20"
@@ -2020,9 +2282,49 @@ function SummaryEntryRow({
           ? "text-[var(--foreground)]"
           : "border-dashed bg-[var(--secondary)]/14 text-[var(--muted-foreground)] opacity-75 ring-[var(--border)]/35",
         editing && "border-[var(--primary)]/60 bg-[var(--primary)]/10 ring-[var(--primary)]/30",
+        dragging && "opacity-40",
       )}
     >
-      <div className="grid grid-cols-[auto_auto_1fr_auto] items-center gap-2 px-2 py-1.5">
+      <div className="grid grid-cols-[auto_auto_auto_1fr_auto] items-center gap-1.5 px-2 py-1.5">
+        <div className="flex shrink-0 items-center gap-0.5">
+          <button
+            type="button"
+            className={cn(
+              "cursor-grab rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] active:cursor-grabbing",
+              (!reorderable || mutationPending) && "pointer-events-none opacity-30",
+            )}
+            title={localizeUi("ui.chat.summaryentryrow.dragToReorder")}
+            aria-label={localizeUi("ui.chat.summaryentryrow.dragToReorder")}
+            tabIndex={reorderable ? undefined : -1}
+            onMouseDown={() => onDragReadyChange(true)}
+            onMouseUp={() => onDragReadyChange(false)}
+            onTouchStart={onTouchStartDrag}
+          >
+            <GripVertical size="0.875rem" />
+          </button>
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              onClick={onMoveUp}
+              disabled={!reorderable || entryIndex === 0 || mutationPending}
+              className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30"
+              title={localizeUi("ui.chat.summaryentryrow.moveSummaryUp", { title: entry.title })}
+              aria-label={localizeUi("ui.chat.summaryentryrow.moveSummaryUp", { title: entry.title })}
+            >
+              <ArrowUp size="0.75rem" />
+            </button>
+            <button
+              type="button"
+              onClick={onMoveDown}
+              disabled={!reorderable || entryIndex === entryCount - 1 || mutationPending}
+              className="rounded p-0.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:pointer-events-none disabled:opacity-30"
+              title={localizeUi("ui.chat.summaryentryrow.moveSummaryDown", { title: entry.title })}
+              aria-label={localizeUi("ui.chat.summaryentryrow.moveSummaryDown", { title: entry.title })}
+            >
+              <ArrowDown size="0.75rem" />
+            </button>
+          </div>
+        </div>
         <input
           type="checkbox"
           checked={selected}
@@ -2041,8 +2343,16 @@ function SummaryEntryRow({
               ? "bg-[var(--primary)]/15 text-[var(--primary)] ring-1 ring-[var(--primary)]/30"
               : "text-[var(--muted-foreground)] ring-1 ring-[var(--border)] hover:bg-[var(--accent)] hover:text-[var(--foreground)]",
           )}
-          title={entry.enabled ?localizeUi("ui.chat.summaryentryrow.disableSummary") :localizeUi("ui.chat.summaryentryrow.enableSummary")}
-          aria-label={entry.enabled ?localizeUi("ui.chat.summaryentryrow.disableSummary") :localizeUi("ui.chat.summaryentryrow.enableSummary")}
+          title={
+            entry.enabled
+              ? localizeUi("ui.chat.summaryentryrow.disableSummary")
+              : localizeUi("ui.chat.summaryentryrow.enableSummary")
+          }
+          aria-label={
+            entry.enabled
+              ? localizeUi("ui.chat.summaryentryrow.disableSummary")
+              : localizeUi("ui.chat.summaryentryrow.enableSummary")
+          }
           aria-pressed={entry.enabled}
         >
           <Check size="0.6875rem" className={cn(!entry.enabled && "opacity-0")} />
@@ -2053,7 +2363,9 @@ function SummaryEntryRow({
             <SummaryEntryOriginIcon entry={entry} />
             <span className="min-w-0 truncate text-xs font-semibold">{entry.title}</span>
             {editing && (
-              <span className="shrink-0 rounded bg-[var(--primary)]/15 px-1.5 py-0.5 text-[0.5625rem] font-semibold text-[var(--primary)]">{localizeUi("ui.panels.imagestyleprofileseditor.editing")}</span>
+              <span className="shrink-0 rounded bg-[var(--primary)]/15 px-1.5 py-0.5 text-[0.5625rem] font-semibold text-[var(--primary)]">
+                {localizeUi("ui.panels.imagestyleprofileseditor.editing")}
+              </span>
             )}
           </div>
           <p className="mt-0.5 truncate text-[0.625rem] text-[var(--muted-foreground)]">{metaLine}</p>
@@ -2067,8 +2379,14 @@ function SummaryEntryRow({
               "rounded p-1 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] active:scale-90",
               expanded && "bg-[var(--accent)] text-[var(--foreground)]",
             )}
-            title={expanded ?localizeUi("ui.panels.ttsconfigcard.collapse") :localizeUi("ui.panels.ttsconfigcard.expand")}
-            aria-label={expanded ?localizeUi("ui.chat.summaryentryrow.collapseSummaryEntry") :localizeUi("ui.chat.summaryentryrow.expandSummaryEntry")}
+            title={
+              expanded ? localizeUi("ui.panels.ttsconfigcard.collapse") : localizeUi("ui.panels.ttsconfigcard.expand")
+            }
+            aria-label={
+              expanded
+                ? localizeUi("ui.chat.summaryentryrow.collapseSummaryEntry")
+                : localizeUi("ui.chat.summaryentryrow.expandSummaryEntry")
+            }
           >
             <ChevronRight size="0.75rem" className={cn("transition-transform", expanded && "rotate-90")} />
           </button>
@@ -2129,13 +2447,7 @@ interface SummaryEntryEditorProps {
   onSave: (entry: ChatSummaryEntry) => void;
 }
 
-function SummaryEntryEditor({
-  entry,
-  textareaRef,
-  mutationPending,
-  onCancel,
-  onSave,
-}: SummaryEntryEditorProps) {
+function SummaryEntryEditor({ entry, textareaRef, mutationPending, onCancel, onSave }: SummaryEntryEditorProps) {
   const { t: localizeUi } = useUiTranslation();
   const [draft, setDraft] = useState(() => ({ ...entry }));
   const metaLine = getSummaryEntryMetaLine(draft, localizeUi);
@@ -2143,7 +2455,11 @@ function SummaryEntryEditor({
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2 text-[0.625rem] text-[var(--muted-foreground)]">
         <span className="min-w-0 truncate">{metaLine || localizeUi("chat.summary.manual")}</span>
-        <span>{draft.enabled ?localizeUi("ui.characters.lorebooktab.active") :localizeUi("ui.chat.summaryentryeditor.inactive")}</span>
+        <span>
+          {draft.enabled
+            ? localizeUi("ui.characters.lorebooktab.active")
+            : localizeUi("ui.chat.summaryentryeditor.inactive")}
+        </span>
       </div>
       <input
         value={draft.title}
@@ -2152,30 +2468,37 @@ function SummaryEntryEditor({
         placeholder={localizeUi("ui.chat.summaryentryeditor.summaryTitle")}
         className="w-full rounded-md bg-[var(--card)] px-2.5 py-1.5 text-xs font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
       />
-      <textarea
-        ref={textareaRef}
+      <MacroTextarea
+        textareaRef={textareaRef}
         value={draft.content}
-        onChange={(event) => setDraft((current) => ({ ...current, content: event.target.value }))}
+        onChange={(content) => setDraft((current) => ({ ...current, content }))}
         rows={7}
+        title={localizeUi("ui.chat.summaryentryeditor.summaryTitle")}
+        ariaLabel={localizeUi("ui.chat.summaryentryeditor.writeOrPasteASummaryOfThisChat")}
         placeholder={localizeUi("ui.chat.summaryentryeditor.writeOrPasteASummaryOfThisChat")}
-        className="max-h-64 min-h-36 w-full resize-y rounded-md bg-[var(--card)] p-2.5 text-xs leading-relaxed text-[var(--foreground)] ring-1 ring-[var(--border)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+        className="max-h-64 min-h-36 rounded-md bg-[var(--card)] text-xs leading-relaxed"
       />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-[0.625rem] text-[var(--muted-foreground)]">
-          ~{formatTokenCount(estimateChatSummaryTokens(draft.content))} {localizeUi("ui.agents.agenteditor.tokens")}</span>
+          ~{formatTokenCount(estimateChatSummaryTokens(draft.content))} {localizeUi("ui.agents.agenteditor.tokens")}
+        </span>
         <div className="flex justify-end gap-1.5">
           <button
             type="button"
             onClick={onCancel}
             className="rounded-md px-2.5 py-1 text-[0.625rem] font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)]"
-          >{localizeUi("chat.delete.dialog.cancel")}</button>
+          >
+            {localizeUi("chat.delete.dialog.cancel")}
+          </button>
           <button
             type="button"
             onClick={() => onSave(draft)}
             disabled={mutationPending || !draft.content.trim()}
             className="flex items-center gap-1 rounded-md bg-[var(--secondary)] px-2.5 py-1 text-[0.625rem] font-semibold text-[var(--foreground)] ring-1 ring-[var(--border)] transition-all hover:bg-[var(--accent)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Save size="0.625rem" />{localizeUi("ui.noodle.noodlehome.save")}</button>
+            <Save size="0.625rem" />
+            {localizeUi("ui.noodle.noodlehome.save")}
+          </button>
         </div>
       </div>
     </div>
@@ -2185,14 +2508,30 @@ function SummaryEntryEditor({
 function SummaryEntryOriginIcon({ entry }: { entry: ChatSummaryEntry }) {
   const { t: localizeUi } = useUiTranslation();
   if (entry.origin === "automated") {
-    return <Sparkles size="0.75rem" className="shrink-0 text-[var(--primary)]" aria-label={localizeUi("ui.chat.summaryentryoriginicon.automatedSummary")} />;
+    return (
+      <Sparkles
+        size="0.75rem"
+        className="shrink-0 text-[var(--primary)]"
+        aria-label={localizeUi("ui.chat.summaryentryoriginicon.automatedSummary")}
+      />
+    );
   }
   if (entry.origin === "legacy") {
     return (
-      <ScrollText size="0.75rem" className="shrink-0 text-[var(--muted-foreground)]" aria-label={localizeUi("ui.chat.summaryentryoriginicon.legacySummary")} />
+      <ScrollText
+        size="0.75rem"
+        className="shrink-0 text-[var(--muted-foreground)]"
+        aria-label={localizeUi("ui.chat.summaryentryoriginicon.legacySummary")}
+      />
     );
   }
-  return <PenLine size="0.75rem" className="shrink-0 text-[var(--muted-foreground)]" aria-label={localizeUi("ui.chat.summaryentryoriginicon.manualSummary")} />;
+  return (
+    <PenLine
+      size="0.75rem"
+      className="shrink-0 text-[var(--muted-foreground)]"
+      aria-label={localizeUi("ui.chat.summaryentryoriginicon.manualSummary")}
+    />
+  );
 }
 
 interface SummaryReadableSectionProps {

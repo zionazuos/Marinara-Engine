@@ -3,6 +3,7 @@ import { Bell, BellRing, Loader2, Play, Trash2, Upload, Volume2 } from "lucide-r
 import { useTranslation, useTranslation as useUiTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useUIStore } from "../../../stores/ui.store";
+import { ANDROID_BRIDGE_READY_EVENT } from "../../../lib/android-bridge";
 import {
   getLocalNotificationPermission,
   getNativeNotificationPermission,
@@ -122,7 +123,7 @@ export function ConversationSoundSetting() {
   const generationMobileNotifications = useUIStore((s) => s.generationMobileNotifications);
   const setGenerationMobileNotifications = useUIStore((s) => s.setGenerationMobileNotifications);
   const [browserPermission, setBrowserPermission] = useState<LocalNotificationPermission>("default");
-  const nativeNotificationsAvailable = hasNativeNotificationBridge();
+  const [nativeNotificationsAvailable, setNativeNotificationsAvailable] = useState(hasNativeNotificationBridge);
   const [nativePermission, setNativePermission] = useState<NativeNotificationPermission>(() =>
     getNativeNotificationPermission(),
   );
@@ -143,6 +144,16 @@ export function ConversationSoundSetting() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    const refreshBridge = () => {
+      setNativeNotificationsAvailable(hasNativeNotificationBridge());
+      setNativePermission(getNativeNotificationPermission());
+    };
+    window.addEventListener(ANDROID_BRIDGE_READY_EVENT, refreshBridge);
+    refreshBridge();
+    return () => window.removeEventListener(ANDROID_BRIDGE_READY_EVENT, refreshBridge);
   }, []);
 
   useEffect(() => {
@@ -176,12 +187,16 @@ export function ConversationSoundSetting() {
       setPreference(false);
       toast.error(
         permission === "insecure"
-          ?localizeUi("ui.panels.conversationsoundsetting.browserNotificationsRequireHttpsOrLocalhostOpenMarinaraThrough")
+          ? localizeUi(
+              "ui.panels.conversationsoundsetting.browserNotificationsRequireHttpsOrLocalhostOpenMarinaraThrough",
+            )
           : permission === "unsupported"
-            ?localizeUi("ui.panels.conversationsoundsetting.browserNotificationsAreNotAvailableInThisEnvironment")
+            ? localizeUi("ui.panels.conversationsoundsetting.browserNotificationsAreNotAvailableInThisEnvironment")
             : permission === "denied"
-              ?localizeUi("ui.panels.conversationsoundsetting.browserNotificationsAreBlockedResetThisSiteSNotification")
-              :localizeUi("ui.panels.conversationsoundsetting.browserNotificationPermissionWasNotGranted"),
+              ? localizeUi(
+                  "ui.panels.conversationsoundsetting.browserNotificationsAreBlockedResetThisSiteSNotification",
+                )
+              : localizeUi("ui.panels.conversationsoundsetting.browserNotificationPermissionWasNotGranted"),
       );
     });
   };
@@ -206,8 +221,8 @@ export function ConversationSoundSetting() {
         setPreference(false);
         toast.error(
           permission === "unsupported"
-            ?localizeUi("ui.panels.conversationsoundsetting.mobileNotificationsRequireTheMarinaraAndroidApp")
-            :localizeUi("ui.panels.conversationsoundsetting.androidNotificationPermissionWasNotGranted"),
+            ? localizeUi("ui.panels.conversationsoundsetting.mobileNotificationsRequireTheMarinaraAndroidApp")
+            : localizeUi("ui.panels.conversationsoundsetting.androidNotificationPermissionWasNotGranted"),
         );
       })
       .catch(() => {
@@ -295,8 +310,8 @@ export function ConversationSoundSetting() {
         disabled={!nativeNotificationsAvailable}
         help={
           nativeNotificationsAvailable
-            ?localizeUi("ui.panels.conversationsoundsetting.usesNativeAndroidNotificationsFromTheInstalledMarinaraApp")
-            :localizeUi("ui.panels.conversationsoundsetting.availableInTheUpdatedMarinaraAndroidApkBrowserAnd")
+            ? localizeUi("ui.panels.conversationsoundsetting.usesNativeAndroidNotificationsFromTheInstalledMarinaraApp")
+            : localizeUi("ui.panels.conversationsoundsetting.availableInTheUpdatedMarinaraAndroidApkBrowserAnd")
         }
       />
       <div className="mt-1 flex items-center gap-1.5">
@@ -335,8 +350,8 @@ export function ConversationSoundSetting() {
         disabled={!nativeNotificationsAvailable}
         help={
           nativeNotificationsAvailable
-            ?localizeUi("ui.panels.conversationsoundsetting.usesNativeAndroidNotificationsFromTheInstalledMarinaraApp")
-            :localizeUi("ui.panels.conversationsoundsetting.availableInTheUpdatedMarinaraAndroidApkBrowserAnd")
+            ? localizeUi("ui.panels.conversationsoundsetting.usesNativeAndroidNotificationsFromTheInstalledMarinaraApp")
+            : localizeUi("ui.panels.conversationsoundsetting.availableInTheUpdatedMarinaraAndroidApkBrowserAnd")
         }
       />
     </div>
