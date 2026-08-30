@@ -14,6 +14,19 @@ export function isGlm52Model(model: string): boolean {
   return /(?:^|\/)glm-5\.2(?:$|[-:])/u.test(model.toLowerCase());
 }
 
+/**
+ * GLM 5.3 raciocina sempre e **rejeita** o pedido de desligar o raciocínio:
+ * responde 400 `reasoning_required` — "GLM 5.3 always thinks and does not support
+ * disabling reasoning" — quando recebe `enable_thinking: false`, `reasoning_effort:
+ * "none"` ou `reasoning.effort: "none"`. Sem raciocínio explícito (tradução de card,
+ * por exemplo) mandávamos `enable_thinking: false` e toda chamada falhava. Enviar
+ * `true` também não serve: passa a valer para quem pediu explicitamente para desligar.
+ * O certo é omitir o parâmetro e deixar o modelo no padrão dele.
+ */
+export function isGlmAlwaysThinkingModel(model: string): boolean {
+  return /(?:^|\/)glm-5\.3(?:$|[-:])/u.test(model.toLowerCase());
+}
+
 export function isNativeGlmEndpoint(baseUrl: string): boolean {
   try {
     const hostname = new URL(baseUrl).hostname.toLowerCase();
@@ -47,6 +60,12 @@ export function applyGlmThinkingParameters(body: Record<string, unknown>, option
     body.thinking = { type: thinkingEnabled ? "enabled" : "disabled" };
     const effort = glm52ReasoningEffort(options.reasoningEffort);
     if (thinkingEnabled && effort) body.reasoning_effort = effort;
+    return true;
+  }
+
+  // Modelos que sempre pensam recusam o parâmetro quando ele pede o desligamento.
+  // Omitir é o único caminho seguro; o modelo já raciocina por padrão.
+  if (!thinkingEnabled && isGlmAlwaysThinkingModel(options.model)) {
     return true;
   }
 
