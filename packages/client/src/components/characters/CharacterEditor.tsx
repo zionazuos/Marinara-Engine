@@ -960,7 +960,8 @@ export function CharacterEditor() {
       toast.error(localizeUi("ui.botBrowser.detailview.translationConnectionRequired"));
       return;
     }
-    setTranslateDialogOpen(false);
+    // O diálogo fica aberto durante a tradução: cada campo pode levar mais de um
+    // minuto com modelo que raciocina, e sem progresso visível a tela parece travada.
     setTranslating(true);
     setTranslationProgress(null);
     try {
@@ -985,6 +986,7 @@ export function CharacterEditor() {
       // Não salva sozinho: o usuário revisa e clica em Salvar.
       setFormData(translated as unknown as CharacterData);
       markDirty();
+      setTranslateDialogOpen(false);
       toast.success(localizeUi("ui.characters.charactereditor.translateCardDone"));
     } catch (error) {
       toast.error(
@@ -1128,11 +1130,42 @@ export function CharacterEditor() {
             </select>
           </label>
 
+          {translating && (
+            <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] p-3">
+              <div className="flex items-center gap-2 text-xs">
+                <Loader2 size="0.875rem" className="animate-spin shrink-0" />
+                <span>
+                  {localizeUi("ui.botBrowser.detailview.translatingProgress", {
+                    completed: translationProgress?.completed ?? 0,
+                    total: translationProgress?.total ?? 0,
+                  })}
+                </span>
+                {translationProgress?.label ? (
+                  <span className="truncate font-mono text-[var(--muted-foreground)]">{translationProgress.label}</span>
+                ) : null}
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--border)]">
+                <div
+                  className="h-full rounded-full bg-[var(--primary)] transition-[width] duration-300"
+                  style={{
+                    width: translationProgress?.total
+                      ? `${Math.round((100 * translationProgress.completed) / translationProgress.total)}%`
+                      : "0%",
+                  }}
+                />
+              </div>
+              <p className="text-[11px] text-[var(--muted-foreground)]">
+                {localizeUi("ui.characters.charactereditor.translateCardSlowHint")}
+              </p>
+            </div>
+          )}
+
           <div className="flex justify-end gap-2">
             <button
               type="button"
+              disabled={translating}
               onClick={() => setTranslateDialogOpen(false)}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {localizeUi("ui.chat.conversationmessageeditform.cancel")}
             </button>

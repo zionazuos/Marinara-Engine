@@ -2183,6 +2183,7 @@
   "ui.characters.charactereditor.translateCardConfirm": "Translate this card's text fields to Brazilian Portuguese? Description, personality, scenario, greetings, examples and embedded lorebook entries are rewritten. Review the result and save — nothing is saved automatically.",
   "ui.characters.charactereditor.translateCardDone": "Card translated. Review the text and save.",
   "ui.characters.charactereditor.translateCardFailed": "Could not translate this card.",
+  "ui.characters.charactereditor.translateCardSlowHint": "Each field is a separate request. Models that reason can take over a minute per field — keep this dialog open.",
   "ui.characters.charactereditor.v": "v",
   "ui.characters.charactereditor.value1VValue2": "{{value1}} · v{{value2}}",
   "ui.characters.charactereditor.waitForTheCurrentAvatarUploadToFinish": "Wait for the current avatar upload to finish.",

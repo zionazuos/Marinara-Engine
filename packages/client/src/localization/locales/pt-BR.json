@@ -596,6 +596,7 @@
   "ui.characters.charactereditor.translateCardConfirm": "Traduzir os campos de texto deste card para português? Descrição, personalidade, cenário, saudações, exemplos e as entradas do lorebook embutido são reescritos. Confira o resultado e salve — nada é salvo automaticamente.",
   "ui.characters.charactereditor.translateCardDone": "Card traduzido. Revise o texto e salve.",
   "ui.characters.charactereditor.translateCardFailed": "Não foi possível traduzir este card.",
+  "ui.characters.charactereditor.translateCardSlowHint": "Cada campo é uma requisição separada. Modelos que raciocinam podem levar mais de um minuto por campo — mantenha esta janela aberta.",
   "ui.characters.charactereditor.waitForTheCurrentAvatarUploadToFinish": "Espere o envio do avatar atual terminar.",
   "ui.characters.charactereditor.waitForTheCurrentAvatarUploadToFinishBefore": "Espere o envio do avatar atual terminar antes de salvar.",
   "ui.characters.charactereditor.waitForTheCurrentAvatarUploadToFinishBefore_bee1ef8": "Espere o envio do avatar atual terminar antes de remover o avatar.",

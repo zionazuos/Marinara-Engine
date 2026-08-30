@@ -90,6 +90,17 @@ function findNestedApiErrorMessage(value: unknown): string {
   return "";
 }
 
+/**
+ * Texto de último recurso para um erro HTTP. `res.statusText` é **string vazia em
+ * HTTP/2** — todo navegador moderno falando com nginx/openresty cai nesse caso —, e
+ * um corpo não-JSON (a página de erro do proxy, por exemplo) não traz `error`. Sem
+ * isso o usuário recebia um alerta em branco: foi o que aconteceu com o 504 do
+ * gateway durante uma tradução longa.
+ */
+function httpStatusFallback(status: number, statusText: string): string {
+  return statusText.trim() || `HTTP ${status}`;
+}
+
 export function getApiErrorMessage(value: unknown, fallback: string): string {
   if (typeof value === "string" && value.trim()) return value.trim();
   if (Array.isArray(value)) {
@@ -205,7 +216,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }));
-    throw new ApiError(res.status, getApiErrorMessage(body.error, res.statusText), body);
+    throw new ApiError(res.status, getApiErrorMessage(body.error, httpStatusFallback(res.status, res.statusText)), body);
   }
 
   // 204 No Content
@@ -501,7 +512,7 @@ export const api = {
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({ error: res.statusText }));
-      throw new ApiError(res.status, getApiErrorMessage(body.error, res.statusText), body);
+      throw new ApiError(res.status, getApiErrorMessage(body.error, httpStatusFallback(res.status, res.statusText)), body);
     }
 
     return res.json() as Promise<T>;
