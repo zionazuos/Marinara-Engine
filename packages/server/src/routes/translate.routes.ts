@@ -5,6 +5,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { createConnectionsStorage } from "../services/storage/connections.storage.js";
 import { createLLMProvider } from "../services/llm/provider-registry.js";
+import { LLMHttpError } from "../services/llm/base-provider.js";
 import { withConnectionFallbackProvider } from "../services/llm/connection-fallback-provider.js";
 import {
   DEFAULT_TRANSLATION_SYSTEM_PROMPT,
@@ -110,19 +111,33 @@ async function translateWithAI(
     input.systemPrompt?.trim() || DEFAULT_TRANSLATION_SYSTEM_PROMPT,
     input.targetLanguage,
   );
-  const result = await provider.chatComplete(
-    [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      {
-        role: "user",
-        content: `Translate the following text to ${input.targetLanguage}:\n\n${input.text}`,
-      },
-    ],
-    { model: conn.model, temperature: 0.3 },
-  );
+  let result;
+  try {
+    result = await provider.chatComplete(
+      [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: `Translate the following text to ${input.targetLanguage}:\n\n${input.text}`,
+        },
+      ],
+      { model: conn.model, temperature: 0.3 },
+    );
+  } catch (error) {
+    // LLMHttpError carrega `status`, não `statusCode`, então o error-handler global
+    // não o reconhece e devolve um "Internal Server Error" genérico — escondendo a
+    // razão real ("modelo X não suporta Y", cota estourada, chave inválida). Repassa
+    // a mensagem do provedor para quem clicou em traduzir poder agir.
+    if (error instanceof LLMHttpError) {
+      throw Object.assign(new Error(error.message), {
+        statusCode: error.status >= 400 && error.status < 500 ? error.status : 502,
+      });
+    }
+    throw error;
+  }
 
   return { translatedText: (result.content ?? "").trim() };
 }

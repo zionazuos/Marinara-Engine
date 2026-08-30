@@ -316,17 +316,22 @@ export function CharacterEditor() {
   // A preferência é compartilhada com o BotBrowser, para não haver duas escolhas.
   const savedTranslationConnectionId = useUIStore((s) => s.botBrowserTranslationConnectionId);
   const setSavedTranslationConnectionId = useUIStore((s) => s.setBotBrowserTranslationConnectionId);
-  const translationConnectionId = useMemo(() => {
-    const textConnections = (
-      Array.isArray(connectionsList)
-        ? (connectionsList as Array<{ id: string; provider: string; isDefault?: boolean }>)
+  const translationConnections = useMemo(
+    () =>
+      (Array.isArray(connectionsList)
+        ? (connectionsList as Array<{ id: string; name: string; model?: string; provider: string; isDefault?: boolean }>)
         : []
-    ).filter((connection) => !NON_TEXT_CONNECTION_PROVIDERS.has(connection.provider));
-    if (textConnections.some((connection) => connection.id === savedTranslationConnectionId)) {
+      ).filter((connection) => !NON_TEXT_CONNECTION_PROVIDERS.has(connection.provider)),
+    [connectionsList],
+  );
+  const translationConnectionId = useMemo(() => {
+    if (translationConnections.some((connection) => connection.id === savedTranslationConnectionId)) {
       return savedTranslationConnectionId;
     }
-    return textConnections.find((connection) => connection.isDefault)?.id ?? textConnections[0]?.id ?? null;
-  }, [connectionsList, savedTranslationConnectionId]);
+    return (
+      translationConnections.find((connection) => connection.isDefault)?.id ?? translationConnections[0]?.id ?? null
+    );
+  }, [translationConnections, savedTranslationConnectionId]);
 
   const [activeTab, setActiveTab] = useState<TabId>(
     () => (useUIStore.getState().characterDetailInitialTab as TabId | null) ?? "metadata",
@@ -364,6 +369,7 @@ export function CharacterEditor() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [translating, setTranslating] = useState(false);
+  const [translateDialogOpen, setTranslateDialogOpen] = useState(false);
   const [translationProgress, setTranslationProgress] = useState<CardTranslationProgress | null>(null);
   const [avatarGeneratorOpen, setAvatarGeneratorOpen] = useState(false);
   const [characterSheetGeneratorOpen, setCharacterSheetGeneratorOpen] = useState(false);
@@ -954,14 +960,7 @@ export function CharacterEditor() {
       toast.error(localizeUi("ui.botBrowser.detailview.translationConnectionRequired"));
       return;
     }
-
-    const confirmed = await showConfirmDialog({
-      title: localizeUi("ui.characters.charactereditor.translateCard"),
-      message: localizeUi("ui.characters.charactereditor.translateCardConfirm"),
-      confirmLabel: localizeUi("ui.characters.charactereditor.translateCard"),
-    });
-    if (!confirmed) return;
-
+    setTranslateDialogOpen(false);
     setTranslating(true);
     setTranslationProgress(null);
     try {
@@ -1001,7 +1000,7 @@ export function CharacterEditor() {
     <>
       <button
         type="button"
-        onClick={() => void handleTranslateCard()}
+        onClick={() => setTranslateDialogOpen(true)}
         disabled={translating || !formData}
         className={cn(headerActionButtonClass, "disabled:cursor-not-allowed disabled:opacity-50")}
         title={
@@ -1094,6 +1093,61 @@ export function CharacterEditor() {
 
   return (
     <div className="mari-editor-shell mari-editor-legacy-bridge flex flex-1 flex-col overflow-hidden">
+      <Modal
+        open={translateDialogOpen}
+        onClose={() => setTranslateDialogOpen(false)}
+        title={localizeUi("ui.characters.charactereditor.translateCard")}
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-sm text-[var(--muted-foreground)]">
+            {localizeUi("ui.characters.charactereditor.translateCardConfirm")}
+          </p>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs font-medium text-[var(--muted-foreground)]">
+              {localizeUi("ui.botBrowser.detailview.translationConnection")}
+            </span>
+            <select
+              value={translationConnectionId ?? ""}
+              onChange={(event) => setSavedTranslationConnectionId(event.target.value || null)}
+              disabled={translating || translationConnections.length === 0}
+              className="mari-chrome-field h-8 w-full px-2 text-xs"
+            >
+              {translationConnections.length === 0 ? (
+                <option value="">{localizeUi("ui.botBrowser.detailview.noTextConnections")}</option>
+              ) : (
+                translationConnections.map((connection) => (
+                  <option key={connection.id} value={connection.id}>
+                    {connection.isDefault
+                      ? localizeUi("ui.botBrowser.detailview.connectionOptionDefault", { name: connection.name })
+                      : connection.name}
+                    {connection.model ? ` — ${connection.model}` : ""}
+                  </option>
+                ))
+              )}
+            </select>
+          </label>
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setTranslateDialogOpen(false)}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:bg-[var(--accent)] hover:text-[var(--foreground)]"
+            >
+              {localizeUi("ui.chat.conversationmessageeditform.cancel")}
+            </button>
+            <button
+              type="button"
+              disabled={translating || !translationConnectionId}
+              onClick={() => void handleTranslateCard()}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--primary)] bg-[var(--primary)]/10 px-3 py-2 text-xs font-medium transition-colors hover:bg-[var(--primary)]/20 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {localizeUi("ui.characters.charactereditor.translateCard")}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       <ExportFormatDialog
         open={exportDialogOpen}
         title={localizeUi("ui.characters.charactereditor.exportCharacter_cdcda78")}
