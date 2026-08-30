@@ -113,7 +113,14 @@ import {
   MessageCircle,
   Pencil,
   Check,
+  Languages,
 } from "lucide-react";
+import {
+  CARD_TRANSLATION_SYSTEM_PROMPT,
+  NON_TEXT_CONNECTION_PROVIDERS,
+  translateCharacterCardPayload,
+  type CardTranslationProgress,
+} from "../../lib/character-card-translation";
 import { cn, copyToClipboard, generateClientId, getAvatarCropStyle } from "../../lib/utils";
 import { normalizeAvatarCrop, type WeekSchedule } from "@marinara-engine/shared";
 import { extractColorsFromImage } from "../../lib/avatar-color-extraction";
@@ -304,6 +311,23 @@ export function CharacterEditor() {
   const uploadCharacterSheet = useUploadCharacterGalleryImage(characterId ?? "");
   const { data: connectionsList } = useConnections();
 
+  // Conexão usada para traduzir o card. Mora aqui em cima porque estes são hooks e
+  // o componente tem um early return mais abaixo enquanto o personagem carrega.
+  // A preferência é compartilhada com o BotBrowser, para não haver duas escolhas.
+  const savedTranslationConnectionId = useUIStore((s) => s.botBrowserTranslationConnectionId);
+  const setSavedTranslationConnectionId = useUIStore((s) => s.setBotBrowserTranslationConnectionId);
+  const translationConnectionId = useMemo(() => {
+    const textConnections = (
+      Array.isArray(connectionsList)
+        ? (connectionsList as Array<{ id: string; provider: string; isDefault?: boolean }>)
+        : []
+    ).filter((connection) => !NON_TEXT_CONNECTION_PROVIDERS.has(connection.provider));
+    if (textConnections.some((connection) => connection.id === savedTranslationConnectionId)) {
+      return savedTranslationConnectionId;
+    }
+    return textConnections.find((connection) => connection.isDefault)?.id ?? textConnections[0]?.id ?? null;
+  }, [connectionsList, savedTranslationConnectionId]);
+
   const [activeTab, setActiveTab] = useState<TabId>(
     () => (useUIStore.getState().characterDetailInitialTab as TabId | null) ?? "metadata",
   );
@@ -339,6 +363,8 @@ export function CharacterEditor() {
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [translationProgress, setTranslationProgress] = useState<CardTranslationProgress | null>(null);
   const [avatarGeneratorOpen, setAvatarGeneratorOpen] = useState(false);
   const [characterSheetGeneratorOpen, setCharacterSheetGeneratorOpen] = useState(false);
   const [newTag, setNewTag] = useState("");
@@ -918,8 +944,80 @@ export function CharacterEditor() {
     saveDisabled && "cursor-not-allowed opacity-50",
   );
 
+  // ── Traduzir o card já importado ──
+  // O BotBrowser traduz na importação; aqui a tradução é sob demanda, para cards
+  // que entraram por outro caminho (arquivo, PNG, duplicata) ou que o usuário
+  // decidiu traduzir depois. Reaproveita a conexão escolhida lá.
+  const handleTranslateCard = async () => {
+    if (!formData || translating) return;
+    if (!translationConnectionId) {
+      toast.error(localizeUi("ui.botBrowser.detailview.translationConnectionRequired"));
+      return;
+    }
+
+    const confirmed = await showConfirmDialog({
+      title: localizeUi("ui.characters.charactereditor.translateCard"),
+      message: localizeUi("ui.characters.charactereditor.translateCardConfirm"),
+      confirmLabel: localizeUi("ui.characters.charactereditor.translateCard"),
+    });
+    if (!confirmed) return;
+
+    setTranslating(true);
+    setTranslationProgress(null);
+    try {
+      const translated = await translateCharacterCardPayload(
+        formData as unknown as Record<string, unknown>,
+        async (text) => {
+          const response = await api.post<{ translatedText: string }>("/translate", {
+            text,
+            provider: "ai",
+            targetLanguage: "Brazilian Portuguese (pt-BR)",
+            connectionId: translationConnectionId,
+            systemPrompt: CARD_TRANSLATION_SYSTEM_PROMPT,
+          });
+          return response.translatedText;
+        },
+        setTranslationProgress,
+      );
+      // Lembra a conexão usada, para o BotBrowser e o editor ficarem coerentes.
+      if (translationConnectionId !== savedTranslationConnectionId) {
+        setSavedTranslationConnectionId(translationConnectionId);
+      }
+      // Não salva sozinho: o usuário revisa e clica em Salvar.
+      setFormData(translated as unknown as CharacterData);
+      markDirty();
+      toast.success(localizeUi("ui.characters.charactereditor.translateCardDone"));
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : localizeUi("ui.characters.charactereditor.translateCardFailed"),
+      );
+    } finally {
+      setTranslationProgress(null);
+      setTranslating(false);
+    }
+  };
+
   const headerActions = (
     <>
+      <button
+        type="button"
+        onClick={() => void handleTranslateCard()}
+        disabled={translating || !formData}
+        className={cn(headerActionButtonClass, "disabled:cursor-not-allowed disabled:opacity-50")}
+        title={
+          translating
+            ? translationProgress
+              ? localizeUi("ui.botBrowser.detailview.translatingProgress", {
+                  completed: translationProgress.completed,
+                  total: translationProgress.total,
+                })
+              : localizeUi("ui.characters.charactereditor.translateCard")
+            : localizeUi("ui.characters.charactereditor.translateCard")
+        }
+      >
+        {translating ? <Loader2 size="1rem" className="animate-spin" /> : <Languages size="1rem" />}
+      </button>
+
       <button
         type="button"
         onClick={() => updateExtension("fav", !formData.extensions.fav)}

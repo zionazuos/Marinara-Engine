@@ -9,6 +9,9 @@ const TRANSLATABLE_FIELDS = [
   "post_history_instructions",
 ] as const;
 
+/** Connection providers that cannot translate text, so they never appear in the picker. */
+export const NON_TEXT_CONNECTION_PROVIDERS = new Set<string>(["image_generation", "video_generation"]);
+
 export const CARD_TRANSLATION_SYSTEM_PROMPT = `You are a professional literary localization specialist for interactive-fiction character cards.
 
 Translate all supplied content faithfully into natural Brazilian Portuguese (pt-BR).

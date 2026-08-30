@@ -38,6 +38,7 @@ import { useConnections } from "../../hooks/use-connections";
 import { lorebookKeys } from "../../hooks/use-lorebooks";
 import {
   CARD_TRANSLATION_SYSTEM_PROMPT,
+  NON_TEXT_CONNECTION_PROVIDERS,
   translateCharacterCardPayload,
   type CardTranslationProgress,
 } from "../../lib/character-card-translation";
@@ -79,7 +80,6 @@ const TAG_IMPORT_OPTIONS: Array<{ value: TagImportMode; label: string; descripti
 const SOURCE_MENU_MIN_WIDTH = 180;
 const SOURCE_MENU_MARGIN = 8;
 const JANNY_DOWNLOAD_API = "https://api.jannyai.com/api/v1/download";
-const NON_TEXT_CONNECTION_PROVIDERS = new Set<string>(["image_generation", "video_generation"]);
 
 async function fetchCompleteJannyCard(characterId: string, signal?: AbortSignal): Promise<Response> {
   const requestSignal = signal ? AbortSignal.any([signal, AbortSignal.timeout(45_000)]) : AbortSignal.timeout(45_000);
